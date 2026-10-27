@@ -1,0 +1,30 @@
+{
+  "schema_version": "0.2.0",
+  "project_id": "c0f9f2b8-d184-4a2d-b922-cd3ad1ce3a10",
+  "project_revision": 0,
+  "name": "Synthetic two-node demonstration — specification example only",
+  "created_at": "2026-10-26T12:00:00-04:00",
+  "model_entrypoint": "model/thermal-model.json",
+  "artifacts": [
+    {
+      "artifact_id": "47da7b5b-8056-4c49-adb4-4a0a09929cd5",
+      "path": "model/thermal-model.json",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "media_type": "application/json",
+      "role": "canonical_model",
+      "byte_length": 0,
+      "redistribution": "public"
+    }
+  ],
+  "compatibility_profiles": [
+    {"profile_id": "TD-NATIVE", "status": "not_assessed"},
+    {"profile_id": "ESA-NATIVE", "status": "not_assessed"}
+  ],
+  "validation_status": "experimental",
+  "extensions": {
+    "org.fcst.spec.example": {
+      "synthetic": true,
+      "note": "Hash and size are placeholders. No referenced thermal-model file is provided; this is a schema example, not an executable package."
+    }
+  }
+}

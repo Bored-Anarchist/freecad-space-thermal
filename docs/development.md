@@ -1,0 +1,48 @@
+# Development and automated verification
+
+WP-02 supplies a C++20 worker skeleton and standalone Python application/CLI/MCP package boundaries. The worker reports build information and rejects solve requests as unimplemented. No thermal physics or legacy-file compatibility is claimed.
+
+Create an isolated Python 3.11 environment under `.local/venv`, activate it, and run:
+
+```text
+python -m pip install --require-hashes --only-binary=:all: -r ci/requirements.lock
+python tools/verify.py --tier fast --preset windows-debug
+```
+
+Use `windows-release`, `linux-debug` or `linux-release` for the other configurations. Windows needs Visual Studio 2022 C++ build tools and an x64 Windows SDK; Linux needs GCC 13 and a supported C/C++ runtime. The driver uses locked CMake, builds, runs CTest, installs the worker, tests it with Python and FreeCAD absent from its executable search path, and verifies that unimplemented solves fail. It installs the Python package offline with no production dependencies. Debug Linux enables address/undefined-behavior sanitizers. Both release profiles disable unsafe floating-point transformations. Set one thread for the reference profile. Exact compiler/runner builds remain Q0 qualification inputs; recorded build information reports actual versions.
+
+If an older pip cannot use the operating system certificate store, `python tools/fetch_tooling.py` downloads wheels using verified TLS and verifies every wheel against the lock; install with `--no-index --find-links .local/wheelhouse` and the same `--require-hashes` options. No TLS-verification bypass is needed.
+
+The fast driver compares collected case IDs with `ci/coverage.json`. Missing, duplicated, skipped, cancelled, blocked or failed required cases fail the gate. Tests prove those rejection paths. Local raw logs remain under `.local/`; CI publishes only the privacy-cleared verification/build-info JSON files. Debug symbols, source maps, raw compiler output and native binaries are not uploaded by these foundation workflows.
+
+```text
+python tools/verify.py --tier full --preset windows-release
+python tools/check_github.py
+python tools/probe_dependencies.py
+```
+
+Full qualification deliberately reports blocked prerequisites until exact FreeCAD builds, vendor-runner isolation, reference hardware and numerical-backend qualification exist. Candidate library discovery does not install, select or qualify SUNDIALS, PETSc, HDF5, Embree or Open CASCADE; adoption needs exact source hashes, verified licenses and clean build/install plus numerical evidence. Host dependencies remain separate in `ci/host-requirements.lock`; do not install standalone tooling into embedded FreeCAD Python.
+
+The public GitHub repository is authoritative. Work-package issues and milestones track the version-controlled plan; `plans/github-backlog.json` maps their identities. Public CI runs only on GitHub-hosted Windows/Linux runners without vendor secrets. Privileged vendor/performance runners must be provisioned through a separate private validation repository once exact licensed profiles exist. Unreviewed pull requests must never execute there. Source-model contents and raw evidence stay in authorized runner-local stores. Workflow dependencies use immutable official Actions commits; jobs default to read permissions. Release publication is deferred until WP-19's complete evidence gate exists.
+
+## Publication privacy (TST-021)
+
+The user approved the public maintainer identity recorded in `ci/publication-policy.json`. No private author email is used. The staged Git index is the sanitized publication copy; restricted originals and raw engineering evidence remain outside it. Install version-controlled hooks with:
+
+```text
+git config core.hooksPath .githooks
+python tools/publication_preflight.py --staged --revision HEAD --report .local/clearance.json
+python tools/publication_preflight.py --staged --revision HEAD --verify-clearance .local/clearance.json
+```
+
+Omit `--revision HEAD` only before the first commit. Pre-commit checks staged bytes; pre-push checks every reachable commit/tree and both author/committer identities. Clearance binds policy version/hash, exact bytes, locations and metadata. Recheck after any change. Native Git hooks cover ordinary pushes; direct API writes must call the same preflight explicitly. `tools/setup_github.py` scans its exact outgoing JSON payloads before posting.
+
+For prose or generated assets, select the actual outgoing files:
+
+```text
+python tools/publication_preflight.py --file release-notes.md --file package.zip --report .local/asset-clearance.json
+```
+
+The scanner detects credential/contact/path/network patterns, hashed project-private identifiers, restricted paths, unapproved commit identities and nested archive findings. It bounds archive size/count/depth and rejects traversal, links and encrypted inputs. Unknown binaries, images, document containers and unsupported encodings fail closed until a suitable sanitization/inspection path exists; they are not cleared by their filename. Safe reports contain categories, opaque location IDs, byte counts and hashes, never sensitive matched values. Keep reports local until they themselves pass preflight. Narrow exceptions must bind exact content hashes and categories and retain required public license attribution.
+
+Pattern scanning cannot infer all confidential engineering meaning. Use synthetic public fixtures and exclude restricted originals. Add hashes of private identifiers to the policy without publishing their raw values, and review the outgoing content classification. Do not weaken detection to force publication. If previously published content is exposed, address credentials and coordinate affected history/artifact cleanup explicitly.

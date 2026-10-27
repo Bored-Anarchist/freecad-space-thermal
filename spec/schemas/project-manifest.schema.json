@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fcst:spec:project-manifest:0.2",
+  "title": "FCST project manifest — draft 0.2",
+  "description": "Package identity and artifact contract only. Physical model validity, archive path safety, hash verification and dependency closure require application validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "project_id", "project_revision", "name", "created_at", "model_entrypoint", "artifacts", "compatibility_profiles", "validation_status"],
+  "properties": {
+    "schema_version": {"const": "0.2.0"},
+    "project_id": {"$ref": "#/$defs/uuid"},
+    "project_revision": {"type": "integer", "minimum": 0},
+    "name": {"type": "string", "minLength": 1, "maxLength": 256},
+    "created_at": {"type": "string", "format": "date-time"},
+    "model_entrypoint": {"$ref": "#/$defs/relativePath"},
+    "freecad_document": {"$ref": "#/$defs/relativePath"},
+    "artifacts": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["artifact_id", "path", "sha256", "media_type", "role", "byte_length"],
+        "properties": {
+          "artifact_id": {"$ref": "#/$defs/uuid"},
+          "path": {"$ref": "#/$defs/relativePath"},
+          "sha256": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+          "media_type": {"type": "string", "minLength": 1},
+          "role": {"enum": ["canonical_model", "geometry", "source_original", "source_dependency", "result", "evidence", "audit", "freecad_document"]},
+          "byte_length": {"type": "integer", "minimum": 0},
+          "source_tool": {"type": "string", "minLength": 1},
+          "source_version": {"type": "string", "minLength": 1},
+          "redistribution": {"enum": ["public", "restricted", "unknown"]}
+        }
+      }
+    },
+    "compatibility_profiles": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["profile_id", "status"],
+        "properties": {
+          "profile_id": {"type": "string", "minLength": 1},
+          "status": {"enum": ["not_assessed", "staging", "native_reconstructed", "bridged_executable", "retained_opaque", "approximated", "unsupported", "qualified"]},
+          "evidence_artifact_ids": {"type": "array", "items": {"$ref": "#/$defs/uuid"}, "uniqueItems": true},
+          "backend_id": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "validation_status": {"enum": ["not_assessed", "experimental", "passed", "failed", "stale"]},
+    "compatibility_report_artifact_id": {"$ref": "#/$defs/uuid"},
+    "extensions": {"type": "object", "description": "Namespaced, non-executable extensions. Unknown extensions cannot alter core semantics or qualify a profile."}
+  },
+  "$defs": {
+    "uuid": {"type": "string", "format": "uuid"},
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]*$",
+      "description": "POSIX-style package-relative path. Runtime must additionally reject dot/dot-dot components, symlink escapes, duplicate normalized paths and platform-reserved names."
+    }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "work_package": "WP-02",
+  "status": "in_progress",
+  "scope": "Build/test/privacy foundation implemented; no thermal or legacy compatibility qualification",
+  "checks": [
+    {
+      "id": "windows-release-local",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "evidence": "Local verification.json; public CI evidence linked after push"
+    },
+    {
+      "id": "privacy-adversarial-self-checks",
+      "status": "passed",
+      "command": "python -m unittest discover -s tests",
+      "evidence": "Exact expected IDs in ci/coverage.json"
+    },
+    {
+      "id": "github-backlog",
+      "status": "passed",
+      "evidence": "plans/github-backlog.json"
+    },
+    {
+      "id": "windows-debug-local",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "evidence": "25 required cases passed, including isolated installed worker and adversarial privacy/gate tests"
+    },
+    {
+      "id": "candidate-dependency-discovery",
+      "status": "passed",
+      "command": "python tools/probe_dependencies.py",
+      "evidence": "Five candidates probed; all unavailable in local environment; none adopted or qualified"
+    }
+  ],
+  "blockers": [
+    "GitHub Projects token scope unavailable; project board pending",
+    "Exact FreeCAD build/ABI and host smoke profile not selected",
+    "Authorized vendor runtime/fixture profiles and scoped private runners not configured",
+    "Q0 reference hardware and dependency candidate build/install qualification not frozen"
+  ],
+  "acceptance_policy": "Fast foundation results cannot satisfy full Q0/product/vendor qualification. Missing prerequisites remain blocked; native core development continues."
+}

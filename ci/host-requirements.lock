@@ -1,0 +1,3 @@
+# Host-only environment: no third-party Python packages selected yet.
+# The WP-02 standalone environment must never replace FreeCAD's embedded Python.
+# A pinned FreeCAD build and ABI are prerequisites for selecting host dependencies.

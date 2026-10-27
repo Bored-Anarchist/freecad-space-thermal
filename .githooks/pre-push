@@ -1,0 +1,10 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT OR Apache-2.0
+set -eu
+root=$(git rev-parse --show-toplevel)
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$local_sha" in
+    0000000000000000000000000000000000000000) continue ;;
+  esac
+  python "$root/tools/publication_preflight.py" --root "$root" --revision "$local_sha"
+done

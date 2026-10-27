@@ -1,0 +1,25 @@
+name: Work package
+description: Implement a planned package with automated evidence
+title: "WP-XX: "
+body:
+  - type: textarea
+    id: scope
+    attributes:
+      label: Behavior and deliverables
+    validations:
+      required: true
+  - type: input
+    id: requirements
+    attributes:
+      label: Requirement IDs and gate
+    validations:
+      required: true
+  - type: textarea
+    id: verification
+    attributes:
+      label: Automated acceptance and prerequisite packages
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: Use only sanitized public examples. Do not attach restricted models or raw logs.

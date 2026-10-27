@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "approved_identities": [
+    {
+      "name": "Bored-Anarchist",
+      "email": "109712444+Bored-Anarchist@users.noreply.github.com"
+    }
+  ],
+  "private_term_hashes": [
+    "4886464c8c1b014a8232a8835307b2b531f1400de16964b200b8fa4b1fbde9fa",
+    "e548841b52b0a733142756cf20a1ffd750a9172d591e34f20243b9e3c7d6380d"
+  ],
+  "text_extensions": [
+    ".md",
+    ".csv",
+    ".json",
+    ".py",
+    ".cpp",
+    ".hpp",
+    ".in",
+    ".txt",
+    ".toml",
+    ".yml",
+    ".yaml",
+    ".cmake",
+    ".lock",
+    ".sh"
+  ],
+  "text_names": [
+    ".gitignore",
+    ".gitattributes",
+    "CODEOWNERS",
+    "pre-push",
+    "pre-commit",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "denied_segments": [
+    "restricted",
+    "private",
+    "customer-data",
+    "raw-evidence",
+    ".env",
+    ".aws",
+    ".ssh"
+  ],
+  "max_item_bytes": 16777216,
+  "max_total_bytes": 67108864,
+  "max_archive_depth": 3,
+  "max_items": 10000,
+  "exceptions": [],
+  "policy": "Fail closed on uninspected binaries/media, symlinks, archive traversal, encrypted or oversized archives. Publish only separately sanitized text copies; preserve authorized originals locally. Exact identity approval required before publication."
+}

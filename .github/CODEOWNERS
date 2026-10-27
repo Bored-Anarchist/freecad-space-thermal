@@ -1,0 +1,5 @@
+# Approved public maintainer; workflow/security review ownership.
+* @Bored-Anarchist
+/.github/ @Bored-Anarchist
+/ci/ @Bored-Anarchist
+/python/fcst_tools/ @Bored-Anarchist

@@ -1,0 +1,14 @@
+{
+  "api_version": "1.0",
+  "project_id": "c0f9f2b8-d184-4a2d-b922-cd3ad1ce3a10",
+  "expected_revision": 42,
+  "idempotency_key": "cf47fd7a-2615-4488-8b7b-efec1ca44e1d",
+  "operation": "thermal.conductor.create",
+  "arguments": {
+    "from_node_id": "33d63704-7357-408c-b5af-a5f591f7a30d",
+    "to_node_id": "21916ddf-8e59-4cd4-94b5-083f0a8dc978",
+    "conductance": {"value": 0.75, "unit": "W/K"},
+    "label": "Synthetic conductor"
+  },
+  "dry_run": true
+}

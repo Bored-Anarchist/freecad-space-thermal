@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fcst:spec:thermal.conductor.create.arguments:0.1",
+  "title": "Draft arguments for thermal.conductor.create",
+  "description": "Representative operation-specific schema. Runtime must additionally verify distinct existing nodes, compatible project/revision, supported physics and authorization.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["from_node_id", "to_node_id", "conductance"],
+  "properties": {
+    "from_node_id": {"type": "string", "format": "uuid"},
+    "to_node_id": {"type": "string", "format": "uuid"},
+    "label": {"type": "string", "minLength": 1, "maxLength": 256},
+    "conductance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit"],
+      "properties": {
+        "value": {"type": "number", "minimum": 0},
+        "unit": {"const": "W/K"}
+      }
+    }
+  }
+}

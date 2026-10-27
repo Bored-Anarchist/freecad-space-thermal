@@ -1,0 +1,28 @@
+{
+  "schema_version": 1,
+  "unit_cases": [
+    "test_gate.GateTests.test_correct_coverage_passes",
+    "test_gate.GateTests.test_duplicate_and_substituted_coverage_rejected",
+    "test_gate.GateTests.test_missing_and_zero_cases_rejected",
+    "test_gate.GateTests.test_skeleton_never_claims_solver_implementation",
+    "test_gate.GateTests.test_skipped_blocked_and_failed_rejected",
+    "test_privacy.PrivacyTests.test_archive_traversal",
+    "test_privacy.PrivacyTests.test_clearance_binds_content_and_policy",
+    "test_privacy.PrivacyTests.test_empty_input_rejected",
+    "test_privacy.PrivacyTests.test_git_deleted_history_and_author_are_inspected",
+    "test_privacy.PrivacyTests.test_nested_archive",
+    "test_privacy.PrivacyTests.test_planted_categories_and_reports_never_echo_values",
+    "test_privacy.PrivacyTests.test_private_identifier_hash",
+    "test_privacy.PrivacyTests.test_safe_synthetic_document",
+    "test_privacy.PrivacyTests.test_sensitive_filename_redacted",
+    "test_privacy.PrivacyTests.test_size_and_depth_limits",
+    "test_privacy.PrivacyTests.test_staged_bytes_are_not_worktree_bytes",
+    "test_privacy.PrivacyTests.test_unknown_binary_and_fake_text_fail_closed"
+  ],
+  "full_prerequisites": [
+    "freecad-exact-build-smoke",
+    "vendor-runner-isolation",
+    "performance-reference-profile",
+    "Q0-numerical-backend-qualification"
+  ]
+}

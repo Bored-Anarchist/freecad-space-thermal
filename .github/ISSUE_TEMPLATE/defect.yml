@@ -1,0 +1,18 @@
+name: Defect
+description: Reproducible behavior affecting a requirement or profile
+body:
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Synthetic reproducer and expected versus observed behavior
+    validations:
+      required: true
+  - type: input
+    id: affected
+    attributes:
+      label: Requirement IDs, profile and candidate commit
+    validations:
+      required: true
+  - type: markdown
+    attributes:
+      value: Exclude personal details, private paths, credentials and restricted engineering data.

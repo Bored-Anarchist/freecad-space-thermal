@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fcst:spec:operation-envelope:0.1",
+  "title": "FCST mutating application operation envelope — draft 0.1",
+  "description": "Application-level contract, not an MCP protocol message. Each operation additionally requires a published argument schema, authorization and semantic validation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["api_version", "project_id", "expected_revision", "idempotency_key", "operation", "arguments"],
+  "properties": {
+    "api_version": {"const": "1.0"},
+    "project_id": {"type": "string", "format": "uuid"},
+    "expected_revision": {"type": "integer", "minimum": 0},
+    "idempotency_key": {"type": "string", "format": "uuid"},
+    "operation": {"type": "string", "pattern": "^[a-z][a-z0-9_]*(\\.[a-z][a-z0-9_]*)+$"},
+    "arguments": {"type": "object"},
+    "dry_run": {"type": "boolean", "default": false},
+    "authorization_context_id": {"type": "string", "minLength": 1, "description": "Reference to a server-issued policy context; the caller cannot grant itself permissions through this value."}
+  }
+}

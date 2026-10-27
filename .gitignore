@@ -1,0 +1,17 @@
+.local/
+.venv/
+out/
+build/
+dist/
+*.egg-info/
+__pycache__/
+*.py[cod]
+CMakeUserPresets.json
+.env
+.env.*
+restricted/
+*.fcst
+*.h5
+*.hdf5
+*.dmp
+*.pdb

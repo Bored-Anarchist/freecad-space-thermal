@@ -1,0 +1,5 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT OR Apache-2.0
+set -eu
+root=$(git rev-parse --show-toplevel)
+python "$root/tools/publication_preflight.py" --root "$root" --staged

@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "reference": {"python": "3.11.9", "cmake": "3.31.6", "threads": 1, "fast_math": false, "floating_point_contraction": false},
+  "platforms": [
+    {"runner": "windows-2022", "presets": ["windows-debug", "windows-release"], "compiler": "MSVC v143", "abi": "x64 MSVC dynamic CRT", "status": "candidate"},
+    {"runner": "ubuntu-24.04", "presets": ["linux-debug", "linux-release"], "compiler": "GCC 13", "abi": "x86_64 libstdc++", "status": "candidate"}
+  ],
+  "freecad": {"status": "blocked", "reason": "Exact supported FreeCAD build and embedded Python ABI not selected"},
+  "vendor_runners": {"status": "blocked", "reason": "No authorized exact-version vendor runtimes or fixture stores configured"},
+  "performance_runner": {"status": "blocked", "reason": "Reference hardware not frozen at Q0"},
+  "policy": "Record actual compiler/CMake/Python versions with each run. Candidate runner labels are not immutable toolchain qualification. Freeze exact compiler and runner image builds at the Q0 numerical decision."
+}
