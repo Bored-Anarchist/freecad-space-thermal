@@ -2,6 +2,7 @@
   "schema_version": 1,
   "production": [],
   "build": [
+    {"name": "PyYAML", "version": "6.0.2", "source": "https://pypi.org/project/PyYAML/6.0.2/", "license": "MIT", "hashes": "ci/requirements.lock"},
     {"name": "CMake", "version": "3.31.6", "source": "https://pypi.org/project/cmake/3.31.6/", "license": "BSD-3-Clause", "hashes": "ci/requirements.lock"},
     {"name": "Ninja", "version": "1.11.1.4", "source": "https://pypi.org/project/ninja/1.11.1.4/", "license": "Apache-2.0", "hashes": "ci/requirements.lock"},
     {"name": "setuptools", "version": "78.1.0", "source": "https://pypi.org/project/setuptools/78.1.0/", "license": "MIT", "hashes": "ci/requirements.lock"},

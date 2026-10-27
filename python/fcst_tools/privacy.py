@@ -165,6 +165,7 @@ def inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: bool
             if mode not in {"100644", "100755"} or stage != "0":
                 scanner.finding("link_submodule_or_unmerged", name)
                 continue
+            scanner.scan("index-mode/" + name + ".txt", mode.encode())
             scanner.scan("index/" + name, git(root, "cat-file", "blob", blob))
     if revision:
         object_id = git(root, "rev-parse", "--verify", revision).decode().strip()

@@ -7,7 +7,7 @@ from urllib.request import urlopen
 PINS = {"attrs": "24.3.0", "cmake": "3.31.6", "jsonschema": "4.23.0",
         "jsonschema-specifications": "2024.10.1", "ninja": "1.11.1.4",
         "referencing": "0.36.2", "rpds-py": "0.23.1", "setuptools": "78.1.0",
-        "typing-extensions": "4.13.2"}
+        "typing-extensions": "4.13.2", "PyYAML": "6.0.2"}
 
 
 def main():

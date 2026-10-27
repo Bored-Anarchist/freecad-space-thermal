@@ -1,6 +1,8 @@
 {
   "schema_version": 1,
   "unit_cases": [
+    "test_privacy.PrivacyTests.test_annotated_tag_identity_is_inspected",
+    "test_privacy.PrivacyTests.test_staged_mode_changes_invalidate_clearance",
     "test_gate.GateTests.test_correct_coverage_passes",
     "test_gate.GateTests.test_duplicate_and_substituted_coverage_rejected",
     "test_gate.GateTests.test_missing_and_zero_cases_rejected",
