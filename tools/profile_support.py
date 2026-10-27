@@ -11,6 +11,13 @@ from urllib.request import urlopen
 ROOT = Path(__file__).resolve().parents[1]
 
 
+class ProbeFailure(ValueError):
+    def __init__(self, stage, reason="process_failure"):
+        super().__init__("Probe failed; raw output retained locally")
+        self.stage = stage
+        self.reason = reason
+
+
 def verified_download(url, destination, size, digest):
     if (urlsplit(url).scheme != "https" or urlsplit(url).hostname not in
             {"github.com", "codeload.github.com"} or len(digest) != 64 or not 0 < size < 1024 ** 3):
@@ -58,4 +65,12 @@ def run(command, directory, log, env=None, timeout=1800):
         process = subprocess.run(command, cwd=directory, stdout=output, stderr=subprocess.STDOUT,
                                  stdin=subprocess.DEVNULL, env=env, timeout=timeout)
     if process.returncode:
-        raise ValueError("Probe process failed; raw output retained locally")
+        text = Path(log).read_text(encoding="utf-8", errors="replace").lower()
+        reason = "process_failure"
+        if "blas" in text and any(token in text for token in ("could not find", "unable to find", "cannot find")):
+            reason = "blas_lapack_unavailable"
+        elif "no targets specified and no makefile found" in text:
+            reason = "installed_makefile_unavailable"
+        elif "target was not found" in text:
+            reason = "exported_target_unavailable"
+        raise ProbeFailure(Path(log).stem, reason)

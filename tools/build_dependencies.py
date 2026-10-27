@@ -9,11 +9,12 @@ import hashlib
 import json
 import os
 import platform
+import re
 import subprocess
 import tarfile
 import time
 from pathlib import Path
-from profile_support import ROOT, cmake_tools, run, verified_download, revision
+from profile_support import ROOT, cmake_tools, run, verified_download, revision, ProbeFailure
 import sys
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.profiles import assess_dependencies
@@ -138,12 +139,35 @@ def petsc_probe(source, work, jobs):
     # Linux system BLAS/LAPACK are probe inputs, never an adopted production lock.
     run([__import__("sys").executable, str(source / "configure"), "--prefix=" + str(install),
          "PETSC_ARCH=arch-fcst-probe", "--with-debugging=0", "--with-mpi=0", "--with-fc=0",
-         "--with-cxx=0", "--with-x=0", "--with-shared-libraries=1", "--with-ssl=0"], source, work / "configure.log")
+         "--with-cxx=0", "--with-x=0", "--with-shared-libraries=1", "--with-ssl=0",
+         "--with-blaslapack-lib=[/usr/lib/x86_64-linux-gnu/liblapack.so.3,/usr/lib/x86_64-linux-gnu/libblas.so.3]"], source, work / "configure.log")
     run(["make", "PETSC_DIR=" + str(source), "PETSC_ARCH=arch-fcst-probe", "-j" + str(jobs), "all"], source, work / "build.log")
     run(["make", "PETSC_DIR=" + str(source), "PETSC_ARCH=arch-fcst-probe", "install"], source, work / "install.log")
     env = dict(os.environ, PETSC_DIR=str(install), PETSC_ARCH="", OMP_NUM_THREADS="1")
-    run(["make", "PETSC_DIR=" + str(install), "PETSC_ARCH=", "check"], install, work / "consumer-run.log", env=env)
+    run(["make", "PETSC_DIR=" + str(install), "PETSC_ARCH=", "check"], source, work / "consumer-run.log", env=env)
     return install
+
+
+def toolchain(work):
+    values = {"system": platform.system(), "architecture": platform.machine(), "threads": 1}
+    for name in ("ImageOS", "ImageVersion"):
+        value = os.environ.get(name, "")
+        if value and re.fullmatch(r"[A-Za-z0-9_.-]{1,80}", value):
+            values[name] = value
+    for path in sorted((work / "build/CMakeFiles").glob("*/CMake*Compiler.cmake")):
+        text = path.read_text(encoding="utf-8", errors="replace")
+        for language, key, value in re.findall(r'set\(CMAKE_(C|CXX)_COMPILER_(ID|VERSION) "([A-Za-z0-9_.+-]+)"\)', text):
+            values[language.lower() + "_" + key.lower()] = value
+    if (work / "install/lib/libpetsc.so").exists():
+        process = subprocess.run(["cc", "-dumpfullversion"], capture_output=True, text=True, timeout=10)
+        if re.fullmatch(r"[0-9.]+", process.stdout.strip()):
+            values["c_version"] = process.stdout.strip()
+        values["system_blas_lapack"] = []
+        for name in ("liblapack.so.3", "libblas.so.3"):
+            path = Path("/usr/lib/x86_64-linux-gnu") / name
+            if path.is_file():
+                values["system_blas_lapack"].append({"soname": name, "sha256": hashlib.sha256(path.read_bytes()).hexdigest()})
+    return values
 
 
 def main():
@@ -175,13 +199,19 @@ def main():
                 source = source_tree(item, work)
                 install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs)
                 record.update(status="passed", stages=["source_hash", "license_hash", "configure", "build", "install", "installed_consumer"],
-                              installed_bytes=sum(p.stat().st_size for p in install.rglob("*") if p.is_file()))
+                              installed_bytes=sum(p.stat().st_size for p in install.rglob("*") if p.is_file()),
+                              toolchain=toolchain(work), build_options=OPTIONS.get(item["id"], ["serial", "shared", "system_blas_lapack"]))
+            except ProbeFailure as failure:
+                record.update(status="failed", failing_stage=failure.stage, reason=failure.reason)
             except (ValueError, OSError, tarfile.TarError, subprocess.SubprocessError):
                 record.update(status="failed", reason="probe_failed_raw_logs_local")
         record["seconds"] = round(time.monotonic() - start, 3)
         records.append(record)
         (work / "result.json").write_text(json.dumps(record, indent=2) + "\n", encoding="utf-8")
         print(item["id"] + ": " + record["status"], flush=True)
+        if record["status"] == "failed":
+            print(json.dumps({"id": item["id"], "stage": record.get("failing_stage", "source_preparation"),
+                              "reason": record["reason"]}), flush=True)
     report = {"scope": "Candidate packaging only; no numerical qualification or production adoption", "platform": platform.system(),
               "candidate": revision(), "source_lock_sha256": hashlib.sha256(lock.read_bytes()).hexdigest(), "candidates": records}
     name = "dependency-builds" + ("-" + args.candidate if args.candidate else "") + ".json"

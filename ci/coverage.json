@@ -40,7 +40,8 @@
     "test_profiles.ProfileTests.test_pins_require_immutable_sources_and_license_hashes",
     "test_profiles.ProfileTests.test_host_rejects_missing_cases_wrong_abi_and_substituted_binary",
     "test_profiles.ProfileTests.test_dependency_missing_install_substituted_source_and_skips_rejected",
-    "test_profiles.ProfileTests.test_corrupt_cached_sources_never_execute_or_download"
+    "test_profiles.ProfileTests.test_corrupt_cached_sources_never_execute_or_download",
+    "test_profiles.ProfileTests.test_link_validation_excludes_ignored_originals_but_checks_project_docs"
   ],
   "full_prerequisites": [
     "freecad-exact-build-smoke",

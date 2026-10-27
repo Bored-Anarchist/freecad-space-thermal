@@ -31,9 +31,11 @@ jobs:
       - name: Execute identical local driver
         run: python tools/verify.py --preset ${{ matrix.preset }}
       - name: Clear exact public reports
+        id: clear
         if: always()
         run: python tools/publication_preflight.py --file .local/${{ matrix.preset }}/verification.json --file .local/${{ matrix.preset }}/build-info.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        if: always() && steps.clear.outcome == 'success'
         with:
           name: foundation-${{ matrix.preset }}
           path: |
@@ -62,9 +64,12 @@ jobs:
       - name: Exact host document and geometry smoke
         run: python tools/host_smoke.py
       - name: Clear exact host report
+        id: clear
+        if: always()
         shell: bash
         run: python tools/publication_preflight.py --file .local/host/*/host-smoke.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.clear.outcome == 'success'
         with:
           name: host-${{ matrix.os }}
           path: .local/host/*/host-smoke.json
@@ -92,9 +97,12 @@ jobs:
       - name: Build install and run installed consumer
         run: python tools/build_dependencies.py --candidate ${{ matrix.candidate }} --jobs 2
       - name: Clear exact package report
+        id: clear
+        if: always()
         shell: bash
         run: python tools/publication_preflight.py --file .local/dependency-builds/*/dependency-builds-${{ matrix.candidate }}.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always() && steps.clear.outcome == 'success'
         with:
           name: package-${{ matrix.os }}-${{ matrix.candidate }}
           path: .local/dependency-builds/*/dependency-builds-${{ matrix.candidate }}.json

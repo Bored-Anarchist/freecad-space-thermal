@@ -12,6 +12,7 @@ from fcst_tools.profiles import HOST_CASES, BUILD_STAGES, assess_dependencies, a
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
 from profile_support import verified_download
+from project_files import markdown_files
 
 
 class ProfileTests(unittest.TestCase):
@@ -66,3 +67,18 @@ class ProfileTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     verified_download(url, path, 4, hashlib.sha256(b"safe").hexdigest())
             network.assert_not_called()
+
+    def test_link_validation_excludes_ignored_originals_but_checks_project_docs(self):
+        import subprocess
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            subprocess.run(["git", "init", "-q", str(root)], check=True, capture_output=True)
+            (root / ".gitignore").write_text(".local/\n", encoding="utf-8")
+            (root / ".local").mkdir()
+            (root / ".local/original.md").write_bytes(b"\xff[private](unresolved)")
+            (root / "tracked.md").write_text("[target](unresolved)", encoding="utf-8")
+            subprocess.run(["git", "add", "tracked.md", ".gitignore"], cwd=root, check=True, capture_output=True)
+            (root / "new.md").write_text("[target](unresolved)", encoding="utf-8")
+            self.assertEqual({p.name for p in markdown_files(root)}, {"tracked.md", "new.md"})
+            (root / "tracked.md").unlink()
+            self.assertEqual({p.name for p in markdown_files(root)}, {"new.md"})
