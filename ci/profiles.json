@@ -16,7 +16,7 @@
       ],
       "compiler": "MSVC v143",
       "abi": "x64 MSVC dynamic CRT",
-      "status": "candidate"
+      "status": "foundation_verified"
     },
     {
       "runner": "ubuntu-24.04",
@@ -26,11 +26,11 @@
       ],
       "compiler": "GCC 13",
       "abi": "x86_64 libstdc++",
-      "status": "candidate"
+      "status": "foundation_verified"
     }
   ],
   "freecad": {
-    "status": "pinned_smoke_implemented",
+    "status": "foundation_smoke_verified",
     "profile": "ci/host-profile.json",
     "version": "1.1.4",
     "python_abi": "cp311",
@@ -44,5 +44,6 @@
     "status": "blocked",
     "reason": "Reference hardware not frozen at Q0"
   },
-  "policy": "Record actual compiler/CMake/Python versions with each run. Candidate runner labels are not immutable toolchain qualification. Freeze exact compiler and runner image builds at the Q0 numerical decision."
+  "policy": "Record actual compiler/CMake/Python versions with each run. Candidate runner labels are not immutable toolchain qualification. Freeze exact compiler and runner image builds at the Q0 numerical decision.",
+  "foundation_evidence": "plans/evidence/foundation-profiles.json"
 }

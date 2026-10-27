@@ -1,103 +1,85 @@
 {
   "work_package": "WP-02",
-  "status": "in_progress",
-  "scope": "Build/test/privacy foundation implemented; no thermal or legacy compatibility qualification",
+  "status": "complete",
+  "scope": "Source/build/test and publication-privacy foundation under the original WP-02 completion criteria",
   "checks": [
     {
-      "id": "windows-release-local",
+      "id": "windows-linux-clean-build-install",
       "status": "passed",
-      "command": "python tools/verify.py --preset windows-release",
-      "evidence": "Local verification.json; public CI evidence linked after push"
-    },
-    {
-      "id": "privacy-adversarial-self-checks",
-      "status": "passed",
-      "command": "python -m unittest discover -s tests",
-      "evidence": "Exact expected IDs in ci/coverage.json"
-    },
-    {
-      "id": "github-backlog",
-      "status": "passed",
-      "evidence": "plans/github-backlog.json"
-    },
-    {
-      "id": "windows-debug-local",
-      "status": "passed",
-      "command": "python tools/verify.py --preset windows-debug",
-      "evidence": "25 required cases passed, including isolated installed worker and adversarial privacy/gate tests"
-    },
-    {
-      "id": "candidate-dependency-discovery",
-      "status": "passed",
-      "command": "python tools/probe_dependencies.py",
-      "evidence": "Five candidates probed; all unavailable in local environment; none adopted or qualified"
-    },
-    {
-      "id": "github-windows-linux-matrix",
-      "status": "passed",
-      "candidate": "7833a606c2bb487904efdc361929b08619029357",
-      "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40545378601",
-      "cases_per_configuration": 28,
+      "candidate": "8085d55eff7b6f409bda1add6f7a30176b2d7772",
+      "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40576270922",
       "configurations": [
         "windows-debug",
         "windows-release",
         "linux-debug",
         "linux-release"
-      ]
+      ],
+      "cases_per_configuration": 55
     },
     {
-      "id": "github-publication-privacy",
+      "id": "engine-only-installed-worker",
       "status": "passed",
-      "candidate": "7833a606c2bb487904efdc361929b08619029357",
-      "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40545378387"
+      "evidence": "All four installed workers launch with host/Python absent from PATH, identify fcst_native, report no solver and reject unimplemented solves"
     },
     {
-      "id": "full-tier-negative-gate",
+      "id": "pinned-freecad-build-abi-smokes",
       "status": "passed",
-      "command": "python tools/verify.py --tier full --preset windows-release",
-      "evidence": "All 28 foundation checks passed; four missing qualification prerequisites reported blocked and command returned failure as required"
+      "command": "python tools/host_smoke.py",
+      "evidence": "Official FreeCAD 1.1.4 asset hashes verified on Windows/Linux; embedded Python 3.11.14 cp311 and OCCT 7.8.1; create geometry save/reopen edit/undo and application imports pass"
     },
     {
-      "id": "repository-protections",
+      "id": "candidate-source-build-install-consumers",
       "status": "passed",
-      "evidence": "Default and release branches require Foundation gate, Planning gate and Publication privacy; read-only Actions defaults and official-action allowlist configured"
+      "command": "python tools/build_dependencies.py --jobs 2 --prepare-system",
+      "evidence": "plans/evidence/foundation-profiles.json; nine supported Windows/Linux packaging probes pass; native MSVC PETSc explicitly unsupported; source and license hashes compiler versions installed sizes and elapsed times retained; no production adoption"
     },
     {
-      "id": "private-validation-boundary",
+      "id": "negative-fixture-and-evidence-gates",
       "status": "passed",
-      "evidence": "Separate private repository, no privileged runners registered; manual-only workflow denies unconfigured execution"
+      "command": "python tools/check_security.py",
+      "evidence": "44 registered cases reject tampered originals missing/skipped/duplicate coverage substituted sources wrong host ABI missing installed consumers unsafe publication and private-boundary bypasses"
     },
     {
-      "id": "final-foundation-matrix",
-      "status": "passed",
-      "candidate": "ce709930a0bf35d23e1d269d14118f273c15a266",
-      "cases_per_configuration": 29,
-      "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40546143540"
-    },
-    {
-      "id": "github-project-population",
-      "status": "passed",
-      "command": "python tools/setup_projects.py",
-      "evidence": "https://github.com/users/Bored-Anarchist/projects/1",
-      "work_packages": 21,
-      "metadata": "Delivery states; completion gates; prerequisite packages; requirement IDs; owner roles"
-    },
-    {
-      "id": "live-repository-and-project-settings",
+      "id": "github-source-tracking-protections",
       "status": "passed",
       "command": "python tools/check_github.py",
-      "evidence": "Live project identity visibility repository linkage issue coverage and states verified; all repository settings passed with no findings"
+      "evidence": "Canonical source repository; all 21 linked project issues and delivery metadata; required default/release branch checks and read-only Actions defaults verified live"
     },
     {
-      "id": "project-evidence-negative-cases",
+      "id": "private-validation-disabled-boundary",
       "status": "passed",
-      "evidence": "Tests reject missing remote evidence missing issues falsely completed states wrong repository linkage and incomplete delivery states"
+      "command": "python tools/check_github.py",
+      "evidence": "Live policy is disabled with reviewed candidates and runner-local fixtures required; workflow_dispatch only exact deny guard read-only permissions and zero privileged runners verified; planted bypasses rejected"
+    },
+    {
+      "id": "full-tier-remains-fail-closed",
+      "status": "passed",
+      "command": "python tools/verify.py --tier full --preset windows-release",
+      "evidence": "Foundation and exact host checks pass; missing vendor-runner isolation reference hardware and numerical-backend qualification remain blocked and return failure"
+    },
+    {
+      "id": "publication-privacy-local-and-ci",
+      "status": "passed",
+      "evidence": "TST-021 planted-data checks and exact staged/outgoing-history prose metadata and artifact scans pass before publication; required Publication privacy check repeats in CI"
     }
   ],
-  "blockers": [
-    "Exact FreeCAD build/ABI and host smoke profile not selected",
-    "Authorized vendor runtime/fixture profiles and scoped private runners not configured",
-    "Q0 reference hardware and dependency candidate build/install qualification not frozen"
+  "blockers": [],
+  "open_qualification_obligations": [
+    {
+      "owner": "WP-01;WP-08;WP-09",
+      "gate": "Q0/Q1",
+      "obligation": "Acquire authorized exact-version vendor profiles and fixture access; provision isolated runners only after authorization and qualification"
+    },
+    {
+      "owner": "WP-04",
+      "gate": "Q0",
+      "obligation": "Freeze numerical backend reference hardware compiler/runtime performance and accuracy decision from the actual numerical prototype"
+    },
+    {
+      "owner": "WP-13",
+      "gate": "Q1",
+      "obligation": "Implement and qualify the FCST workbench with unattended GUI behavior on the pinned host"
+    }
   ],
-  "acceptance_policy": "Fast foundation results cannot satisfy full Q0/product/vendor qualification. Missing prerequisites remain blocked; native core development continues."
+  "acceptance_policy": "WP-02 foundation completion does not close Q0 qualify vendor compatibility select numerical libraries or claim implemented physics. WP-01 original closure criteria remain blocked."
 }

@@ -34,10 +34,10 @@
       "evidence": "Tests reject missing provenance/profiles/owners, unidentified versions without blockers, tampered originals, unsafe paths, unsupported qualification and syntax-as-physics claims; imported logic stays inert"
     },
     {
-      "id": "local-foundation-regression",
+      "id": "foundation-regression",
       "status": "passed",
-      "command": "python tools/verify.py --preset windows-release",
-      "evidence": "47 foundation checks passed; subsequent planning/specification/inventory checks pass after final documentation sanitization"
+      "command": "python tools/verify.py --preset windows-debug",
+      "evidence": "55 local foundation cases pass; four hosted Windows/Linux debug/release configurations each pass 55 cases in run 40576270922"
     },
     {
       "id": "source-version-header-observations",
