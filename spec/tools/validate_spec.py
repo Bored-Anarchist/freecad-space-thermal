@@ -13,8 +13,11 @@ import csv
 import io
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "tools"))
+from project_files import markdown_files
 
 
 def main() -> None:
@@ -61,7 +64,7 @@ def main() -> None:
     defined_sources = set(re.findall(r"^\| (S\d{2}) \|", sources, flags=re.MULTILINE))
     used_sources = set(re.findall(r"\bS\d{2}\b", content))
     assert used_sources <= defined_sources, f"Missing sources: {used_sources - defined_sources}"
-    for path in root.rglob("*.md"):
+    for path in markdown_files(root):
         text = path.read_text(encoding="utf-8")
         for _, target in re.findall(r"\[([^\]]*)\]\(([^)]+)\)", text):
             if "://" in target or target.startswith("#") or target.startswith("mailto:"):

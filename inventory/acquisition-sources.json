@@ -1,0 +1,262 @@
+{
+  "schema_version": 1,
+  "policy": "Public source examples are acquired as inert original bytes into ignored local storage. No third-party model, license file, output or metadata is republished by this catalog. Repository licenses are recorded; vendor-generated data coverage and privacy require separate review before any redistribution.",
+  "sources": [
+    {
+      "id": "TD-ARTEMIS-TUTORIAL",
+      "repository": "hsfl/artemis-hardware",
+      "revision": "bcc649cf7932dcc410f8a594213383fb84e68d47",
+      "documentation": "https://pressbooks-dev.oer.hawaii.edu/epet302/chapter/therma/",
+      "repository_license": "MIT",
+      "files": [
+        {
+          "path": "LICENSE",
+          "role": "license"
+        },
+        {
+          "path": "Thermal/artemis_thermal_lab.dwg",
+          "role": "native_model"
+        },
+        {
+          "path": "Thermal/rcoptics (1).rco",
+          "role": "optical_properties"
+        },
+        {
+          "path": "Thermal/tdthermo (1).tdp",
+          "role": "thermal_properties"
+        }
+      ]
+    },
+    {
+      "id": "ESA-DISC-TUTORIAL",
+      "repository": "pycanha-project/pycanha",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "documentation": "https://pycanha.readthedocs.io/en/stable/auto_examples/plot_build_model_from_tmd.html",
+      "repository_license": "MIT",
+      "files": [
+        {
+          "path": "LICENSE",
+          "role": "license"
+        },
+        {
+          "path": "tests/data/esatan/DISC/README.md",
+          "role": "provenance"
+        },
+        {
+          "path": "tests/data/esatan/DISC/DISC.erg",
+          "role": "geometry_model"
+        },
+        {
+          "path": "tests/data/esatan/DISC/DISCTR_STEADY.d",
+          "role": "steady_deck"
+        },
+        {
+          "path": "tests/data/esatan/DISC/DISCTR_TRANSIENT.d",
+          "role": "transient_deck"
+        },
+        {
+          "path": "tests/data/esatan/DISC/DISCTR_STEADY.TMD",
+          "role": "steady_results"
+        },
+        {
+          "path": "tests/data/esatan/DISC/DISCTR_TRANSIENT.TMD",
+          "role": "transient_results"
+        },
+        {
+          "path": "tests/data/esatan/README.md",
+          "role": "provenance"
+        },
+        {
+          "path": "tests/data/esatan/FEATURES.erg",
+          "role": "geometry_feature_model"
+        },
+        {
+          "path": "tests/data/esatan/FEATURES.stp",
+          "role": "step_tas_exchange"
+        },
+        {
+          "path": "tests/data/esatan/expected_faces.csv",
+          "role": "upstream_geometry_expectations"
+        }
+      ]
+    },
+    {
+      "id": "TD-SINDA-COMMUNITY",
+      "repository": "Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "documentation": "https://github.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop",
+      "repository_license": "not_declared",
+      "files": [
+        {
+          "path": "Working CubeSat Model/case1.inp",
+          "role": "network_entrypoint"
+        },
+        {
+          "path": "Working CubeSat Model/case1.cc",
+          "role": "network_include"
+        },
+        {
+          "path": "Working CubeSat Model/userlogic.for",
+          "role": "source_logic"
+        },
+        {
+          "path": "Working CubeSat Model/case1.out",
+          "role": "source_results"
+        },
+        {
+          "path": "Working CubeSat Model/C1A0.hra",
+          "role": "environment_include"
+        },
+        {
+          "path": "Working CubeSat Model/C1A0.hrl",
+          "role": "environment_include"
+        },
+        {
+          "path": "Working CubeSat Model/C1A1.k_in",
+          "role": "radiation_include"
+        },
+        {
+          "path": "Working CubeSat Model/C1A2.k_in",
+          "role": "radiation_include"
+        },
+        {
+          "path": "Working CubeSat Model/C1A1.k",
+          "role": "radiation_data"
+        },
+        {
+          "path": "Working CubeSat Model/C1A2.k",
+          "role": "radiation_data"
+        }
+      ]
+    },
+    {
+      "id": "ESA-ACUBESAT-NATIVE",
+      "repository": "AcubeSAT/esatan-models",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "documentation": "https://github.com/AcubeSAT/esatan-models/tree/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2",
+      "repository_license": "not_declared",
+      "files": [
+        {
+          "path": "cubesat/v2/README.md",
+          "role": "provenance"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Comissioning_Detumbling_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_Active.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_summer_2022.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v2.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v3.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v4.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Comissioning_Detumbling_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500_Active.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500v1_1.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_Glass_PEEK_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_005.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_RAD_10.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1_summer_2022.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_2.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_3.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_4.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_6LTAN_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_6LTAN_Nominal_Nadir_600.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_600.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Nadir.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.ere",
+          "role": "native_environment"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.erg",
+          "role": "native_geometry"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.erk",
+          "role": "native_kinematics"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.xml",
+          "role": "native_project_descriptor"
+        }
+      ]
+    }
+  ]
+}

@@ -2,17 +2,79 @@
   "schema_version": 1,
   "production": [],
   "build": [
-    {"name": "CMake", "version": "3.31.6", "source": "https://pypi.org/project/cmake/3.31.6/", "license": "BSD-3-Clause", "hashes": "ci/requirements.lock"},
-    {"name": "Ninja", "version": "1.11.1.4", "source": "https://pypi.org/project/ninja/1.11.1.4/", "license": "Apache-2.0", "hashes": "ci/requirements.lock"},
-    {"name": "setuptools", "version": "78.1.0", "source": "https://pypi.org/project/setuptools/78.1.0/", "license": "MIT", "hashes": "ci/requirements.lock"},
-    {"name": "jsonschema", "version": "4.23.0", "source": "https://pypi.org/project/jsonschema/4.23.0/", "license": "MIT", "hashes": "ci/requirements.lock"}
+    {
+      "name": "PyYAML",
+      "version": "6.0.2",
+      "source": "https://pypi.org/project/PyYAML/6.0.2/",
+      "license": "MIT",
+      "hashes": "ci/requirements.lock"
+    },
+    {
+      "name": "CMake",
+      "version": "3.31.6",
+      "source": "https://pypi.org/project/cmake/3.31.6/",
+      "license": "BSD-3-Clause",
+      "hashes": "ci/requirements.lock"
+    },
+    {
+      "name": "Ninja",
+      "version": "1.11.1.4",
+      "source": "https://pypi.org/project/ninja/1.11.1.4/",
+      "license": "Apache-2.0",
+      "hashes": "ci/requirements.lock"
+    },
+    {
+      "name": "setuptools",
+      "version": "78.1.0",
+      "source": "https://pypi.org/project/setuptools/78.1.0/",
+      "license": "MIT",
+      "hashes": "ci/requirements.lock"
+    },
+    {
+      "name": "jsonschema",
+      "version": "4.23.0",
+      "source": "https://pypi.org/project/jsonschema/4.23.0/",
+      "license": "MIT",
+      "hashes": "ci/requirements.lock"
+    }
   ],
   "candidates": [
-    {"name": "SUNDIALS", "cmake_package": "SUNDIALS", "license": "BSD-3-Clause", "status": "not_selected"},
-    {"name": "PETSc", "cmake_package": "PETSc", "license": "BSD-2-Clause", "status": "not_selected"},
-    {"name": "HDF5", "cmake_package": "HDF5", "license": "BSD-3-Clause", "status": "not_selected"},
-    {"name": "Embree", "cmake_package": "embree", "license": "Apache-2.0", "status": "not_selected"},
-    {"name": "Open CASCADE", "cmake_package": "OpenCASCADE", "license": "LGPL-2.1-only WITH OCCT-exception-1.0", "status": "not_selected"}
+    {
+      "name": "SUNDIALS",
+      "cmake_package": "SUNDIALS",
+      "license": "BSD-3-Clause",
+      "status": "not_selected"
+    },
+    {
+      "name": "PETSc",
+      "cmake_package": "PETSc",
+      "license": "BSD-2-Clause",
+      "status": "not_selected"
+    },
+    {
+      "name": "HDF5",
+      "cmake_package": "HDF5",
+      "license": "BSD-3-Clause",
+      "status": "not_selected"
+    },
+    {
+      "name": "Embree",
+      "cmake_package": "embree",
+      "license": "Apache-2.0",
+      "status": "not_selected"
+    },
+    {
+      "name": "Open CASCADE",
+      "cmake_package": "OpenCASCADE",
+      "license": "LGPL-2.1-only WITH OCCT-exception-1.0",
+      "status": "not_selected"
+    }
   ],
-  "policy": "Candidate licenses and exact source/build hashes must be verified before adoption; a discovery probe does not qualify a backend. Transitive tooling pins and artifact hashes are in requirements.lock."
+  "policy": "Candidate licenses and exact source/build hashes must be verified before adoption; a discovery probe does not qualify a backend. Transitive tooling pins and artifact hashes are in requirements.lock.",
+  "packaging_probes": {
+    "sources": "ci/probe-sources.json",
+    "driver": "tools/build_dependencies.py",
+    "scope": "Active Windows source builds, installs and consumers for SUNDIALS HDF5 Embree OCCT; no production adoption or numerical qualification",
+    "petsc_windows": "Native MSVC unsupported; any Linux assessment is an optional stretch goal outside the work packages"
+  }
 }

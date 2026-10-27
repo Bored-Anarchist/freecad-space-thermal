@@ -1,0 +1,546 @@
+{
+  "schema_version": 1,
+  "scope": "Durable foundation deployment evidence; no thermal, GUI or compatibility qualification",
+  "run": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40576270922",
+  "source_head": "8085d55eff7b6f409bda1add6f7a30176b2d7772",
+  "tested_merge_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+  "foundation": [
+    {
+      "preset": "linux-debug",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "cases": 55,
+      "coverage_manifest_sha256": "c6ddd24a76fbfc6fe76e2bd80a48f358a55436e01a5a14c355be1615a4dfa918",
+      "report_sha256": "e54f74069085d47967bef09737bcb2650238253de36aa4d466d17e95cfa3bb8b",
+      "build_info": {
+        "engine": "fcst_native",
+        "version": "0.1.0",
+        "compiler": "GNU",
+        "compiler_version": "13.3.0",
+        "source_revision": "8a25c204b39e24a0126a9616939a34f594643612",
+        "cxx_standard": 20,
+        "solver_available": false,
+        "protocol_version": 1
+      }
+    },
+    {
+      "preset": "linux-release",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "cases": 55,
+      "coverage_manifest_sha256": "c6ddd24a76fbfc6fe76e2bd80a48f358a55436e01a5a14c355be1615a4dfa918",
+      "report_sha256": "a45b97aa7c062ec86b867b527af6f0c14f3471f3052ccd48b1da6a316d54684c",
+      "build_info": {
+        "engine": "fcst_native",
+        "version": "0.1.0",
+        "compiler": "GNU",
+        "compiler_version": "13.3.0",
+        "source_revision": "8a25c204b39e24a0126a9616939a34f594643612",
+        "cxx_standard": 20,
+        "solver_available": false,
+        "protocol_version": 1
+      }
+    },
+    {
+      "preset": "windows-debug",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "cases": 55,
+      "coverage_manifest_sha256": "c6ddd24a76fbfc6fe76e2bd80a48f358a55436e01a5a14c355be1615a4dfa918",
+      "report_sha256": "f61f39efd524de662230fb7ff28a1594094f663f75a006fb5f9a63bbea2c6a0c",
+      "build_info": {
+        "engine": "fcst_native",
+        "version": "0.1.0",
+        "compiler": "MSVC",
+        "compiler_version": "19.44.35229.0",
+        "source_revision": "8a25c204b39e24a0126a9616939a34f594643612",
+        "cxx_standard": 20,
+        "solver_available": false,
+        "protocol_version": 1
+      }
+    },
+    {
+      "preset": "windows-release",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "cases": 55,
+      "coverage_manifest_sha256": "c6ddd24a76fbfc6fe76e2bd80a48f358a55436e01a5a14c355be1615a4dfa918",
+      "report_sha256": "ba55279863feca8f2780171a4f56207649b0ce2cefdf273a5f83490fdb955aba",
+      "build_info": {
+        "engine": "fcst_native",
+        "version": "0.1.0",
+        "compiler": "MSVC",
+        "compiler_version": "19.44.35229.0",
+        "source_revision": "8a25c204b39e24a0126a9616939a34f594643612",
+        "cxx_standard": 20,
+        "solver_available": false,
+        "protocol_version": 1
+      }
+    }
+  ],
+  "hosts": [
+    {
+      "platform": "Linux",
+      "report_sha256": "00a25348931597e4d4f7c1d482a83bac465c9eff65179feb230b85373f2b499e",
+      "status": "passed",
+      "scope": "foundation_host_smoke",
+      "freecad_version": [
+        "1",
+        "1",
+        "4"
+      ],
+      "python": "3.11.14",
+      "python_abi": "cp311",
+      "soabi": "cpython-311-x86_64-linux-gnu",
+      "occt": "7.8.1",
+      "cases": [
+        "create_geometry",
+        "save_reopen",
+        "edit_undo",
+        "application_imports"
+      ],
+      "volume": 24,
+      "solver_available": false,
+      "gui_qualified": false,
+      "asset_sha256": "f6dc6ba676e5ac96a565ebc8d657232f94c6158e85b4352141bd1a46f6b43434",
+      "profile_sha256": "0c38af95433b5929466d920ae9a7b270929778264774119251b6896d2decbfab",
+      "candidate": "8a25c204b39e24a0126a9616939a34f594643612"
+    },
+    {
+      "platform": "Windows",
+      "report_sha256": "bc6d2ec4efecce88fdb627b92256eceac0249bda3dc22472ea5bd4f44eff8d28",
+      "status": "passed",
+      "scope": "foundation_host_smoke",
+      "freecad_version": [
+        "1",
+        "1",
+        "4"
+      ],
+      "python": "3.11.14",
+      "python_abi": "cp311",
+      "soabi": null,
+      "occt": "7.8.1",
+      "cases": [
+        "create_geometry",
+        "save_reopen",
+        "edit_undo",
+        "application_imports"
+      ],
+      "volume": 24,
+      "solver_available": false,
+      "gui_qualified": false,
+      "asset_sha256": "4828741fc91ee37fafcdb97a1abacb18b04ba451ac4372d9ff7a7349b36f4d6d",
+      "profile_sha256": "0c38af95433b5929466d920ae9a7b270929778264774119251b6896d2decbfab",
+      "candidate": "8a25c204b39e24a0126a9616939a34f594643612"
+    }
+  ],
+  "packaging": [
+    {
+      "platform": "Linux",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "9e8d7d32858605c86f5c2eead9cdfbf80318f905475d94b4c2ff0ae10c659896",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "embree",
+      "version": "4.3.3",
+      "source_sha256": "8fba54992b1faf9546884254bf5f32681670280832286e31ed2215e0ca21fcfe",
+      "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 24979612,
+      "toolchain": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "threads": 1,
+        "ImageOS": "ubuntu24",
+        "ImageVersion": "20261023.334.3",
+        "c_id": "GNU",
+        "c_version": "13.3.0",
+        "cxx_id": "GNU",
+        "cxx_version": "13.3.0"
+      },
+      "build_options": [
+        "EMBREE_TUTORIALS=OFF",
+        "EMBREE_ISPC_SUPPORT=OFF",
+        "EMBREE_TASKING_SYSTEM=INTERNAL",
+        "EMBREE_MAX_ISA=SSE2",
+        "EMBREE_STATIC_LIB=OFF",
+        "EMBREE_TESTING_INTENSITY=0"
+      ],
+      "seconds": 146.657
+    },
+    {
+      "platform": "Linux",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "afb9a2c4c10a8ba3ed94c00cf8447f5a747f03eef95a1f6e866ec4857f80b176",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "hdf5",
+      "version": "1.14.6",
+      "source_sha256": "3421670b88f54d1d29e2255d40069e6b680c4f7c841e43aacac1980e48da73dd",
+      "license_sha256": "587b532c4c27b64ecff3192d6189e149231934a00c753a401d4559231af7f7a7",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 25964349,
+      "toolchain": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "threads": 1,
+        "ImageOS": "ubuntu24",
+        "ImageVersion": "20261023.334.3",
+        "c_id": "GNU",
+        "c_version": "13.3.0"
+      },
+      "build_options": [
+        "BUILD_TESTING=OFF",
+        "HDF5_BUILD_TOOLS=OFF",
+        "HDF5_BUILD_EXAMPLES=OFF",
+        "HDF5_BUILD_HL_LIB=OFF",
+        "HDF5_ENABLE_Z_LIB_SUPPORT=OFF",
+        "HDF5_ENABLE_SZIP_SUPPORT=OFF",
+        "HDF5_BUILD_CPP_LIB=OFF",
+        "HDF5_BUILD_FORTRAN=OFF",
+        "BUILD_SHARED_LIBS=ON"
+      ],
+      "seconds": 84.831
+    },
+    {
+      "platform": "Linux",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "ed9fdf1d974f22a5b847fea3bd2ac070742e1b38473162a129c10b2a5448d020",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "occt",
+      "version": "7.9.0",
+      "source_sha256": "d49efe4a5d07331b905af7d1ac053855fa8197f33d7ef60cdb81282430b0618d",
+      "license_sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 48241036,
+      "toolchain": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "threads": 1,
+        "ImageOS": "ubuntu24",
+        "ImageVersion": "20261026.354.1",
+        "c_id": "GNU",
+        "c_version": "13.3.0",
+        "cxx_id": "GNU",
+        "cxx_version": "13.3.0"
+      },
+      "build_options": [
+        "BUILD_MODULE_ModelingData=ON",
+        "BUILD_MODULE_ModelingAlgorithms=OFF",
+        "BUILD_MODULE_Visualization=OFF",
+        "BUILD_MODULE_ApplicationFramework=OFF",
+        "BUILD_MODULE_DataExchange=OFF",
+        "BUILD_MODULE_DETools=OFF",
+        "BUILD_MODULE_Draw=OFF",
+        "USE_TK=OFF",
+        "USE_TCL=OFF",
+        "USE_FREETYPE=OFF",
+        "USE_TBB=OFF",
+        "USE_VTK=OFF",
+        "INSTALL_DIR_LAYOUT=Unix",
+        "BUILD_LIBRARY_TYPE=Shared"
+      ],
+      "seconds": 255.467
+    },
+    {
+      "platform": "Linux",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "e54e302c67481a32992cc480e78d3f5e22297a843ab188b9b3c8520737229536",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "petsc",
+      "version": "3.23.0",
+      "source_sha256": "59b1e84e5faa4628b782983abadc01445c0fc8e19a46972b19b038645cb5d764",
+      "license_sha256": "efc206ebe66fda24a32ebe69e81caa2c5595e093626170e57fbeff522507cc54",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 276085138,
+      "toolchain": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "threads": 1,
+        "ImageOS": "ubuntu24",
+        "ImageVersion": "20261026.354.1",
+        "c_version": "13.3.0",
+        "system_blas_lapack": [
+          {
+            "soname": "liblapack.so.3",
+            "sha256": "851bb1fc5833ede9ed704b4417a251a899976d5e0915de40452615187a65278f"
+          },
+          {
+            "soname": "libblas.so.3",
+            "sha256": "e748efcae5753fe4a652877fccdb5895ac6f7605668a2db878b19c914e78e3a8"
+          }
+        ]
+      },
+      "build_options": [
+        "serial",
+        "shared",
+        "system_blas_lapack"
+      ],
+      "seconds": 196.759
+    },
+    {
+      "platform": "Linux",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "59368e8319640446ed29e62fbc6b7eed6cfeac1bcca2ed25a60a92201c2a77a6",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "sundials",
+      "version": "7.3.0",
+      "source_sha256": "a1aa9261c4034da363db379ffe2db0a3b77980f526ee0471f5f56dc53a9c2ed2",
+      "license_sha256": "5fa5c15f6262163679bf1fe70db6cbf5bc49e60726b39560330d402fd1dc79f8",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 2506947,
+      "toolchain": {
+        "system": "Linux",
+        "architecture": "x86_64",
+        "threads": 1,
+        "ImageOS": "ubuntu24",
+        "ImageVersion": "20261023.334.3",
+        "c_id": "GNU",
+        "c_version": "13.3.0"
+      },
+      "build_options": [
+        "BUILD_ARKODE=OFF",
+        "BUILD_CVODES=OFF",
+        "BUILD_IDAS=OFF",
+        "BUILD_IDA=OFF",
+        "BUILD_KINSOL=OFF",
+        "EXAMPLES_ENABLE_C=OFF",
+        "EXAMPLES_ENABLE_CXX=OFF",
+        "EXAMPLES_INSTALL=OFF",
+        "BUILD_STATIC_LIBS=OFF",
+        "BUILD_SHARED_LIBS=ON"
+      ],
+      "seconds": 10.408
+    },
+    {
+      "platform": "Windows",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "8e895061e110893bc1f7f19972bc82ddc31b5199e76d4b8f4b4023758344ce2f",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "embree",
+      "version": "4.3.3",
+      "source_sha256": "8fba54992b1faf9546884254bf5f32681670280832286e31ed2215e0ca21fcfe",
+      "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 10294978,
+      "toolchain": {
+        "system": "Windows",
+        "architecture": "AMD64",
+        "threads": 1,
+        "ImageOS": "win22",
+        "ImageVersion": "20261022.344.1",
+        "c_id": "MSVC",
+        "c_version": "19.44.35229.0",
+        "cxx_id": "MSVC",
+        "cxx_version": "19.44.35229.0"
+      },
+      "build_options": [
+        "EMBREE_TUTORIALS=OFF",
+        "EMBREE_ISPC_SUPPORT=OFF",
+        "EMBREE_TASKING_SYSTEM=INTERNAL",
+        "EMBREE_MAX_ISA=SSE2",
+        "EMBREE_STATIC_LIB=OFF",
+        "EMBREE_TESTING_INTENSITY=0"
+      ],
+      "seconds": 605.922
+    },
+    {
+      "platform": "Windows",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "eff8670fe12810da94cb9a5343fd9e2d39b5e31cb70205003f5e9a53b0a36195",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "hdf5",
+      "version": "1.14.6",
+      "source_sha256": "3421670b88f54d1d29e2255d40069e6b680c4f7c841e43aacac1980e48da73dd",
+      "license_sha256": "587b532c4c27b64ecff3192d6189e149231934a00c753a401d4559231af7f7a7",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 19712623,
+      "toolchain": {
+        "system": "Windows",
+        "architecture": "AMD64",
+        "threads": 1,
+        "ImageOS": "win22",
+        "ImageVersion": "20261022.344.1",
+        "c_id": "MSVC",
+        "c_version": "19.44.35229.0"
+      },
+      "build_options": [
+        "BUILD_TESTING=OFF",
+        "HDF5_BUILD_TOOLS=OFF",
+        "HDF5_BUILD_EXAMPLES=OFF",
+        "HDF5_BUILD_HL_LIB=OFF",
+        "HDF5_ENABLE_Z_LIB_SUPPORT=OFF",
+        "HDF5_ENABLE_SZIP_SUPPORT=OFF",
+        "HDF5_BUILD_CPP_LIB=OFF",
+        "HDF5_BUILD_FORTRAN=OFF",
+        "BUILD_SHARED_LIBS=ON"
+      ],
+      "seconds": 188.485
+    },
+    {
+      "platform": "Windows",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "e7ec40362c527558405a87d95aaa1dece38ddd20b743bb18953b3bfdf27eaabd",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "occt",
+      "version": "7.9.0",
+      "source_sha256": "d49efe4a5d07331b905af7d1ac053855fa8197f33d7ef60cdb81282430b0618d",
+      "license_sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 23838053,
+      "toolchain": {
+        "system": "Windows",
+        "architecture": "AMD64",
+        "threads": 1,
+        "ImageOS": "win22",
+        "ImageVersion": "20261022.344.1",
+        "c_id": "MSVC",
+        "c_version": "19.44.35229.0",
+        "cxx_id": "MSVC",
+        "cxx_version": "19.44.35229.0"
+      },
+      "build_options": [
+        "BUILD_MODULE_ModelingData=ON",
+        "BUILD_MODULE_ModelingAlgorithms=OFF",
+        "BUILD_MODULE_Visualization=OFF",
+        "BUILD_MODULE_ApplicationFramework=OFF",
+        "BUILD_MODULE_DataExchange=OFF",
+        "BUILD_MODULE_DETools=OFF",
+        "BUILD_MODULE_Draw=OFF",
+        "USE_TK=OFF",
+        "USE_TCL=OFF",
+        "USE_FREETYPE=OFF",
+        "USE_TBB=OFF",
+        "USE_VTK=OFF",
+        "INSTALL_DIR_LAYOUT=Unix",
+        "BUILD_LIBRARY_TYPE=Shared"
+      ],
+      "seconds": 318.0
+    },
+    {
+      "platform": "Windows",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "96591ed935f5d41fedcc5214165c0005d8df9751c7eb65dbe6e6cb6fbc4cddf6",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "petsc",
+      "version": "3.23.0",
+      "source_sha256": "59b1e84e5faa4628b782983abadc01445c0fc8e19a46972b19b038645cb5d764",
+      "license_sha256": "efc206ebe66fda24a32ebe69e81caa2c5595e093626170e57fbeff522507cc54",
+      "adopted": false,
+      "status": "unsupported",
+      "reason_code": "petsc_native_msvc_unsupported",
+      "reason": "Native MSVC is not a supported PETSc build profile; Linux probe is required",
+      "seconds": 0.0
+    },
+    {
+      "platform": "Windows",
+      "tested_commit": "8a25c204b39e24a0126a9616939a34f594643612",
+      "report_sha256": "f1aefe14aca5ca69a2a87b37fff8db618914ca12e6686fd2c666a37ad47a1428",
+      "source_lock_sha256": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "id": "sundials",
+      "version": "7.3.0",
+      "source_sha256": "a1aa9261c4034da363db379ffe2db0a3b77980f526ee0471f5f56dc53a9c2ed2",
+      "license_sha256": "5fa5c15f6262163679bf1fe70db6cbf5bc49e60726b39560330d402fd1dc79f8",
+      "adopted": false,
+      "status": "passed",
+      "stages": [
+        "source_hash",
+        "license_hash",
+        "configure",
+        "build",
+        "install",
+        "installed_consumer"
+      ],
+      "installed_bytes": 1183158,
+      "toolchain": {
+        "system": "Windows",
+        "architecture": "AMD64",
+        "threads": 1,
+        "ImageOS": "win22",
+        "ImageVersion": "20261022.344.1",
+        "c_id": "MSVC",
+        "c_version": "19.44.35229.0"
+      },
+      "build_options": [
+        "BUILD_ARKODE=OFF",
+        "BUILD_CVODES=OFF",
+        "BUILD_IDAS=OFF",
+        "BUILD_IDA=OFF",
+        "BUILD_KINSOL=OFF",
+        "EXAMPLES_ENABLE_C=OFF",
+        "EXAMPLES_ENABLE_CXX=OFF",
+        "EXAMPLES_INSTALL=OFF",
+        "BUILD_STATIC_LIBS=OFF",
+        "BUILD_SHARED_LIBS=ON"
+      ],
+      "seconds": 37.266
+    }
+  ],
+  "disposition": "Nine supported package/platform probes passed. Native Windows PETSc is explicitly unsupported; no dependency is adopted for production."
+}

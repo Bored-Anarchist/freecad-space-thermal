@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "python-package", "configure", "build", "ctest", "install", "engine-only"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only"]
 
 
 def command(args, log, env=None):
@@ -31,8 +31,10 @@ def command(args, log, env=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tier", choices=["fast", "full"], default="fast")
-    parser.add_argument("--preset", default="windows-debug" if os.name == "nt" else "linux-debug")
+    parser.add_argument("--preset", choices=["windows-debug", "windows-release"], default="windows-debug")
     args = parser.parse_args()
+    if platform.system() != "Windows":
+        parser.error("macOS and Linux verification is an uncommitted stretch goal outside the work packages")
     manifest = json.loads((ROOT / "ci/coverage.json").read_text())
     output = ROOT / ".local" / args.preset
     output.mkdir(parents=True, exist_ok=True)
@@ -78,7 +80,10 @@ def main():
     actions = {
         "planning": [sys.executable, "plans/tools/validate_plan.py"],
         "specification": [sys.executable, "spec/tools/validate_spec.py"],
+        "inventory": [sys.executable, "tools/check_inventory.py"],
+        "workflow-lint": [sys.executable, "tools/check_workflows.py"],
         "python-package": [sys.executable, "-m", "pip", "install", "--no-deps", "--no-build-isolation", "--no-index", "-e", "."],
+        "python-imports": [sys.executable, "-I", "-c", "import fcst_app,fcst_cli,fcst_mcp; assert not fcst_app.capabilities()['solver_available']"],
         "configure": [cmake, "--preset", args.preset, "-DFCST_SOURCE_REVISION=" + revision],
         "build": [cmake, "--build", "--preset", args.preset, "--parallel", "2"],
         "ctest": [ctest, "--preset", args.preset],
@@ -106,9 +111,16 @@ def main():
             record(case_id, "failed", reason="execution_unavailable")
     expected = manifest["unit_cases"] + STEPS
     if args.tier == "full":
-        # Product qualification must remain blocked until implemented coverage exists.
         for case_id in manifest["full_prerequisites"]:
-            record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
+            if case_id == "freecad-exact-build-smoke":
+                try:
+                    okay = command([sys.executable, "tools/host_smoke.py"], output / "host-smoke.log")
+                    record(case_id, "passed" if okay else "failed")
+                except (OSError, ValueError, subprocess.SubprocessError):
+                    record(case_id, "failed", reason="host_execution_unavailable")
+            else:
+                # Product/vendor/numerical qualification is a separate Q0 gate.
+                record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
         expected += manifest["full_prerequisites"]
     verdict = evaluate(expected, records)
     report = {"schema_version": 1, "scope": "WP-02 foundation; no thermal or compatibility qualification",

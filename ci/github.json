@@ -3,8 +3,13 @@
   "default_branch": "main",
   "visibility": "public",
   "maintainer": "Bored-Anarchist",
-  "required_checks": ["Foundation gate", "Planning gate", "Publication privacy"],
+  "required_checks": [
+    "Foundation gate",
+    "Planning gate",
+    "Publication privacy"
+  ],
   "projects_title": "FCST implementation",
   "validation_repository": "Bored-Anarchist/freecad-space-thermal-validation",
-  "release_branch_pattern": "release/*"
+  "release_branch_pattern": "release/*",
+  "work_package_count": 21
 }

@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "sources": [
+    {
+      "id": "sundials",
+      "repository": "LLNL/sundials",
+      "version": "7.3.0",
+      "revision": "cb681a4e3a46bcad903fb966284d6f53e85bdb94",
+      "url": "https://codeload.github.com/LLNL/sundials/tar.gz/cb681a4e3a46bcad903fb966284d6f53e85bdb94",
+      "bytes": 32190509,
+      "sha256": "a1aa9261c4034da363db379ffe2db0a3b77980f526ee0471f5f56dc53a9c2ed2",
+      "license_file": "LICENSE",
+      "license_sha256": "5fa5c15f6262163679bf1fe70db6cbf5bc49e60726b39560330d402fd1dc79f8"
+    },
+    {
+      "id": "hdf5",
+      "repository": "HDFGroup/hdf5",
+      "version": "1.14.6",
+      "revision": "7bf340440909d468dbb3cf41f0ea0d87f5050cea",
+      "url": "https://codeload.github.com/HDFGroup/hdf5/tar.gz/7bf340440909d468dbb3cf41f0ea0d87f5050cea",
+      "bytes": 39210946,
+      "sha256": "3421670b88f54d1d29e2255d40069e6b680c4f7c841e43aacac1980e48da73dd",
+      "license_file": "COPYING",
+      "license_sha256": "587b532c4c27b64ecff3192d6189e149231934a00c753a401d4559231af7f7a7"
+    },
+    {
+      "id": "embree",
+      "repository": "RenderKit/embree",
+      "version": "4.3.3",
+      "revision": "5730b150471602d6dc02d9b7d8a4a6ce9ceffe16",
+      "url": "https://codeload.github.com/RenderKit/embree/tar.gz/5730b150471602d6dc02d9b7d8a4a6ce9ceffe16",
+      "bytes": 71135289,
+      "sha256": "8fba54992b1faf9546884254bf5f32681670280832286e31ed2215e0ca21fcfe",
+      "license_file": "LICENSE.txt",
+      "license_sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+    },
+    {
+      "id": "occt",
+      "repository": "Open-Cascade-SAS/OCCT",
+      "version": "7.9.0",
+      "revision": "858dd02fed80c8ca68cf1d70a6e03ecf97f849ca",
+      "url": "https://codeload.github.com/Open-Cascade-SAS/OCCT/tar.gz/858dd02fed80c8ca68cf1d70a6e03ecf97f849ca",
+      "bytes": 48602762,
+      "sha256": "d49efe4a5d07331b905af7d1ac053855fa8197f33d7ef60cdb81282430b0618d",
+      "license_file": "LICENSE_LGPL_21.txt",
+      "license_sha256": "e237fa56668030e928551ddd60f05df5fe957f75eab874bbd017e085ed722e7c"
+    },
+    {
+      "id": "petsc",
+      "repository": "petsc/petsc",
+      "version": "3.23.0",
+      "revision": "94492ad7969135c3eb015b281de13ea0fd580ab4",
+      "url": "https://codeload.github.com/petsc/petsc/tar.gz/94492ad7969135c3eb015b281de13ea0fd580ab4",
+      "bytes": 15686092,
+      "sha256": "59b1e84e5faa4628b782983abadc01445c0fc8e19a46972b19b038645cb5d764",
+      "license_file": "LICENSE",
+      "license_sha256": "efc206ebe66fda24a32ebe69e81caa2c5595e093626170e57fbeff522507cc54"
+    }
+  ]
+}

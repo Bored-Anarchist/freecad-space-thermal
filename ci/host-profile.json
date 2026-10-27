@@ -1,0 +1,16 @@
+{
+  "schema_version": 1,
+  "version": "1.1.4",
+  "source": "https://github.com/FreeCAD/FreeCAD/releases/tag/1.1.4",
+  "scope": "Foundation document/geometry and embedded-Python smoke; no FCST workbench or GUI qualification",
+  "platforms": {
+    "Windows": {
+      "asset": "FreeCAD_1.1.4-Windows-x86_64-py311.7z",
+      "bytes": 418088341,
+      "sha256": "4828741fc91ee37fafcdb97a1abacb18b04ba451ac4372d9ff7a7349b36f4d6d"
+    }
+  },
+  "python_abi": "cp311",
+  "host_dependencies": [],
+  "policy": "Use the bundle's own Python and OCCT; standalone locks must not modify the host environment. Hash-verify the official asset before executing or extracting. Record actual embedded versions in the smoke report."
+}

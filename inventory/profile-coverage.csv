@@ -1,0 +1,13 @@
+profile_id,owner_work_package,model_ids,qualification,blocked_reason
+TD-NATIVE,WP-08,TD-ARTEMIS,unqualified,Static examples acquired; exact licensed vendor operations and owned-engine qualification unavailable
+TD-NETWORK,WP-08,TD-SINDA-CASE1,unqualified,Static examples acquired; exact licensed vendor operations and owned-engine qualification unavailable
+TD-RESULTS,WP-08,TD-SINDA-CASE1,unqualified,Static examples acquired; exact licensed vendor operations and owned-engine qualification unavailable
+ESA-NATIVE,WP-09,ESA-DISC-STEADY;ESA-DISC-TRANSIENT;ESA-FEATURES;ESA-ACUBESAT-V2,unqualified,Static examples acquired; exact licensed vendor operations and owned-engine qualification unavailable
+ESA-NETWORK,WP-09,ESA-DISC-STEADY;ESA-DISC-TRANSIENT,unqualified,Static examples acquired; exact licensed vendor operations and owned-engine qualification unavailable
+ESA-RESULTS,WP-09,ESA-DISC-STEADY;ESA-DISC-TRANSIENT,unqualified,Static examples acquired; exact licensed vendor operations and owned-engine qualification unavailable
+STEP-TAS,WP-10,ESA-FEATURES,unqualified,Static examples acquired; exact licensed vendor operations and owned-engine qualification unavailable
+TD-ESA-COMMON,WP-10,,unqualified,No complete paired fixture/runtime profile acquired; existing requirement remains outstanding
+THERMICA,WP-21,,unqualified,No complete paired fixture/runtime profile acquired; existing requirement remains outstanding
+THERMISOL,WP-21,,unqualified,No complete paired fixture/runtime profile acquired; existing requirement remains outstanding
+ESA-LEGACY,WP-21,,unqualified,No complete paired fixture/runtime profile acquired; existing requirement remains outstanding
+CUSTOMER-LEGACY,WP-21,,unqualified,No complete paired fixture/runtime profile acquired; existing requirement remains outstanding

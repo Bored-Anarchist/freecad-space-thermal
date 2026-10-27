@@ -5,8 +5,8 @@
 | Field | Baseline |
 |---|---|
 | Document | FCST-SYS-SPEC-001 |
-| Revision | 0.5 — C++ solver and Python integration baseline |
-| Prepared | 2026-10-26 |
+| Revision | 0.7 — Windows delivery; optional platform stretch goals |
+| Prepared | 2026-10-27 |
 | Product name | FreeCAD Space Thermal (FCST), working name |
 | User decisions | Open-source add-on and independently maintained C++ engine; Python integration; existing solvers may be starting points; local-first; equal priority for Thermal Desktop and ESATAN-TMS; NASA/ESA refers to existing-tool file compatibility |
 | Intended audience | Thermal analysts, implementation engineers, and software testers |
@@ -34,6 +34,10 @@ Revision 0.3 resolves native-versus-bridged execution in favor of the owned solv
 Revision 0.4 explicitly adds SINDA/FLUINT and Thermal Desktop as required benchmark and behavioral starting-point references, alongside the owned Rust solver direction.
 
 Revision 0.5 replaces the earlier Rust-first implementation choice with a C++ solver and Python integration baseline. Solver ownership, native execution, backwards compatibility, and AI automation requirements remain in force. The language comparison checkpoint evaluates integration and numerical behavior before expensive modules are locked in.
+
+Revision 0.6 adopted Windows-only development and Q0/P0/Q1/Q2 delivery with a scheduled platform-port follow-on. Revision 0.7 supersedes that follow-on commitment with optional stretch goals. WP-01 closes on the acquired inventory and explicit gaps; licensed reference access and complete compatibility/schema qualification remain obligations of the affected later packages. This is a FreeCAD add-on/workbench with a standalone engine, not a modified FreeCAD distribution.
+
+Revision 0.7 removes the previously numbered port package and POST-Q2 gate. Optional macOS/Linux configurations are stretch goals, not committed delivery work. Windows Q0/P0/Q1/Q2 acceptance and the completed WP-01 baseline remain unchanged.
 
 ## 2. Purpose, users, and scope
 
@@ -64,7 +68,7 @@ No automatic equivalence is assumed between CAD faces, radiation facets, thermal
 
 ## 3. Compatibility and product acceptance baseline
 
-At Gate Q0, identify the actual source tools/versions, sample files, dependencies, required editing and exchange operations, reference results, format schemas, and comparison tolerances. This source-file inventory defines backwards compatibility. Changing a supported format or source version requires the relevant regression tests.
+At Gate Q0, freeze the acquired sample inventory, known source-version observations and explicit owned gaps for missing versions, dependencies, results and schemas. WP-01 acceptance covers that acquired baseline. Complete source runtime/dependency and schema/reference qualification is required by the affected Q1/Q2 compatibility profiles, not by native Q0 development. Changing a supported format or source version requires the relevant regression tests.
 
 STEP-TAS documentation, including ECSS-E-ST-31-04C, is used solely to understand the exchange format. Support is driven by entities and dataset types needed by the real files. This specification does not require a separate agency conformance program or blanket implementation of every STEP-TAS class. [S06]
 
@@ -125,7 +129,7 @@ An optional in-process Python binding may expose the C++ library through pybind1
 | ARC-010 | Adopted open-source solver code/components shall have recorded provenance, compatible licensing, maintainable interfaces, and independent regression tests. | I/T: component inventory identifies retained/reworked code and its tests; no unsupported ownership or licensing claim. | User P | Q1 |
 | ARC-011 | PyCanha and other external thermal solvers shall be optional reference/prototype backends; their successful runs shall not count as owned-engine acceptance results. | T/I: run records identify the actual backend and gate evaluation rejects substituted external runs. | User | Q1 |
 | ARC-012 | Canonical models, UI commands, and MCP operations shall remain backend-independent while exposing the actual solver identity and capabilities. | T: a reference backend can be removed without changing the native model format or mislabeling results. | P | Q1 |
-| ARC-013 | Before numerical interfaces freeze, the project shall record a prototype-based C++ suitability assessment and, when testing Rust as a challenger, use the same snapshots, numerical backend, tolerances, hardware and comparison criteria. | T/A: correctness, convergence, event/energy error, runtime, memory, implementation effort and Windows/Linux packaging evidence recorded; C++ remains the default unless an explicit decision changes it. | User P | Q0 |
+| ARC-013 | Before numerical interfaces freeze, the project shall record a prototype-based C++ suitability assessment and, when testing Rust as a challenger, use the same snapshots, numerical backend, tolerances, hardware and comparison criteria. | T/A: correctness, convergence, event/energy error, runtime, memory, implementation effort and Windows packaging evidence recorded; C++ remains the default unless an explicit decision changes it. | User P | Q0 |
 | ARC-014 | Low-level numerical and ray-intersection dependencies shall sit behind owned-engine interfaces and shall not replace FCST thermal/radiation model semantics or acceptance tests. | I/T: dependency versions, capabilities and licenses recorded; native analytic/source-comparison cases pass. | P | Q1 |
 | ARC-015 | Python shall provide FreeCAD integration and automation/test orchestration while the compiled engine owns repeated performance-critical physics kernels. | T/I: engine-only operation and Python GUI/CLI/MCP tests agree; profile representative workloads before moving additional code across the boundary. | P | Q1 |
 
@@ -162,13 +166,13 @@ Candidate dependency roles, subject to license, build and benchmark checks:
 | Component | Intended role | Boundary / evidence needed |
 |---|---|---|
 | SUNDIALS CVODE/CVODES and IDA/IDAS | ODE/DAE time integration and associated nonlinear/linear-solver machinery | Evaluate stiff systems, algebraic-node initialization, events, sparse Jacobians and restart; FCST supplies thermal equations and control semantics. [S25] |
-| PETSc | Alternative scalable sparse/nonlinear/time-integration stack where workload justifies it | Optional; assess Windows/Linux packaging, resource use and scaling before selecting it. [S26] |
+| PETSc | Alternative scalable sparse/nonlinear/time-integration stack where workload justifies it | Optional; assess Windows packaging, resource use and scaling before selecting it. [S26] |
 | Embree | Candidate ray intersection/occlusion acceleration | Does not supply FCST view-factor estimators, optical laws, orbital heating or radiation validation. [S27] |
 | Open CASCADE | Geometry extraction/tessellation through the host or a geometry adapter | Optional to a numerical engine that already receives meshes; not a mandatory CAD dependency for network-only runs. [S28] |
 | pybind11 | Optional C++/Python in-process binding | Not required for worker IPC; validate embedded-Python ABI, lifetime, exception and thread behavior before release. [S29] |
 | Rust Diffsol/faer or Rust with the same C numerical backend | Optional comparison prototype | No additional production dependency; compare equivalent equations and accuracy rather than unrelated default settings. [S30] |
 
-The comparison checkpoint uses a stiff nonlinear network with temperature-dependent properties, zero-capacity algebraic/prescribed nodes and consistent initialization, radiation feedback, heater switching, sparse scaling, cancellation/restart, and one required TD and ESATAN input case. Run analytic/conservation/refinement checks first. Measure runtime and peak memory at equal numerical accuracy, failure/diagnostic behavior, debugging/implementation effort, replay behavior, and clean Windows/Linux installs. Distinguish backend-library effects from language effects; compare C++ and Rust with the same numerical backend when drawing language conclusions.
+The comparison checkpoint uses a stiff nonlinear network with temperature-dependent properties, zero-capacity algebraic/prescribed nodes and consistent initialization, radiation feedback, heater switching, sparse scaling, cancellation/restart, and an independently authored native analytic case. Paired TD and ESATAN source comparisons are required before their Q1 compatibility claims under WP-08/WP-09/WP-19. Run analytic/conservation/refinement checks first. Measure runtime and peak memory at equal numerical accuracy, failure/diagnostic behavior, debugging/implementation effort, replay behavior, and clean Windows installs. Distinguish backend-library effects from language effects; compare C++ and Rust with the same numerical backend when drawing language conclusions.
 
 The Q0 deliverable is a short decision record and reproducible results, not a new performance ranking. No broad solver-language rewrite is required when C++ meets the criteria. A later language change requires an explicit architecture revision and affected regression tests while retaining canonical schemas, application operations and MCP contracts.
 
@@ -306,7 +310,7 @@ There is no independent requirement to implement a fixed set of full STEP-TAS co
 
 | ID | Requirement | Verification / acceptance | Basis | Gate |
 |---|---|---|---|---|
-| INT-001 | A controlled inventory shall identify every mandatory source version, file family, dependency, feature, case, and baseline result before compatibility scope freezes. | I: TD and ESATAN owners approve equal-priority fixture/profile lists. | User P | Q0 |
+| INT-001 | A controlled acquired inventory shall record source files and observed versions, file families, dependencies, features, cases, result and rights dispositions, and assigned gaps; complete source scope shall freeze before its compatibility qualification. | I: acquired TD and ESATAN examples have immutable provenance and equal-priority profile mappings; unknown versions or missing inputs have explicit owners and qualification blockers. | User P | Q0 |
 | INT-002 | TD and ESATAN core profile qualification shall pass at the same Q1 gate; success in one shall not substitute for the other. | T/I: paired profile acceptance reports. | User | Q1 |
 | INT-003 | Every conversion shall produce a machine-readable feature inventory and fidelity report per entity/case, operation, and version profile with source and target IDs. | T: complete inventories for positive, partial, and malformed fixtures; execution does not imply edit/write support. | S06 P | Q1 |
 | INT-004 | Retained-opaque, approximated, and unsupported statuses shall remain distinct from executable compatibility. | T: opaque code cannot satisfy a solver/profile release check. | P | Q1 |
@@ -406,7 +410,7 @@ The default installation is offline-capable and account-free. Network calls, ext
 
 Proposed licenses for new code: Python FreeCAD workbench **LGPL-2.1-or-later**; C++ core/worker, standalone Python API/MCP tooling and independently written adapters **MIT OR Apache-2.0**; original documentation **CC-BY-4.0**. These are design choices to adopt when implementation repositories are created, not relicensing declarations over FreeCAD, vendor files, reference models, or third-party assets. Evaluate dependency licenses and trademarks before distribution. A restrictive licensed converter is a separately invoked runtime, not part of the open-source license grant. [S22]
 
-Initial qualified deployment targets: Windows 11 x64 and Ubuntu 24.04 LTS x64, with a pinned FreeCAD 1.1.x build and its actual embedded Python/Qt versions. These are proposed test targets, not a claim that every combination already works. macOS and other FreeCAD builds may be added only after their profile passes. The Windows vendor bridge remains separate from the portable native core. Pin C++ compiler/toolchain and standard-library/ABI, CMake/build configuration, dependency lock/manifest, Python package hashes, mesher/backend builds, and numerical libraries in release manifests. An optional Rust prototype separately records its toolchain and Cargo.lock. Never replace or upgrade FreeCAD's embedded Python opportunistically.
+The active deployment target is Windows 11 x64 with the official pinned FreeCAD 1.1.4 build and its actual embedded Python/Qt versions. FCST is installed as an add-on/workbench alongside the owned standalone engine; it does not fork or rebuild FreeCAD. Q0/P0/Q1/Q2 gates apply to Windows. macOS and Linux development, build/host profiles, installers and qualification are uncommitted stretch goals outside all work packages, milestones, dependencies and release acceptance. They are not promised follow-on delivery and need a future scope decision before implementation. Earlier Linux foundation runs are historical evidence, not current support claims. Deferred platform releases require their own full automated parity and qualification evidence. The Windows vendor bridge remains separate from the portable native core. Pin C++ compiler/toolchain and standard-library/ABI, CMake/build configuration, dependency lock/manifest, Python package hashes, mesher/backend builds, and numerical libraries in release manifests. An optional Rust prototype separately records its toolchain and Cargo.lock. Never replace or upgrade FreeCAD's embedded Python opportunistically.
 
 | ID | Requirement | Verification / acceptance | Basis | Gate |
 |---|---|---|---|---|
@@ -482,7 +486,7 @@ Performance is a product target, separate from physical correctness. At Q0, free
 
 | Gate | Required outcome | Release claim allowed |
 |---|---|---|
-| Q0 — requirements/interface baseline | Exact legacy-file inventory, sample-file rights, vendor API/runtime access, canonical and exchange schemas, numerical criteria, hardware, prototype-based C++ suitability/language decision record, and test plan | Design/prototype only |
+| Q0 — requirements/interface baseline | Acquired inventory with explicit assigned version/rights/dependency/schema gaps, native canonical/interface contracts, Windows numerical criteria/hardware/prototype decision and test plan; vendor runtime/schema closure remains with affected compatibility gates | Design/prototype only |
 | P0 — vertical slice | Build and save a two-node/two-surface model, conduction/radiation/transient result, visualization, typed API and MCP, and one synthetic fixture from each ecosystem | Experimental demonstration; no qualification or general compatibility claim |
 | Q1 — tested owned core, equal ecosystem gate | All Q1 requirements; core physics and required imported core cases solved by the owned C++ engine; both source profiles, necessary STEP-TAS datasets, changed-model round trips, cross-tool exchange, and offline installation | Precisely named/versioned tested profiles and owned core capabilities; reference backends remain separately labeled |
 | Q2 — backward compatibility and owned-solver closure | Every required legacy profile, custom logic, advanced physics, ESA-tool path, editing/re-export need, and fixture passes; required thermal solving uses the owned engine; all Q2 requirements closed | Full backward compatibility and independent solving within the published inventory; proprietary source-file conversion may still use declared vendor tools |
@@ -499,13 +503,13 @@ These items do not prevent creation of this specification. They do prevent hones
 
 | Item | Required resolution | Owner / gate |
 |---|---|---|
-| Legacy corpus | Obtain authorized TD and ESATAN projects, all dependent files/code, baseline results and exact versions; classify confidential/redistributable fixtures | Product owner + source analysts / Q0 |
-| Required compatibility semantics | Identify required read/edit/re-export/cross-tool operations and the physics/logic each imported model must execute on the owned engine | Product owner + source analysts / Q0 |
-| Proprietary bridge and benchmark access | Licensed TD/OpenTD/AutoCAD/SINDA/FLUINT and ESATAN installations, relevant RadCAD/FloCAD modules, API docs, compilers, and runnable reference environments; optional Fluent only for selected CFD comparisons | Adapter and numerical leads / Q0 |
-| ESA tools beyond ESATAN | Exact SYSTEMA/THERMICA/THERMISOL, ESARAD and historical formats/version priorities | ESA-side analyst / Q0 |
-| STEP-TAS distribution | Relevant EXPRESS/dictionary schema, license/access terms, required entity/dataset coverage, and usable validation tools | Exchange owner / Q0 |
-| Owned-engine implementation map | Assign every required source-physics/user-logic feature a native implementation or explicitly accepted native equivalent, tests, and migration plan; reference solver runs do not close the item | Numerical and adapter leads / Q0 |
-| Material/optical data | Approved libraries, uncertainty, BOL/EOL, cryogenic/high-temperature scope, and redistribution permissions | Thermal lead / Q0 |
+| Legacy corpus | Obtain authorized TD and ESATAN projects, all dependent files/code, baseline results and exact versions; classify confidential/redistributable fixtures | Product owner + source analysts / affected Q1/Q2 compatibility gate |
+| Required compatibility semantics | Identify required read/edit/re-export/cross-tool operations and the physics/logic each imported model must execute on the owned engine | Product owner + source analysts / affected Q1/Q2 compatibility gate |
+| Proprietary bridge and benchmark access | Licensed TD/OpenTD/AutoCAD/SINDA/FLUINT and ESATAN installations, relevant RadCAD/FloCAD modules, API docs, compilers, and runnable reference environments; optional Fluent only for selected CFD comparisons | Adapter and numerical leads / affected Q1/Q2 compatibility gate |
+| ESA tools beyond ESATAN | Exact SYSTEMA/THERMICA/THERMISOL, ESARAD and historical formats/version priorities | ESA-side analyst / affected Q1/Q2 compatibility gate |
+| STEP-TAS distribution | Relevant EXPRESS/dictionary schema, license/access terms, required entity/dataset coverage, and usable validation tools | Exchange owner / affected Q1/Q2 compatibility gate |
+| Owned-engine implementation map | Assign every required source-physics/user-logic feature a native implementation or explicitly accepted native equivalent, tests, and migration plan; reference solver runs do not close the item | Numerical and adapter leads / affected Q1/Q2 compatibility gate |
+| Material/optical data | Approved libraries, uncertainty, BOL/EOL, cryogenic/high-temperature scope, and redistribution permissions | Thermal lead / affected Q1/Q2 compatibility gate |
 | Numerical/language checkpoint | C++ prototype suitability and optional Rust comparison using equivalent numerical backends; choose sparse/integration, radiation, geometry and orbit/time components and freeze tested toolchain/dependency versions | Numerical lead / Q0 |
 | AI client profiles | Named MCP clients/protocol revisions and local-model support to qualify; optional external provider permission policy | Automation owner / Q0 |
 

@@ -1,0 +1,51 @@
+{
+  "schema_version": 1,
+  "decision": "User scope amendment: Windows-only committed delivery; optional macOS/Linux configurations are stretch goals outside the work packages",
+  "active_platforms": [
+    "Windows"
+  ],
+  "active_presets": [
+    "windows-debug",
+    "windows-release"
+  ],
+  "product_target": "FreeCAD add-on/workbench and standalone owned engine; no FreeCAD fork",
+  "windows_gates": [
+    "Q0",
+    "P0",
+    "Q1",
+    "Q2"
+  ],
+  "deferred_platforms": {
+    "Linux": {
+      "stretch_goal": "SG-PLATFORMS",
+      "status": "uncommitted"
+    },
+    "macOS": {
+      "stretch_goal": "SG-PLATFORMS",
+      "status": "uncommitted"
+    }
+  },
+  "wp01": {
+    "status": "complete",
+    "scope": "Acquired example inventory and explicit dispositions",
+    "files": 55,
+    "cases": 6,
+    "sources": 4,
+    "profiles": 12,
+    "feature_groups": 21,
+    "qualification_claim": false
+  },
+  "policy": "Only Windows is committed through Q0/P0/Q1/Q2 and WP-01 through WP-21. macOS/Linux configurations are optional stretch goals outside all work packages, dependencies, milestones, acceptance and release gates. They require a future scope decision before implementation or support claims.",
+  "stretch_goals": {
+    "SG-PLATFORMS": {
+      "platforms": [
+        "macOS",
+        "Linux"
+      ],
+      "status": "uncommitted",
+      "work_package": null,
+      "completion_gate": null,
+      "blocks_delivery": false
+    }
+  }
+}

@@ -10,11 +10,16 @@ from __future__ import annotations
 import csv
 import json
 import re
+import sys
 from collections import Counter
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "python"))
+from project_files import markdown_files
+from fcst_tools.delivery import validate_scope
 PLANS = ROOT / "plans"
 
 
@@ -174,7 +179,13 @@ def main() -> None:
         require(suite["runner"] and suite["triggers"] and suite["evidence_contract"], f"Incomplete suite: {suite_id}")
         require(suite["first_gate"] in valid_gates, f"Unknown suite gate: {suite_id}")
 
-    for path in ROOT.rglob("*.md"):
+    def document(name):
+        return json.loads((ROOT / name).read_text(encoding="utf-8"))
+    require(not validate_scope(document("plans/delivery-scope.json"), list(packages.values()),
+            document("plans/evidence/WP-01.json"), document("inventory/gaps.json"),
+            document("CMakePresets.json"), document("ci/host-profile.json")), "Delivery scope drift")
+
+    for path in markdown_files(ROOT):
         for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", path.read_text(encoding="utf-8")):
             if "://" in target or target.startswith(("#", "mailto:")):
                 continue

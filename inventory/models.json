@@ -1,0 +1,513 @@
+{
+  "schema_version": 1,
+  "baseline": "online-examples-2026-10-27-r2",
+  "scope": "Acquired example inventory; not a frozen complete compatibility claim",
+  "models": [
+    {
+      "required_operations": [
+        "inspect",
+        "represent",
+        "edit",
+        "native_execute",
+        "write",
+        "source_reopen_run",
+        "cross_tool_exchange"
+      ],
+      "qualification": "unqualified",
+      "rights": {
+        "redistribution": "hold",
+        "policy": "Originals remain local; repository license alone does not clear vendor metadata or third-party generated content"
+      },
+      "operation_dispositions": {
+        "inspect": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "represent": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "edit": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "native_execute": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "write": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "source_reopen_run": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "cross_tool_exchange": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        }
+      },
+      "id": "TD-ARTEMIS",
+      "source_id": "TD-ARTEMIS-TUTORIAL",
+      "profiles": [
+        "TD-NATIVE"
+      ],
+      "files": [
+        "Thermal/artemis_thermal_lab.dwg",
+        "Thermal/rcoptics (1).rco",
+        "Thermal/tdthermo (1).tdp"
+      ],
+      "source_version": {
+        "status": "unknown",
+        "value": null,
+        "evidence": "DWG signature AC1032 identifies the container only; originating Thermal Desktop release not recorded"
+      },
+      "purpose": "physical",
+      "owner_role": "TD adapter owner",
+      "dependency_review": {
+        "status": "incomplete",
+        "evidence": "DWG and both published property companions acquired; native embedded references and property-name resolution need licensed inspection; separate heat-load worksheet is linked by the tutorial"
+      },
+      "reference_results": {
+        "status": "missing",
+        "physical_oracle": false
+      },
+      "blockers": [
+        "TD_LICENSE_UNAVAILABLE",
+        "TD_SOURCE_VERSION_UNKNOWN",
+        "TD_EMBEDDED_DEPENDENCIES_UNVERIFIED",
+        "TD_TUTORIAL_RESULTS_MISSING"
+      ]
+    },
+    {
+      "required_operations": [
+        "inspect",
+        "represent",
+        "edit",
+        "native_execute",
+        "write",
+        "source_reopen_run",
+        "cross_tool_exchange"
+      ],
+      "qualification": "unqualified",
+      "rights": {
+        "redistribution": "hold",
+        "policy": "Originals remain local; repository license alone does not clear vendor metadata or third-party generated content"
+      },
+      "operation_dispositions": {
+        "inspect": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "represent": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "edit": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "native_execute": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "write": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "source_reopen_run": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "cross_tool_exchange": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        }
+      },
+      "id": "ESA-DISC-STEADY",
+      "source_id": "ESA-DISC-TUTORIAL",
+      "profiles": [
+        "ESA-NATIVE",
+        "ESA-NETWORK",
+        "ESA-RESULTS"
+      ],
+      "files": [
+        "tests/data/esatan/DISC/DISC.erg",
+        "tests/data/esatan/DISC/DISCTR_STEADY.d",
+        "tests/data/esatan/DISC/DISCTR_STEADY.TMD"
+      ],
+      "source_version": {
+        "status": "observed",
+        "value": "2018 SP1",
+        "evidence": "Explicit ESATAN-TMS version header in acquired D-deck"
+      },
+      "purpose": "physical",
+      "owner_role": "ESA adapter owner",
+      "dependency_review": {
+        "status": "static_review_only",
+        "evidence": "Full deck has inline properties, 102 node declarations, 190 GL and 5050 GR declarations; no lexical include directives; solver/output procedures still require the vendor runtime; complete native project container not provided"
+      },
+      "reference_results": {
+        "status": "upstream_results_present_not_reproduced",
+        "physical_oracle": true,
+        "format": "HDF5 TMD",
+        "case": "steady",
+        "evidence": "Pinned upstream README identifies these as ESATAN-calculated results; raw results remain local and are not a current qualified run"
+      },
+      "blockers": [
+        "ESA_RUNTIME_UNAVAILABLE",
+        "ESA_NATIVE_PROJECT_CONTAINER_MISSING",
+        "ESA_RESULT_SCHEMA_UNQUALIFIED"
+      ]
+    },
+    {
+      "required_operations": [
+        "inspect",
+        "represent",
+        "edit",
+        "native_execute",
+        "write",
+        "source_reopen_run",
+        "cross_tool_exchange"
+      ],
+      "qualification": "unqualified",
+      "rights": {
+        "redistribution": "hold",
+        "policy": "Originals remain local; repository license alone does not clear vendor metadata or third-party generated content"
+      },
+      "operation_dispositions": {
+        "inspect": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "represent": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "edit": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "native_execute": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "write": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "source_reopen_run": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "cross_tool_exchange": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        }
+      },
+      "id": "ESA-DISC-TRANSIENT",
+      "source_id": "ESA-DISC-TUTORIAL",
+      "profiles": [
+        "ESA-NATIVE",
+        "ESA-NETWORK",
+        "ESA-RESULTS"
+      ],
+      "files": [
+        "tests/data/esatan/DISC/DISC.erg",
+        "tests/data/esatan/DISC/DISCTR_TRANSIENT.d",
+        "tests/data/esatan/DISC/DISCTR_TRANSIENT.TMD"
+      ],
+      "source_version": {
+        "status": "observed",
+        "value": "2018 SP1",
+        "evidence": "Explicit ESATAN-TMS version header in acquired D-deck"
+      },
+      "purpose": "physical",
+      "owner_role": "ESA adapter owner",
+      "dependency_review": {
+        "status": "static_review_only",
+        "evidence": "Full deck has inline properties, 102 node declarations, 190 GL and 5050 GR declarations; no lexical include directives; solver/output procedures still require the vendor runtime; complete native project container not provided"
+      },
+      "reference_results": {
+        "status": "upstream_results_present_not_reproduced",
+        "physical_oracle": true,
+        "format": "HDF5 TMD",
+        "case": "transient",
+        "evidence": "Pinned upstream README identifies these as ESATAN-calculated results; raw results remain local and are not a current qualified run"
+      },
+      "blockers": [
+        "ESA_RUNTIME_UNAVAILABLE",
+        "ESA_NATIVE_PROJECT_CONTAINER_MISSING",
+        "ESA_RESULT_SCHEMA_UNQUALIFIED"
+      ]
+    },
+    {
+      "required_operations": [
+        "inspect",
+        "represent",
+        "edit",
+        "native_execute",
+        "write",
+        "source_reopen_run",
+        "cross_tool_exchange"
+      ],
+      "qualification": "unqualified",
+      "rights": {
+        "redistribution": "hold",
+        "policy": "Originals remain local; repository license alone does not clear vendor metadata or third-party generated content"
+      },
+      "operation_dispositions": {
+        "inspect": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "represent": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "edit": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "native_execute": {
+          "status": "not_applicable",
+          "reason": "Nonphysical syntax corpus; cannot be used as a thermal numerical or common-model oracle"
+        },
+        "write": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "source_reopen_run": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "cross_tool_exchange": {
+          "status": "not_applicable",
+          "reason": "Nonphysical syntax corpus; cannot be used as a thermal numerical or common-model oracle"
+        }
+      },
+      "id": "ESA-FEATURES",
+      "source_id": "ESA-DISC-TUTORIAL",
+      "profiles": [
+        "ESA-NATIVE",
+        "STEP-TAS"
+      ],
+      "files": [
+        "tests/data/esatan/FEATURES.erg",
+        "tests/data/esatan/FEATURES.stp",
+        "tests/data/esatan/expected_faces.csv"
+      ],
+      "source_version": {
+        "status": "observed",
+        "value": "2025",
+        "evidence": "ESATAN-TMS 2025 exporter header in FEATURES.stp; separate DISC decks are 2018 SP1"
+      },
+      "purpose": "syntax_only",
+      "owner_role": "ESA adapter owner",
+      "dependency_review": {
+        "status": "incomplete",
+        "evidence": "Geometry corpus and STEP Part21 tas_arm file acquired; EXPRESS schema/dictionary and independent validator are not acquired"
+      },
+      "reference_results": {
+        "status": "not_a_physical_oracle",
+        "physical_oracle": false
+      },
+      "blockers": [
+        "STEP_TAS_SCHEMA_DICTIONARY_UNAVAILABLE",
+        "ESA_RUNTIME_UNAVAILABLE"
+      ]
+    },
+    {
+      "required_operations": [
+        "inspect",
+        "represent",
+        "edit",
+        "native_execute",
+        "write",
+        "source_reopen_run",
+        "cross_tool_exchange"
+      ],
+      "qualification": "unqualified",
+      "rights": {
+        "redistribution": "hold",
+        "policy": "Originals remain local; repository license alone does not clear vendor metadata or third-party generated content"
+      },
+      "operation_dispositions": {
+        "inspect": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "represent": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "edit": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "native_execute": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "write": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "source_reopen_run": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "cross_tool_exchange": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        }
+      },
+      "id": "TD-SINDA-CASE1",
+      "source_id": "TD-SINDA-COMMUNITY",
+      "profiles": [
+        "TD-NETWORK",
+        "TD-RESULTS"
+      ],
+      "files": [
+        "Working CubeSat Model/case1.inp",
+        "Working CubeSat Model/case1.cc",
+        "Working CubeSat Model/userlogic.for",
+        "Working CubeSat Model/case1.out",
+        "Working CubeSat Model/C1A0.hra",
+        "Working CubeSat Model/C1A0.hrl",
+        "Working CubeSat Model/C1A1.k_in",
+        "Working CubeSat Model/C1A2.k_in",
+        "Working CubeSat Model/C1A1.k",
+        "Working CubeSat Model/C1A2.k"
+      ],
+      "source_version": {
+        "status": "observed",
+        "value": "Thermal Desktop 6.3; exact patch and SINDA release unknown",
+        "evidence": "Explicit Thermal Desktop 6.3 header in the acquired case1.cc; this identifies no SINDA runtime or patch release"
+      },
+      "purpose": "physical",
+      "owner_role": "TD adapter owner",
+      "dependency_review": {
+        "status": "static_insert_closure_reviewed",
+        "evidence": "All five direct INSERT references acquired; associated radiation coefficient files and source logic retained; indirect runtime I/O and procedure/link dependencies remain unqualified"
+      },
+      "reference_results": {
+        "status": "upstream_output_present_not_reproduced",
+        "physical_oracle": true,
+        "format": "source text output",
+        "evidence": "Output accompanies the deck at the pinned repository revision; correspondence and tolerances need a licensed source run"
+      },
+      "blockers": [
+        "SINDA_LICENSE_UNAVAILABLE",
+        "TD_PATCH_AND_SINDA_RELEASE_UNKNOWN",
+        "RIGHTS_NOT_DECLARED",
+        "RUNTIME_DEPENDENCY_CLOSURE_UNVERIFIED"
+      ]
+    },
+    {
+      "required_operations": [
+        "inspect",
+        "represent",
+        "edit",
+        "native_execute",
+        "write",
+        "source_reopen_run",
+        "cross_tool_exchange"
+      ],
+      "qualification": "unqualified",
+      "rights": {
+        "redistribution": "hold",
+        "policy": "Originals remain local; repository license alone does not clear vendor metadata or third-party generated content"
+      },
+      "operation_dispositions": {
+        "inspect": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "represent": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "edit": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "native_execute": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "write": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "source_reopen_run": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "cross_tool_exchange": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        }
+      },
+      "id": "ESA-ACUBESAT-V2",
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "profiles": [
+        "ESA-NATIVE"
+      ],
+      "files": [
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Comissioning_Detumbling_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_Active.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_summer_2022.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v2.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v3.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v4.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Comissioning_Detumbling_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500_Active.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500v1_1.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Nominal_Glass_PEEK_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_005.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_RAD_10.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1_summer_2022.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_2.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_3.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_4.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_6LTAN_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_6LTAN_Nominal_Nadir_600.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_600.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Nadir.tpl",
+        "cubesat/v2/model/summer-2022.ere",
+        "cubesat/v2/model/summer-2022.erg",
+        "cubesat/v2/model/summer-2022.erk",
+        "cubesat/v2/model/summer-2022.xml"
+      ],
+      "source_version": {
+        "status": "observed",
+        "value": "2020 (analysis templates only)",
+        "evidence": "All 25 acquired case templates identify ESATAN-TMS 2020; native geometry/environment/kinematics release and exact patch still require vendor inspection"
+      },
+      "purpose": "physical",
+      "owner_role": "ESA adapter owner",
+      "dependency_review": {
+        "status": "incomplete",
+        "evidence": "Native ERG geometry ERE environment ERK kinematics XML descriptor and 25 analysis templates acquired. Native path/property resolution and complete runtime dependency closure require licensed reopen; imported logic remains inert"
+      },
+      "reference_results": {
+        "status": "missing",
+        "physical_oracle": false
+      },
+      "blockers": [
+        "ESA_RUNTIME_UNAVAILABLE",
+        "ESA_NATIVE_RELEASE_PATCH_UNVERIFIED",
+        "ESA_RUNTIME_DEPENDENCY_CLOSURE_UNVERIFIED",
+        "RIGHTS_NOT_DECLARED",
+        "ESA_NATIVE_RESULTS_MISSING"
+      ]
+    }
+  ]
+}

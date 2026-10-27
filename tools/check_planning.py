@@ -10,7 +10,8 @@ if __name__ == "__main__":
     output = ROOT / ".local/planning"
     output.mkdir(parents=True, exist_ok=True)
     passed = True
-    for name, script in [("plan", "plans/tools/validate_plan.py"), ("specification", "spec/tools/validate_spec.py")]:
+    for name, script in [("plan", "plans/tools/validate_plan.py"), ("specification", "spec/tools/validate_spec.py"),
+                         ("workflows", "tools/check_workflows.py"), ("inventory", "tools/check_inventory.py")]:
         try:
             with (output / (name + ".log")).open("wb") as log:
                 result = subprocess.run([sys.executable, script], cwd=ROOT, stdout=log,

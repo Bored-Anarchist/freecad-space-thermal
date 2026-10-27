@@ -1,0 +1,104 @@
+{
+  "schema_version": 1,
+  "gaps": [
+    {
+      "id": "GAP-LICENSES",
+      "category": "vendor_execution",
+      "description": "No active licensed reference-runner configuration is available for the required Thermal Desktop/SINDA and ESATAN source operations",
+      "owner_work_package": "WP-08",
+      "status": "blocked",
+      "supporting_work_packages": [
+        "WP-09"
+      ],
+      "required_gate": "Q1"
+    },
+    {
+      "id": "GAP-VERSIONS",
+      "category": "source_version",
+      "description": "Thermal Desktop 6.3 header and ESATAN-TMS 2020 case-template headers now observed; TD exact patch and SINDA release plus native ESATAN container release/patch remain unverified",
+      "owner_work_package": "WP-08",
+      "status": "blocked",
+      "supporting_work_packages": [
+        "WP-09"
+      ],
+      "required_gate": "Q1"
+    },
+    {
+      "id": "GAP-NATIVE",
+      "category": "native_dependency_closure",
+      "description": "Native ESATAN geometry/environment/kinematics/project descriptor and 25 cases acquired; TD embedded and both ecosystems runtime dependency closure still require licensed reopen/edit/export/run verification",
+      "owner_work_package": "WP-08",
+      "status": "blocked",
+      "supporting_work_packages": [
+        "WP-09"
+      ],
+      "required_gate": "Q1"
+    },
+    {
+      "id": "GAP-RIGHTS",
+      "category": "redistribution",
+      "description": "All originals are held locally; MIT repository examples retain separate metadata/content review; community SINDA and acquired AcubeSAT native project declare no redistribution license",
+      "owner_work_package": "WP-19",
+      "status": "blocked",
+      "supporting_work_packages": [
+        "WP-07",
+        "WP-08",
+        "WP-09"
+      ],
+      "required_gate": "Q1"
+    },
+    {
+      "id": "GAP-STEP",
+      "category": "schema_access",
+      "description": "The public standard identifies an EXPRESS annex and dictionary, but both the current ECSS download landing page and ESA exchange portal redirect to an unavailable-site notice; schema/dictionary and independent validation remain unacquired",
+      "owner_work_package": "WP-10",
+      "status": "blocked",
+      "required_gate": "Q1"
+    },
+    {
+      "id": "GAP-ADVANCED",
+      "category": "fixture_coverage",
+      "description": "No selected example establishes required FLUINT/two-phase fluid, detailed heat-pipe, advanced optical or full customer/legacy coverage",
+      "owner_work_package": "WP-20",
+      "status": "blocked",
+      "required_gate": "Q1/Q2",
+      "supporting_work_packages": [
+        "WP-12"
+      ]
+    },
+    {
+      "id": "GAP-LEGACY",
+      "category": "fixture_coverage",
+      "description": "Required modern THERMICA/THERMISOL and historical ESARAD/SYSBAS/VIF/TRASYS fixture/version inventories are not acquired",
+      "owner_work_package": "WP-21",
+      "status": "blocked",
+      "required_gate": "Q2"
+    },
+    {
+      "id": "GAP-RESULTS",
+      "category": "numerical_reference",
+      "description": "No paired TD tutorial source result; retained upstream SINDA/ESATAN outputs require schema/provenance review and licensed reproduction; owned solver comparisons belong to later packages",
+      "owner_work_package": "WP-19",
+      "status": "blocked",
+      "supporting_work_packages": [
+        "WP-08",
+        "WP-09",
+        "WP-11"
+      ],
+      "required_gate": "Q1"
+    }
+  ],
+  "additional_candidates": [
+    {
+      "source": "https://www.crtech.com/getting-started",
+      "kind": "vendor tutorials and samples",
+      "decision": "Customer/evaluator login and active license required; no authentication or license restrictions bypassed"
+    },
+    {
+      "source": "https://ecss.nl/wp-content/uploads/2018/01/ecss-e-st-31-04-annex-a.zip",
+      "kind": "STEP-TAS EXPRESS annex",
+      "decision": "The normative standard says registered login is required; archive/dictionary not acquired through a bypass"
+    }
+  ],
+  "scope_disposition": "Open qualification obligations owned by later packages; they do not block the acquired WP-01 baseline or native Q0 development."
+}

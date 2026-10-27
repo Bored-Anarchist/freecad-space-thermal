@@ -30,6 +30,15 @@ class PrivacyTests(unittest.TestCase):
         self.scanner.scan("fixtures/model.json", b'{"nodes":[{"id":"n1","temperature_K":300}]}')
         self.assertEqual(self.scanner.report()["status"], "passed")
 
+    def test_public_project_url_is_distinct_from_real_home_paths(self):
+        self.scanner.scan("project.json", b'{"url":"https://github.com/users/sample/projects/1"}')
+        self.assertEqual(self.scanner.report()["status"], "passed")
+        for value in ["/".join(["", "home", "synthetic-person", "model.txt"]),
+                      "file://" + "/".join(["", "Users", "synthetic-person", "model.txt"])]:
+            scanner = Scanner(self.policy)
+            scanner.scan("data.txt", value.encode())
+            self.assertIn("personal_path", {item["category"] for item in scanner.findings})
+
     def test_planted_categories_and_reports_never_echo_values(self):
         cases = {
             "personal_path": "C:" + chr(92) + "Users" + chr(92) + "synthetic-person" + chr(92) + "model.txt",
@@ -135,3 +144,34 @@ class PrivacyTests(unittest.TestCase):
             target.write_text("safe worktree")
             inspect_git(self.scanner, root, None, True)
             self.assertIn("credential", {item["category"] for item in self.scanner.findings})
+
+    def test_annotated_tag_identity_is_inspected(self):
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as temporary:
+            root = Path(temporary)
+            def git(*args):
+                return subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True).stdout
+            git("init", "-q")
+            identity = self.policy["approved_identities"][0]
+            git("config", "user.name", identity["name"])
+            git("config", "user.email", identity["email"])
+            (root / "safe.txt").write_text("safe")
+            git("add", "safe.txt")
+            git("-c", "core.hooksPath=", "commit", "-qm", "Synthetic safe commit")
+            git("-c", "user.name=Synthetic unapproved tagger", "tag", "-a", "test-tag", "-m", "Synthetic tag")
+            inspect_git(self.scanner, root, "test-tag", False)
+            self.assertIn("unapproved_identity", {item["category"] for item in self.scanner.findings})
+
+    def test_staged_mode_changes_invalidate_clearance(self):
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as temporary:
+            root = Path(temporary)
+            def git(*args):
+                return subprocess.run(["git", "-C", str(root), *args], check=True, capture_output=True).stdout
+            git("init", "-q")
+            (root / "safe.txt").write_text("safe")
+            git("add", "safe.txt")
+            inspect_git(self.scanner, root, None, True)
+            first = self.scanner.report()
+            git("update-index", "--chmod=+x", "safe.txt")
+            changed = Scanner(self.policy)
+            inspect_git(changed, root, None, True)
+            self.assertNotEqual(first["payload_sha256"], changed.report()["payload_sha256"])
