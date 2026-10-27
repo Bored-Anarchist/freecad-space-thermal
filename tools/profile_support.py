@@ -3,6 +3,8 @@
 from __future__ import annotations
 import hashlib
 import os
+import json
+import re
 import subprocess
 from pathlib import Path
 from urllib.parse import urlsplit
@@ -12,10 +14,32 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class ProbeFailure(ValueError):
-    def __init__(self, stage, reason="process_failure"):
+    def __init__(self, stage, reason="process_failure", diagnostics=None):
         super().__init__("Probe failed; raw output retained locally")
         self.stage = stage
         self.reason = reason
+        self.diagnostics = diagnostics or []
+
+
+def safe_failure_excerpt(log):
+    """Retain bounded error sentences after removing path lines and privacy findings."""
+    from fcst_tools.privacy import POLICY_PATH, Scanner
+    policy = json.loads(POLICY_PATH.read_text(encoding="utf-8"))
+    lines = Path(log).read_text(encoding="utf-8", errors="replace").splitlines()[-100:]
+    chosen = set()
+    for index, line in enumerate(lines):
+        if re.search(r"error|unable|invalid|missing|not found|not available|cannot", line, re.I):
+            chosen.update(range(index, min(index + 3, len(lines))))
+    safe = []
+    for index in sorted(chosen):
+        line = lines[index].strip()
+        if not line or len(line) > 300 or any(char in line for char in ("/", chr(92), "@")):
+            continue
+        scanner = Scanner(policy)
+        scanner.scan("probe-diagnostic.txt", line.encode("utf-8"))
+        if not scanner.findings:
+            safe.append(line)
+    return safe[:20]
 
 
 def verified_download(url, destination, size, digest):
@@ -73,4 +97,4 @@ def run(command, directory, log, env=None, timeout=1800):
             reason = "installed_makefile_unavailable"
         elif "target was not found" in text:
             reason = "exported_target_unavailable"
-        raise ProbeFailure(Path(log).stem, reason)
+        raise ProbeFailure(Path(log).stem, reason, safe_failure_excerpt(log))

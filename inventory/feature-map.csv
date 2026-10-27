@@ -6,17 +6,17 @@ F-CONDUCTION,Conductive links and source conductance assembly,Q1,physics/assembl
 F-MATERIALS,Material conductivity capacity density and property expressions,Q1,model/materials,WP-16,PHY-002,TD-ARTEMIS;ESA-DISC-STEADY,,Thermal discretization lead
 F-LOADS,Point and surface heat loads time tables and cases,Q1,physics/loads,WP-11,PHY-004;PHY-005,TD-ARTEMIS;TD-SINDA-CASE1;ESA-DISC-TRANSIENT,,Numerical lead
 F-RADIATION,Radiative couplings boundary exchange and optical properties,Q1,radiation/exchange,WP-12,RAD-001;RAD-002;RAD-004,TD-ARTEMIS;TD-SINDA-CASE1;ESA-DISC-STEADY,,Radiation lead
-F-GEOMETRY,Geometry primitives transformations meshes and GMM/TMM links,Q1,geometry/mappings,WP-13,DAT-002;DAT-004;INT-006,TD-ARTEMIS;ESA-FEATURES;ESA-DISC-STEADY,,FreeCAD host lead
+F-GEOMETRY,Geometry primitives transformations meshes and GMM/TMM links,Q1,geometry/mappings,WP-13,DAT-002;DAT-004;INT-006,TD-ARTEMIS;ESA-FEATURES;ESA-DISC-STEADY;ESA-ACUBESAT-V2,,FreeCAD host lead
 F-STEADY,Steady nonlinear solve energy and boundary balances,Q1,numerics/steady,WP-11,PHY-001;PHY-006;PHY-007,TD-SINDA-CASE1;ESA-DISC-STEADY,,Numerical lead
 F-TRANSIENT,Transient stepping initialization events and diagnostics,Q1,numerics/transient,WP-11,PHY-001;PHY-005;PHY-006;PHY-007,ESA-DISC-TRANSIENT;TD-ARTEMIS,,Numerical lead
 F-EXPRESSIONS,Typed source expressions and tables without automatic evaluation,Q1,model/expressions,WP-03,DAT-011,TD-SINDA-CASE1;ESA-DISC-STEADY;ESA-FEATURES,,Architecture and API lead
 F-SOURCE-LOGIC,Inert retention and reviewed translation of source procedures,Q1,adapters/logic,WP-07,INT-009;SEC-001,TD-SINDA-CASE1;ESA-DISC-STEADY;ESA-DISC-TRANSIENT,,Exchange lead
 F-RESULTS,Source result identity time grids units and provenance,Q1,adapters/results,WP-09,INT-017;DAT-010,TD-SINDA-CASE1;ESA-DISC-STEADY;ESA-DISC-TRANSIENT,,Exchange lead
 F-TD-ROUNDTRIP,Changed-model TD native import editing source writing and reopening,Q1,adapters/td,WP-08,INT-005;INT-010;INT-011;INT-022,TD-ARTEMIS,GAP-NATIVE,TD adapter owner
-F-ESA-ROUNDTRIP,Changed-model ESATAN native editing source writing and reopening,Q1,adapters/esatan,WP-09,INT-006;INT-010;INT-011;INT-022,ESA-DISC-STEADY;ESA-FEATURES,GAP-NATIVE,ESA adapter owner
+F-ESA-ROUNDTRIP,Changed-model ESATAN native editing source writing and reopening,Q1,adapters/esatan,WP-09,INT-006;INT-010;INT-011;INT-022,ESA-DISC-STEADY;ESA-FEATURES;ESA-ACUBESAT-V2,GAP-NATIVE,ESA adapter owner
 F-STEP-TAS,Schema-backed thermal data exchange and dataset coverage,Q1,adapters/step_tas,WP-10,INT-013;INT-014;INT-021,ESA-FEATURES,GAP-STEP,Exchange lead
 F-CROSS-TOOL,Separate TD-to-ESA and ESA-to-TD common profiles,Q1,adapters/common,WP-10,INT-002;INT-012,TD-ARTEMIS;ESA-DISC-STEADY,GAP-LICENSES,Exchange lead
-F-ENVIRONMENT,Orbit solar albedo IR and moving geometry histories,Q1,environment/orbit,WP-17,RAD-006;RAD-007;RAD-008,TD-SINDA-CASE1;TD-ARTEMIS,GAP-NATIVE,Environment and radiation lead
+F-ENVIRONMENT,Orbit solar albedo IR and moving geometry histories,Q1,environment/orbit,WP-17,RAD-006;RAD-007;RAD-008,TD-SINDA-CASE1;TD-ARTEMIS;ESA-ACUBESAT-V2,GAP-NATIVE,Environment and radiation lead
 F-ADVANCED-FLUID,Required FLUINT multiphase and detailed heat-pipe behavior,Q2,fluid/coupling,WP-20,RAD-010,,GAP-ADVANCED,Numerical lead with fluid specialists
 F-ADVANCED-OPTICS,Required specular transmissive and wavelength behavior,Q1,radiation/optics,WP-12,RAD-005,,GAP-ADVANCED,Radiation lead
 F-LEGACY,Mandatory historical source versions and advanced user logic,Q2,adapters/legacy,WP-21,INT-018,,GAP-LEGACY,Exchange lead

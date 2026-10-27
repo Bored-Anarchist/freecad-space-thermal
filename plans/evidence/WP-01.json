@@ -1,13 +1,13 @@
 {
   "work_package": "WP-01",
-  "status": "in_progress",
-  "scope": "Online example acquisition and compatibility inventory; no native/legacy/source-run qualification",
+  "status": "blocked",
+  "scope": "Expanded public-source acquisition and compatibility inventory; original full WP-01 closure remains blocked by external reference prerequisites",
   "checks": [
     {
       "id": "immutable-original-acquisition",
       "status": "passed",
       "command": "python tools/acquire_corpus.py",
-      "evidence": "25 original files from three pinned public repositories preserved byte-for-byte in ignored local storage"
+      "evidence": "55 original files from four pinned public repositories preserved byte-for-byte in ignored local storage, including native ESATAN ERG/ERE/ERK/XML and 25 case templates"
     },
     {
       "id": "upstream-git-tree-lock",
@@ -19,7 +19,7 @@
       "id": "local-inventory-and-originals",
       "status": "passed",
       "command": "python tools/check_inventory.py --local",
-      "evidence": "Five model/example cases; 21 feature groups; all 12 profiles mapped; original SHA-256 checks pass"
+      "evidence": "Six model/example cases; 21 feature groups; all 12 profiles mapped; all 55 original SHA-256 checks pass"
     },
     {
       "id": "negative-qualification-gate",
@@ -38,15 +38,21 @@
       "status": "passed",
       "command": "python tools/verify.py --preset windows-release",
       "evidence": "47 foundation checks passed; subsequent planning/specification/inventory checks pass after final documentation sanitization"
+    },
+    {
+      "id": "source-version-header-observations",
+      "status": "passed",
+      "command": "python tools/lock_corpus.py",
+      "evidence": "Community generated source explicitly identifies Thermal Desktop 6.3; all 25 native ESATAN analysis templates identify 2020. Exact TD patch/SINDA release and native ESATAN container build remain unverified"
     }
   ],
   "blockers": [
-    "No active licensed source runner; no source reopen/export/run evidence",
-    "Unknown TD/SINDA source release and unresolved native/indirect dependencies",
-    "Original redistribution/metadata clearance held; community SINDA candidate has no declared license",
-    "STEP-TAS schema/dictionary/independent validator not acquired",
+    "No active licensed source runner; required source reopen/export/run/result retrieval cannot be executed",
+    "Unknown Artemis TD release, community TD exact patch/SINDA release, native ESA container build and unresolved runtime dependency closure",
+    "Original redistribution held; community SINDA and native ESATAN repositories declare no license; local acquisition does not grant redistribution rights",
+    "STEP-TAS normative schema/dictionary/independent validator unavailable from current official endpoints and not found in the searched public schema sources",
     "Advanced fluid/optical and historical/customer fixture coverage incomplete",
-    "Upstream numerical outputs not independently reproduced or compared with an owned solver"
+    "Upstream numerical outputs not independently reproduced; owned-solver comparisons require later implementation"
   ],
   "evidence_policy": "See inventory/gaps.json. Existing requirement/profile gates are preserved. Native core development continues; WP-01/Q0 cannot be called complete while these prerequisites remain open."
 }

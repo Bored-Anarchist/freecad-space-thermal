@@ -11,7 +11,7 @@ from fcst_tools.profiles import HOST_CASES, BUILD_STAGES, assess_dependencies, a
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-from profile_support import verified_download
+from profile_support import verified_download, safe_failure_excerpt
 from project_files import markdown_files
 
 
@@ -82,3 +82,17 @@ class ProfileTests(unittest.TestCase):
             self.assertEqual({p.name for p in markdown_files(root)}, {"tracked.md", "new.md"})
             (root / "tracked.md").unlink()
             self.assertEqual({p.name for p in markdown_files(root)}, {"new.md"})
+
+    def test_probe_diagnostics_withhold_private_values_and_paths(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "raw.log"
+            home = chr(47) + "home" + chr(47) + "private-person"
+            contact = "private-person" + chr(64) + "example.org"
+            secret = "api_" + "key=" + "synthetic-private-value"
+            path.write_text("ERROR: Unsupported configure option\nError " + home + "\nError " + contact +
+                            "\nError " + secret + "\n", encoding="utf-8")
+            excerpt = safe_failure_excerpt(path)
+            self.assertIn("ERROR: Unsupported configure option", excerpt)
+            text = json.dumps(excerpt)
+            for value in (home, contact, secret):
+                self.assertNotIn(value, text)

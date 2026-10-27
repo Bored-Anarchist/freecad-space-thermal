@@ -56,6 +56,8 @@ if(d<0 || H5Dread(d,H5T_NATIVE_DOUBLE,H5S_ALL,H5S_ALL,H5P_DEFAULT,y)<0) return 3
 H5Dclose(d); H5Fclose(f); return y[0]==1.25 && y[1]==2.5 ? 0 : 4; }
 """),
     "embree": ("find_package(embree 4 REQUIRED)", "embree", """#include <embree4/rtcore.h>
+#include <cmath>
+#include <limits>
 int main(){ auto d=rtcNewDevice("threads=1"); if(!d) return 1;
 auto s=rtcNewScene(d); auto g=rtcNewGeometry(d,RTC_GEOMETRY_TYPE_TRIANGLE);
 auto v=(float*)rtcSetNewGeometryBuffer(g,RTC_BUFFER_TYPE_VERTEX,0,RTC_FORMAT_FLOAT3,12,3);
@@ -65,7 +67,8 @@ ix[0]=0;ix[1]=1;ix[2]=2; rtcCommitGeometry(g); rtcAttachGeometry(s,g); rtcReleas
 RTCRayHit r={}; r.ray.org_x=.25f;r.ray.org_y=.25f;r.ray.org_z=1;
 r.ray.dir_z=-1;r.ray.tfar=10;r.ray.mask=~0u;r.hit.geomID=RTC_INVALID_GEOMETRY_ID;
 RTCIntersectArguments a;rtcInitIntersectArguments(&a);rtcIntersect1(s,&r,&a);
-int ok=r.hit.geomID!=RTC_INVALID_GEOMETRY_ID && r.ray.tfar==1 && rtcGetDeviceError(d)==RTC_ERROR_NONE;
+int ok=r.hit.geomID!=RTC_INVALID_GEOMETRY_ID && std::abs(r.ray.tfar-1)<=8*std::numeric_limits<float>::epsilon()
+ && rtcGetDeviceError(d)==RTC_ERROR_NONE;
 rtcReleaseScene(s);rtcReleaseDevice(d);return ok?0:2; }
 """),
     "occt": ("find_package(OpenCASCADE REQUIRED)\ninclude_directories(${OpenCASCADE_INCLUDE_DIR})\nlink_directories(${OpenCASCADE_LIBRARY_DIR})",
@@ -202,7 +205,8 @@ def main():
                               installed_bytes=sum(p.stat().st_size for p in install.rglob("*") if p.is_file()),
                               toolchain=toolchain(work), build_options=OPTIONS.get(item["id"], ["serial", "shared", "system_blas_lapack"]))
             except ProbeFailure as failure:
-                record.update(status="failed", failing_stage=failure.stage, reason=failure.reason)
+                record.update(status="failed", failing_stage=failure.stage, reason=failure.reason,
+                              sanitized_diagnostics=failure.diagnostics)
             except (ValueError, OSError, tarfile.TarError, subprocess.SubprocessError):
                 record.update(status="failed", reason="probe_failed_raw_logs_local")
         record["seconds"] = round(time.monotonic() - start, 3)
