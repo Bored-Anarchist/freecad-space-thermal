@@ -1,0 +1,17 @@
+{
+  "fixture_schema": "fcst-inventory-analytic-v1",
+  "purpose": "Independent analytic seed; not an implemented FCST snapshot or vendor-format fixture",
+  "license": "MIT OR Apache-2.0",
+  "criterion_version": "analytic-seed-v1",
+  "units": {"temperature": "K", "heat_capacity": "J/K", "conductance": "W/K", "power": "W", "time": "s"},
+  "capacity_J_per_K": 10.0,
+  "conductance_W_per_K": 2.0,
+  "boundary_K": 300.0,
+  "initial_K": 300.0,
+  "power_W": 1.0,
+  "steady_reference_K": 300.5,
+  "time_constant_s": 5.0,
+  "reference_times_s": [0.0, 1.0, 5.0, 20.0],
+  "oracle_identity": "C dT/dt = Q - G(T-Tb); steady T=Tb+Q/G; transient T=Tb+Q/G+(T0-Tb-Q/G)exp(-Gt/C)",
+  "scope": "Checks reference arithmetic and future native test inputs only; cannot qualify a thermal solver or imported model"
+}

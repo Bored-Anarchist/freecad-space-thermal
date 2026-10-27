@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "gaps": [
+    {
+      "id": "GAP-LICENSES",
+      "category": "vendor_execution",
+      "description": "No active licensed reference-runner configuration is available for the required Thermal Desktop/SINDA and ESATAN source operations",
+      "owner_work_package": "WP-01",
+      "status": "blocked"
+    },
+    {
+      "id": "GAP-VERSIONS",
+      "category": "source_version",
+      "description": "Thermal Desktop/SINDA example source versions cannot be established from DWG signatures or sibling filenames; exact source profile qualification remains open",
+      "owner_work_package": "WP-08",
+      "status": "blocked"
+    },
+    {
+      "id": "GAP-NATIVE",
+      "category": "native_dependency_closure",
+      "description": "TD embedded property/heat-load dependencies and a complete native ESATAN project container are not verified; no vendor reopen/edit/export/run evidence exists",
+      "owner_work_package": "WP-01",
+      "status": "blocked"
+    },
+    {
+      "id": "GAP-RIGHTS",
+      "category": "redistribution",
+      "description": "All originals are held locally; university and Pycanha repositories declare MIT but vendor-generated metadata still needs publication review; community SINDA and AcubeSAT repositories declare no license",
+      "owner_work_package": "WP-01",
+      "status": "blocked"
+    },
+    {
+      "id": "GAP-STEP",
+      "category": "schema_access",
+      "description": "The public standard identifies an EXPRESS annex and dictionary, but both the current ECSS download landing page and ESA exchange portal redirect to an unavailable-site notice; schema/dictionary and independent validation remain unacquired",
+      "owner_work_package": "WP-10",
+      "status": "blocked"
+    },
+    {
+      "id": "GAP-ADVANCED",
+      "category": "fixture_coverage",
+      "description": "No selected example establishes required FLUINT/two-phase fluid, detailed heat-pipe, advanced optical or full customer/legacy coverage",
+      "owner_work_package": "WP-20",
+      "status": "blocked"
+    },
+    {
+      "id": "GAP-LEGACY",
+      "category": "fixture_coverage",
+      "description": "Required modern THERMICA/THERMISOL and historical ESARAD/SYSBAS/VIF/TRASYS fixture/version inventories are not acquired",
+      "owner_work_package": "WP-21",
+      "status": "blocked"
+    },
+    {
+      "id": "GAP-RESULTS",
+      "category": "numerical_reference",
+      "description": "No paired TD tutorial source result; retained upstream SINDA/ESATAN outputs require schema/provenance review and licensed reproduction; owned solver comparisons belong to later packages",
+      "owner_work_package": "WP-04",
+      "status": "blocked"
+    }
+  ],
+  "additional_candidates": [
+    {
+      "source": "https://github.com/AcubeSAT/esatan-models",
+      "kind": "complete native ESATAN project candidate",
+      "decision": "Not downloaded or republished; no repository license; acquired tutorial geometry/decks do not replace this missing native-project coverage"
+    },
+    {
+      "source": "https://www.crtech.com/getting-started",
+      "kind": "vendor tutorials and samples",
+      "decision": "Customer/evaluator login and active license required; no authentication or license restrictions bypassed"
+    },
+    {
+      "source": "https://ecss.nl/wp-content/uploads/2018/01/ecss-e-st-31-04-annex-a.zip",
+      "kind": "STEP-TAS EXPRESS annex",
+      "decision": "The normative standard says registered login is required; archive/dictionary not acquired through a bypass"
+    }
+  ]
+}

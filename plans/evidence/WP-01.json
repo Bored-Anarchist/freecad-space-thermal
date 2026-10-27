@@ -1,0 +1,52 @@
+{
+  "work_package": "WP-01",
+  "status": "in_progress",
+  "scope": "Online example acquisition and compatibility inventory; no native/legacy/source-run qualification",
+  "checks": [
+    {
+      "id": "immutable-original-acquisition",
+      "status": "passed",
+      "command": "python tools/acquire_corpus.py",
+      "evidence": "25 original files from three pinned public repositories preserved byte-for-byte in ignored local storage"
+    },
+    {
+      "id": "upstream-git-tree-lock",
+      "status": "passed",
+      "command": "python tools/lock_corpus.py",
+      "evidence": "inventory/source-lock.json; every acquired file matched its pinned upstream Git blob hash and byte count"
+    },
+    {
+      "id": "local-inventory-and-originals",
+      "status": "passed",
+      "command": "python tools/check_inventory.py --local",
+      "evidence": "Five model/example cases; 21 feature groups; all 12 profiles mapped; original SHA-256 checks pass"
+    },
+    {
+      "id": "negative-qualification-gate",
+      "status": "passed",
+      "command": "python tools/check_inventory.py --local --qualify",
+      "evidence": "Exit code 1 and blocked verdict for all eight prerequisite/risk categories; static inventory never returns a qualification pass"
+    },
+    {
+      "id": "synthetic-inventory-regressions",
+      "status": "passed",
+      "command": "python tools/check_security.py",
+      "evidence": "Tests reject missing provenance/profiles/owners, unidentified versions without blockers, tampered originals, unsafe paths, unsupported qualification and syntax-as-physics claims; imported logic stays inert"
+    },
+    {
+      "id": "local-foundation-regression",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "evidence": "47 foundation checks passed; subsequent planning/specification/inventory checks pass after final documentation sanitization"
+    }
+  ],
+  "blockers": [
+    "No active licensed source runner; no source reopen/export/run evidence",
+    "Unknown TD/SINDA source release and unresolved native/indirect dependencies",
+    "Original redistribution/metadata clearance held; community SINDA candidate has no declared license",
+    "STEP-TAS schema/dictionary/independent validator not acquired",
+    "Advanced fluid/optical and historical/customer fixture coverage incomplete",
+    "Upstream numerical outputs not independently reproduced or compared with an owned solver"
+  ],
+  "evidence_policy": "See inventory/gaps.json. Existing requirement/profile gates are preserved. Native core development continues; WP-01/Q0 cannot be called complete while these prerequisites remain open."
+}

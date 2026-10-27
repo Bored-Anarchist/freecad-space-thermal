@@ -15,6 +15,8 @@ If an older pip cannot use the operating system certificate store, `python tools
 
 The fast driver compares collected case IDs with `ci/coverage.json`. Missing, duplicated, skipped, cancelled, blocked or failed required cases fail the gate. Tests prove those rejection paths. Local raw logs remain under `.local/`; CI publishes only the privacy-cleared verification/build-info JSON files. Debug symbols, source maps, raw compiler output and native binaries are not uploaded by these foundation workflows.
 
+WP-01 adds the offline inventory checker and synthetic regression cases to that same fast driver. See [the corpus inventory](../inventory/README.md) for reproducible acquisition, local original-byte checks and the separate blocked qualification command. CI validates provenance/coverage metadata without downloading third-party models or executing imported logic. An acquired file, syntax-only corpus or retained upstream result cannot satisfy native physics or vendor qualification.
+
 ```text
 python tools/verify.py --tier full --preset windows-release
 python tools/check_github.py

@@ -1,0 +1,610 @@
+{
+  "schema_version": 1,
+  "scope": "Public provenance metadata only; no raw model bytes or original matched values",
+  "files": [
+    {
+      "source_id": "TD-ARTEMIS-TUTORIAL",
+      "path": "LICENSE",
+      "role": "license",
+      "revision": "bcc649cf7932dcc410f8a594213383fb84e68d47",
+      "url": "https://raw.githubusercontent.com/hsfl/artemis-hardware/bcc649cf7932dcc410f8a594213383fb84e68d47/LICENSE",
+      "bytes": 1087,
+      "sha256": "208373295aac97b7938fbb0d60dddf83c4adf2b203075e1c968267004cefff61",
+      "git_blob_sha1": "0f95090cbb3d96bb38ec561b385a578e18d0394e",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-ARTEMIS-TUTORIAL",
+      "path": "Thermal/artemis_thermal_lab.dwg",
+      "role": "native_model",
+      "revision": "bcc649cf7932dcc410f8a594213383fb84e68d47",
+      "url": "https://raw.githubusercontent.com/hsfl/artemis-hardware/bcc649cf7932dcc410f8a594213383fb84e68d47/Thermal/artemis_thermal_lab.dwg",
+      "bytes": 252076,
+      "sha256": "06f40cd4ae5586dcd894d61cd08b059209ec77de7ce242952d5d7e44a504d242",
+      "git_blob_sha1": "501181584ebb4c5f95a26ad66b113b39dc718d87",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "blocked_binary",
+      "observations": {
+        "format": "DWG",
+        "container_signature": "AC1032",
+        "vendor_version_identified": false,
+        "metadata_inspected": false,
+        "can_execute": false
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-ARTEMIS-TUTORIAL",
+      "path": "Thermal/rcoptics (1).rco",
+      "role": "optical_properties",
+      "revision": "bcc649cf7932dcc410f8a594213383fb84e68d47",
+      "url": "https://raw.githubusercontent.com/hsfl/artemis-hardware/bcc649cf7932dcc410f8a594213383fb84e68d47/Thermal/rcoptics%20%281%29.rco",
+      "bytes": 9461,
+      "sha256": "da1cfc6d020119a4d092cc03418495b68cdc45fbc8cb06b61567b2720aed49e7",
+      "git_blob_sha1": "8fb24a4f04ed97cf8ce78852dceabb443bdebdba",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-ARTEMIS-TUTORIAL",
+      "path": "Thermal/tdthermo (1).tdp",
+      "role": "thermal_properties",
+      "revision": "bcc649cf7932dcc410f8a594213383fb84e68d47",
+      "url": "https://raw.githubusercontent.com/hsfl/artemis-hardware/bcc649cf7932dcc410f8a594213383fb84e68d47/Thermal/tdthermo%20%281%29.tdp",
+      "bytes": 8632,
+      "sha256": "5eed6cd66bfbb87603f8adf5660b5ef244436928f9a4becf815082016ddefba7",
+      "git_blob_sha1": "f2881d6f109466a912176ec999974f4b08c1025c",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "LICENSE",
+      "role": "license",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/LICENSE",
+      "bytes": 1080,
+      "sha256": "7ee8cbd570c47869df5cbb1097af12b0f03cd4f132ae4165d515919c01b7e21d",
+      "git_blob_sha1": "c133413f1e0b297db34a5fc4b8d033231ac2d461",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/DISC/README.md",
+      "role": "provenance",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/DISC/README.md",
+      "bytes": 1566,
+      "sha256": "f0e63d8cb0231fab7a870135346b558ebe34fb3d7030112b7b22b3cf3fde9f5f",
+      "git_blob_sha1": "3bcebe26c0f73c5a1174f81a546f045a93521dc7",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/DISC/DISC.erg",
+      "role": "geometry_model",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/DISC/DISC.erg",
+      "bytes": 2455,
+      "sha256": "dc775deabb4278abb7a1f8281b56d5c244ea7d6994463ea399082ee188768908",
+      "git_blob_sha1": "e19be599929ed18fd40874fa386d873731d4dc45",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/DISC/DISCTR_STEADY.d",
+      "role": "steady_deck",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/DISC/DISCTR_STEADY.d",
+      "bytes": 208682,
+      "sha256": "ecf5b81099c179562da9f5fe54c2017f18236ca7395a99dd824c8c553a612519",
+      "git_blob_sha1": "31a00f5bef3ae8d612b7fe8debda25c9fe4c4114",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "esatan_ddeck",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2018 sp1"
+        ],
+        "sections": [
+          "ARRAYS",
+          "CHARACTER",
+          "CONDUCTORS",
+          "CONSTANTS",
+          "ENDMODEL",
+          "EVENTS",
+          "EXECUTION",
+          "INITIAL",
+          "INTEGER",
+          "LOCALS",
+          "MODEL",
+          "NODES",
+          "OUTPUTS",
+          "REAL",
+          "SUBROUTINES",
+          "VARIABLES1",
+          "VARIABLES2"
+        ],
+        "node_declaration_counts": {
+          "D": 101,
+          "B": 1,
+          "A": 0
+        },
+        "coupling_declaration_counts": {
+          "GL": 190,
+          "GR": 5050
+        },
+        "logic_retained_inert": true
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/DISC/DISCTR_TRANSIENT.d",
+      "role": "transient_deck",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/DISC/DISCTR_TRANSIENT.d",
+      "bytes": 210740,
+      "sha256": "da09e28bee95b61e0210213875ed5c147f3868721ac3036d8f3e5b1b9b05f63b",
+      "git_blob_sha1": "7d3a9a410cf9d7a1237c5ff36a273d76ff2de5b8",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "esatan_ddeck",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2018 sp1"
+        ],
+        "sections": [
+          "ARRAYS",
+          "CHARACTER",
+          "CONDUCTORS",
+          "CONSTANTS",
+          "ENDMODEL",
+          "EVENTS",
+          "EXECUTION",
+          "INITIAL",
+          "INTEGER",
+          "LOCALS",
+          "MODEL",
+          "NODES",
+          "OUTPUTS",
+          "REAL",
+          "SUBROUTINES",
+          "VARIABLES1",
+          "VARIABLES2"
+        ],
+        "node_declaration_counts": {
+          "D": 101,
+          "B": 1,
+          "A": 0
+        },
+        "coupling_declaration_counts": {
+          "GL": 190,
+          "GR": 5050
+        },
+        "logic_retained_inert": true
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/DISC/DISCTR_STEADY.TMD",
+      "role": "steady_results",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/DISC/DISCTR_STEADY.TMD",
+      "bytes": 132905,
+      "sha256": "923c9fb3508e5c1db551590cffc04db1d9f9de6359e3fd2bbdeea0e2b7e15e34",
+      "git_blob_sha1": "45f0b09d7402be746ad92e8e53d03ccd4d904925",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "blocked_binary",
+      "observations": {
+        "format": "HDF5",
+        "metadata_inspected": false,
+        "can_execute": false
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/DISC/DISCTR_TRANSIENT.TMD",
+      "role": "transient_results",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/DISC/DISCTR_TRANSIENT.TMD",
+      "bytes": 908152,
+      "sha256": "b1198eb414e199c9e1a40d09512ffc6b66c80eb2994dfb2ab8d41d6d8a7f00e5",
+      "git_blob_sha1": "46c2a4932b31780a99bb111be6e265a818307ee3",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "blocked_binary",
+      "observations": {
+        "format": "HDF5",
+        "metadata_inspected": false,
+        "can_execute": false
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/README.md",
+      "role": "provenance",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/README.md",
+      "bytes": 5547,
+      "sha256": "5aa72386513a676c54f3b6db71ff653778b454add8b5577844905961eeb9c086",
+      "git_blob_sha1": "8de157bbec444b06d5d49df126d7d140a7b729a1",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/FEATURES.erg",
+      "role": "geometry_feature_model",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/FEATURES.erg",
+      "bytes": 28342,
+      "sha256": "8e6ba32dd35e542b21d7d5d1ef656b2aea6b9f34eb1e951be28e2f523d460cec",
+      "git_blob_sha1": "7c903d8d32b2e911f6bf8f4909b705dee14b7aef",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/FEATURES.stp",
+      "role": "step_tas_exchange",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/FEATURES.stp",
+      "bytes": 130026,
+      "sha256": "bd5584e1704d0780eb947559c4ef8fcdc02b467ef1e3598bf2addec5efccf9cc",
+      "git_blob_sha1": "f4ff0dcfb2582337c91b5b3af08570f8f7018c34",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "step_part21",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2025"
+        ],
+        "schema_names": [],
+        "schema_validated": false
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-DISC-TUTORIAL",
+      "path": "tests/data/esatan/expected_faces.csv",
+      "role": "upstream_geometry_expectations",
+      "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+      "url": "https://raw.githubusercontent.com/pycanha-project/pycanha/01c5e219c086ea25fbe00868ecd0e27994619fb3/tests/data/esatan/expected_faces.csv",
+      "bytes": 2283,
+      "sha256": "8d591e39598000ed6ab7edf47d24de5f1b653026ebd8a3d6dc1910872d73f5cb",
+      "git_blob_sha1": "ceee1619d5f1754b454c4ac3ed98712da9c339e3",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/case1.inp",
+      "role": "network_entrypoint",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/case1.inp",
+      "bytes": 2179,
+      "sha256": "fe6fb9812edf127752111efa9a59f6ebdc40c9319202d7acbc143d354da0734e",
+      "git_blob_sha1": "4aa2a130da8bdbea1ae6b19280861817d7b62890",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "sinda_text",
+        "can_execute": false,
+        "external_reference_count": 5,
+        "header_section_count": 4,
+        "logic_retained_inert": true
+      },
+      "static_dependencies": [
+        {
+          "reference_sha256": "98582b9a9a21c309a4587353a817020655333e5020f295257b367a2fe2399209",
+          "target_path": "Working CubeSat Model/case1.cc",
+          "resolved": true
+        },
+        {
+          "reference_sha256": "8d61d27c9c8dcdaccc571dbdeeeda064233e0aa1a46d6a50ce1f638109d08326",
+          "target_path": "Working CubeSat Model/C1A0.hra",
+          "resolved": true
+        },
+        {
+          "reference_sha256": "d55dace517c0395725bf1bb82cf8d30635deba84868fdb0f34863bba47aae8f3",
+          "target_path": "Working CubeSat Model/C1A0.hrl",
+          "resolved": true
+        },
+        {
+          "reference_sha256": "dbcd66ddd7d427b14df0783f1bdf9abf0f37e57ea7490cfd81629129df2605ad",
+          "target_path": "Working CubeSat Model/C1A1.k_in",
+          "resolved": true
+        },
+        {
+          "reference_sha256": "9db874cff28ff5928ace4d93903c97db63fe4edcc5bdc96a5d16574c83a86968",
+          "target_path": "Working CubeSat Model/C1A2.k_in",
+          "resolved": true
+        }
+      ]
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/case1.cc",
+      "role": "network_include",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/case1.cc",
+      "bytes": 26829,
+      "sha256": "6b1998ea6d02a297bd88ba7348ddb28471aa734c7a43a7061b7082a6db312ffd",
+      "git_blob_sha1": "6f1827ec4c1a7c8612ea5a2e034d41c70883e61a",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "sinda_text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "header_section_count": 18,
+        "logic_retained_inert": true
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/userlogic.for",
+      "role": "source_logic",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/userlogic.for",
+      "bytes": 23762,
+      "sha256": "ee5d3d27c1af247cc5c88d5d4c12ee663cded4b3b280d328e084435891074bce",
+      "git_blob_sha1": "4ea5ea24f37f20fc4aeb3fd787c3b7dc297e1544",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "source_text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "logic_retained_inert": true
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/case1.out",
+      "role": "source_results",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/case1.out",
+      "bytes": 2088273,
+      "sha256": "c1c36a47e35cd6501d9db15b7dda90c4dfea391ecdc40ed9df62e30187fed47e",
+      "git_blob_sha1": "90e8d29bb650645b697c5686b11709f73bbadd04",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [
+        "contact"
+      ],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/C1A0.hra",
+      "role": "environment_include",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/C1A0.hra",
+      "bytes": 81565,
+      "sha256": "e94a21f66b5dac8eea2551e1a10eb578ec6e9ca6ac5bd7023036ae9819ccc34b",
+      "git_blob_sha1": "5415caa57320cfb92a64b299910a2ee6334557b2",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/C1A0.hrl",
+      "role": "environment_include",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/C1A0.hrl",
+      "bytes": 2005,
+      "sha256": "66146e71a6a71399ef29ff7067c085cdfe4481058c22ddf6017d920cec8a1d08",
+      "git_blob_sha1": "3d56e8a7a44210a05057a212991cdeebb59aeaa7",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/C1A1.k_in",
+      "role": "radiation_include",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/C1A1.k_in",
+      "bytes": 3900,
+      "sha256": "b8046540d8ce653a45cc9e5802876060a2703abf3653524bc4948352a89b4d67",
+      "git_blob_sha1": "b965ed24f8f19de88be8afa80bc41108031a7264",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/C1A2.k_in",
+      "role": "radiation_include",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/C1A2.k_in",
+      "bytes": 159680,
+      "sha256": "f4cdd2b4a49ae78aa4f5f42edfa1d62e5fb5a14ce9b817e372dc3bd8268cf0a2",
+      "git_blob_sha1": "72a56303c9e1aa81b1dda27a370670f6a246458e",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/C1A1.k",
+      "role": "radiation_data",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/C1A1.k",
+      "bytes": 14676,
+      "sha256": "85bbbf709f2fd746a3a6f0c776fe9911895931637befb48eb7c84d633c471ed5",
+      "git_blob_sha1": "4bb5673fc7ee116e9db13585a3e3ddc501750b8b",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "TD-SINDA-COMMUNITY",
+      "path": "Working CubeSat Model/C1A2.k",
+      "role": "radiation_data",
+      "revision": "c7424e7e9be0b40527c69f84800ef6c691fc73dc",
+      "url": "https://raw.githubusercontent.com/Space-and-Satellite-Systems-UC-Davis/Structure-Thermal-Desktop/c7424e7e9be0b40527c69f84800ef6c691fc73dc/Working%20CubeSat%20Model/C1A2.k",
+      "bytes": 701509,
+      "sha256": "1f82b2ca7fd0d598fcdebc9f20d65971b1521bfb7ba79624cec6c6356b0bce80",
+      "git_blob_sha1": "c80a320416c445dc64cdff12ae679ad29d05d15f",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    }
+  ]
+}

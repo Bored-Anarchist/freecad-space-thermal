@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "workflow-lint", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only"]
 
 
 def command(args, log, env=None):
@@ -78,6 +78,7 @@ def main():
     actions = {
         "planning": [sys.executable, "plans/tools/validate_plan.py"],
         "specification": [sys.executable, "spec/tools/validate_spec.py"],
+        "inventory": [sys.executable, "tools/check_inventory.py"],
         "workflow-lint": [sys.executable, "tools/check_workflows.py"],
         "python-package": [sys.executable, "-m", "pip", "install", "--no-deps", "--no-build-isolation", "--no-index", "-e", "."],
         "python-imports": [sys.executable, "-I", "-c", "import fcst_app,fcst_cli,fcst_mcp; assert not fcst_app.capabilities()['solver_available']"],

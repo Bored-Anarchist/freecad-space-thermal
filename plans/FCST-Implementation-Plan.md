@@ -155,6 +155,8 @@ The dependency register allows native contract and analytic-prototype slices wit
 
 **Outputs:** frozen inventory, scope/operation matrix, fixture manifests, native-feature backlog, access/prerequisite report, initial risk register. **Completion:** automated inventory checks find no mandatory unassigned feature, missing owner, unidentified version, or undocumented fixture dependency; required reference environments are runnable. Missing licenses or files remain explicit Q0 blockers. Independent core development can continue, but Q0 cannot be declared complete.
 
+**Implementation progress:** [WP-01's acquired online examples](../inventory/README.md) include immutable source/hash/rights records, a model/operation inventory, feature-to-engine ownership, all-profile gap coverage and an independent public analytic seed. [WP-01 evidence](evidence/WP-01.json) records executable checks and remaining blockers. `python tools/check_inventory.py` checks the public metadata offline; `--local` verifies preserved original bytes; `--qualify` fails while required closure evidence is missing. Unavailable active licensed runners prevent source-tool execution; raw downloaded models, outputs and license/metadata records remain local. This inventory does not qualify TD/ESATAN compatibility or replace the full Q0 corpus freeze.
+
 ### Step 2 — WP-02: create the source/build/test foundation
 
 1. Establish the authoritative GitHub repository, Issues/Projects backlog, milestone/requirement links, PR/issue templates, component ownership, proposed licenses for new code, contribution rules and a dependency/provenance manifest. Configure and automatically verify default/release-branch protections and required checks.
