@@ -151,6 +151,13 @@ def petsc_probe(source, work, jobs):
     return install
 
 
+def prepare_blas(work):
+    """Install distribution-signed probe inputs only on an ephemeral Linux runner."""
+    run(["sudo", "apt-get", "update", "-qq"], ROOT, work / "system-update.log", timeout=600)
+    run(["sudo", "apt-get", "install", "-y", "--no-install-recommends", "libblas-dev", "liblapack-dev"],
+        ROOT, work / "system-install.log", timeout=600)
+
+
 def toolchain(work):
     values = {"system": platform.system(), "architecture": platform.machine(), "threads": 1}
     for name in ("ImageOS", "ImageVersion"):
@@ -177,6 +184,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", choices=list(OPTIONS) + ["petsc"])
     parser.add_argument("--jobs", type=int, default=2)
+    parser.add_argument("--prepare-system", action="store_true", help="Install signed Linux BLAS/LAPACK probe prerequisites using sudo apt-get")
     args = parser.parse_args()
     if not 1 <= args.jobs <= 16:
         parser.error("jobs must be between 1 and 16")
@@ -199,6 +207,8 @@ def main():
                           reason="Native MSVC is not a supported PETSc build profile; Linux probe is required")
         else:
             try:
+                if item["id"] == "petsc" and args.prepare_system:
+                    prepare_blas(work)
                 source = source_tree(item, work)
                 install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs)
                 record.update(status="passed", stages=["source_hash", "license_hash", "configure", "build", "install", "installed_consumer"],
