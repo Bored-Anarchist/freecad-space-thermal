@@ -61,6 +61,14 @@ def main():
     project_path = ROOT / "plans/github-project.json"
     project = json.loads(project_path.read_text()) if project_path.exists() else None
     report = {"repository": config["repository"], **assess(config, repo, protection, actions, workflows, rules, issues, project)}
+    validation_prefix = "repos/" + config["validation_repository"]
+    validation = request(validation_prefix)
+    runners = request(validation_prefix + "/actions/runners")
+    if not validation or validation.get("private") is not True or runners is None or runners.get("total_count") != 0:
+        report["findings"].append("unqualified_validation_boundary")
+        report["status"] = "blocked"
+    else:
+        report["validation_boundary"] = "private_no_privileged_runners_registered"
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2) + "\n")
     print(json.dumps(report))

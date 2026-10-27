@@ -31,6 +31,41 @@
       "status": "passed",
       "command": "python tools/probe_dependencies.py",
       "evidence": "Five candidates probed; all unavailable in local environment; none adopted or qualified"
+    },
+    {
+      "id": "github-windows-linux-matrix",
+      "status": "passed",
+      "candidate": "7833a606c2bb487904efdc361929b08619029357",
+      "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40545378601",
+      "cases_per_configuration": 28,
+      "configurations": [
+        "windows-debug",
+        "windows-release",
+        "linux-debug",
+        "linux-release"
+      ]
+    },
+    {
+      "id": "github-publication-privacy",
+      "status": "passed",
+      "candidate": "7833a606c2bb487904efdc361929b08619029357",
+      "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40545378387"
+    },
+    {
+      "id": "full-tier-negative-gate",
+      "status": "passed",
+      "command": "python tools/verify.py --tier full --preset windows-release",
+      "evidence": "All 28 foundation checks passed; four missing qualification prerequisites reported blocked and command returned failure as required"
+    },
+    {
+      "id": "repository-protections",
+      "status": "passed",
+      "evidence": "Default and release branches require Foundation gate, Planning gate and Publication privacy; read-only Actions defaults and official-action allowlist configured"
+    },
+    {
+      "id": "private-validation-boundary",
+      "status": "passed",
+      "evidence": "Separate private repository, no privileged runners registered; manual-only workflow denies unconfigured execution"
     }
   ],
   "blockers": [

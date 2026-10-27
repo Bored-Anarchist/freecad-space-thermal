@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "workflow-lint", "python-package", "configure", "build", "ctest", "install", "engine-only"]
+STEPS = ["planning", "specification", "workflow-lint", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only"]
 
 
 def command(args, log, env=None):
@@ -80,6 +80,7 @@ def main():
         "specification": [sys.executable, "spec/tools/validate_spec.py"],
         "workflow-lint": [sys.executable, "tools/check_workflows.py"],
         "python-package": [sys.executable, "-m", "pip", "install", "--no-deps", "--no-build-isolation", "--no-index", "-e", "."],
+        "python-imports": [sys.executable, "-I", "-c", "import fcst_app,fcst_cli,fcst_mcp; assert not fcst_app.capabilities()['solver_available']"],
         "configure": [cmake, "--preset", args.preset, "-DFCST_SOURCE_REVISION=" + revision],
         "build": [cmake, "--build", "--preset", args.preset, "--parallel", "2"],
         "ctest": [ctest, "--preset", args.preset],
