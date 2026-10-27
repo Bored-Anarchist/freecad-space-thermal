@@ -85,7 +85,7 @@ def main():
         item = existing_by_url.get(issue_url) or gh("project", "item-add", number, "--owner", owner,
                                                    "--url", issue_url, "--format", "json")
         state = {"in_progress": "In progress", "blocked": "Blocked", "complete": "Complete"}.get(package["status"], "Planned")
-        # Native foundation slices are delivered even while full WP-02 qualification is open.
+        # Native contract work can proceed while the vendor inventory is blocked.
         if package_id in {"WP-01", "WP-03"} and state == "Planned":
             state = "Ready"
         values = {"Status": {"singleSelectOptionId": next(option["id"] for option in fields["Status"]["options"] if option["name"] == state)},

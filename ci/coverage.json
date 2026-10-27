@@ -42,7 +42,9 @@
     "test_profiles.ProfileTests.test_dependency_missing_install_substituted_source_and_skips_rejected",
     "test_profiles.ProfileTests.test_corrupt_cached_sources_never_execute_or_download",
     "test_profiles.ProfileTests.test_link_validation_excludes_ignored_originals_but_checks_project_docs",
-    "test_profiles.ProfileTests.test_probe_diagnostics_withhold_private_values_and_paths"
+    "test_profiles.ProfileTests.test_probe_diagnostics_withhold_private_values_and_paths",
+    "test_validation_boundary.ValidationBoundaryTests.test_closed_boundary_and_privileged_trigger_rejection",
+    "test_validation_boundary.ValidationBoundaryTests.test_guard_bypass_policy_activation_and_write_permissions_rejected"
   ],
   "full_prerequisites": [
     "freecad-exact-build-smoke",
