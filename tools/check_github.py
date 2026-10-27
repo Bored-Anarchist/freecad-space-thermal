@@ -5,7 +5,6 @@ import base64
 import json
 import subprocess
 from pathlib import Path
-import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -42,8 +41,14 @@ def content(endpoint, yaml_document=False):
         return None
     try:
         text = base64.b64decode(response["content"]).decode("utf-8")
-        return yaml.load(text, Loader=yaml.BaseLoader) if yaml_document else json.loads(text)
-    except (KeyError, ValueError, UnicodeError, yaml.YAMLError):
+        if yaml_document:
+            import yaml
+            try:
+                return yaml.load(text, Loader=yaml.BaseLoader)
+            except yaml.YAMLError:
+                return None
+        return json.loads(text)
+    except (KeyError, ValueError, UnicodeError, ImportError):
         return None
 
 

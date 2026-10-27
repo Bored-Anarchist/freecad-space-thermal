@@ -18,6 +18,6 @@ jobs:
       - name: Test adversarial privacy and coverage cases
         env:
           PYTHONPATH: python
-        run: python tools/check_security.py
+        run: python -S tools/check_security.py
       - name: Inspect complete outgoing history and metadata
         run: python tools/publication_preflight.py --revision HEAD
