@@ -128,6 +128,135 @@
           "role": "radiation_data"
         }
       ]
+    },
+    {
+      "id": "ESA-ACUBESAT-NATIVE",
+      "repository": "AcubeSAT/esatan-models",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "documentation": "https://github.com/AcubeSAT/esatan-models/tree/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2",
+      "repository_license": "not_declared",
+      "files": [
+        {
+          "path": "cubesat/v2/README.md",
+          "role": "provenance"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Comissioning_Detumbling_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_Active.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_summer_2022.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v2.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v3.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v4.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Comissioning_Detumbling_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500_Active.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500v1_1.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_Glass_PEEK_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_005.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_RAD_10.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1_summer_2022.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_2.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_3.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_4.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_6LTAN_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_6LTAN_Nominal_Nadir_600.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_600.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Final.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Nadir.tpl",
+          "role": "native_analysis_case"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.ere",
+          "role": "native_environment"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.erg",
+          "role": "native_geometry"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.erk",
+          "role": "native_kinematics"
+        },
+        {
+          "path": "cubesat/v2/model/summer-2022.xml",
+          "role": "native_project_descriptor"
+        }
+      ]
     }
   ]
 }

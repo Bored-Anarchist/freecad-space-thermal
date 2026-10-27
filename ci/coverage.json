@@ -36,7 +36,11 @@
     "test_inventory.InventoryTests.test_public_metadata_and_analytic_seed_are_privacy_cleared",
     "test_inventory.InventoryTests.test_independent_seed_oracle_conserves_energy",
     "test_inventory.InventoryTests.test_missing_dependency_target_or_removed_reference_rejected",
-    "test_inventory.InventoryTests.test_acquisition_never_overwrites_different_original_bytes"
+    "test_inventory.InventoryTests.test_acquisition_never_overwrites_different_original_bytes",
+    "test_profiles.ProfileTests.test_pins_require_immutable_sources_and_license_hashes",
+    "test_profiles.ProfileTests.test_host_rejects_missing_cases_wrong_abi_and_substituted_binary",
+    "test_profiles.ProfileTests.test_dependency_missing_install_substituted_source_and_skips_rejected",
+    "test_profiles.ProfileTests.test_corrupt_cached_sources_never_execute_or_download"
   ],
   "full_prerequisites": [
     "freecad-exact-build-smoke",

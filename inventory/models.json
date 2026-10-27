@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "baseline": "online-examples-2026-10-27-r1",
+  "baseline": "online-examples-2026-10-27-r2",
   "scope": "Acquired example inventory; not a frozen complete compatibility claim",
   "models": [
     {
@@ -382,9 +382,9 @@
         "Working CubeSat Model/C1A2.k"
       ],
       "source_version": {
-        "status": "unknown",
-        "value": null,
-        "evidence": "Exact source release not established; a sibling DWG filename is not reliable version evidence"
+        "status": "observed",
+        "value": "Thermal Desktop 6.3; exact patch and SINDA release unknown",
+        "evidence": "Explicit Thermal Desktop 6.3 header in the acquired case1.cc; this identifies no SINDA runtime or patch release"
       },
       "purpose": "physical",
       "owner_role": "TD adapter owner",
@@ -400,9 +400,113 @@
       },
       "blockers": [
         "SINDA_LICENSE_UNAVAILABLE",
-        "TD_SOURCE_VERSION_UNKNOWN",
+        "TD_PATCH_AND_SINDA_RELEASE_UNKNOWN",
         "RIGHTS_NOT_DECLARED",
         "RUNTIME_DEPENDENCY_CLOSURE_UNVERIFIED"
+      ]
+    },
+    {
+      "required_operations": [
+        "inspect",
+        "represent",
+        "edit",
+        "native_execute",
+        "write",
+        "source_reopen_run",
+        "cross_tool_exchange"
+      ],
+      "qualification": "unqualified",
+      "rights": {
+        "redistribution": "hold",
+        "policy": "Originals remain local; repository license alone does not clear vendor metadata or third-party generated content"
+      },
+      "operation_dispositions": {
+        "inspect": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "represent": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "edit": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "native_execute": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "write": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "source_reopen_run": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        },
+        "cross_tool_exchange": {
+          "status": "blocked",
+          "reason": "Product adapter/engine and exact licensed reference qualification not yet available"
+        }
+      },
+      "id": "ESA-ACUBESAT-V2",
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "profiles": [
+        "ESA-NATIVE"
+      ],
+      "files": [
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Comissioning_Detumbling_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_Active.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_summer_2022.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v2.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v3.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v4.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Comissioning_Detumbling_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500_Active.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500v1_1.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Nominal_Glass_PEEK_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_005.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_RAD_10.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1_summer_2022.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_2.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_3.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_4.tpl",
+        "cubesat/v2/model/cases/summer-2022_Cold_Science_6LTAN_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_6LTAN_Nominal_Nadir_600.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_600.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Final.tpl",
+        "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Nadir.tpl",
+        "cubesat/v2/model/summer-2022.ere",
+        "cubesat/v2/model/summer-2022.erg",
+        "cubesat/v2/model/summer-2022.erk",
+        "cubesat/v2/model/summer-2022.xml"
+      ],
+      "source_version": {
+        "status": "observed",
+        "value": "2020 (analysis templates only)",
+        "evidence": "All 25 acquired case templates identify ESATAN-TMS 2020; native geometry/environment/kinematics release and exact patch still require vendor inspection"
+      },
+      "purpose": "physical",
+      "owner_role": "ESA adapter owner",
+      "dependency_review": {
+        "status": "incomplete",
+        "evidence": "Native ERG geometry ERE environment ERK kinematics XML descriptor and 25 analysis templates acquired. Native path/property resolution and complete runtime dependency closure require licensed reopen; imported logic remains inert"
+      },
+      "reference_results": {
+        "status": "missing",
+        "physical_oracle": false
+      },
+      "blockers": [
+        "ESA_RUNTIME_UNAVAILABLE",
+        "ESA_NATIVE_RELEASE_PATCH_UNVERIFIED",
+        "ESA_RUNTIME_DEPENDENCY_CLOSURE_UNVERIFIED",
+        "RIGHTS_NOT_DECLARED",
+        "ESA_NATIVE_RESULTS_MISSING"
       ]
     }
   ]

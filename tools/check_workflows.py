@@ -24,6 +24,11 @@ def validate():
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["linux-debug", "linux-release", "windows-debug", "windows-release"], "Incomplete build matrix"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
+    assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies"}, "Profile jobs absent from required gate"
+    assert set(workflow["jobs"]["host"]["strategy"]["matrix"]["os"]) == {"windows-2022", "ubuntu-24.04"}, "Missing host platform"
+    packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]
+    assert set(packages["os"]) == {"windows-2022", "ubuntu-24.04"}, "Missing package platform"
+    assert set(packages["candidate"]) == {"sundials", "hdf5", "embree", "occt", "petsc"}, "Missing package candidate"
 
 
 if __name__ == "__main__":

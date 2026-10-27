@@ -438,6 +438,9 @@
         "format": "sinda_text",
         "can_execute": false,
         "external_reference_count": 0,
+        "thermal_desktop_version_headers": [
+          "6.3"
+        ],
         "header_section_count": 18,
         "logic_retained_inert": true
       },
@@ -502,7 +505,10 @@
       "observations": {
         "format": "text",
         "can_execute": false,
-        "external_reference_count": 0
+        "external_reference_count": 0,
+        "thermal_desktop_version_headers": [
+          "6.3"
+        ]
       },
       "static_dependencies": []
     },
@@ -582,7 +588,10 @@
       "observations": {
         "format": "text",
         "can_execute": false,
-        "external_reference_count": 0
+        "external_reference_count": 0,
+        "thermal_desktop_version_headers": [
+          "6.3"
+        ]
       },
       "static_dependencies": []
     },
@@ -595,6 +604,686 @@
       "bytes": 701509,
       "sha256": "1f82b2ca7fd0d598fcdebc9f20d65971b1521bfb7ba79624cec6c6356b0bce80",
       "git_blob_sha1": "c80a320416c445dc64cdff12ae679ad29d05d15f",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "thermal_desktop_version_headers": [
+          "6.3"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/README.md",
+      "role": "provenance",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/README.md",
+      "bytes": 1060,
+      "sha256": "3f9019928140bb36877678d72a492cb6c711db23dc4058e8162ed4d4dc3773cc",
+      "git_blob_sha1": "45ae7c687ea44fcf098f4f2f344213aa89554dc2",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Comissioning_Detumbling_500.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Comissioning_Detumbling_500.tpl",
+      "bytes": 1348,
+      "sha256": "dca0de05958fced10c81044948ef27bcef4e859d3bb0a60257033f5f326c8b2e",
+      "git_blob_sha1": "6c062b83fc2efd575e3234a522317ab4e9fce7aa",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500.tpl",
+      "bytes": 1338,
+      "sha256": "5261c35fda66e901a5ab97a3ebdc19a253870afd53ae79bc4bb0fc9ad687d31c",
+      "git_blob_sha1": "7ae1ba8061b9d04e6791009c4aabcef7a13945d0",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_Active.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_Active.tpl",
+      "bytes": 1212,
+      "sha256": "811a10bc8cf5047b4bd4b91fb10a7af0e35ec2250eb3e7391e0f4c2757b53fe8",
+      "git_blob_sha1": "ab49c80a99bccdcab4a6cf520603fc8cc0b81fcd",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_summer_2022.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_summer_2022.tpl",
+      "bytes": 1386,
+      "sha256": "d2e9bbcccf658180f398b37dddfd5fc7383303d31689ee886e05af24f6d8ec8f",
+      "git_blob_sha1": "16fa37592c29e10ab7f281ced1cafcabcfc65895",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v2.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v2.tpl",
+      "bytes": 1340,
+      "sha256": "fe668fd38186f24430069595cab0b0b8110abeef1203f2aac6db68a58d86cc09",
+      "git_blob_sha1": "8478cfdaafe8273024ab01ab690a6cd1c6b07c5e",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v3.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v3.tpl",
+      "bytes": 1341,
+      "sha256": "a01ab8e9ca97fdf787377880554bd732c60c957cc15410ad49e9ded8a6a92a7f",
+      "git_blob_sha1": "e0dc7ccb710391f640926b8f746b3b5f35ce1e7b",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v4.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_11LTAN_Nominal_Nadir_500_v4.tpl",
+      "bytes": 1344,
+      "sha256": "c6178cfdd48614f08fb952e4ff98979ed6e0ce201ec34498670438c96eb7b5bb",
+      "git_blob_sha1": "6214b53a95f9ca7e16ed4cf53189ddcd396663fc",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Comissioning_Detumbling_500.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Comissioning_Detumbling_500.tpl",
+      "bytes": 1347,
+      "sha256": "61da7b967a9b5376d1173b2ce04b9c3cdf629c581e23f47fd4782da9de34cd7e",
+      "git_blob_sha1": "c92c5fedef048a9c0f0933bae0e95578c8dc2ff5",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500.tpl",
+      "bytes": 1337,
+      "sha256": "ea06121dd251f76d6f795e6ba24a4010f87084484e51fe0603c6b06f869c1096",
+      "git_blob_sha1": "abc94826ab0e4fe69a4ed79ed6a64c3374611e89",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500_Active.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500_Active.tpl",
+      "bytes": 1211,
+      "sha256": "e66b6cad03fa4621973d3f221e3820c91f1ed393b5e76e31ee272a3eaf366e40",
+      "git_blob_sha1": "444072a43d4a7e52e9b270ef2f1ce6a2f93d7108",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500v1_1.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_6LTAN_Nominal_Nadir_500v1_1.tpl",
+      "bytes": 1343,
+      "sha256": "740b971958add9ba81e075e77e6b00f173205c77e756da8c56e63e2ac363c95a",
+      "git_blob_sha1": "c9b00f421a9c046ca7d84e644a524771d0dee05e",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_Glass_PEEK_Final.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Nominal_Glass_PEEK_Final.tpl",
+      "bytes": 1334,
+      "sha256": "0e986013ff48183ad9d1f28dfffa46fae1955539dd677d23a09c205b9ed4e1aa",
+      "git_blob_sha1": "c392e0e1dd81a322b59de7a319c4cabd59f4fd4c",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_005.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_005.tpl",
+      "bytes": 1279,
+      "sha256": "eecd2088948989a54df9f769f69b7e75701c43a8aaba42a440728da9ac67014f",
+      "git_blob_sha1": "47dffe8f7e61f2e14ff098ebe3edc5cced322d49",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_RAD_10.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Nominal_TIME_STEP_RAD_10.tpl",
+      "bytes": 1281,
+      "sha256": "842d0291dfc355ce72611b8fe7bd00a34050908794545ab148a4c8aa048228fd",
+      "git_blob_sha1": "7dcb66f2a4bcb434f41d525ce4148f45fddd0eb0",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Final.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Final.tpl",
+      "bytes": 1154,
+      "sha256": "e0546188795aa6420b92012a8252b6d6d9dde01bff32952c867c8e49ed5d81af",
+      "git_blob_sha1": "fb4f59574f8f34503b040af2914a0a4ce6e75660",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1.tpl",
+      "bytes": 1158,
+      "sha256": "d64018fae390d2c5dca530b24dc200c4c5b6b18c4fe45d6a15a0019d92f38736",
+      "git_blob_sha1": "409a6147cee04ff37862c6b3aa8a77f7a7d34eb8",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1_summer_2022.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv1_1_summer_2022.tpl",
+      "bytes": 1206,
+      "sha256": "710a87db429363caa53d56b36fa5a9c61677f30adf89941dfe7636a5904d9f51",
+      "git_blob_sha1": "3830f5081bce1025462d7dd238ff4c774963b376",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_2.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_2.tpl",
+      "bytes": 1157,
+      "sha256": "158184bb4a970e31bfcf3e99351fff7d377dce135ef33c1292f0b439176adb68",
+      "git_blob_sha1": "efa384d055389225407eb5087d641713e981c24b",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_3.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_3.tpl",
+      "bytes": 1157,
+      "sha256": "35e42d33ad016bce706c3589d51a6477eeceb9dd5f11ad131ba84a176a2110b7",
+      "git_blob_sha1": "2de6e6603b467066b10c1f441bdc1ef355efc3b8",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_4.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Science_11LTAN_Finalv_4.tpl",
+      "bytes": 1157,
+      "sha256": "13d6a59aaa506ccb502b004ceda2e639594c744b17978c3d7b67bf6e3fbad57b",
+      "git_blob_sha1": "9a9a7c46de900660a46d6375e63323a34b93ddc5",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Cold_Science_6LTAN_Final.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Cold_Science_6LTAN_Final.tpl",
+      "bytes": 1153,
+      "sha256": "5716ff650798518cf40e3e83e7161dbf3f9eeaa6fd732e55cd573aeb7aaa966f",
+      "git_blob_sha1": "ee010f421a56f06912efe6e3aeddf7f887ec9514",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Hot_6LTAN_Nominal_Nadir_600.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Hot_6LTAN_Nominal_Nadir_600.tpl",
+      "bytes": 1326,
+      "sha256": "b869eedef6742e6c7edfcaf9760a5f6eb60e50e9fb3f3cfb840bb1c65a6869f2",
+      "git_blob_sha1": "04d5bee39705aa34f56382aee3c5360c71bc960b",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_600.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_600.tpl",
+      "bytes": 1150,
+      "sha256": "6aaa197f61fdb13d929188c54b4a28931a6142b97535c28c4d9822f4bdabcab0",
+      "git_blob_sha1": "2fd223273f8c65df367de09554e50e13ecb025c8",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Final.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Final.tpl",
+      "bytes": 1155,
+      "sha256": "35754ea8eadb41bca0251561473aa7591211adbe4cc50c513c6226b8cd6ef1d0",
+      "git_blob_sha1": "3b21a53c92400f7c011259f3d836b4a5d3fd7ad0",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Nadir.tpl",
+      "role": "native_analysis_case",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/cases/summer-2022_Hot_Science_6LTAN_Nadir.tpl",
+      "bytes": 1152,
+      "sha256": "6500faf2c998a33d595d33c21258cbea5c95c1159fec97b21d9a9c852223945f",
+      "git_blob_sha1": "7485de93b2fc1ec60c86efdb6009fd40c79b21cc",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0,
+        "source_version_headers": [
+          "2020"
+        ]
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/summer-2022.ere",
+      "role": "native_environment",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/summer-2022.ere",
+      "bytes": 156486,
+      "sha256": "8c87c89b8f04fad79f8ea4ec327032288f7884523f1a66bd0177141f10507a7a",
+      "git_blob_sha1": "2bdf581a8a8f806ff9f9cf07ecf2acc8ac513f67",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [
+        "personal_path"
+      ],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/summer-2022.erg",
+      "role": "native_geometry",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/summer-2022.erg",
+      "bytes": 11246576,
+      "sha256": "a0cdaf8deb7e816d2df0dc5412d80eec07ef91197f6de5865734cc4ec6f040aa",
+      "git_blob_sha1": "9c78cc00c93787121748fdbd6053f6e6a729ad94",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/summer-2022.erk",
+      "role": "native_kinematics",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/summer-2022.erk",
+      "bytes": 55210,
+      "sha256": "8432e1c0cb28b86e19e57dcb5abe7f964d10ed7e3f87985c02834de2912d476e",
+      "git_blob_sha1": "5f3cc09e9f80c14972a91d83fb8b007765762f39",
+      "git_tree_verified": true,
+      "publication": "hold_original",
+      "privacy_categories": [],
+      "metadata_inspection": "pattern_scan_only",
+      "observations": {
+        "format": "text",
+        "can_execute": false,
+        "external_reference_count": 0
+      },
+      "static_dependencies": []
+    },
+    {
+      "source_id": "ESA-ACUBESAT-NATIVE",
+      "path": "cubesat/v2/model/summer-2022.xml",
+      "role": "native_project_descriptor",
+      "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+      "url": "https://raw.githubusercontent.com/AcubeSAT/esatan-models/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/summer-2022.xml",
+      "bytes": 134,
+      "sha256": "f5b1a2f8d73e42fb2926481e01eecffc491076d4d162bf64411c9541f721f20a",
+      "git_blob_sha1": "5e90a15bfeabde8b7d3c96edd1ef2ba93857a2b2",
       "git_tree_verified": true,
       "publication": "hold_original",
       "privacy_categories": [],

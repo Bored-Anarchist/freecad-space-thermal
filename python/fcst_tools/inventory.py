@@ -32,9 +32,12 @@ def static_observations(role: str, data: bytes) -> dict:
                 "vendor_version_identified": False, "metadata_inspected": False, "can_execute": False}
     text = data.decode("utf-8", errors="replace")
     versions = sorted(set(re.findall(r"ESATAN-TMS\s+([0-9]{4}(?:\s+sp[0-9]+)?)", text, re.I)))
+    td_versions = sorted(set(re.findall(r"Thermal Desktop\s+([0-9]+(?:\.[0-9]+){1,3})", text, re.I)))
     result = {"format": "text", "can_execute": False, "external_reference_count": len(include_references(text))}
     if versions:
         result["source_version_headers"] = versions
+    if td_versions:
+        result["thermal_desktop_version_headers"] = td_versions
     if role in {"steady_deck", "transient_deck"}:
         result.update(format="esatan_ddeck", sections=sorted(set(re.findall(r"(?m)^\s*\$([A-Z][A-Z0-9_]*)", text))),
                       node_declaration_counts={kind: len(re.findall(r"(?m)^\s*" + kind + r"[0-9]+\s*=", text)) for kind in ["D", "B", "A"]},

@@ -109,9 +109,16 @@ def main():
             record(case_id, "failed", reason="execution_unavailable")
     expected = manifest["unit_cases"] + STEPS
     if args.tier == "full":
-        # Product qualification must remain blocked until implemented coverage exists.
         for case_id in manifest["full_prerequisites"]:
-            record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
+            if case_id == "freecad-exact-build-smoke":
+                try:
+                    okay = command([sys.executable, "tools/host_smoke.py"], output / "host-smoke.log")
+                    record(case_id, "passed" if okay else "failed")
+                except (OSError, ValueError, subprocess.SubprocessError):
+                    record(case_id, "failed", reason="host_execution_unavailable")
+            else:
+                # Product/vendor/numerical qualification is a separate Q0 gate.
+                record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
         expected += manifest["full_prerequisites"]
     verdict = evaluate(expected, records)
     report = {"schema_version": 1, "scope": "WP-02 foundation; no thermal or compatibility qualification",

@@ -1,3 +1,4 @@
 # Host-only environment: no third-party Python packages selected yet.
 # The WP-02 standalone environment must never replace FreeCAD's embedded Python.
-# A pinned FreeCAD build and ABI are prerequisites for selecting host dependencies.
+# Exact FreeCAD 1.1.4 assets and cp311 ABI are pinned in ci/host-profile.json.
+# The foundation host smoke imports only the standard library and bundled modules.
