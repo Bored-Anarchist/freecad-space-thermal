@@ -25,11 +25,14 @@ class DeliveryScopeTests(unittest.TestCase):
             changed[0]["active_platforms"].append(platform)
             self.assertIn("non_windows_active_platform", validate_scope(*changed))
 
-    def test_ports_cannot_precede_windows_completion(self):
+    def test_stretch_goals_cannot_become_work_packages_or_release_gates(self):
+        for field, value in [("work_package", "WP-22"), ("completion_gate", "Q2"), ("blocks_delivery", True)]:
+            changed = copy.deepcopy(self.args)
+            changed[0]["stretch_goals"]["SG-PLATFORMS"][field] = value
+            self.assertIn("stretch_goal_in_committed_delivery", validate_scope(*changed))
         changed = copy.deepcopy(self.args)
-        port = next(p for p in changed[1] if p["id"] == "WP-22")
-        port.update(completion_gate="Q1", depends_on="WP-02")
-        self.assertIn("deferred_ports_scheduled_before_windows_completion", validate_scope(*changed))
+        changed[1].append({"id": "WP-22"})
+        self.assertIn("stretch_goal_in_committed_delivery", validate_scope(*changed))
 
     def test_inventory_closure_cannot_claim_qualification_or_lose_gap_owner(self):
         changed = copy.deepcopy(self.args)

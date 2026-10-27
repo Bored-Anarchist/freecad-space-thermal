@@ -5,7 +5,7 @@
 | Field | Baseline |
 |---|---|
 | Document | FCST-SYS-SPEC-001 |
-| Revision | 0.6 — Windows-first delivery and acquired inventory baseline |
+| Revision | 0.7 — Windows delivery; optional platform stretch goals |
 | Prepared | 2026-10-27 |
 | Product name | FreeCAD Space Thermal (FCST), working name |
 | User decisions | Open-source add-on and independently maintained C++ engine; Python integration; existing solvers may be starting points; local-first; equal priority for Thermal Desktop and ESATAN-TMS; NASA/ESA refers to existing-tool file compatibility |
@@ -35,7 +35,9 @@ Revision 0.4 explicitly adds SINDA/FLUINT and Thermal Desktop as required benchm
 
 Revision 0.5 replaces the earlier Rust-first implementation choice with a C++ solver and Python integration baseline. Solver ownership, native execution, backwards compatibility, and AI automation requirements remain in force. The language comparison checkpoint evaluates integration and numerical behavior before expensive modules are locked in.
 
-Revision 0.6 adopts Windows-only development and Q0/P0/Q1/Q2 delivery. macOS and Linux ports, host integration, packaging and qualification are deferred to WP-22 after Windows Q2. WP-01 closes on the acquired inventory and explicit gaps; licensed reference access and complete compatibility/schema qualification remain obligations of the affected later packages. This is a FreeCAD add-on/workbench with a standalone engine, not a modified FreeCAD distribution.
+Revision 0.6 adopted Windows-only development and Q0/P0/Q1/Q2 delivery with a scheduled platform-port follow-on. Revision 0.7 supersedes that follow-on commitment with optional stretch goals. WP-01 closes on the acquired inventory and explicit gaps; licensed reference access and complete compatibility/schema qualification remain obligations of the affected later packages. This is a FreeCAD add-on/workbench with a standalone engine, not a modified FreeCAD distribution.
+
+Revision 0.7 removes the previously numbered port package and POST-Q2 gate. Optional macOS/Linux configurations are stretch goals, not committed delivery work. Windows Q0/P0/Q1/Q2 acceptance and the completed WP-01 baseline remain unchanged.
 
 ## 2. Purpose, users, and scope
 
@@ -408,7 +410,7 @@ The default installation is offline-capable and account-free. Network calls, ext
 
 Proposed licenses for new code: Python FreeCAD workbench **LGPL-2.1-or-later**; C++ core/worker, standalone Python API/MCP tooling and independently written adapters **MIT OR Apache-2.0**; original documentation **CC-BY-4.0**. These are design choices to adopt when implementation repositories are created, not relicensing declarations over FreeCAD, vendor files, reference models, or third-party assets. Evaluate dependency licenses and trademarks before distribution. A restrictive licensed converter is a separately invoked runtime, not part of the open-source license grant. [S22]
 
-The active deployment target is Windows 11 x64 with the official pinned FreeCAD 1.1.4 build and its actual embedded Python/Qt versions. FCST is installed as an add-on/workbench alongside the owned standalone engine; it does not fork or rebuild FreeCAD. Q0/P0/Q1/Q2 gates apply to Windows. macOS and Linux development, build/host profiles, installers and qualification are deferred to WP-22 (POST-Q2), after the Windows project and WP-21 are complete. Earlier Linux foundation runs are historical evidence, not current support claims. Deferred platform releases require their own full automated parity and qualification evidence. The Windows vendor bridge remains separate from the portable native core. Pin C++ compiler/toolchain and standard-library/ABI, CMake/build configuration, dependency lock/manifest, Python package hashes, mesher/backend builds, and numerical libraries in release manifests. An optional Rust prototype separately records its toolchain and Cargo.lock. Never replace or upgrade FreeCAD's embedded Python opportunistically.
+The active deployment target is Windows 11 x64 with the official pinned FreeCAD 1.1.4 build and its actual embedded Python/Qt versions. FCST is installed as an add-on/workbench alongside the owned standalone engine; it does not fork or rebuild FreeCAD. Q0/P0/Q1/Q2 gates apply to Windows. macOS and Linux development, build/host profiles, installers and qualification are uncommitted stretch goals outside all work packages, milestones, dependencies and release acceptance. They are not promised follow-on delivery and need a future scope decision before implementation. Earlier Linux foundation runs are historical evidence, not current support claims. Deferred platform releases require their own full automated parity and qualification evidence. The Windows vendor bridge remains separate from the portable native core. Pin C++ compiler/toolchain and standard-library/ABI, CMake/build configuration, dependency lock/manifest, Python package hashes, mesher/backend builds, and numerical libraries in release manifests. An optional Rust prototype separately records its toolchain and Cargo.lock. Never replace or upgrade FreeCAD's embedded Python opportunistically.
 
 | ID | Requirement | Verification / acceptance | Basis | Gate |
 |---|---|---|---|---|
@@ -488,7 +490,6 @@ Performance is a product target, separate from physical correctness. At Q0, free
 | P0 — vertical slice | Build and save a two-node/two-surface model, conduction/radiation/transient result, visualization, typed API and MCP, and one synthetic fixture from each ecosystem | Experimental demonstration; no qualification or general compatibility claim |
 | Q1 — tested owned core, equal ecosystem gate | All Q1 requirements; core physics and required imported core cases solved by the owned C++ engine; both source profiles, necessary STEP-TAS datasets, changed-model round trips, cross-tool exchange, and offline installation | Precisely named/versioned tested profiles and owned core capabilities; reference backends remain separately labeled |
 | Q2 — backward compatibility and owned-solver closure | Every required legacy profile, custom logic, advanced physics, ESA-tool path, editing/re-export need, and fixture passes; required thermal solving uses the owned engine; all Q2 requirements closed | Full backward compatibility and independent solving within the published inventory; proprietary source-file conversion may still use declared vendor tools |
-| POST-Q2 — deferred platform ports | WP-22 ports and qualifies macOS and Linux after Windows WP-21/Q2 is complete, with automated host/engine/API/MCP and offline installation parity | Only the specific deferred platforms that pass their complete applicable qualification |
 
 Thermal Desktop and ESATAN-TMS have equal staffing, fixture acquisition, and acceptance priority. No delivery shall call itself backward compatible with both if only one passes. SYSTEMA/THERMICA and older ESA tooling are required Q2 profile families; inventory may promote them to Q1 when necessary for the first user's delivery.
 

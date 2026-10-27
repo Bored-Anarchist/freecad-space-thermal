@@ -9,9 +9,9 @@ from check_github import assess_project
 
 class ProjectEvidenceTests(unittest.TestCase):
     def setUp(self):
-        self.config = {"repository": "sample/project", "projects_title": "Sample implementation", "work_package_count": 22}
+        self.config = {"repository": "sample/project", "projects_title": "Sample implementation", "work_package_count": 21}
         self.project = {"project_id": "synthetic-project", "url": "https://github.com/users/sample/projects/1",
-                        "items": [{"issue": f"https://github.com/sample/project/issues/{i}", "state": "Planned"} for i in range(1, 23)]}
+                        "items": [{"issue": f"https://github.com/sample/project/issues/{i}", "state": "Planned"} for i in range(1, 22)]}
         self.snapshot = {"id": "synthetic-project", "title": "Sample implementation", "url": self.project["url"],
                          "closed": False, "public": True, "repositories": {"nodes": [{"nameWithOwner": "sample/project"}]},
                          "fields": {"nodes": [{"name": "Status", "options": [{"name": value} for value in

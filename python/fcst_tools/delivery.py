@@ -10,11 +10,13 @@ def validate_scope(scope, packages, evidence, gaps, presets, host):
     if active != set(scope.get("active_presets", [])):
         errors.append("active_presets_mismatch")
     by_id = {p["id"]: p for p in packages}
-    port = by_id.get("WP-22", {})
-    if (port.get("depends_on") != "WP-21" or port.get("first_delivery") != "POST-Q2"
-            or port.get("completion_gate") != "POST-Q2" or port.get("status") != "planned"):
-        errors.append("deferred_ports_scheduled_before_windows_completion")
-    expected = {p: {"work_package": "WP-22", "gate": "POST-Q2"} for p in ["Linux", "macOS"]}
+    goal = scope.get("stretch_goals", {}).get("SG-PLATFORMS", {})
+    if (set(by_id) != {f"WP-{i:02d}" for i in range(1, 22)}
+            or scope.get("windows_gates") != ["Q0", "P0", "Q1", "Q2"]
+            or goal != {"platforms": ["macOS", "Linux"], "status": "uncommitted",
+                        "work_package": None, "completion_gate": None, "blocks_delivery": False}):
+        errors.append("stretch_goal_in_committed_delivery")
+    expected = {p: {"stretch_goal": "SG-PLATFORMS", "status": "uncommitted"} for p in ["Linux", "macOS"]}
     if scope.get("deferred_platforms") != expected:
         errors.append("missing_deferred_platform_disposition")
     if (by_id.get("WP-01", {}).get("status") != "complete" or evidence.get("status") != "complete"

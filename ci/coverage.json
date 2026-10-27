@@ -46,7 +46,7 @@
     "test_validation_boundary.ValidationBoundaryTests.test_closed_boundary_and_privileged_trigger_rejection",
     "test_validation_boundary.ValidationBoundaryTests.test_guard_bypass_policy_activation_and_write_permissions_rejected",
     "test_delivery_scope.DeliveryScopeTests.test_deferred_platform_cannot_enter_active_scope",
-    "test_delivery_scope.DeliveryScopeTests.test_ports_cannot_precede_windows_completion",
+    "test_delivery_scope.DeliveryScopeTests.test_stretch_goals_cannot_become_work_packages_or_release_gates",
     "test_delivery_scope.DeliveryScopeTests.test_inventory_closure_cannot_claim_qualification_or_lose_gap_owner"
   ],
   "full_prerequisites": [

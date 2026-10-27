@@ -1,6 +1,5 @@
 {
-  "status": "deferred",
-  "work_package": "WP-22",
+  "status": "uncommitted",
   "version": "1.1.4",
   "platforms": {
     "Linux": {
@@ -9,5 +8,6 @@
       "sha256": "f6dc6ba676e5ac96a565ebc8d657232f94c6158e85b4352141bd1a46f6b43434"
     }
   },
-  "policy": "Historical pin only; reselect and qualify after Windows Q2."
+  "policy": "Historical pin only; optional stretch reference outside committed work. Reselect and qualify if separately approved.",
+  "stretch_goal": "SG-PLATFORMS"
 }

@@ -34,7 +34,7 @@ def main():
     parser.add_argument("--preset", choices=["windows-debug", "windows-release"], default="windows-debug")
     args = parser.parse_args()
     if platform.system() != "Windows":
-        parser.error("macOS and Linux verification is deferred to WP-22 after Windows Q2")
+        parser.error("macOS and Linux verification is an uncommitted stretch goal outside the work packages")
     manifest = json.loads((ROOT / "ci/coverage.json").read_text())
     output = ROOT / ".local" / args.preset
     output.mkdir(parents=True, exist_ok=True)

@@ -68,7 +68,7 @@ def main():
             options.append(option)
         graphql("mutation($input:UpdateProjectV2FieldInput!){ updateProjectV2Field(input:$input){ projectV2Field { ... on ProjectV2SingleSelectField { id } } } }",
                 input={"fieldId": status_field["id"], "singleSelectOptions": options})
-    for name, data_type, options in [("Work package", "TEXT", None), ("Completion gate", "SINGLE_SELECT", "Q0,P0,Q1,Q2,POST-Q2"),
+    for name, data_type, options in [("Work package", "TEXT", None), ("Completion gate", "SINGLE_SELECT", "Q0,P0,Q1,Q2"),
                                      ("Prerequisites", "TEXT", None), ("Requirements", "TEXT", None), ("Owner role", "TEXT", None)]:
         if not any(field["name"] == name for field in fields):
             args = ["project", "field-create", number, "--owner", owner, "--name", name,
@@ -78,10 +78,11 @@ def main():
             fields.append(gh(*args))
     fields = {field["name"]: field for field in gh("project", "field-list", number, "--owner", owner, "--format", "json")["fields"]}
     gate_field = fields["Completion gate"]
-    if {option["name"] for option in gate_field["options"]} != {"Q0", "P0", "Q1", "Q2", "POST-Q2"}:
+    if {option["name"] for option in gate_field["options"]} != {"Q0", "P0", "Q1", "Q2"}:
         options = [{"id": option["id"], "name": option["name"], "color": "GRAY", "description": "Delivery gate: " + option["name"]}
-                   for option in gate_field["options"]]
-        options.append({"name": "POST-Q2", "color": "ORANGE", "description": "Deferred ports after Windows Q2"})
+                   for option in gate_field["options"] if option["name"] in {"Q0", "P0", "Q1", "Q2"}]
+        if len(options) != 4:
+            raise RuntimeError("Missing committed delivery gate; refusing to change project fields")
         graphql("mutation($input:UpdateProjectV2FieldInput!){updateProjectV2Field(input:$input){projectV2Field{... on ProjectV2SingleSelectField{id}}}}",
                 input={"fieldId": gate_field["id"], "singleSelectOptions": options})
         fields = {field["name"]: field for field in gh("project", "field-list", number, "--owner", owner, "--format", "json")["fields"]}

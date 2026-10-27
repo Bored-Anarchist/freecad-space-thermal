@@ -15,7 +15,7 @@ def main():
     profile = json.loads((ROOT / "ci/host-profile.json").read_text(encoding="utf-8"))
     system = platform.system()
     if system != "Windows":
-        raise ValueError("Platform deferred to WP-22 after Windows Q2")
+        raise ValueError("Platform is an uncommitted stretch goal outside the work packages")
     asset = profile["platforms"][system]
     output = ROOT / ".local/host" / system
     output.mkdir(parents=True, exist_ok=True)

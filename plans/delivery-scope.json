@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "decision": "User scope amendment: acquired inventory complete; Windows delivery first; macOS/Linux at project end",
+  "decision": "User scope amendment: Windows-only committed delivery; optional macOS/Linux configurations are stretch goals outside the work packages",
   "active_platforms": [
     "Windows"
   ],
@@ -17,12 +17,12 @@
   ],
   "deferred_platforms": {
     "Linux": {
-      "work_package": "WP-22",
-      "gate": "POST-Q2"
+      "stretch_goal": "SG-PLATFORMS",
+      "status": "uncommitted"
     },
     "macOS": {
-      "work_package": "WP-22",
-      "gate": "POST-Q2"
+      "stretch_goal": "SG-PLATFORMS",
+      "status": "uncommitted"
     }
   },
   "wp01": {
@@ -35,5 +35,17 @@
     "feature_groups": 21,
     "qualification_claim": false
   },
-  "policy": "Windows Q0/P0/Q1/Q2 acceptance does not require deferred platforms. WP-22 starts after Windows WP-21/Q2 closure. Compatibility gaps retain their affected profile gates and owners; WP-01 closure is not vendor or physics qualification."
+  "policy": "Only Windows is committed through Q0/P0/Q1/Q2 and WP-01 through WP-21. macOS/Linux configurations are optional stretch goals outside all work packages, dependencies, milestones, acceptance and release gates. They require a future scope decision before implementation or support claims.",
+  "stretch_goals": {
+    "SG-PLATFORMS": {
+      "platforms": [
+        "macOS",
+        "Linux"
+      ],
+      "status": "uncommitted",
+      "work_package": null,
+      "completion_gate": null,
+      "blocks_delivery": false
+    }
+  }
 }

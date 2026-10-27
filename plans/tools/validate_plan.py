@@ -85,8 +85,8 @@ def main() -> None:
         require(len(identifiers) == len(set(identifiers)), f"Duplicate suite: {context}")
         require(set(identifiers) <= set(suites), f"Unknown suite: {context}")
 
-    valid_gates = {"Q0", "P0", "Q1", "Q2", "POST-Q2"}
-    gate_rank = {gate: rank for rank, gate in enumerate(["Q0", "P0", "Q1", "Q2", "POST-Q2"])}
+    valid_gates = {"Q0", "P0", "Q1", "Q2"}
+    gate_rank = {gate: rank for rank, gate in enumerate(["Q0", "P0", "Q1", "Q2"])}
     for package_id, package in packages.items():
         require(re.fullmatch(r"WP-\d{2}", package_id) is not None, f"Invalid package ID: {package_id}")
         require(package["lead"] and package["outputs"], f"Missing owner/output: {package_id}")

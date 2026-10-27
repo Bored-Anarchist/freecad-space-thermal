@@ -4,7 +4,7 @@ Plan revision 1.3, 27 October 2026. Based on specification FCST-SYS-SPEC-001 rev
 
 This is an implementation plan, not evidence of implemented physics or file compatibility. The workspace contains the specification, 121 registered requirements, 12 proposed compatibility profiles, three draft JSON schemas and two schema examples. WP-02 now adds a native worker/application skeleton, local/CI verification and publication-privacy preflight; it implements no thermal solving or file compatibility. [WP-02 evidence](evidence/WP-02.json) records completed foundation acceptance and remaining Q0/product obligations. The specification remains the design baseline; the automated-test requirements below add delivery obligations without relaxing its acceptance criteria.
 
-The [delivery scope](delivery-scope.json) is Windows-only for Q0/P0/Q1/Q2. WP-01 is Complete at the acquired baseline; licensed/source/schema qualification remains with later packages. macOS and Linux are deferred to POST-Q2 WP-22, after WP-21. FCST remains a FreeCAD add-on/workbench with a standalone engine, not a modified FreeCAD build.
+The [delivery scope](delivery-scope.json) is Windows-only for Q0/P0/Q1/Q2. WP-01 is Complete at the acquired baseline; licensed/source/schema qualification remains with later packages. macOS and Linux configurations are optional stretch goals outside all work packages, committed milestones and release gates; see [stretch goals](stretch-goals.md). FCST remains a FreeCAD add-on/workbench with a standalone engine, not a modified FreeCAD build.
 
 Read this plan alongside the [specification](../spec/FreeCAD-Space-Thermal-Specification.md), [requirements](../spec/requirements.csv), [compatibility profiles](../spec/compatibility-profiles.csv), and [source register](../spec/sources.md). Execution records are provided by the [work-package register](work-packages.csv), [automated-test requirements](automated-test-requirements.csv), [test-suite register](test-suites.csv), [compatibility test plan](compatibility-test-plan.csv), and [requirement traceability](requirement-traceability.csv).
 
@@ -36,7 +36,7 @@ Online publication must exclude private/personal information. This covers code a
 | Geometry | Obtain mesh/geometry through a FreeCAD adapter; keep engine network-only operation possible | Supported primitives/elements, pinned FreeCAD/OCCT combination and attachment rules |
 | Storage | Documented ZIP/directory `.fcst`, JSON metadata and versioned HDF5 arrays | Full model/results schemas, canonical hashing, atomic-save/recovery protocol |
 | Vendor access | Separate version-matched adapters; Windows OpenTD sidecar where required | Actual licenses, runtimes, APIs, fixture rights and unattended automation paths |
-| Platform qualification | Windows 11 x64 and official pinned FreeCAD 1.1.4; macOS/Linux deferred to WP-22 after Windows Q2 | Qualify actual combinations; do not infer support from version names |
+| Platform qualification | Windows 11 x64 and official pinned FreeCAD 1.1.4; macOS/Linux are uncommitted stretch goals outside work packages | Qualify actual combinations; do not infer support from version names |
 | MCP | Local stdio over the shared application API | Verify and pin a released protocol/SDK and named clients at Q0; separately test legacy profiles |
 | Optional work | In-process pybind11, GPU acceleration, Rust comparisons, network MCP, Fluent comparisons | Add only when justified; none is necessary for the initial worker architecture |
 
@@ -139,7 +139,6 @@ Each package below specifies concrete tasks and completion evidence. Its registe
 | Build P0 | Minimal WP-11 through WP-14, integrated by WP-15 | Automated end-to-end two-node/two-surface demonstration |
 | Complete Q1 | Finish prior packages plus WP-16 through WP-19 | Qualified owned core, both ecosystems and unattended release evidence |
 | Complete Windows Q2 | WP-20 and WP-21 | Required advanced physics, user logic and all mandatory legacy profiles |
-| Deferred ports | WP-22 after WP-21 | macOS/Linux ports and platform qualification; POST-Q2 |
 
 Do acquisition and feasibility work early for both ecosystems. After contracts stabilize, TD and ESATAN adapter implementation may proceed concurrently with core numerical work. This describes engineering staffing, not a request to run implementation agents during this planning task.
 
@@ -421,17 +420,6 @@ Plan and prototype this work from WP-01 findings; do not wait for Q1 to discover
 
 **Outputs:** full required legacy adapters, advanced/native support matrix and Q2 qualification bundle. **Completion:** zero unresolved required coverage entries and all mandatory round trips/owned-engine executions pass. Compatibility claims stay bounded by the published inventory; proprietary source conversion may still require declared vendor tools.
 
-### Step 22 — WP-22: port and qualify macOS and Linux after Windows completion
-
-This is a POST-Q2 package and depends on completed WP-21. It is outside Windows Q0/P0/Q1/Q2 release acceptance. Do not schedule macOS/Linux development, native build jobs, FreeCAD host jobs or package qualification before the Windows project is complete. Historical Linux presets, pins and evidence are retained as deferred references only.
-
-1. Select exact supported macOS and Linux OS/architecture, official FreeCAD, embedded Python/Qt/OCCT and compiler/ABI profiles at that time; requalify any historical pins.
-2. Port the add-on, owned engine, worker launch, persistence, GUI and installation without changing common model/file/API semantics.
-3. Implement platform-specific installers and automated clean/offline install, save/reopen/solve, GUI/CLI/MCP parity, numerical and failure-recovery qualification.
-4. Restore platform CI only when these profiles are scheduled; publish support per platform from exact tested evidence and pass publication privacy checks.
-
-**Outputs:** qualified macOS/Linux add-on and standalone engine packages, platform manifests and automated parity/qualification evidence. **Completion:** each claimed deferred platform passes its full applicable suite after Windows Q2; no FreeCAD fork is required.
-
 
 ## 4. Mandatory automated-test delivery requirements
 
@@ -498,7 +486,7 @@ For each round trip, the driver runs this complete chain: verify original hashes
 
 If a vendor interface needs an interactive desktop, use a dedicated signed-in automation session with a test supervisor, timeouts and stable selectors. Prefer supported vendor APIs/commands wherever possible. Automating a supported UI does not remove license constraints. If no reliable unattended route exists, record a blocked profile and build the missing driver/path; do not replace it with a request for the user to click through tests or accept a screenshot as numerical evidence.
 
-FreeCAD test jobs launch an isolated instance on the pinned build and use host-side test hooks on the application thread. Command-level tests assert canonical state; UI tests exercise editor widgets, selection/view providers and event-loop responsiveness. A watchdog handles dialogs/hangs and captures crash logs. Run the supported Windows desktop profile; macOS/Linux host qualification belongs to deferred WP-22; a headless engine test alone cannot qualify the GUI.
+FreeCAD test jobs launch an isolated instance on the pinned build and use host-side test hooks on the application thread. Command-level tests assert canonical state; UI tests exercise editor widgets, selection/view providers and event-loop responsiveness. A watchdog handles dialogs/hangs and captures crash logs. Run the supported Windows desktop profile; macOS/Linux host work is an optional stretch goal outside the work packages; a headless engine test alone cannot qualify the GUI.
 
 ### 4.3 Continuous integration and execution cadence
 
@@ -531,7 +519,6 @@ Evidence for cached unchanged tests can be reused only if the declared test-inpu
 | P0 | Complete WP-15 scripted demo across native/host/API/MCP paths and paired synthetic fixtures, with crash/cancel/invalidation checks | Q0 baseline; demo clearly labeled experimental |
 | Q1 | Every Q1 requirement and applicable TST requirement, paired TD/ESA profiles, STEP-TAS datasets, changed-model source round trips, both cross-tool directions, native-only solve and clean offline installs | No unaccepted critical qualification-impacting defect; exact tested support matrix and performance dispositions |
 | Q2 | All Q1 regression plus every required legacy/advanced/entity/case/operation entry and Q2 native fluid/optical/logic comparisons | No unresolved required native behavior or required source editing/re-export path |
-| POST-Q2 | WP-22 macOS/Linux ports and complete platform-specific automated parity/install/GUI/numerical qualification | Windows WP-21/Q2 complete; no deferred platform support claim before its own evidence passes |
 
 Before a release is declared, the driver generates a coverage table for every claimed configuration and privacy clearance for the exact outgoing release contents/prose. The product owner and engineering leads may review the evidence and any scope/disposition decisions; they do not supply manual test execution in place of it. Product claims are generated from passing coverage and cannot be broadened by editing report prose.
 

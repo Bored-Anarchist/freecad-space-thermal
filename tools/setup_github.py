@@ -56,7 +56,7 @@ def main():
                                "description": "Independent spacecraft thermal modeling and owned C++ engine with Thermal Desktop and ESATAN interoperability"})
         milestones = api(prefix + "/milestones?state=all&per_page=100")
         numbers = {row["title"]: row["number"] for row in milestones}
-        for gate in ["Q0", "P0", "Q1", "Q2", "POST-Q2"]:
+        for gate in ["Q0", "P0", "Q1", "Q2"]:
             if gate not in numbers:
                 numbers[gate] = api(prefix + "/milestones", {"title": gate, "description": "Evidence-backed " + gate + " delivery gate"})["number"]
         existing = api(prefix + "/issues?state=all&per_page=100")
@@ -81,7 +81,7 @@ def main():
                     f'Deliverables: {package["outputs"]}.\n\n'
                     f'Requirements: {", ".join(ids) or "Integration of supporting requirements"}.\n\n'
                     f'Automated suites: {package["automated_suites"]}.\n\n'
-                    f'Delivery scope: {"Deferred macOS/Linux ports after Windows WP-21/Q2; no current platform support claim" if package["id"] == "WP-22" else "Windows-only Q0/P0/Q1/Q2; macOS and Linux belong to deferred WP-22"}.\n\n'
+                    'Delivery scope: Windows-only Q0/P0/Q1/Q2. Optional macOS/Linux configurations are uncommitted stretch goals outside all work packages and release gates.\n\n'
                     f'Inventory policy: {"WP-01 is complete on the acquired 55-file six-case baseline; remaining qualification gaps are owned by later packages" if package["id"] == "WP-01" else "Use the completed WP-01 inventory and retain the affected qualification/publication gates"}.\n\n'
                     'Acceptance and detailed tasks: plans/FCST-Implementation-Plan.md. '
                     'Completion requires executable evidence; no manual acceptance execution is assigned to the user. '

@@ -82,5 +82,5 @@
     }
   ],
   "acceptance_policy": "WP-02 foundation completion does not close Q0 qualify vendor compatibility select numerical libraries or claim implemented physics. WP-01 original closure criteria remain blocked.",
-  "current_delivery_scope": "Windows only per plans/delivery-scope.json; previous Windows/Linux runs remain historical evidence. Linux and macOS qualification is deferred to WP-22 after Windows Q2."
+  "current_delivery_scope": "Windows only per plans/delivery-scope.json. Earlier Linux results remain historical; macOS/Linux configurations are uncommitted stretch goals outside work packages and release acceptance."
 }

@@ -39,14 +39,12 @@
   "delivery_scope": "plans/delivery-scope.json",
   "deferred_platforms": {
     "Linux": {
-      "work_package": "WP-22",
-      "gate": "POST-Q2",
-      "status": "deferred"
+      "stretch_goal": "SG-PLATFORMS",
+      "status": "uncommitted"
     },
     "macOS": {
-      "work_package": "WP-22",
-      "gate": "POST-Q2",
-      "status": "deferred"
+      "stretch_goal": "SG-PLATFORMS",
+      "status": "uncommitted"
     }
   },
   "foundation_evidence_policy": "Earlier Linux evidence is historical and is not current supported-platform or release acceptance."
