@@ -31,8 +31,10 @@ def command(args, log, env=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tier", choices=["fast", "full"], default="fast")
-    parser.add_argument("--preset", default="windows-debug" if os.name == "nt" else "linux-debug")
+    parser.add_argument("--preset", choices=["windows-debug", "windows-release"], default="windows-debug")
     args = parser.parse_args()
+    if platform.system() != "Windows":
+        parser.error("macOS and Linux verification is deferred to WP-22 after Windows Q2")
     manifest = json.loads((ROOT / "ci/coverage.json").read_text())
     output = ROOT / ".local" / args.preset
     output.mkdir(parents=True, exist_ok=True)

@@ -102,7 +102,7 @@ def assess_project(config, project, snapshot):
         values = row.get("fieldValues", {}).get("nodes", [])
         actual[url] = next((value.get("name") for value in values
                             if (value.get("field") or {}).get("name") == "Status"), None)
-    if len(expected) != 21 or actual != expected:
+    if len(expected) != config["work_package_count"] or actual != expected:
         findings.append("project_backlog_or_states_mismatch")
     return findings
 
@@ -133,7 +133,7 @@ def assess(config, repo, protection, actions, workflows, rules, issues, project)
          and workflows.get("allowed_actions") == "selected", "action_allowlist_missing")
     need(rules is not None and any(row.get("name") == "Protect release branches" and row.get("enforcement") == "active"
                                   for row in rules), "release_protection_missing")
-    need(issues is not None and len(issues) >= 21, "work_package_backlog_incomplete")
+    need(issues is not None and len(issues) >= config["work_package_count"], "work_package_backlog_incomplete")
     need(project is not None and bool(project.get("url")), "project_link_missing")
     return {"status": "blocked" if findings else "passed", "findings": findings}
 

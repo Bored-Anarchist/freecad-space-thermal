@@ -7,6 +7,7 @@ milestones, issues and project discovery; protection setup follows initial CI.
 import argparse
 import csv
 import json
+import re
 import subprocess
 import sys
 from pathlib import Path
@@ -55,14 +56,20 @@ def main():
                                "description": "Independent spacecraft thermal modeling and owned C++ engine with Thermal Desktop and ESATAN interoperability"})
         milestones = api(prefix + "/milestones?state=all&per_page=100")
         numbers = {row["title"]: row["number"] for row in milestones}
-        for gate in ["Q0", "P0", "Q1", "Q2"]:
+        for gate in ["Q0", "P0", "Q1", "Q2", "POST-Q2"]:
             if gate not in numbers:
                 numbers[gate] = api(prefix + "/milestones", {"title": gate, "description": "Evidence-backed " + gate + " delivery gate"})["number"]
         existing = api(prefix + "/issues?state=all&per_page=100")
-        titles = {row["title"]: row for row in existing if "pull_request" not in row}
-        with (ROOT / "plans/work-packages.csv").open(newline="") as stream:
+        by_package = {}
+        for row in existing:
+            match = re.match(r"^(WP-\d{2}):", row["title"])
+            if "pull_request" not in row and match:
+                if match[1] in by_package:
+                    raise RuntimeError("Duplicate work-package issue identity")
+                by_package[match[1]] = row
+        with (ROOT / "plans/work-packages.csv").open(encoding="utf-8", newline="") as stream:
             packages = list(csv.DictReader(stream))
-        with (ROOT / "plans/requirement-traceability.csv").open(newline="") as stream:
+        with (ROOT / "plans/requirement-traceability.csv").open(encoding="utf-8", newline="") as stream:
             trace = list(csv.DictReader(stream))
         links = []
         for package in packages:
@@ -74,11 +81,15 @@ def main():
                     f'Deliverables: {package["outputs"]}.\n\n'
                     f'Requirements: {", ".join(ids) or "Integration of supporting requirements"}.\n\n'
                     f'Automated suites: {package["automated_suites"]}.\n\n'
+                    f'Delivery scope: {"Deferred macOS/Linux ports after Windows WP-21/Q2; no current platform support claim" if package["id"] == "WP-22" else "Windows-only Q0/P0/Q1/Q2; macOS and Linux belong to deferred WP-22"}.\n\n'
+                    f'Inventory policy: {"WP-01 is complete on the acquired 55-file six-case baseline; remaining qualification gaps are owned by later packages" if package["id"] == "WP-01" else "Use the completed WP-01 inventory and retain the affected qualification/publication gates"}.\n\n'
                     'Acceptance and detailed tasks: plans/FCST-Implementation-Plan.md. '
                     'Completion requires executable evidence; no manual acceptance execution is assigned to the user. '
                     'Keep restricted fixtures and raw evidence in authorized local storage.\n')
-            if title in titles:
-                issue = titles[title]
+            if package["id"] in by_package:
+                issue = by_package[package["id"]]
+                api(prefix + "/issues/" + str(issue["number"]), {"title": title, "body": body,
+                    "milestone": numbers[package["completion_gate"]]}, method="PATCH")
             else:
                 issue = api(prefix + "/issues", {"title": title, "body": body,
                                                  "milestone": numbers[package["completion_gate"]]})

@@ -1,7 +1,7 @@
 {
   "work_package": "WP-01",
-  "status": "blocked",
-  "scope": "Expanded public-source acquisition and compatibility inventory; original full WP-01 closure remains blocked by external reference prerequisites",
+  "status": "complete",
+  "scope": "User-approved acquired inventory baseline: 55 immutable original files, six cases, four sources, 21 feature groups and all 12 profile dispositions",
   "checks": [
     {
       "id": "immutable-original-acquisition",
@@ -25,7 +25,7 @@
       "id": "negative-qualification-gate",
       "status": "passed",
       "command": "python tools/check_inventory.py --local --qualify",
-      "evidence": "Exit code 1 and blocked verdict for all eight prerequisite/risk categories; static inventory never returns a qualification pass"
+      "evidence": "Separate compatibility prerequisite command returns exit code 1 for all eight assigned gap categories; this is expected and does not block the narrowed inventory package"
     },
     {
       "id": "synthetic-inventory-regressions",
@@ -46,13 +46,12 @@
       "evidence": "Community generated source explicitly identifies Thermal Desktop 6.3; all 25 native ESATAN analysis templates identify 2020. Exact TD patch/SINDA release and native ESATAN container build remain unverified"
     }
   ],
-  "blockers": [
-    "No active licensed source runner; required source reopen/export/run/result retrieval cannot be executed",
-    "Unknown Artemis TD release, community TD exact patch/SINDA release, native ESA container build and unresolved runtime dependency closure",
-    "Original redistribution held; community SINDA and native ESATAN repositories declare no license; local acquisition does not grant redistribution rights",
-    "STEP-TAS normative schema/dictionary/independent validator unavailable from current official endpoints and not found in the searched public schema sources",
-    "Advanced fluid/optical and historical/customer fixture coverage incomplete",
-    "Upstream numerical outputs not independently reproduced; owned-solver comparisons require later implementation"
-  ],
-  "evidence_policy": "See inventory/gaps.json. Existing requirement/profile gates are preserved. Native core development continues; WP-01/Q0 cannot be called complete while these prerequisites remain open."
+  "blockers": [],
+  "evidence_policy": "WP-01 completion records acquisition and inventory only. All compatibility profiles remain unqualified; --qualify is the separate compatibility-prerequisite gate and must remain blocked. Original bytes and publication holds are preserved.",
+  "scope_amendment": {
+    "decision": "Descope WP-01 to the acquired inventory and recorded gaps",
+    "completion": "Metadata and local original-byte checks pass; every acquired case/feature/profile has provenance, rights/dependency/version dispositions and an owner",
+    "excluded": "Runnable vendor environments, exact runtime/dependency qualification, normative schema acquisition, expanded corpus and owned-engine/source comparisons remain later-package work"
+  },
+  "qualification_obligations": "inventory/gaps.json"
 }

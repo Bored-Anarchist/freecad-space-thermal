@@ -17,10 +17,6 @@ jobs:
             preset: windows-debug
           - os: windows-2022
             preset: windows-release
-          - os: ubuntu-24.04
-            preset: linux-debug
-          - os: ubuntu-24.04
-            preset: linux-release
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -53,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022, ubuntu-24.04]
+        os: [windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -85,8 +81,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2022, ubuntu-24.04]
-        candidate: [sundials, hdf5, embree, occt, petsc]
+        os: [windows-2022]
+        candidate: [sundials, hdf5, embree, occt]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -115,11 +111,12 @@ jobs:
           retention-days: 30
   gate:
     name: Foundation gate
-    runs-on: ubuntu-24.04
+    runs-on: windows-2022
     if: always()
     needs: [build, host, dependencies]
     steps:
       - name: Require every matrix configuration to pass
+        shell: bash
         env:
           RESULT: ${{ needs.build.result }}
           HOST: ${{ needs.host.result }}

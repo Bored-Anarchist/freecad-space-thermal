@@ -22,13 +22,23 @@ def validate():
                     assert re.fullmatch(r"actions/[a-z-]+@[a-f0-9]{40}", step["uses"]), "Unpinned workflow dependency"
     workflow = yaml.load((ROOT / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader)
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
-    assert sorted(presets) == ["linux-debug", "linux-release", "windows-debug", "windows-release"], "Incomplete build matrix"
+    assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
     assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies"}, "Profile jobs absent from required gate"
-    assert set(workflow["jobs"]["host"]["strategy"]["matrix"]["os"]) == {"windows-2022", "ubuntu-24.04"}, "Missing host platform"
+    assert workflow["jobs"]["host"]["strategy"]["matrix"]["os"] == ["windows-2022"], "Windows-only host matrix required"
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]
-    assert set(packages["os"]) == {"windows-2022", "ubuntu-24.04"}, "Missing package platform"
-    assert set(packages["candidate"]) == {"sundials", "hdf5", "embree", "occt", "petsc"}, "Missing package candidate"
+    assert packages["os"] == ["windows-2022"], "Windows-only package matrix required"
+    assert set(packages["candidate"]) == {"sundials", "hdf5", "embree", "occt"}, "Incorrect active Windows package candidates"
+    for path in sorted((ROOT / ".github/workflows").glob("*.yml")):
+        document = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
+        for job in document["jobs"].values():
+            runner = job["runs-on"]
+            if "matrix.os" in runner:
+                matrix = job["strategy"]["matrix"]
+                runners = matrix.get("os") or [r["os"] for r in matrix.get("include", [])]
+                assert runners and set(runners) == {"windows-2022"}, "Deferred platform scheduled"
+            else:
+                assert runner == "windows-2022", "Deferred platform scheduled"
 
 
 if __name__ == "__main__":

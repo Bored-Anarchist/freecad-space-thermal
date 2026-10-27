@@ -4,6 +4,8 @@ Plan revision 1.3, 27 October 2026. Based on specification FCST-SYS-SPEC-001 rev
 
 This is an implementation plan, not evidence of implemented physics or file compatibility. The workspace contains the specification, 121 registered requirements, 12 proposed compatibility profiles, three draft JSON schemas and two schema examples. WP-02 now adds a native worker/application skeleton, local/CI verification and publication-privacy preflight; it implements no thermal solving or file compatibility. [WP-02 evidence](evidence/WP-02.json) records completed foundation acceptance and remaining Q0/product obligations. The specification remains the design baseline; the automated-test requirements below add delivery obligations without relaxing its acceptance criteria.
 
+The [delivery scope](delivery-scope.json) is Windows-only for Q0/P0/Q1/Q2. WP-01 is Complete at the acquired baseline; licensed/source/schema qualification remains with later packages. macOS and Linux are deferred to POST-Q2 WP-22, after WP-21. FCST remains a FreeCAD add-on/workbench with a standalone engine, not a modified FreeCAD build.
+
 Read this plan alongside the [specification](../spec/FreeCAD-Space-Thermal-Specification.md), [requirements](../spec/requirements.csv), [compatibility profiles](../spec/compatibility-profiles.csv), and [source register](../spec/sources.md). Execution records are provided by the [work-package register](work-packages.csv), [automated-test requirements](automated-test-requirements.csv), [test-suite register](test-suites.csv), [compatibility test plan](compatibility-test-plan.csv), and [requirement traceability](requirement-traceability.csv).
 
 ## Delivery approach
@@ -29,12 +31,12 @@ Online publication must exclude private/personal information. This covers code a
 | Project development | GitHub repository, Issues/Projects, pull requests, GitHub Actions and Releases | Repository owner/URL, visibility, permissions, supported protection features and runner/evidence access established at Q0 |
 | Numerical implementation | C++20, CMake, independent engine executable/library | Q0 compiler, ABI, build flags, numerical-backend prototype and platform results |
 | Python integration | Application operations, FreeCAD host adapter, CLI, MCP, orchestration/reporting | Separate host and standalone Python dependency environments; no opportunistic host-Python replacement |
-| Numerical libraries | Evaluate SUNDIALS and sparse solvers behind FCST interfaces; PETSc only if justified | Algebraic initialization, stiff integration, events, sparse scaling, licenses and clean Windows/Linux builds |
+| Numerical libraries | Evaluate SUNDIALS and sparse solvers behind FCST interfaces; PETSc only if justified | Algebraic initialization, stiff integration, events, sparse scaling, licenses and clean Windows builds |
 | Radiation | FCST estimators/optical laws with CPU intersection backend; evaluate Embree | Error/convergence evidence, deterministic seed policy and deployable dependency build |
 | Geometry | Obtain mesh/geometry through a FreeCAD adapter; keep engine network-only operation possible | Supported primitives/elements, pinned FreeCAD/OCCT combination and attachment rules |
 | Storage | Documented ZIP/directory `.fcst`, JSON metadata and versioned HDF5 arrays | Full model/results schemas, canonical hashing, atomic-save/recovery protocol |
 | Vendor access | Separate version-matched adapters; Windows OpenTD sidecar where required | Actual licenses, runtimes, APIs, fixture rights and unattended automation paths |
-| Platform qualification | Proposed Windows 11 x64 and Ubuntu 24.04 x64, pinned FreeCAD 1.1.x builds | Qualify actual combinations; do not infer support from version names |
+| Platform qualification | Windows 11 x64 and official pinned FreeCAD 1.1.4; macOS/Linux deferred to WP-22 after Windows Q2 | Qualify actual combinations; do not infer support from version names |
 | MCP | Local stdio over the shared application API | Verify and pin a released protocol/SDK and named clients at Q0; separately test legacy profiles |
 | Optional work | In-process pybind11, GPU acceleration, Rust comparisons, network MCP, Fluent comparisons | Add only when justified; none is necessary for the initial worker architecture |
 
@@ -93,7 +95,7 @@ Inside FreeCAD, application dispatch runs on the host's owning thread for docume
 2. **Create the executable backlog.** Represent each work package as a GitHub Issue with linked implementation/test tasks, requirement IDs, prerequisites, owner and Q0/P0/Q1/Q2 milestone. Track them in GitHub Projects with explicit planned, ready, in-progress, blocked and complete states. Link defects to affected profiles/builds, automated reproductions and release disposition. The CSV registers remain version-controlled baselines; issue/project links must identify the same work rather than introduce a competing requirement list.
 3. **Use pull requests for changes.** Each PR links its issue/work package, affected requirement/profile IDs, intended behavior and automated verification. Add real maintainer/team handles to CODEOWNERS after repository ownership is known. Protect the default and release branches against unchecked changes and destructive history updates; configure required checks and appropriate review ownership. Verify the selected repository visibility and account plan support the required protections at Q0. [GitHub ruleset documentation](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets)
 4. **Make automated checks decisive.** GitHub Actions runs the same local test drivers and publishes uniquely named checks. A required aggregate check compares collected cases with the expected coverage manifest and fails on missing, failed, blocked, cancelled or unexpectedly skipped required work. Configure checks after their first run establishes their identities. Changes to tests, criteria and workflows are reviewed and tested like numerical changes; the PR author cannot replace failed numerical evidence with a green documentation-only check.
-5. **Separate public and privileged runners.** Public PR checks use GitHub-hosted Windows/Linux runners and public synthetic fixtures without vendor credentials. Exact-version vendor, restricted-data and dedicated-performance workflows run from a controlled private validation repository with explicitly scoped runner access and a reviewed candidate SHA/build manifest. Keep private fixture data in authorized runner-local storage; online transfer needs explicit destination-specific permission. Never execute unreviewed PR code in a privileged context. Recreate or reset execution state and verify candidate/artifact hashes before each run; return only approved sanitized verdict summaries and safe evidence references to the source repository. This design follows GitHub's guidance on self-hosted runner access. [Runner access documentation](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/manage-access)
+5. **Separate public and privileged runners.** Public PR checks use GitHub-hosted Windows runners and public synthetic fixtures without vendor credentials. Exact-version vendor, restricted-data and dedicated-performance workflows run from a controlled private validation repository with explicitly scoped runner access and a reviewed candidate SHA/build manifest. Keep private fixture data in authorized runner-local storage; online transfer needs explicit destination-specific permission. Never execute unreviewed PR code in a privileged context. Recreate or reset execution state and verify candidate/artifact hashes before each run; return only approved sanitized verdict summaries and safe evidence references to the source repository. This design follows GitHub's guidance on self-hosted runner access. [Runner access documentation](https://docs.github.com/en/actions/how-tos/manage-runners/self-hosted-runners/manage-access)
 6. **Version and scope workflow dependencies.** Pin external actions to reviewed full commit SHAs, lock build/test dependencies and grant the minimum job permissions. PR test jobs need read access; release publication receives write permissions only in its release job. Do not execute candidate code through privileged `pull_request_target` workflows. Record workflow revisions, Actions run/attempt/job IDs, commit SHA and runner image with evidence. [GitHub Actions secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)
 7. **Publish qualified releases.** Run the gate evaluator for the exact candidate, then produce GitHub Releases tied to that tested commit/tag with binaries, source/build/dependency/license manifests, checksums, profile matrix and approved qualification summaries. Preserve immutable evidence in durable, access-appropriate storage; expiring workflow artifacts alone cannot satisfy the retention contract. Restricted model contents and license material stay in controlled storage with hash references in public summaries.
 8. **Verify repository settings automatically.** Add a settings checker for remote identity, required branch checks, workflow permissions, supported protection settings, runner restrictions and release-to-commit evidence links. Unavailable permissions, protection features or licensed runners are reported as setup blockers, not silently relaxed. Review of repository access or a release decision does not make the user responsible for executing tests.
@@ -102,8 +104,8 @@ The planned GitHub workflow deliverables are:
 
 | Workflow | Scope and trigger | Runner/evidence |
 |---|---|---|
-| `planning-checks.yml` | Pull requests and pushes validate this plan, registers and specification package | Hosted Windows/Linux; planning consistency only |
-| `ci.yml` | Pull requests and pushes build and run fast/affected contract, unit, analytic, API and public exchange/security suites | Hosted Windows/Linux; named required checks |
+| `planning-checks.yml` | Pull requests and pushes validate this plan, registers and specification package | Hosted Windows; planning consistency only |
+| `ci.yml` | Pull requests and pushes build and run fast/affected contract, unit, analytic, API and public exchange/security suites | Hosted Windows; named required checks |
 | `integration.yml` | Integration-branch changes and scheduled full deterministic/statistical campaigns | Hosted or controlled qualified profiles; all collected verdicts |
 | `gui.yml` | Host changes and integration/release qualification | Qualified FreeCAD desktop/display runners through the appropriate trusted boundary |
 | `vendor-validation.yml` | Reviewed candidates and source/adapter profile changes, dispatched in the private validation repository | Restricted exact-version licensed runners; paired source round-trip evidence |
@@ -132,45 +134,46 @@ Each package below specifies concrete tasks and completion evidence. Its registe
 
 | Stage | Packages | Result |
 |---|---|---|
-| Establish Q0 | WP-01 through WP-04, plus small adapter feasibility probes | Inventory, contracts, reference environment, criteria, automated harness and numerical decision |
+| Establish Q0 | WP-01 through WP-04, plus native feasibility probes | Inventory, contracts, reference environment, criteria, automated harness and numerical decision |
 | Build foundations | WP-05 through WP-10 | Durable operations/jobs and paired import/export paths |
 | Build P0 | Minimal WP-11 through WP-14, integrated by WP-15 | Automated end-to-end two-node/two-surface demonstration |
 | Complete Q1 | Finish prior packages plus WP-16 through WP-19 | Qualified owned core, both ecosystems and unattended release evidence |
-| Complete Q2 | WP-20 and WP-21 | Required advanced physics, user logic and all mandatory legacy profiles |
+| Complete Windows Q2 | WP-20 and WP-21 | Required advanced physics, user logic and all mandatory legacy profiles |
+| Deferred ports | WP-22 after WP-21 | macOS/Linux ports and platform qualification; POST-Q2 |
 
 Do acquisition and feasibility work early for both ecosystems. After contracts stabilize, TD and ESATAN adapter implementation may proceed concurrently with core numerical work. This describes engineering staffing, not a request to run implementation agents during this planning task.
 
-The dependency register allows native contract and analytic-prototype slices without WP-01. WP-01 findings must still be reconciled into the complete contracts and paired prototype cases before Q0 closes; adapters retain their inventory dependency. Native create/save/reopen/solve checks run as soon as their components exist, before the full P0 integration demonstration.
+The dependency register allows native contract and analytic-prototype slices without WP-01. WP-01 findings must still be reconciled into the complete contracts and explicit compatibility dispositions before Q0 closes; paired source qualification belongs to Q1; adapters retain their inventory dependency. Native create/save/reopen/solve checks run as soon as their components exist, before the full P0 integration demonstration.
 
-### Step 1 — WP-01: establish the real model and compatibility inventory
+### Step 1 — WP-01: freeze the acquired inventory and explicit dispositions
 
-1. Import the 121 specification requirements and 12 proposed profiles into the delivery backlog. Keep the existing requirement IDs and Q0/Q1/Q2 gates.
-2. Assign a product owner, numerical lead, host/API lead, TD analyst/adapter owner, ESA analyst/adapter owner, and test/release owner. TD and ESA need equal capacity and the same acceptance priority.
-3. For each required source model, record exact product/module/version, files/includes/property libraries, code, geometry, GMM/TMM relationships, cases, reference results, redistribution rights, and required operations.
-4. Split each profile into feature/operation coverage: inspect, reconstruct, edit, native execute, write, source reopen/run, and cross-tool exchange. A native-file profile name does not mean native solver support.
-5. Build a feature-to-engine map for each required node type, expression, material law, radiation option, environment, control and fluid behavior. Identify Q1 core work and Q2 remaining behavior. Promote a required family to Q1 if the first delivery actually needs it; do not silently discard a difficult model.
-6. Acquire licensed runnable vendor environments and document supported unattended APIs/command-line entry points. Probe open/export/reopen/result retrieval for one model in each ecosystem. Capture runtime/compiler prerequisites and failures automatically.
-7. Acquire the required STEP-TAS schema/dictionary and validation mechanism, with exact versions/hashes and distribution terms. Public summaries are insufficient for implementing a schema-backed reader.
-8. Create reproducible public synthetic fixtures and controlled storage/manifests for restricted fixtures. Check missing dependency closure automatically.
+The user narrowed WP-01 to the delivered baseline: 55 immutable files from four public sources, six model/example cases, 21 feature groups, all 12 profile dispositions and the independent public analytic seed. Original bytes, notices and restricted metadata remain local.
 
-**Outputs:** frozen inventory, scope/operation matrix, fixture manifests, native-feature backlog, access/prerequisite report, initial risk register. **Completion:** automated inventory checks find no mandatory unassigned feature, missing owner, unidentified version, or undocumented fixture dependency; required reference environments are runnable. Missing licenses or files remain explicit Q0 blockers. Independent core development can continue, but Q0 cannot be declared complete.
+1. Lock provenance and hashes against pinned upstream Git trees and verify every acquired original locally.
+2. Record source-version observations, dependency/result/rights status and every required operation; unknowns require explicit owned gaps.
+3. Map all acquired cases and feature/profile rows to requirements, components and later-package owners. TD and ESATAN retain equal compatibility priority.
+4. Preserve publication holds and inert source logic. Keep all acquired profiles unqualified.
 
-**Implementation progress:** [WP-01's acquired online examples](../inventory/README.md) contain 55 immutable original files from four pinned public sources, six cases, 21 feature groups and all 12 profile dispositions. The native ESATAN acquisition includes geometry/environment/kinematics/project companions and 25 case templates. Explicit headers establish Thermal Desktop 6.3 and ESATAN-TMS 2020 template families; exact remaining runtime builds still need source-tool inspection. [WP-01 evidence](evidence/WP-01.json) records executable checks and the original unmet closure criteria, so this package remains Blocked. `python tools/check_inventory.py` checks public metadata offline; `--local` verifies preserved original bytes; `--qualify` fails while required closure evidence is missing. Unavailable active licensed runners prevent source-tool execution; downloaded models, outputs and original metadata remain local. This inventory does not qualify TD/ESATAN compatibility or replace the full Q0 corpus freeze.
+**Outputs:** acquired inventory, source/hash manifests, feature/operation map, rights/dependency dispositions and assigned qualification gaps. **Completion:** offline metadata checks and all 55 local original-byte checks pass; no acquired row lacks provenance, ownership or a required disposition. This criterion is met and WP-01 is Complete.
+
+**Explicit later obligations:** licensed reference runtimes, exact source/dependency closure and source reopen/export/run are WP-08/WP-09; normative STEP-TAS schema/dictionary/validation is WP-10; redistribution and paired numerical-reference closure is WP-19; advanced and legacy coverage remain WP-12/WP-20/WP-21 as mapped in [inventory/gaps.json](../inventory/gaps.json). These still block the affected compatibility or publication claim. They do not reopen WP-01 or block native Q0 work. `python tools/check_inventory.py --local --qualify` remains the separate blocked compatibility-prerequisite check, not the WP-01 completion command.
+
+See [WP-01 evidence](evidence/WP-01.json) and [inventory](../inventory/README.md). Closing this inventory is not a compatibility, source-run or physics qualification claim.
 
 ### Step 2 — WP-02: create the source/build/test foundation
 
 1. Establish the authoritative GitHub repository, Issues/Projects backlog, milestone/requirement links, PR/issue templates, component ownership, proposed licenses for new code, contribution rules and a dependency/provenance manifest. Configure and automatically verify default/release-branch protections and required checks.
 2. Add CMake build/install presets for a debug/sanitizer configuration where supported and a release reference configuration. Add a Python package layout and isolated lockfiles for standalone tooling and host-compatible dependencies.
 3. Implement empty engine/worker entry points, structured diagnostic types and build-info output. The native executable must launch with FreeCAD and Python absent.
-4. Add GitHub Actions Windows/Linux CI that builds, runs a trivial executable test, imports standalone Python modules, validates contracts, and stores machine-readable results. Add the planning/specification checks first, before product code exists. Host smoke jobs use the exact selected FreeCAD build. Establish the separate private validation repository and scoped vendor/performance runner access as required.
+4. Add GitHub Actions Windows CI that builds, runs a trivial executable test, imports standalone Python modules, validates contracts, and stores machine-readable results. Add the planning/specification checks first, before product code exists. Host smoke jobs use the exact selected FreeCAD build. Establish the separate private validation repository and scoped vendor/performance runner access as required.
 5. Create platform installation/build probes for the numerical, HDF5, intersection and geometry candidates. Measure packaging burden and record licenses rather than adding every candidate to production.
 6. Define supported compiler/runtime/ABI profiles, dependency source hashes, thread settings and floating-point flags. Avoid unsafe optimization flags in the deterministic numerical reference profile.
 7. Provide one documented developer command for the fast suite and one for full qualification. GitHub Actions uses the same drivers and publishes a required aggregate coverage check; workflow jobs cannot silently skip required cases.
 8. Implement TST-021's local publication driver, staged/outgoing-history and author-metadata checks, generated-output/prose/media scanning, sanitized reports and exact-byte publication clearance. Verify the check using planted synthetic private data before the first push or post. GitHub Actions repeats the checks, and the release workflow requires privacy clearance for its final assets.
 
-**Outputs:** GitHub repository/backlog/protection setup, reproducible skeleton builds, Actions workflows, scoped runner infrastructure, tested publication-privacy preflight, dependency records, developer setup guide. **Completion:** clean Windows/Linux runners build/install the skeleton; engine-only smoke tests pass without host/Python; CI rejects a deliberately broken fixture in an isolated harness self-check; the repository-settings checker confirms the agreed GitHub configuration; publication preflight rejects planted private data and clears the exact outgoing artifacts.
+**Outputs:** GitHub repository/backlog/protection setup, reproducible skeleton builds, Actions workflows, scoped runner infrastructure, tested publication-privacy preflight, dependency records, developer setup guide. **Completion:** clean Windows runners build/install the skeleton; engine-only smoke tests pass without host/Python; CI rejects a deliberately broken fixture in an isolated harness self-check; the repository-settings checker confirms the agreed GitHub configuration; publication preflight rejects planted private data and clears the exact outgoing artifacts.
 
-**Foundation acceptance boundary:** the exact FreeCAD 1.1.4/cp311 bundle smoke and pinned candidate source build/install/consumer probes are part of WP-02. The controlled private validation infrastructure is deliberately disabled until WP-01 supplies authorized reference profiles; its fail-closed policy, workflow, permissions and absence of privileged runners are checked live. Activating licensed source execution remains blocked under WP-01/WP-08/WP-09. Numerical backend selection and reference hardware/compiler freeze remain WP-04's existing Q0 decision, and the full qualification driver continues to reject their absence. Completing the foundation cannot close Q0, qualify a compatibility profile or qualify the future WP-13 workbench.
+**Foundation acceptance boundary:** the exact FreeCAD 1.1.4/cp311 bundle smoke and pinned candidate source build/install/consumer probes are part of WP-02. The controlled private validation infrastructure is deliberately disabled until WP-08/WP-09 supply authorized reference profiles; its fail-closed policy, workflow, permissions and absence of privileged runners are checked live. Activating licensed source execution remains with WP-08/WP-09; it does not block completed WP-01. Numerical backend selection and reference hardware/compiler freeze remain WP-04's existing Q0 decision, and the full qualification driver continues to reject their absence. Completing the foundation cannot close Q0, qualify a compatibility profile or qualify the future WP-13 workbench.
 
 ### Step 3 — WP-03: freeze model, operation, result and worker contracts
 
@@ -191,14 +194,14 @@ The dependency register allows native contract and analytic-prototype slices wit
 
 1. Create fixture manifests with analytical equations or independently derived expected values, declared discretization, comparison quantities, tolerances, units, normalization floors and expected failure categories.
 2. Establish criterion versions separately from result files. Freeze criteria before execution and preserve failed results when criteria later change.
-3. Build a small C++ prototype with nonlinear conductance/capacity, capacitive/algebraic/prescribed nodes, consistent initialization, radiation feedback and heater switching. Exercise one minimal required TD and one ESA input after a reviewed mapping/probe.
+3. Build a small C++ prototype with nonlinear conductance/capacity, capacitive/algebraic/prescribed nodes, consistent initialization, radiation feedback and heater switching. Exercise the independently authored native seed without a vendor runtime; paired TD/ESA source cases remain required under their Q1 adapter qualification.
 4. Compare candidate integration/sparse backends on the same equations, accuracy settings, hardware and inputs. Check Jacobian/residual consistency, energy, events, failure diagnostics and restart before timing.
 5. Run sparse scale probes and clean install probes. Record implementation effort, debug/deployment issues, memory and runtime; freeze reference hardware and toolchain settings.
 6. If a Rust comparison is explicitly selected, keep it a bounded prototype using the same numerical backend where applicable. Otherwise record that C++ met or failed the checkpoint; a Rust implementation is not a dependency.
 7. Predeclare Monte Carlo seed ensembles, sample/replicate counts, interval estimator/coverage, multiplicity treatment, convergence and practical error policy.
 8. Record the Q0 decision, selected libraries/interfaces and unresolved limitations. An unsatisfactory backend triggers another measured candidate, not weakened criteria.
 
-**Outputs:** executable oracle harness, baseline numerical/statistical/performance policies, prototype results and architecture decision. **Completion:** repeatable automated runs establish acceptable C++ suitability and required deployment behavior; Q0 inventory/contracts/access items are also complete. Prototype success permits implementation, not compatibility claims.
+**Outputs:** executable oracle harness, baseline numerical/statistical/performance policies, prototype results and architecture decision. **Completion:** repeatable automated runs establish acceptable C++ suitability and required deployment behavior; Q0 acquired-inventory/contracts/native prototype items are also complete; affected compatibility access remains required before Q1 claims. Prototype success permits implementation, not compatibility claims.
 
 ### Step 5 — WP-05: implement persistence, revisions and transactional operations
 
@@ -341,7 +344,7 @@ The dependency register allows native contract and analytic-prototype slices wit
 6. Cancel a solve, terminate a worker and reopen the saved project. Check that no partial solution is published as complete.
 7. Produce a single machine-readable P0 report with input/build/criteria hashes and all evidence links.
 
-**Outputs:** repeatable demonstration project and `qualify --gate P0` report. **Completion:** the full scripted demonstration passes on the selected Windows/Linux native/host profiles and named MCP client profile. P0 claims remain experimental even when every demo step passes.
+**Outputs:** repeatable demonstration project and `qualify --gate P0` report. **Completion:** the full scripted demonstration passes on the selected Windows native/host profiles and named MCP client profile. P0 claims remain experimental even when every demo step passes.
 
 ### Step 16 — WP-16: complete FD/FE discretization, contacts and property coverage
 
@@ -385,7 +388,7 @@ The dependency register allows native contract and analytic-prototype slices wit
 2. Run a native-only environment without vendor solvers/FreeCAD/Python for the engine suite, and separate host/API/MCP parity environments. Record actual loaded backend/build dependencies.
 3. Profile large models. Test 100,000-node inspection within 5 s after load, UI/cancellation acknowledgement within 1 s, and the 100,000-node/1,000,000-link steady sparse benchmark within 60 s/16 GiB on the frozen reference hardware. Record raw timings/memory and any explicit performance disposition separately from physics correctness.
 4. Publish million-facet radiation scaling/error curves; do not invent a throughput threshold before measurement. Verify query paging, streaming and bounded memory.
-5. Automate clean offline installation and model open/build/solve/report/uninstall/rollback on Windows/Linux. Test portable dependency closure and `.FCStd` coordinated recovery on clean machines.
+5. Automate clean offline installation and model open/build/solve/report/uninstall/rollback on Windows. Test portable dependency closure and `.FCStd` coordinated recovery on clean machines.
 6. Add sanitizers where supported, parser/security fuzz regression, malformed packages, injection/scope checks, secret redaction, dependency/license inventories and source/build reproducibility checks.
 7. Generate analyst/developer/API/MCP documentation and runnable examples from tested interfaces. Publish supported versions/directions/features/backends from evidence, not a manually embellished support list. Produce GitHub Release assets tied to the tested candidate commit/tag, checksums, license/dependency manifests and qualification summary; retain raw evidence durably under its access policy. Run privacy preflight on final assets, rendered documentation, metadata, logs and release prose, and publish only outputs bound to a valid sanitization/clearance report.
 8. Run the gate evaluator over all 114 Q1 specification requirements and applicable automated-test requirements, considering defects and explicitly accepted dispositions. Missing/failed required tests block the gate.
@@ -418,6 +421,18 @@ Plan and prototype this work from WP-01 findings; do not wait for Q1 to discover
 
 **Outputs:** full required legacy adapters, advanced/native support matrix and Q2 qualification bundle. **Completion:** zero unresolved required coverage entries and all mandatory round trips/owned-engine executions pass. Compatibility claims stay bounded by the published inventory; proprietary source conversion may still require declared vendor tools.
 
+### Step 22 — WP-22: port and qualify macOS and Linux after Windows completion
+
+This is a POST-Q2 package and depends on completed WP-21. It is outside Windows Q0/P0/Q1/Q2 release acceptance. Do not schedule macOS/Linux development, native build jobs, FreeCAD host jobs or package qualification before the Windows project is complete. Historical Linux presets, pins and evidence are retained as deferred references only.
+
+1. Select exact supported macOS and Linux OS/architecture, official FreeCAD, embedded Python/Qt/OCCT and compiler/ABI profiles at that time; requalify any historical pins.
+2. Port the add-on, owned engine, worker launch, persistence, GUI and installation without changing common model/file/API semantics.
+3. Implement platform-specific installers and automated clean/offline install, save/reopen/solve, GUI/CLI/MCP parity, numerical and failure-recovery qualification.
+4. Restore platform CI only when these profiles are scheduled; publish support per platform from exact tested evidence and pass publication privacy checks.
+
+**Outputs:** qualified macOS/Linux add-on and standalone engine packages, platform manifests and automated parity/qualification evidence. **Completion:** each claimed deferred platform passes its full applicable suite after Windows Q2; no FreeCAD fork is required.
+
+
 ## 4. Mandatory automated-test delivery requirements
 
 The following 21 requirements implement the user's instructions for unattended testing, GitHub delivery and privacy before publication. Their full machine-readable acceptance text is in [automated-test-requirements.csv](automated-test-requirements.csv). They supplement the 121 baseline requirements; their IDs are deliberately separate. Q0 is the first required gate for test infrastructure/criteria and publication privacy, while Q1 requirements also apply to Q2 and any changed capability. TST-021 applies before the first online publication even if Q0 is not yet complete.
@@ -426,7 +441,7 @@ The following 21 requirements implement the user's instructions for unattended t
 |---|---|---|
 | TST-001 | Every delivery requirement and claimed profile operation has an executable test/inspection rule, owner and evidence link | Q0 |
 | TST-002 | Numerical/statistical/semantic criteria are versioned and frozen before runs; changes create reassessment runs | Q0 |
-| TST-003 | Fixtures are reproducibly generated/acquired with independent oracles, dependency/build hashes and rights | Q0 |
+| TST-003 | Acquired fixtures have reproducible manifests, hashes, status/rights dispositions and assigned gaps; executable oracles are required at their affected qualification gate | Q0 |
 | TST-004 | Owned-engine physics, energy, refinement, algebraic initialization and controls/events run automatically | Q1 |
 | TST-005 | Scripted GUI/CLI/MCP sequences produce equivalent model semantics and numerical outcomes | Q1 |
 | TST-006 | Persistence/job tests inject crashes, interrupted writes, retries, disconnects and cancellation races | Q1 |
@@ -468,7 +483,7 @@ Use CTest for compiled unit/physics tests and a pinned Python test runner for ap
 | SUITE-CAMPAIGN | Variant identity, sweeps, uncertainty/sensitivity replay, synthetic sensor correlation/holdout and report/table provenance |
 | SUITE-SECURITY | Publication privacy, outgoing history/metadata/prose/media/artifact checks, malicious/archive/parser corpus, fuzz regressions, imported code inertness, scope/budget enforcement, isolation, secret redaction and no default listener |
 | SUITE-PERF | Fixed sparse/large-query workloads, peak memory, UI/cancel latency and million-facet accuracy/scaling curves |
-| SUITE-INSTALL | Clean Windows/Linux builds/packages, engine without host/Python/vendor solvers, offline host workflow, portable delivery, upgrade/rollback and licenses |
+| SUITE-INSTALL | Clean Windows builds/packages, engine without host/Python/vendor solvers, offline host workflow, portable delivery, upgrade/rollback and licenses |
 | SUITE-GATE | Traceability and criteria versions, fixture coverage, actual backend, candidate/profile hashes, blocked/flaky cases, defects and published claims |
 
 Each suite's trigger, runner and evidence contract is recorded in [test-suites.csv](test-suites.csv). A suite is an organizational group, not one giant test: individual cases carry requirement/profile IDs so regression selection and failure triage stay specific.
@@ -483,14 +498,14 @@ For each round trip, the driver runs this complete chain: verify original hashes
 
 If a vendor interface needs an interactive desktop, use a dedicated signed-in automation session with a test supervisor, timeouts and stable selectors. Prefer supported vendor APIs/commands wherever possible. Automating a supported UI does not remove license constraints. If no reliable unattended route exists, record a blocked profile and build the missing driver/path; do not replace it with a request for the user to click through tests or accept a screenshot as numerical evidence.
 
-FreeCAD test jobs launch an isolated instance on the pinned build and use host-side test hooks on the application thread. Command-level tests assert canonical state; UI tests exercise editor widgets, selection/view providers and event-loop responsiveness. A watchdog handles dialogs/hangs and captures crash logs. Run the supported Windows desktop profile and Linux display/offscreen profile as appropriate; a headless engine test alone cannot qualify the GUI.
+FreeCAD test jobs launch an isolated instance on the pinned build and use host-side test hooks on the application thread. Command-level tests assert canonical state; UI tests exercise editor widgets, selection/view providers and event-loop responsiveness. A watchdog handles dialogs/hangs and captures crash logs. Run the supported Windows desktop profile; macOS/Linux host qualification belongs to deferred WP-22; a headless engine test alone cannot qualify the GUI.
 
 ### 4.3 Continuous integration and execution cadence
 
 | Trigger | Automatically executed work | Merge/release effect |
 |---|---|---|
 | Developer command | Contract/unit tests plus directly affected physics/API cases | Fast feedback using the same fixtures/drivers as CI |
-| Each proposed change | Windows/Linux build, schema/unit tests, affected integration/analytic cases, public exchange and security regressions | Required checks must pass before merge |
+| Each proposed change | Windows build, schema/unit tests, affected integration/analytic cases, public exchange and security regressions | Required checks must pass before merge |
 | Integration branch / scheduled run | Full deterministic suites, GUI/CLI/MCP parity, fixed stochastic ensembles, fuzz budgets and relevant vendor profiles | Failure/blocked status is visible and assigned; required coverage remains outstanding |
 | Adapter/source-version change | All affected original and controlled-edit round trips plus both applicable cross-tool directions | Requalify exact affected profiles; do not inherit stale evidence |
 | Numerical/dependency/compiler change | Analytic/conservation/refinement, source comparisons, stochastic and resource suites affected by the change | New build evidence; changed library identity cannot reuse old pass results silently |
@@ -512,10 +527,11 @@ Evidence for cached unchanged tests can be reused only if the declared test-inpu
 
 | Gate | Automated completion evidence | Additional prerequisites |
 |---|---|---|
-| Q0 | Requirement/profile/fixture completeness, contracts/independent readers, numerical prototype, criteria/hardware records and harness self-checks | Actual authorized fixtures, vendor/schema access and recorded architecture/physics decisions |
+| Q0 | Acquired-inventory and explicit-disposition completeness, contracts/independent readers, numerical prototype, criteria/hardware records and harness self-checks | Acquired fixture/disposition baseline and native architecture/physics decisions; source runtime/schema closure remains with affected compatibility gates |
 | P0 | Complete WP-15 scripted demo across native/host/API/MCP paths and paired synthetic fixtures, with crash/cancel/invalidation checks | Q0 baseline; demo clearly labeled experimental |
 | Q1 | Every Q1 requirement and applicable TST requirement, paired TD/ESA profiles, STEP-TAS datasets, changed-model source round trips, both cross-tool directions, native-only solve and clean offline installs | No unaccepted critical qualification-impacting defect; exact tested support matrix and performance dispositions |
 | Q2 | All Q1 regression plus every required legacy/advanced/entity/case/operation entry and Q2 native fluid/optical/logic comparisons | No unresolved required native behavior or required source editing/re-export path |
+| POST-Q2 | WP-22 macOS/Linux ports and complete platform-specific automated parity/install/GUI/numerical qualification | Windows WP-21/Q2 complete; no deferred platform support claim before its own evidence passes |
 
 Before a release is declared, the driver generates a coverage table for every claimed configuration and privacy clearance for the exact outgoing release contents/prose. The product owner and engineering leads may review the evidence and any scope/disposition decisions; they do not supply manual test execution in place of it. Product claims are generated from passing coverage and cannot be broadened by editing report prose.
 
@@ -536,7 +552,7 @@ Produce calendar estimates after WP-01 through WP-04 establish corpus size, acce
 
 | Risk | Resolve early through | What blocks completion |
 |---|---|---|
-| Missing proprietary semantics/dependencies | WP-01 inventory and paired extraction probes | Required unknown fields/procedures/cases remain unassigned |
+| Missing proprietary semantics/dependencies | Completed WP-01 gap map and WP-08/WP-09 paired extraction probes | Required unknown fields/procedures/cases remain unassigned |
 | No unattended vendor route/license | Version-specific runner feasibility probe | Required source reopen/run cannot execute automatically |
 | Geometry attachment drift | Stable mapping contract and split/merge tests | Silent material/heater reassignment or ambiguous mappings accepted as valid |
 | Numerical backend insufficient | Q0 DAE/events/sparse/deployment prototype | Wrong initialization/events, failed conservation or unusable supported builds |
@@ -549,7 +565,7 @@ Produce calendar estimates after WP-01 through WP-04 establish corpus size, acce
 
 The first tickets should produce reviewable, automatically checked artifacts in the order below. Begin native foundation work immediately; compatibility acquisition proceeds alongside it and does not hold native implementation:
 
-1. Implement the publication-privacy preflight before any push/post, then establish the GitHub repository/backlog/protection settings and create the CMake/Python skeleton, GitHub Actions planning and Windows/Linux build jobs, engine-only smoke test and build-info manifests.
+1. Implement the publication-privacy preflight before any push/post, then establish the GitHub repository/backlog/protection settings and create the CMake/Python skeleton, GitHub Actions planning and Windows build jobs, engine-only smoke test and build-info manifests.
 2. Publish identity/units, minimal native thermal snapshot, `.fcst` storage, result and operation/worker contracts; add C++/Python conformance/hash fixtures using synthetic models authored from scratch.
 3. Start the compatibility inventory and acquire one runnable TD and one ESA source fixture with dependencies/results; implement an inventory checker. Continue native work while access is pending; record missing compatibility prerequisites explicitly.
 4. Create analytic one/two-node oracles and an immutable criteria register; add structured test/evidence output and missing-test detection.

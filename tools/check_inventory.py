@@ -12,7 +12,7 @@ from fcst_tools.inventory import load_inventory, rows, validate_inventory, verif
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--local", dest="verify_originals", action="store_true", help="Also verify preserved originals without executing them")
-    parser.add_argument("--qualify", action="store_true", help="Require full WP-01 closure; unavailable prerequisites fail")
+    parser.add_argument("--qualify", action="store_true", help="Check later compatibility prerequisites; unavailable qualification inputs fail independently of completed WP-01")
     args = parser.parse_args()
     data = load_inventory()
     errors = validate_inventory(data,

@@ -186,6 +186,8 @@ def main():
     parser.add_argument("--jobs", type=int, default=2)
     parser.add_argument("--prepare-system", action="store_true", help="Install signed Linux BLAS/LAPACK probe prerequisites using sudo apt-get")
     args = parser.parse_args()
+    if platform.system() != "Windows":
+        parser.error("macOS and Linux package probes are deferred to WP-22 after Windows Q2")
     if not 1 <= args.jobs <= 16:
         parser.error("jobs must be between 1 and 16")
     lock = ROOT / "ci/probe-sources.json"

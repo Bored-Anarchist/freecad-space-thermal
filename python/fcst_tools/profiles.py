@@ -47,7 +47,7 @@ def assess_dependencies(report, sources, system, selected=None):
 
 def validate_locks(host, sources):
     errors = []
-    if host.get("version") != "1.1.4" or host.get("python_abi") != "cp311" or set(host.get("platforms", {})) != {"Windows", "Linux"}:
+    if host.get("version") != "1.1.4" or host.get("python_abi") != "cp311" or set(host.get("platforms", {})) != {"Windows"}:
         errors.append("invalid_host_profile")
     if {row["id"] for row in sources} != {"sundials", "hdf5", "embree", "occt", "petsc"} or len(sources) != 5:
         errors.append("missing_candidate_profile")

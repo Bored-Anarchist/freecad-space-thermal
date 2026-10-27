@@ -66,8 +66,8 @@
   "blockers": [],
   "open_qualification_obligations": [
     {
-      "owner": "WP-01;WP-08;WP-09",
-      "gate": "Q0/Q1",
+      "owner": "WP-08;WP-09",
+      "gate": "Q1",
       "obligation": "Acquire authorized exact-version vendor profiles and fixture access; provision isolated runners only after authorization and qualification"
     },
     {
@@ -81,5 +81,6 @@
       "obligation": "Implement and qualify the FCST workbench with unattended GUI behavior on the pinned host"
     }
   ],
-  "acceptance_policy": "WP-02 foundation completion does not close Q0 qualify vendor compatibility select numerical libraries or claim implemented physics. WP-01 original closure criteria remain blocked."
+  "acceptance_policy": "WP-02 foundation completion does not close Q0 qualify vendor compatibility select numerical libraries or claim implemented physics. WP-01 original closure criteria remain blocked.",
+  "current_delivery_scope": "Windows only per plans/delivery-scope.json; previous Windows/Linux runs remain historical evidence. Linux and macOS qualification is deferred to WP-22 after Windows Q2."
 }

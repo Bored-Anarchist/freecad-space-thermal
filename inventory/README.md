@@ -1,6 +1,6 @@
 # WP-01 online example inventory
 
-Baseline `online-examples-2026-10-27-r2` contains 55 original files from four pinned public repositories, grouped into six model/example cases. It maps 21 feature groups and all 12 proposed compatibility profiles. This is an acquired-example baseline; no profile is qualified and the complete required corpus is not frozen.
+Baseline `online-examples-2026-10-27-r2` contains 55 original files from four pinned public repositories, grouped into six model/example cases. It maps 21 feature groups and all 12 proposed compatibility profiles. This is the user-approved completed WP-01 baseline. No profile is qualified and the complete compatibility corpus remains later-package work.
 
 | Source | Acquired material | Rights/publication disposition |
 |---|---|---|
@@ -11,7 +11,7 @@ Baseline `online-examples-2026-10-27-r2` contains 55 original files from four pi
 
 `acquisition-sources.json` identifies exact upstream commits and selected paths. `source-lock.json` records byte counts, SHA-256 and Git blob hashes, verified against those exact upstream trees. Originals and their license notices are preserved under ignored `.local/corpus/originals/`; no original model bytes, binary metadata, source logic or raw outputs are committed. The lock contains bounded static observations and privacy categories without sensitive matched values.
 
-`models.json` records source versions, dependencies, results, rights and per-operation dispositions. `feature-map.csv` assigns engine components, packages, owner roles and requirement IDs. `profile-coverage.csv` retains every profile, including those without examples. `gaps.json` is the risk/prerequisite register. Role assignments follow the existing work-package ownership; qualified physics/version decisions remain future evidence.
+`models.json` records source versions, dependencies, results, rights and per-operation dispositions. `feature-map.csv` assigns engine components, packages, owner roles and requirement IDs. `profile-coverage.csv` retains every profile, including those without examples. `gaps.json` assigns unresolved compatibility/publication obligations to later work packages; none remain owned by completed WP-01. Role assignments follow the existing work-package ownership; qualified physics/version decisions remain future evidence.
 
 The disc decks explicitly identify ESATAN-TMS **2018 SP1**. Their TMD files have HDF5 signatures; their schemas and numeric observations have not been independently qualified. Static deck inspection counts 102 node declarations (101 D and one B), 190 GL declarations and 5050 GR declarations. These lexical classes do not establish all physical boundary/algebraic semantics. The separate FEATURES STEP file identifies a **2025** exporter and `tas_arm`; its companion geometry deliberately exercises syntax and is not a physical numerical oracle.
 
@@ -31,4 +31,4 @@ python tools/check_inventory.py --local
 python tools/check_inventory.py --local --qualify
 ```
 
-Acquisition requires internet access and never executes downloads. Locking also requires authenticated GitHub read access to verify pinned upstream tree metadata. CI runs the offline metadata checker and adversarial synthetic tests; it does not download or upload third-party originals. `--local` checks every retained original hash. `--qualify` deliberately returns a blocked failure while licensing, version, dependency, rights, schema, advanced/legacy coverage or reference-result gaps remain. Native model creation and solving development continues independently of those compatibility prerequisites.
+Acquisition requires internet access and never executes downloads. Locking also requires authenticated GitHub read access to verify pinned upstream tree metadata. CI runs the offline metadata checker and adversarial synthetic tests; it does not download or upload third-party originals. `--local` checks every retained original hash. `--qualify` is a separate compatibility-prerequisite gate, not WP-01 completion. It deliberately returns a blocked failure while licensing, version, dependency, rights, schema, advanced/legacy coverage or reference-result gaps remain. Native model creation and solving development continues independently of those compatibility prerequisites.

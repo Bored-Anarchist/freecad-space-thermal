@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "decision": "User scope amendment: acquired inventory complete; Windows delivery first; macOS/Linux at project end",
+  "active_platforms": [
+    "Windows"
+  ],
+  "active_presets": [
+    "windows-debug",
+    "windows-release"
+  ],
+  "product_target": "FreeCAD add-on/workbench and standalone owned engine; no FreeCAD fork",
+  "windows_gates": [
+    "Q0",
+    "P0",
+    "Q1",
+    "Q2"
+  ],
+  "deferred_platforms": {
+    "Linux": {
+      "work_package": "WP-22",
+      "gate": "POST-Q2"
+    },
+    "macOS": {
+      "work_package": "WP-22",
+      "gate": "POST-Q2"
+    }
+  },
+  "wp01": {
+    "status": "complete",
+    "scope": "Acquired example inventory and explicit dispositions",
+    "files": 55,
+    "cases": 6,
+    "sources": 4,
+    "profiles": 12,
+    "feature_groups": 21,
+    "qualification_claim": false
+  },
+  "policy": "Windows Q0/P0/Q1/Q2 acceptance does not require deferred platforms. WP-22 starts after Windows WP-21/Q2 closure. Compatibility gaps retain their affected profile gates and owners; WP-01 closure is not vendor or physics qualification."
+}

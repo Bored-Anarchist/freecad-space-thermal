@@ -17,7 +17,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
+sys.path.insert(0, str(ROOT / "python"))
 from project_files import markdown_files
+from fcst_tools.delivery import validate_scope
 PLANS = ROOT / "plans"
 
 
@@ -83,8 +85,8 @@ def main() -> None:
         require(len(identifiers) == len(set(identifiers)), f"Duplicate suite: {context}")
         require(set(identifiers) <= set(suites), f"Unknown suite: {context}")
 
-    valid_gates = {"Q0", "P0", "Q1", "Q2"}
-    gate_rank = {gate: rank for rank, gate in enumerate(["Q0", "P0", "Q1", "Q2"])}
+    valid_gates = {"Q0", "P0", "Q1", "Q2", "POST-Q2"}
+    gate_rank = {gate: rank for rank, gate in enumerate(["Q0", "P0", "Q1", "Q2", "POST-Q2"])}
     for package_id, package in packages.items():
         require(re.fullmatch(r"WP-\d{2}", package_id) is not None, f"Invalid package ID: {package_id}")
         require(package["lead"] and package["outputs"], f"Missing owner/output: {package_id}")
@@ -176,6 +178,12 @@ def main() -> None:
         require(suite["status"] == "planned", f"Unsubstantiated suite implementation: {suite_id}")
         require(suite["runner"] and suite["triggers"] and suite["evidence_contract"], f"Incomplete suite: {suite_id}")
         require(suite["first_gate"] in valid_gates, f"Unknown suite gate: {suite_id}")
+
+    def document(name):
+        return json.loads((ROOT / name).read_text(encoding="utf-8"))
+    require(not validate_scope(document("plans/delivery-scope.json"), list(packages.values()),
+            document("plans/evidence/WP-01.json"), document("inventory/gaps.json"),
+            document("CMakePresets.json"), document("ci/host-profile.json")), "Delivery scope drift")
 
     for path in markdown_files(ROOT):
         for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", path.read_text(encoding="utf-8")):

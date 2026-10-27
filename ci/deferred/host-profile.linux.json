@@ -1,0 +1,13 @@
+{
+  "status": "deferred",
+  "work_package": "WP-22",
+  "version": "1.1.4",
+  "platforms": {
+    "Linux": {
+      "asset": "FreeCAD_1.1.4-Linux-x86_64-py311.AppImage",
+      "bytes": 820812280,
+      "sha256": "f6dc6ba676e5ac96a565ebc8d657232f94c6158e85b4352141bd1a46f6b43434"
+    }
+  },
+  "policy": "Historical pin only; reselect and qualify after Windows Q2."
+}

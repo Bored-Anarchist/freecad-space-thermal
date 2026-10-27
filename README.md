@@ -1,12 +1,14 @@
 # FreeCAD Space Thermal — specification package
 
-Design baseline **0.5**, prepared **26 October 2026**.
+Design baseline **0.6**, amended **27 October 2026**.
 
-Project development uses [the GitHub source repository](https://github.com/Bored-Anarchist/freecad-space-thermal), Issues/Projects, pull requests, GitHub Actions automated testing, and Releases. The [implementation plan](plans/FCST-Implementation-Plan.md) specifies required checks, scoped vendor runners, and evidence-backed release gates. The WP-02 skeleton provides C++20/CMake worker and Python package foundations with [shared local/CI verification commands](docs/development.md); solving and compatibility remain unimplemented. [WP-02 evidence](plans/evidence/WP-02.json) records completed foundation acceptance and the separate remaining Q0/product obligations. Exact host and dependency packaging probes run on Windows/Linux; no numerical backend is adopted.
+**Windows first:** develop and qualify the FreeCAD add-on/workbench and standalone engine for Windows. macOS and Linux ports are deferred to WP-22 after Windows Q2 completion. No modified FreeCAD distribution is required.
 
-Track the 21 work packages in the [FCST implementation project](https://github.com/users/Bored-Anarchist/projects/1), with requirement IDs, delivery gates, prerequisites and evidence-backed states.
+Project development uses [the GitHub source repository](https://github.com/Bored-Anarchist/freecad-space-thermal), Issues/Projects, pull requests, GitHub Actions automated testing, and Releases. The [implementation plan](plans/FCST-Implementation-Plan.md) specifies required checks, scoped vendor runners, and evidence-backed release gates. The WP-02 skeleton provides C++20/CMake worker and Python package foundations with [shared local/CI verification commands](docs/development.md); solving and compatibility remain unimplemented. [WP-02 evidence](plans/evidence/WP-02.json) records completed foundation acceptance and the separate remaining Q0/product obligations. Active host and dependency packaging probes run on Windows; no numerical backend is adopted.
 
-[WP-01's online example inventory](inventory/README.md) records acquired Thermal Desktop/SINDA and ESATAN examples, pinned hashes, rights/dependency dispositions and feature mappings. Raw originals remain local; vendor execution is blocked by unavailable licensed runners and no compatibility profile is qualified.
+Track the 22 work packages in the [FCST implementation project](https://github.com/users/Bored-Anarchist/projects/1), with requirement IDs, delivery gates, prerequisites and evidence-backed states.
+
+[WP-01's completed acquired inventory](inventory/README.md) records acquired Thermal Desktop/SINDA and ESATAN examples, pinned hashes, rights/dependency dispositions and feature mappings. Raw originals remain local; vendor execution is blocked by unavailable licensed runners and no compatibility profile is qualified.
 
 **Publication privacy:** remove private/personal information before any online code, documentation, issue/PR/comment/post, log, image or release upload. The [standing repository instructions](AGENTS.md) and plan requirement TST-021 require checks before publication, sanitized outputs and separate preservation of authorized engineering originals.
 
@@ -20,7 +22,7 @@ The accepted baseline is **C++20 with CMake**, with exact compiler and dependenc
 
 Start with [the specification](spec/FreeCAD-Space-Thermal-Specification.md). Supporting artifacts are:
 
-- [Detailed implementation and build plan](plans/FCST-Implementation-Plan.md): 21 ordered work packages, component boundaries, dependencies, Q0/P0/Q1/Q2 gates, and unattended test and release execution.
+- [Detailed implementation and build plan](plans/FCST-Implementation-Plan.md): 22 ordered work packages, component boundaries, dependencies, Windows Q0/P0/Q1/Q2 and deferred POST-Q2 gates, and unattended test and release execution.
 - [Implementation requirement traceability](plans/requirement-traceability.csv): all 121 baseline requirements plus 21 additional automated-test delivery requirements mapped to owners, work packages, suites, and planned evidence. The [test requirements](plans/automated-test-requirements.csv), [work packages](plans/work-packages.csv), [test suites](plans/test-suites.csv), and [compatibility test plan](plans/compatibility-test-plan.csv) provide the execution registers. [Validate the plan](plans/tools/validate_plan.py) with `python plans/tools/validate_plan.py`; it uses only the standard library and checks planning consistency, not implemented product behavior.
 
 - [Requirements register](spec/requirements.csv): machine-readable requirements extracted from the specification.

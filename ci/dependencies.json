@@ -74,7 +74,7 @@
   "packaging_probes": {
     "sources": "ci/probe-sources.json",
     "driver": "tools/build_dependencies.py",
-    "scope": "Pinned source builds installs and installed consumers on Windows/Linux; no production selection or numerical qualification",
-    "petsc_windows": "Native MSVC unsupported; Linux installed check required"
+    "scope": "Active Windows source builds, installs and consumers for SUNDIALS HDF5 Embree OCCT; no production adoption or numerical qualification",
+    "petsc_windows": "Native MSVC unsupported; PETSc Linux assessment deferred to WP-22 after Windows Q2"
   }
 }
