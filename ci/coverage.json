@@ -1,6 +1,10 @@
 {
   "schema_version": 1,
   "unit_cases": [
+    "test_privacy.PrivacyTests.test_public_project_url_is_distinct_from_real_home_paths",
+    "test_projects.ProjectEvidenceTests.test_local_link_cannot_replace_remote_evidence",
+    "test_projects.ProjectEvidenceTests.test_missing_item_and_falsely_completed_state_rejected",
+    "test_projects.ProjectEvidenceTests.test_wrong_repository_and_missing_delivery_states_rejected",
     "test_privacy.PrivacyTests.test_annotated_tag_identity_is_inspected",
     "test_privacy.PrivacyTests.test_staged_mode_changes_invalidate_clearance",
     "test_gate.GateTests.test_correct_coverage_passes",

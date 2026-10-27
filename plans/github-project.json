@@ -1,0 +1,143 @@
+{
+  "repository": "Bored-Anarchist/freecad-space-thermal",
+  "owner": "Bored-Anarchist",
+  "project_id": "PVT_kwHOBooUPM4BpASX",
+  "number": 1,
+  "title": "FCST implementation",
+  "url": "https://github.com/users/Bored-Anarchist/projects/1",
+  "states": [
+    "Planned",
+    "Ready",
+    "In progress",
+    "Blocked",
+    "Complete"
+  ],
+  "items": [
+    {
+      "work_package": "WP-01",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/1",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-FHE",
+      "state": "Ready"
+    },
+    {
+      "work_package": "WP-02",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/2",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-FN0",
+      "state": "In progress"
+    },
+    {
+      "work_package": "WP-03",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/3",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-FSQ",
+      "state": "Ready"
+    },
+    {
+      "work_package": "WP-04",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/4",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-FW0",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-05",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/5",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-FaM",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-06",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/6",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-Ffo",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-07",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/7",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-Fl0",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-08",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/8",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-FpU",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-09",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/9",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-Fuc",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-10",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/10",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-Fzs",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-11",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/11",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-F60",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-12",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/12",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-F_w",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-13",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/13",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-GHU",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-14",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/14",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-GL0",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-15",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/15",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-GQA",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-16",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/16",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-GVM",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-17",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/17",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-GZo",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-18",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/18",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-Gd4",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-19",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/19",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-GiA",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-20",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/20",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-GmU",
+      "state": "Planned"
+    },
+    {
+      "work_package": "WP-21",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/21",
+      "item_id": "PVTI_lAHOBooUPM4BpASXzhD-Gro",
+      "state": "Planned"
+    }
+  ]
+}

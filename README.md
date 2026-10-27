@@ -4,6 +4,8 @@ Design baseline **0.5**, prepared **26 October 2026**.
 
 Project development uses [the GitHub source repository](https://github.com/Bored-Anarchist/freecad-space-thermal), Issues/Projects, pull requests, GitHub Actions automated testing, and Releases. The [implementation plan](plans/FCST-Implementation-Plan.md) specifies required checks, scoped vendor runners, and evidence-backed release gates. The WP-02 skeleton provides C++20/CMake worker and Python package foundations with [shared local/CI verification commands](docs/development.md); solving and compatibility remain unimplemented. [WP-02 evidence](plans/evidence/WP-02.json) records remaining setup prerequisites.
 
+Track the 21 work packages in the [FCST implementation project](https://github.com/users/Bored-Anarchist/projects/1), with requirement IDs, delivery gates, prerequisites and evidence-backed states.
+
 **Publication privacy:** remove private/personal information before any online code, documentation, issue/PR/comment/post, log, image or release upload. The [standing repository instructions](AGENTS.md) and plan requirement TST-021 require checks before publication, sanitized outputs and separate preservation of authorized engineering originals.
 
 This package specifies an open-source, local-first FreeCAD add-on and independently maintained **C++ numerical engine**, with **Python FreeCAD, API/MCP, automation, and test interfaces**, for spacecraft thermal engineering. Thermal Desktop/SINDA and ESATAN-TMS interoperability have equal priority. NASA/ESA compatibility means compatibility with thermal model files and workflows used by their teams. The specification covers file exchange, preserved model semantics, numerical behavior, and API/MCP automation.

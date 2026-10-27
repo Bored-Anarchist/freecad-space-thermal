@@ -73,10 +73,28 @@
       "candidate": "ce709930a0bf35d23e1d269d14118f273c15a266",
       "cases_per_configuration": 29,
       "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40546143540"
+    },
+    {
+      "id": "github-project-population",
+      "status": "passed",
+      "command": "python tools/setup_projects.py",
+      "evidence": "https://github.com/users/Bored-Anarchist/projects/1",
+      "work_packages": 21,
+      "metadata": "Delivery states; completion gates; prerequisite packages; requirement IDs; owner roles"
+    },
+    {
+      "id": "live-repository-and-project-settings",
+      "status": "passed",
+      "command": "python tools/check_github.py",
+      "evidence": "Live project identity visibility repository linkage issue coverage and states verified; all repository settings passed with no findings"
+    },
+    {
+      "id": "project-evidence-negative-cases",
+      "status": "passed",
+      "evidence": "Tests reject missing remote evidence missing issues falsely completed states wrong repository linkage and incomplete delivery states"
     }
   ],
   "blockers": [
-    "GitHub Projects token scope unavailable; project board pending",
     "Exact FreeCAD build/ABI and host smoke profile not selected",
     "Authorized vendor runtime/fixture profiles and scoped private runners not configured",
     "Q0 reference hardware and dependency candidate build/install qualification not frozen"

@@ -15,7 +15,7 @@ from pathlib import Path, PurePosixPath
 ROOT = Path(__file__).resolve().parents[2]
 POLICY_PATH = ROOT / "ci/publication-policy.json"
 PATTERNS = {
-    "personal_path": r"(?i)(?:[a-z]:[\\/]+(?:users|documents and settings)[\\/]+[^\s\\/]+|/(?:home|Users)/[^\s/]+)",
+    "personal_path": r"(?i)(?:[a-z]:[\\/]+(?:users|documents and settings)[\\/]+[^\s\\/]+|(?<![a-z0-9/.])/(?:home|Users)/[^\s/]+|file:///(?:home|Users)/[^\s/]+)",
     "private_key": r"-----BEGIN (?:RSA |EC |OPENSSH |DSA )?PRIVATE KEY-----",
     "credential": r"(?:gh[pousr]_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|AKIA[A-Z0-9]{16}|sk-[A-Za-z0-9_-]{20,})",
     "credential_url": r"(?i)https?://[^\s/@:]+:[^\s/@]+@",

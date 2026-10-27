@@ -15,6 +15,54 @@ def request(endpoint):
     return json.loads(result.stdout)
 
 
+def project_snapshot(project_id):
+    query = """query($id:ID!){node(id:$id){... on ProjectV2{
+      id title url closed public
+      repositories(first:100){nodes{nameWithOwner}}
+      fields(first:100){nodes{... on ProjectV2SingleSelectField{name options{name}}}}
+      items(first:100){nodes{
+        content{... on Issue{url}}
+        fieldValues(first:100){nodes{... on ProjectV2ItemFieldSingleSelectValue{
+          name field{... on ProjectV2SingleSelectField{name}}
+        }}}
+      }}
+    }}}"""
+    result = subprocess.run(["gh", "api", "graphql", "--input", "-"],
+                            input=json.dumps({"query": query, "variables": {"id": project_id}}),
+                            capture_output=True, text=True, timeout=60)
+    if result.returncode:
+        return None
+    data = json.loads(result.stdout)
+    return None if data.get("errors") else data.get("data", {}).get("node")
+
+
+def assess_project(config, project, snapshot):
+    if not project or not snapshot:
+        return ["project_evidence_unavailable"]
+    findings = []
+    if (snapshot.get("id") != project.get("project_id") or snapshot.get("url") != project.get("url")
+            or snapshot.get("title") != config["projects_title"] or snapshot.get("closed")
+            or snapshot.get("public") is not True):
+        findings.append("project_identity_or_visibility_mismatch")
+    repositories = {row["nameWithOwner"] for row in snapshot.get("repositories", {}).get("nodes", [])}
+    if config["repository"] not in repositories:
+        findings.append("project_not_linked_to_repository")
+    fields = {row.get("name"): row for row in snapshot.get("fields", {}).get("nodes", [])}
+    options = {row["name"] for row in fields.get("Status", {}).get("options", [])}
+    if options != {"Planned", "Ready", "In progress", "Blocked", "Complete"}:
+        findings.append("project_delivery_states_incomplete")
+    expected = {row["issue"]: row["state"] for row in project.get("items", [])}
+    actual = {}
+    for row in snapshot.get("items", {}).get("nodes", []):
+        url = (row.get("content") or {}).get("url")
+        values = row.get("fieldValues", {}).get("nodes", [])
+        actual[url] = next((value.get("name") for value in values
+                            if (value.get("field") or {}).get("name") == "Status"), None)
+    if len(expected) != 21 or actual != expected:
+        findings.append("project_backlog_or_states_mismatch")
+    return findings
+
+
 def assess(config, repo, protection, actions, workflows, rules, issues, project):
     findings = []
     def need(condition, code):
@@ -61,6 +109,12 @@ def main():
     project_path = ROOT / "plans/github-project.json"
     project = json.loads(project_path.read_text()) if project_path.exists() else None
     report = {"repository": config["repository"], **assess(config, repo, protection, actions, workflows, rules, issues, project)}
+    project_findings = assess_project(config, project, project_snapshot(project["project_id"]) if project else None)
+    if project_findings:
+        report["findings"].extend(project_findings)
+        report["status"] = "blocked"
+    elif project:
+        report["project"] = {"url": project["url"], "items": len(project["items"]), "status": "passed"}
     validation_prefix = "repos/" + config["validation_repository"]
     validation = request(validation_prefix)
     runners = request(validation_prefix + "/actions/runners")

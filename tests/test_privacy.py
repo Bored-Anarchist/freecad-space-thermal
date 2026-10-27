@@ -30,6 +30,15 @@ class PrivacyTests(unittest.TestCase):
         self.scanner.scan("fixtures/model.json", b'{"nodes":[{"id":"n1","temperature_K":300}]}')
         self.assertEqual(self.scanner.report()["status"], "passed")
 
+    def test_public_project_url_is_distinct_from_real_home_paths(self):
+        self.scanner.scan("project.json", b'{"url":"https://github.com/users/sample/projects/1"}')
+        self.assertEqual(self.scanner.report()["status"], "passed")
+        for value in ["/".join(["", "home", "synthetic-person", "model.txt"]),
+                      "file://" + "/".join(["", "Users", "synthetic-person", "model.txt"])]:
+            scanner = Scanner(self.policy)
+            scanner.scan("data.txt", value.encode())
+            self.assertIn("personal_path", {item["category"] for item in scanner.findings})
+
     def test_planted_categories_and_reports_never_echo_values(self):
         cases = {
             "personal_path": "C:" + chr(92) + "Users" + chr(92) + "synthetic-person" + chr(92) + "model.txt",
