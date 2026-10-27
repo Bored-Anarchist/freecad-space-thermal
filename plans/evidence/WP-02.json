@@ -66,6 +66,13 @@
       "id": "private-validation-boundary",
       "status": "passed",
       "evidence": "Separate private repository, no privileged runners registered; manual-only workflow denies unconfigured execution"
+    },
+    {
+      "id": "final-foundation-matrix",
+      "status": "passed",
+      "candidate": "ce709930a0bf35d23e1d269d14118f273c15a266",
+      "cases_per_configuration": 29,
+      "evidence": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/40546143540"
     }
   ],
   "blockers": [
