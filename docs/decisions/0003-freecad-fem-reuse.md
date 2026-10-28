@@ -2,6 +2,8 @@
 
 Date: 28 October 2026. Status: accepted planning direction; component adoption and qualification remain planned under WP-13/WP-16. This decision supplements the [numerical checkpoint](0001-q0-numerical.md) without changing its engine boundary or claiming an implemented FEM integration.
 
+Planning amendment: [WP-05.5](../../plans/WP-05.5-Foundation-Reconciliation.md), displayed as WP-5.5, now owns the missing foundation inventory, API/mesher prototypes, mesh/field contract extensions, storage and representative host handoff before dependent feature acceptance. Its separate 25 planned cases and TST-022 supplement this decision. WP-13/WP-16 retain full feature implementation and the six FEM-REUSE cases below; foundation probes cannot close their production acceptance.
+
 ## Problem and decision
 
 The specification cites FreeCAD FEM as reusable infrastructure, but the implementation has no FEM adapter, adopted FEM source or qualified FEM workflow. The existing host smoke imports `FreeCAD` and `Part` and tests geometry, document persistence and undo. WP-13 and WP-16 remain planned. The earlier plan did not require a component-level reuse assessment before implementing equivalent host and mesh features.

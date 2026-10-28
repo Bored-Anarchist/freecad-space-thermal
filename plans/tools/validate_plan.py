@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "tools"))
 sys.path.insert(0, str(ROOT / "python"))
 from project_files import markdown_files
-from fcst_tools.delivery import validate_scope
+from fcst_tools.delivery import COMMITTED_WORK_PACKAGES, validate_foundation_acceptance, validate_scope
 PLANS = ROOT / "plans"
 
 
@@ -69,7 +69,7 @@ def main() -> None:
 
     plan_path = PLANS / "FCST-Implementation-Plan.md"
     plan_text = plan_path.read_text(encoding="utf-8")
-    described_packages = re.findall(r"^### Step \d+ — (WP-\d{2}):", plan_text, flags=re.MULTILINE)
+    described_packages = re.findall(r"^### Step \d+(?:\.\d+)? — (WP-\d{2}(?:\.\d+)?):", plan_text, flags=re.MULTILINE)
     require(Counter(described_packages) == Counter({key: 1 for key in packages}),
             "Plan steps and work-package register differ")
     described_tests = re.findall(r"^\| (TST-\d{3}) \|", plan_text, flags=re.MULTILINE)
@@ -88,7 +88,7 @@ def main() -> None:
     valid_gates = {"Q0", "P0", "Q1", "Q2"}
     gate_rank = {gate: rank for rank, gate in enumerate(["Q0", "P0", "Q1", "Q2"])}
     for package_id, package in packages.items():
-        require(re.fullmatch(r"WP-\d{2}", package_id) is not None, f"Invalid package ID: {package_id}")
+        require(package_id in COMMITTED_WORK_PACKAGES, f"Invalid package ID: {package_id}")
         require(package["lead"] and package["outputs"], f"Missing owner/output: {package_id}")
         require(package["first_delivery"] in valid_gates and package["completion_gate"] in valid_gates,
                 f"Unknown package gate: {package_id}")
@@ -131,6 +131,9 @@ def main() -> None:
         visit(package_id)
 
     all_requirements = {**baseline, **testing}
+    foundation_cases = read_rows(PLANS / "WP-05.5-acceptance.csv", "case_id")
+    require(not validate_foundation_acceptance(list(foundation_cases.values()), all_requirements, suites),
+            "Foundation acceptance coverage, references or planned status differ")
     require(set(trace) == set(all_requirements),
             f"Traceability mismatch: missing={set(all_requirements) - set(trace)}, extra={set(trace) - set(all_requirements)}")
     for req_id, requirement in all_requirements.items():
@@ -185,6 +188,17 @@ def main() -> None:
             document("plans/evidence/WP-01.json"), document("inventory/gaps.json"),
             document("CMakePresets.json"), document("ci/host-profile.json")), "Delivery scope drift")
 
+    github = document("ci/github.json")
+    backlog = document("plans/github-backlog.json")["issues"]
+    project = document("plans/github-project.json")["items"]
+    for records, label in ((backlog, "issue"), (project, "project")):
+        require(Counter(row["work_package"] for row in records) == Counter({key: 1 for key in packages}),
+                f"GitHub {label} work-package identities differ")
+        require(len({row["issue"] for row in records}) == len(records), f"Duplicate GitHub {label} mapping")
+    require(github["work_package_count"] == len(packages), "GitHub work-package count differs")
+    require({row["work_package"]: row["issue"] for row in backlog} ==
+            {row["work_package"]: row["issue"] for row in project}, "GitHub issue/project links differ")
+
     for path in markdown_files(ROOT):
         for target in re.findall(r"\[[^\]]*\]\(([^)]+)\)", path.read_text(encoding="utf-8")):
             if "://" in target or target.startswith(("#", "mailto:")):
@@ -198,6 +212,7 @@ def main() -> None:
         "automated_test_requirements": len(testing),
         "planned_coverage_records": len(trace),
         "work_packages": len(packages),
+        "foundation_acceptance_cases_planned": len(foundation_cases),
         "automated_suites": len(suites),
         "compatibility_profiles_planned": len(profile_plan),
         "dependency_order": order,

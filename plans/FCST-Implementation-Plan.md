@@ -1,6 +1,6 @@
 # FreeCAD Space Thermal: implementation and build plan
 
-Plan revision 1.4, 28 October 2026. Based on specification FCST-SYS-SPEC-001 revision 0.5 and the user's additional requirements for unattended testing, GitHub project delivery, removal of private/personal information before anything is put online, explicit independence of native model creation, files and solving, and assessment of FreeCAD FEM reuse before overlapping implementation.
+Plan revision 1.5, 28 October 2026. Based on specification FCST-SYS-SPEC-001 revision 0.5 and the user's additional requirements for unattended testing, GitHub project delivery, removal of private/personal information before anything is put online, explicit independence of native model creation, files and solving, assessment of FreeCAD FEM reuse, and an inserted WP-05.5 foundation reconciliation package.
 
 This is an implementation plan, not evidence of implemented physics or file compatibility. The workspace contains the specification, 121 registered requirements, 12 proposed compatibility profiles, three draft JSON schemas and two schema examples. WP-02 now adds a native worker/application skeleton, local/CI verification and publication-privacy preflight; it implements no thermal solving or file compatibility. [WP-02 evidence](evidence/WP-02.json) records completed foundation acceptance and remaining Q0/product obligations. The specification remains the design baseline; the automated-test requirements below add delivery obligations without relaxing its acceptance criteria.
 
@@ -47,7 +47,7 @@ These are implementation directions from the baseline, not a claim that the cand
 
 The [FEM reuse decision](../docs/decisions/0003-freecad-fem-reuse.md) supplies the candidate matrix, recommended dispositions, owner roles, timing and six planned automated acceptance IDs. Current implementation uses basic FreeCAD/Part APIs only; no FEM integration or adopted FEM source is claimed. Before overlapping WP-13 host implementation, assess analysis objects, mesh access/generation, selection/material/load tools, result pipelines, fixtures/test patterns and optional CalculiX/Elmer conduction references. Complete the mesh-specific selection before WP-16 implementation. Prefer compatible APIs and thin adapters; document the failed requirement, measured limitation or actual license incompatibility before replacing existing functionality. Preserve required attribution. Engine independence alone does not justify replacing host infrastructure.
 
-Record exact upstream paths/revision/hashes, API probes on FreeCAD 1.1.4/cp311, dependency and per-file license dispositions, boundary/mapping rules, deployment cost and prototype evidence in the affected GitHub implementation issues/PRs. No new work package or platform commitment is introduced. WP-13 owns the host assessment and P0 subset; WP-16 owns spatial/mesher qualification at Q1; WP-19 checks complete evidence. FEM-REUSE-001 through FEM-REUSE-006 remain planned until implemented with each feature in the common local/GitHub Actions harness and expected coverage manifest. TST-008/TST-014 bind host behavior and execution identity; analytic/manufactured and energy/refinement acceptance remain required. Missing selected external reference tools block their comparison profile, without substituting for native acceptance or stopping unrelated native development.
+Record exact upstream paths/revision/hashes, API probes on FreeCAD 1.1.4/cp311, dependency and per-file license dispositions, boundary/mapping rules, deployment cost and prototype evidence in the affected GitHub implementation issues/PRs. [WP-05.5](WP-05.5-Foundation-Reconciliation.md), displayed as WP-5.5, now owns the missing WP-01 through WP-05 foundation handoff: component inventory, representative API/mesher probes, versioned mesh/field contracts, independent fixtures and extended persistence. It completes at P0 and precedes dependent acceptance in WP-06/WP-07/WP-13/WP-16. Existing package IDs, completed baseline evidence and Windows-only scope remain intact. WP-13 retains full host workflow acceptance; WP-16 retains production spatial/mesher qualification at Q1; WP-19 checks complete evidence. FEM-REUSE-001 through FEM-REUSE-006 remain later feature cases; WP-05.5's separate planned acceptance cases cannot close them. TST-022 binds the foundation handoff; TST-008/TST-014 bind host behavior and execution identity. Missing selected external references block their comparison profile without substituting for native acceptance or stopping unrelated native development.
 
 ## 2. Proposed repository and build layout
 
@@ -145,6 +145,8 @@ FEM reuse work applies TST-021 to exact outgoing decision/assessment text, upstr
 
 The WP-04/WP-05 verification audit adds synthetic truncation, residual, authority, original-corruption, dependency/result-binding, save/host-race and growing-file regressions. Its [decision record](../docs/decisions/0002-wp04-wp05-verification.md) documents corrected behavior and executable acceptance. New sealed numerical attempts and bounded audit summaries supplement the retained original baseline. Exact source/evidence/prose and generated report scans precede upload; raw inputs, databases, binary containers and diagnostics remain local.
 
+WP-05.5 extends TST-021 to the exact reuse/license inventory, versioned field/mesh contracts, synthetic spatial fixtures, API/mesher/host probes, bounded handoff reports and final GitHub issue/project/PR text. Run planted privacy regressions and actual staged/history/identity/file preflight before publication; CI scans each final generated report before upload. Preserve upstream notices and original engineering bytes. Raw example/host/mesh/result containers, screenshots, operational databases and logs remain local until separately sanitized and cleared. Any scanner batching/cache optimization must retain every commit's metadata and path/mode/type/policy context, including identical blobs in unsafe locations and deleted-history findings.
+
 ## 3. Build sequence and dependencies
 
 Each package below specifies concrete tasks and completion evidence. Its register row identifies a lead role, prerequisites, expected outputs, and automated suites. Dependencies describe interface availability; packages can deliver a minimal slice before their complete Q1 capability. Every completion reference must point to an immutable test artifact, not a checklist marked by hand.
@@ -153,6 +155,7 @@ Each package below specifies concrete tasks and completion evidence. Its registe
 |---|---|---|
 | Establish Q0 | WP-01 through WP-04, plus native feasibility probes | Inventory, contracts, reference environment, criteria, automated harness and numerical decision |
 | Build foundations | WP-05 through WP-10 | Durable operations/jobs and paired import/export paths |
+| Reconcile foundation handoff | WP-05.5 after WP-01 through WP-05 | Evidence-backed FEM reuse subset, mesh/field contracts, storage and representative probes before dependent feature acceptance |
 | Build P0 | Minimal WP-11 through WP-14, integrated by WP-15 | Automated end-to-end two-node/two-surface demonstration |
 | Complete Q1 | Finish prior packages plus WP-16 through WP-19 | Qualified owned core, both ecosystems and unattended release evidence |
 | Complete Windows Q2 | WP-20 and WP-21 | Required advanced physics, user logic and all mandatory legacy profiles |
@@ -242,6 +245,20 @@ The [Q0 numerical decision](../docs/decisions/0001-q0-numerical.md) implements t
 The [WP-05 implementation contract](../docs/persistence.md) documents the portable package/generation layouts, operational SQLite store and reconstructable JSON journal, explicit audit-capacity failure, supported migration/downgrade envelope, HDF5 layout enforcement and host reconciliation boundary. The required Windows driver executes the frozen persistence acceptance IDs, including fresh-process package reconstruction and hard termination at every publication boundary; standard-library cases cover SQLite crash/retry/race behavior. Job scheduling remains WP-06 and actual FreeCAD notifications/Undo integration remain WP-13; this package supplies their durable transaction/host boundary without claiming those later workflows.
 
 [Completion evidence](evidence/WP-05.json) records both 104-check Windows configurations, 89 standard-library regressions and seven persistence integration cases. The final exact-byte prior-manifest guard is covered by the security rerun and both persistence summaries. Generated engineering containers and raw crash diagnostics remain local.
+
+### Step 5.5 — WP-05.5: reconcile FEM reuse and the foundation handoff
+
+Implement the detailed [WP-5.5 work package](WP-05.5-Foundation-Reconciliation.md) and its [25-case acceptance register](WP-05.5-acceptance.csv). Status is planned; the package defines missing work rather than reopening completed baselines or claiming an implemented FEM integration. It depends on WP-01 through WP-05 and completes at P0 before dependent acceptance in WP-06, WP-07, WP-13 and WP-16.
+
+1. Inventory all six FEM candidate groups and synthetic examples with exact upstream source/API/license/dependency and reuse/adapt/replace/defer dispositions. Keep the acquired vendor inventory and publication holds separate.
+2. Run representative pinned Windows FEM object/mesh/selection/result and selected mesher/import probes, with independent native startup, offline deployment, host-thread ownership, failure diagnostics and watchdogs.
+3. Freeze the supported element/order/connectivity subset, explicit CAD/conduction/radiation/thermal maps, field location/rank/components/frame semantics and heat-flux W/m2 versus power W. Publish version/minimum-reader/migration decisions; preserve released v1 fixtures and hashes.
+4. Implement the accepted generated contracts and independent C++/Python readers, extended HDF5/package/store validation and representative real-host transaction/result adapters. Exercise corrupt arrays/identities, stale mappings, migration/downgrade refusal, allocation budgets and crash/race recovery.
+5. Prepare independent spatial expected-value generators and frozen refinement/comparison manifests. Preserve the C++/SUNDIALS network decision; optional CalculiX/Elmer references retain separate run identities and cannot close native acceptance.
+6. Retain all recorded WP-04/WP-05 audit corrections/regressions; triage newly reproduced handoff issues with owner, reproducer, affected capability, blocking gate and objective closure. Measure operational resource limits and publication-scan cost without weakening qualification or privacy.
+7. Implement the common local/CI expected-case gate under TST-022. Required acceptance cannot be skipped or satisfied by planned CSV rows, old reports, external runs or screenshots alone. Publish candidate-linked supplemental evidence while retaining the original baseline and failed attempts.
+
+**Outputs:** reuse/source-license manifest; supported-subset and version ADR; contract/readers and strict extended persistence; independent spatial fixtures; pinned API/mesher and representative host probes; issue/coverage/evidence handoff. **Completion:** every applicable WP055 acceptance row and existing regression gate passes on the exact candidate in the two Windows configurations and pinned host profile, with publication clearance and linked consumer handoff. Full jobs, GUI, spatial solvers and product qualification remain WP-06/WP-13/WP-16/WP-19. A document-only planning pass cannot complete this package.
 
 ### Step 6 — WP-06: implement isolated workers and durable jobs
 
@@ -454,7 +471,7 @@ Plan and prototype this work from WP-01 findings; do not wait for Q1 to discover
 
 ## 4. Mandatory automated-test delivery requirements
 
-The following 21 requirements implement the user's instructions for unattended testing, GitHub delivery and privacy before publication. Their full machine-readable acceptance text is in [automated-test-requirements.csv](automated-test-requirements.csv). They supplement the 121 baseline requirements; their IDs are deliberately separate. Q0 is the first required gate for test infrastructure/criteria and publication privacy, while Q1 requirements also apply to Q2 and any changed capability. TST-021 applies before the first online publication even if Q0 is not yet complete.
+The following 22 requirements implement the user's instructions for unattended testing, GitHub delivery, privacy before publication and the foundation handoff. Their full machine-readable acceptance text is in [automated-test-requirements.csv](automated-test-requirements.csv). They supplement the 121 baseline requirements; their IDs are deliberately separate. Q0 is the first required gate for test infrastructure/criteria and publication privacy; TST-022 is required at P0; Q1 requirements also apply to Q2 and changed capabilities. TST-021 applies before the first online publication even if Q0 is not yet complete.
 
 | ID | Required behavior | First required gate |
 |---|---|---|
@@ -479,6 +496,7 @@ The following 21 requirements implement the user's instructions for unattended t
 | TST-019 | No required acceptance step depends on the user executing a manual test procedure | Q1 |
 | TST-020 | A required GitHub Actions gate checks requirements, profiles, evidence, defects and allowed claims before publishing a candidate-linked GitHub Release | Q1 |
 | TST-021 | Local checks before upload and CI publication gates exclude private/personal information from code/history, metadata, docs, posts, media, logs and release assets | Q0 |
+| TST-022 | WP-05.5 closes the missing foundation handoff using exact reuse/API/license evidence, versioned mesh/field contracts, strict storage, independent fixtures and unattended candidate-bound acceptance before dependent feature qualification | P0 |
 
 For Q0, a traceability entry may identify a planned executable test for a future capability, but Q0's own inventory/contract/prototype checks must already execute. At Q1/Q2 a planned test is insufficient: required test evidence must exist for the exact candidate and configuration. A specialist's review of assumptions or a documented scope decision is distinct from asking the user to run tests.
 
@@ -589,6 +607,7 @@ The first tickets should produce reviewable, automatically checked artifacts in 
 4. Create analytic one/two-node oracles and an immutable criteria register; add structured test/evidence output and missing-test detection.
 5. Run the C++ nonlinear/algebraic/event/sparse deployment prototype and record the numerical decision.
 6. Implement atomic packages/revisions and model-authoring operations with durable retry/conflict tests.
+   Complete the inserted WP-05.5 foundation reconciliation before dependent acceptance: measured FEM reuse/probes, versioned mesh/field contracts, storage, independent spatial fixtures and the TST-022 handoff gate. Scaffolding may proceed against unchanged interfaces while those decisions are resolved.
 7. Implement worker submit/progress/cancel/publication and crash/restart/stale-result tests.
 8. As soon as native kernels are available, execute create→save→close/reopen→edit→steady/transient solve→persist/reopen results with vendor software and adapters absent. In the compatibility work, prove paired source extraction→canonical→new-source export/reopen on the limited acquired fixtures; keep profile status unqualified until full coverage passes.
 9. Add native thermal/radiation minimal kernels and scripted FreeCAD/MCP construction/visualization, then execute P0.

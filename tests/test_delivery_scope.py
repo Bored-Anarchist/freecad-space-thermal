@@ -4,7 +4,7 @@ import csv
 import json
 import unittest
 from pathlib import Path
-from fcst_tools.delivery import validate_scope
+from fcst_tools.delivery import package_from_title, validate_foundation_acceptance, validate_scope
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -41,3 +41,37 @@ class DeliveryScopeTests(unittest.TestCase):
         errors = validate_scope(*changed)
         self.assertIn("inventory_completion_or_qualification_claim_invalid", errors)
         self.assertIn("qualification_gap_not_assigned", errors)
+
+    def test_foundation_handoff_cannot_be_omitted_or_depend_on_its_consumers(self):
+        self.assertEqual(validate_scope(*self.args), [])
+        changed = copy.deepcopy(self.args)
+        changed[1] = [row for row in changed[1] if row["id"] != "WP-05.5"]
+        self.assertIn("foundation_handoff_missing_or_misordered", validate_scope(*changed))
+        changed = copy.deepcopy(self.args)
+        foundation = next(row for row in changed[1] if row["id"] == "WP-05.5")
+        foundation["depends_on"] += ";WP-13"
+        self.assertIn("foundation_handoff_missing_or_misordered", validate_scope(*changed))
+        changed = copy.deepcopy(self.args)
+        consumer = next(row for row in changed[1] if row["id"] == "WP-06")
+        consumer["depends_on"] = "WP-04;WP-05"
+        self.assertIn("foundation_handoff_missing_or_misordered", validate_scope(*changed))
+
+    def test_fractional_identity_and_acceptance_fail_closed(self):
+        self.assertEqual(package_from_title("WP-05.5: Foundation handoff"), "WP-05.5")
+        for title in ("WP-05.50: Alias", "WP-5.5: Noncanonical", "WP-05.6: Unapproved", "WP-22: Unapproved"):
+            self.assertIsNone(package_from_title(title))
+        def rows(name):
+            with (ROOT / name).open(encoding="utf-8", newline="") as stream:
+                return list(csv.DictReader(stream))
+        cases = rows("plans/WP-05.5-acceptance.csv")
+        requirements = {row["id"] for name in ("spec/requirements.csv", "plans/automated-test-requirements.csv") for row in rows(name)}
+        suites = {row["id"] for row in rows("plans/test-suites.csv")}
+        self.assertEqual(validate_foundation_acceptance(cases, requirements, suites), [])
+        for damaged in (cases[:-1], cases + [cases[0]]):
+            self.assertIn("foundation_acceptance_coverage_mismatch", validate_foundation_acceptance(damaged, requirements, suites))
+        changed = copy.deepcopy(cases)
+        changed[0]["requirement_ids"] += ";TST-999"
+        self.assertIn("foundation_acceptance_unknown_or_duplicate_reference", validate_foundation_acceptance(changed, requirements, suites))
+        changed = copy.deepcopy(cases)
+        changed[0]["status"] = "passed"
+        self.assertIn("foundation_acceptance_unsubstantiated_or_incomplete", validate_foundation_acceptance(changed, requirements, suites))

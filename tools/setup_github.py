@@ -7,7 +7,6 @@ milestones, issues and project discovery; protection setup follows initial CI.
 import argparse
 import csv
 import json
-import re
 import subprocess
 import sys
 from pathlib import Path
@@ -15,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.privacy import POLICY_PATH, Scanner
+from fcst_tools.delivery import package_from_title
 
 
 def cleared(payload):
@@ -62,11 +62,11 @@ def main():
         existing = api(prefix + "/issues?state=all&per_page=100")
         by_package = {}
         for row in existing:
-            match = re.match(r"^(WP-\d{2}):", row["title"])
-            if "pull_request" not in row and match:
-                if match[1] in by_package:
+            package_id = package_from_title(row["title"])
+            if "pull_request" not in row and package_id:
+                if package_id in by_package:
                     raise RuntimeError("Duplicate work-package issue identity")
-                by_package[match[1]] = row
+                by_package[package_id] = row
         with (ROOT / "plans/work-packages.csv").open(encoding="utf-8", newline="") as stream:
             packages = list(csv.DictReader(stream))
         with (ROOT / "plans/requirement-traceability.csv").open(encoding="utf-8", newline="") as stream:

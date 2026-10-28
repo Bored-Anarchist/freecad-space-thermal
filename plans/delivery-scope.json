@@ -35,7 +35,7 @@
     "feature_groups": 21,
     "qualification_claim": false
   },
-  "policy": "Only Windows is committed through Q0/P0/Q1/Q2 and WP-01 through WP-21. macOS/Linux configurations are optional stretch goals outside all work packages, dependencies, milestones, acceptance and release gates. They require a future scope decision before implementation or support claims.",
+  "policy": "Only Windows is committed through Q0/P0/Q1/Q2 and the 22 packages WP-01 through WP-21 plus inserted WP-05.5. macOS/Linux configurations are optional stretch goals outside all work packages, dependencies, milestones, acceptance and release gates. They require a future scope decision before implementation or support claims.",
   "stretch_goals": {
     "SG-PLATFORMS": {
       "platforms": [

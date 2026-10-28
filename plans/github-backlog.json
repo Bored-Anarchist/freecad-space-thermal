@@ -27,6 +27,11 @@
       "number": 5
     },
     {
+      "work_package": "WP-05.5",
+      "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/25",
+      "number": 25
+    },
+    {
       "work_package": "WP-06",
       "issue": "https://github.com/Bored-Anarchist/freecad-space-thermal/issues/6",
       "number": 6

@@ -11,5 +11,5 @@
   "projects_title": "FCST implementation",
   "validation_repository": "Bored-Anarchist/freecad-space-thermal-validation",
   "release_branch_pattern": "release/*",
-  "work_package_count": 21
+  "work_package_count": 22
 }

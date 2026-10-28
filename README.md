@@ -6,9 +6,11 @@ Design baseline **0.7**, amended **27 October 2026**.
 
 Project development uses [the GitHub source repository](https://github.com/Bored-Anarchist/freecad-space-thermal), Issues/Projects, pull requests, GitHub Actions automated testing, and Releases. The [implementation plan](plans/FCST-Implementation-Plan.md) specifies required checks, scoped vendor runners, and evidence-backed release gates. The WP-02 skeleton provides C++20/CMake worker and Python package foundations with [shared local/CI verification commands](docs/development.md); solving and compatibility remain unimplemented. [WP-02 evidence](plans/evidence/WP-02.json) records completed foundation acceptance and the separate remaining Q0/product obligations. Active host and dependency packaging probes run on Windows; no production numerical backend is adopted.
 
-Track the 21 work packages in the [FCST implementation project](https://github.com/users/Bored-Anarchist/projects/1), with requirement IDs, delivery gates, prerequisites and evidence-backed states.
+Track the 22 work packages in the [FCST implementation project](https://github.com/users/Bored-Anarchist/projects/1), including the inserted WP-05.5, with requirement IDs, delivery gates, prerequisites and evidence-backed states.
 
 [FreeCAD FEM reuse](docs/decisions/0003-freecad-fem-reuse.md) is a required assessment before overlapping WP-13 host and WP-16 mesh work. Evaluate existing mesh, selection/material/load and result tools before replacing them; retain the standalone owned engine. FEM is currently a design reference, with no implemented FEM integration or adopted FEM source. Component selection, pinned API/license checks and unattended host/mesh acceptance remain planned.
+
+[WP-5.5 — FEM reuse and foundation reconciliation](plans/WP-05.5-Foundation-Reconciliation.md), canonical ID WP-05.5, collects the missing WP-01 through WP-05 handoff work and related issues. Its 25 planned acceptance cases cover reuse/provenance, pinned probes, element/field/heat-flux contracts, compatibility, storage/recovery, independent spatial fixtures, representative host integration and privacy. It completes at P0 before dependent feature acceptance in WP-06/WP-07/WP-13/WP-16; the completed baselines retain their original scope and evidence.
 
 [WP-03 contracts](spec/contracts/README.md) freeze native model, operation, result, HDF5 layout and worker protocol version 1.0.0. Independent C++ and Python readers validate typed entities, references, quantities, frames and expression types, and agree on normalized snapshots and semantic hashes. Both Windows configurations run the same positive/negative fixtures and bounded framing checks.
 
@@ -30,7 +32,7 @@ The accepted baseline is **C++20 with CMake**, with exact compiler and dependenc
 
 Start with [the specification](spec/FreeCAD-Space-Thermal-Specification.md). Supporting artifacts are:
 
-- [Detailed implementation and build plan](plans/FCST-Implementation-Plan.md): 21 ordered work packages, component boundaries, dependencies, Windows Q0/P0/Q1/Q2 gates, and unattended test and release execution.
+- [Detailed implementation and build plan](plans/FCST-Implementation-Plan.md): 22 ordered work packages, including WP-05.5, component boundaries, dependencies, Windows Q0/P0/Q1/Q2 gates, and unattended test and release execution.
 - [Implementation requirement traceability](plans/requirement-traceability.csv): all 121 baseline requirements plus 21 additional automated-test delivery requirements mapped to owners, work packages, suites, and planned evidence. The [test requirements](plans/automated-test-requirements.csv), [work packages](plans/work-packages.csv), [test suites](plans/test-suites.csv), and [compatibility test plan](plans/compatibility-test-plan.csv) provide the execution registers. [Validate the plan](plans/tools/validate_plan.py) with `python plans/tools/validate_plan.py`; it uses only the standard library and checks planning consistency, not implemented product behavior.
 
 - [Requirements register](spec/requirements.csv): machine-readable requirements extracted from the specification.
