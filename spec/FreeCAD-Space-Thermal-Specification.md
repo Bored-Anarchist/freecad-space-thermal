@@ -66,6 +66,8 @@ Definitions:
 
 No automatic equivalence is assumed between CAD faces, radiation facets, thermal nodes, and conduction elements. Existing FreeCAD FEM infrastructure is reusable, but it does not by itself implement a Thermal Desktop/RadCAD/FloCAD-equivalent suite. [S13, S14]
 
+The [FEM reuse decision and acceptance plan](../docs/decisions/0003-freecad-fem-reuse.md) requires a component-level assessment before overlapping host/mesh implementation. Prefer compatible FEM mesh, assignment/selection and result APIs through the host adapter; document evidence before replacing them. Qualify exact APIs, units, identity mappings, dependency licenses and unattended behavior against the pinned host. This is planned reuse evaluation, not an implemented FEM integration. Standalone engine independence does not preclude host-side reuse; external solver comparisons remain separately labeled and cannot qualify the owned engine.
+
 ## 3. Compatibility and product acceptance baseline
 
 At Gate Q0, freeze the acquired sample inventory, known source-version observations and explicit owned gaps for missing versions, dependencies, results and schemas. WP-01 acceptance covers that acquired baseline. Complete source runtime/dependency and schema/reference qualification is required by the affected Q1/Q2 compatibility profiles, not by native Q0 development. Changing a supported format or source version requires the relevant regression tests.

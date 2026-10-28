@@ -1,6 +1,6 @@
 # FreeCAD Space Thermal: implementation and build plan
 
-Plan revision 1.3, 27 October 2026. Based on specification FCST-SYS-SPEC-001 revision 0.5 and the user's additional requirements for unattended testing, GitHub project delivery, removal of private/personal information before anything is put online, and explicit independence of native model creation, files and solving.
+Plan revision 1.4, 28 October 2026. Based on specification FCST-SYS-SPEC-001 revision 0.5 and the user's additional requirements for unattended testing, GitHub project delivery, removal of private/personal information before anything is put online, explicit independence of native model creation, files and solving, and assessment of FreeCAD FEM reuse before overlapping implementation.
 
 This is an implementation plan, not evidence of implemented physics or file compatibility. The workspace contains the specification, 121 registered requirements, 12 proposed compatibility profiles, three draft JSON schemas and two schema examples. WP-02 now adds a native worker/application skeleton, local/CI verification and publication-privacy preflight; it implements no thermal solving or file compatibility. [WP-02 evidence](evidence/WP-02.json) records completed foundation acceptance and remaining Q0/product obligations. The specification remains the design baseline; the automated-test requirements below add delivery obligations without relaxing its acceptance criteria.
 
@@ -34,6 +34,7 @@ Online publication must exclude private/personal information. This covers code a
 | Numerical libraries | Evaluate SUNDIALS and sparse solvers behind FCST interfaces; PETSc only if justified | Algebraic initialization, stiff integration, events, sparse scaling, licenses and clean Windows builds |
 | Radiation | FCST estimators/optical laws with CPU intersection backend; evaluate Embree | Error/convergence evidence, deterministic seed policy and deployable dependency build |
 | Geometry | Obtain mesh/geometry through a FreeCAD adapter; keep engine network-only operation possible | Supported primitives/elements, pinned FreeCAD/OCCT combination and attachment rules |
+| FreeCAD FEM reuse | Prefer compatible mesh, selection/assignment and result APIs behind the host adapter; retain the owned engine | WP-13/WP-16 component assessment with pinned source/API/license evidence and automated acceptance before replacement or adoption |
 | Storage | Documented ZIP/directory `.fcst`, JSON metadata and versioned HDF5 arrays | Full model/results schemas, canonical hashing, atomic-save/recovery protocol |
 | Vendor access | Separate version-matched adapters; Windows OpenTD sidecar where required | Actual licenses, runtimes, APIs, fixture rights and unattended automation paths |
 | Platform qualification | Windows 11 x64 and official pinned FreeCAD 1.1.4; macOS/Linux are uncommitted stretch goals outside work packages | Qualify actual combinations; do not infer support from version names |
@@ -41,6 +42,12 @@ Online publication must exclude private/personal information. This covers code a
 | Optional work | In-process pybind11, GPU acceleration, Rust comparisons, network MCP, Fluent comparisons | Add only when justified; none is necessary for the initial worker architecture |
 
 These are implementation directions from the baseline, not a claim that the candidate dependency combination has already been built. Exact versions and vendor API calls must be established from the acquired documentation and measured prototypes. Do not choose an integration library solely because it is listed in the specification.
+
+### 1.1 FreeCAD FEM reuse assessment
+
+The [FEM reuse decision](../docs/decisions/0003-freecad-fem-reuse.md) supplies the candidate matrix, recommended dispositions, owner roles, timing and six planned automated acceptance IDs. Current implementation uses basic FreeCAD/Part APIs only; no FEM integration or adopted FEM source is claimed. Before overlapping WP-13 host implementation, assess analysis objects, mesh access/generation, selection/material/load tools, result pipelines, fixtures/test patterns and optional CalculiX/Elmer conduction references. Complete the mesh-specific selection before WP-16 implementation. Prefer compatible APIs and thin adapters; document the failed requirement, measured limitation or actual license incompatibility before replacing existing functionality. Preserve required attribution. Engine independence alone does not justify replacing host infrastructure.
+
+Record exact upstream paths/revision/hashes, API probes on FreeCAD 1.1.4/cp311, dependency and per-file license dispositions, boundary/mapping rules, deployment cost and prototype evidence in the affected GitHub implementation issues/PRs. No new work package or platform commitment is introduced. WP-13 owns the host assessment and P0 subset; WP-16 owns spatial/mesher qualification at Q1; WP-19 checks complete evidence. FEM-REUSE-001 through FEM-REUSE-006 remain planned until implemented with each feature in the common local/GitHub Actions harness and expected coverage manifest. TST-008/TST-014 bind host behavior and execution identity; analytic/manufactured and energy/refinement acceptance remain required. Missing selected external reference tools block their comparison profile, without substituting for native acceptance or stopping unrelated native development.
 
 ## 2. Proposed repository and build layout
 
@@ -133,6 +140,8 @@ WP-03 extends that executable publication boundary to the generated v1 schemas, 
 WP-04 adds an exact pre-upload scan of each `numerical.json` summary. Its inputs are synthetic SI fixtures and independently frozen criteria; public evidence contains bounded metrics, source/backend/artifact hashes and public hardware/toolchain attributes. Raw per-attempt observations, compiler logs, executable/DLL files and restricted originals remain local. Sealed attempt manifests preserve failed/interrupted/superseded results. TST-021 acceptance executes the planted regressions plus staged/outgoing-history/identity and final prose/evidence scans before push; CI scans the final generated numerical summary before upload. No scanner suppression or authorization to publish engineering originals is added.
 
 WP-05 adds the exact generated `persistence.json` summary to both Windows CI pre-upload scans. Synthetic package/migration fixtures, typed store/array sources, completion evidence and final PR prose are checked with the staged/outgoing-history/approved-identity preflight before publication. Generated `.fcst`, HDF5, SQLite/WAL and synthetic host files plus raw crash/array diagnostics stay local. Imported engineering originals remain unchanged in their authorized storage and are never uploaded by this workflow. TST-021 acceptance includes planted privacy regressions and exact report/prose scans; neither an inert-source role nor successful persistence validation grants publication clearance.
+
+FEM reuse work applies TST-021 to exact outgoing decision/assessment text, upstream attribution/license manifests, synthetic fixtures, bounded host/mesh/comparison reports and final issue/PR prose. Run `python -S tools/check_security.py` and `python tools/publication_preflight.py --staged --revision HEAD` before commit/push; scan each final generated report or post with `--file` before upload. Generated FreeCAD documents, raw solver decks, screenshots, mesh/result containers and logs stay local unless separately sanitized and cleared. Use synthetic inputs for public tests, preserve authorized originals unchanged, and do not weaken privacy policy to admit upstream examples or generated diagnostics.
 
 The WP-04/WP-05 verification audit adds synthetic truncation, residual, authority, original-corruption, dependency/result-binding, save/host-race and growing-file regressions. Its [decision record](../docs/decisions/0002-wp04-wp05-verification.md) documents corrected behavior and executable acceptance. New sealed numerical attempts and bounded audit summaries supplement the retained original baseline. Exact source/evidence/prose and generated report scans precede upload; raw inputs, databases, binary containers and diagnostics remain local.
 
@@ -327,6 +336,8 @@ The [WP-05 implementation contract](../docs/persistence.md) documents the portab
 
 ### Step 13 — WP-13: build the FreeCAD host and model-review interface
 
+Before implementing overlapping objects, editors or visualization, complete the initial [FEM reuse assessment](../docs/decisions/0003-freecad-fem-reuse.md), including mesh candidates for WP-16. Record reuse/adapt/replace/defer decisions with pinned APIs, licenses and prototype evidence in the WP-13 issue/implementation PR. Route selected components through FCST adapters and the shared transaction/result contracts. The existing geometry smoke is not FEM evidence.
+
 1. Add workbench registration, document/project links, tree objects and view providers using the pinned host APIs.
 2. Implement editors for nodes, surfaces, materials/optics, conductors, loads, environments, cases and solver settings. Each editor calls the shared operation API and displays structured errors.
 3. Implement selection-to-entity mappings and explicit visual overlays for nodes, mesh assignments, normals, material axes, contacts, unassigned items and invalid/ambiguous attachments.
@@ -336,7 +347,7 @@ The [WP-05 implementation contract](../docs/persistence.md) documents the portab
 7. Build host test commands and stable UI selectors/object identifiers. Automate command invocation, edits, selection, dialogs, asynchronous completion, save/reopen, undo and result inspection in an isolated FreeCAD process.
 8. Use screenshots as supplementary rendering evidence; numerical/data assertions are primary. Automate visual checks for selected stable reference views with declared tolerances.
 
-**Outputs:** usable workbench, inspectors, visualization and unattended host harness. **Completion:** a clean runner builds/saves/reopens a model through the UI, verifies canonical hashes and plotted values, exercises face changes and failure recovery, and completes without a person clicking through the test.
+**Outputs:** usable workbench, inspectors, visualization, FEM component assessment/adapters and unattended host harness. **Completion:** a clean runner builds/saves/reopens a model through the UI, verifies canonical hashes and plotted values, exercises face changes and failure recovery, and completes without a person clicking through the test. Implement the applicable P0/Q1 FEM-REUSE-001/002/004/005 checks with their features; the coverage gate rejects missing assessment/API/license evidence, operation/units/mapping differences and stale fields. Spatial extensions remain WP-16.
 
 ### Step 14 — WP-14: implement typed MCP automation and policy enforcement
 
@@ -365,6 +376,8 @@ The [WP-05 implementation contract](../docs/persistence.md) documents the portab
 
 ### Step 16 — WP-16: complete FD/FE discretization, contacts and property coverage
 
+Complete WP-13's initial FEM mesh assessment before introducing a meshing stack. Evaluate FEM mesh objects/I/O and Gmsh/Netgen integration on the pinned host, select only qualified components, and record exact source/build/options/licenses plus reasons for any replacement. Explicitly map CAD references, conduction elements/thermal nodes and radiation facets; a shared geometry does not make these identities equivalent. Evaluate CalculiX/Elmer as optional separately labeled conduction references, with predeclared equivalent inputs and tolerances.
+
 1. Freeze supported FD primitives and FE shell/solid element families from the Q1 inventory; document formulations, quadrature, lumping/reduction and validity limits.
 2. Generate meshes through the geometry adapter/selected mesher with stable provenance and explicit CAD/facet/element/node mappings. Mesh refinement cannot silently change source identity associations.
 3. Implement element conduction/storage assembly and rotate symmetric positive-definite material tensors from local frames. Validate interpolation and tensor/temperature ranges.
@@ -373,7 +386,7 @@ The [WP-05 implementation contract](../docs/persistence.md) documents the portab
 6. Implement limited MLI, insulation and reduced heat-pipe abstractions with parameter provenance, calibration/validity limits and explicit unsupported regimes.
 7. Run rod/slab cases, element patch tests, rotated anisotropy, manufactured solutions, contact tests and mesh/time refinement independently of vendor comparisons.
 
-**Outputs:** supported discretization library, mesh/attachment tooling, contact and reduced-component models. **Completion:** analytical/manufactured/conservation/refinement suites and mandatory imported Q1 element/property cases pass; unsupported element types are diagnosed before solving.
+**Outputs:** supported discretization library, qualified FEM reuse/replacement dispositions, mesh/attachment tooling, contact and reduced-component models. **Completion:** analytical/manufactured/conservation/refinement suites and mandatory imported Q1 element/property cases pass; unsupported element types are diagnosed before solving. Implement FEM-REUSE-003 and the spatial extensions of FEM-REUSE-001/004, plus FEM-REUSE-006 with WP-19. Verify mesh/element ordering, units, integrated loads, face-change/refinement invalidation and native engine independence. Selected external comparisons require their pinned profile evidence and never replace owned-engine checks.
 
 ### Step 17 — WP-17: implement environments, motion and campaign events
 
@@ -452,13 +465,13 @@ The following 21 requirements implement the user's instructions for unattended t
 | TST-005 | Scripted GUI/CLI/MCP sequences produce equivalent model semantics and numerical outcomes | Q1 |
 | TST-006 | Persistence/job tests inject crashes, interrupted writes, retries, disconnects and cancellation races | Q1 |
 | TST-007 | Licensed runners automatically perform exact-version source reopen/run, controlled edits and cross-tool comparisons | Q1 |
-| TST-008 | FreeCAD tests create/edit/save/reopen/undo/solve/inspect without user clicks; screenshots supplement data assertions | Q1 |
+| TST-008 | FreeCAD tests create/edit/save/reopen/undo/solve/inspect without user clicks; FEM assessment/API/license, mapping, units and result checks accompany reused or replacement features | Q1 |
 | TST-009 | Clean-machine offline install, native solve, migration, portable reopen and rollback are automated per supported profile | Q1 |
 | TST-010 | Parser/archive fuzzing and non-execution, scope, injection and redaction checks run automatically | Q1 |
 | TST-011 | Stochastic qualification uses predeclared fixed ensembles and convergence/coverage policy; no seed shopping | Q1 |
 | TST-012 | Performance tests record actual resources/hardware and compare frozen targets at unchanged accuracy | Q1 |
 | TST-013 | Test runs emit structured verdicts, diagnostics, raw data and immutable provenance/evidence manifests | Q0 |
-| TST-014 | Native acceptance runs prove no external thermal solver was used and preserve actual execution modes | Q1 |
+| TST-014 | Native acceptance proves no external thermal solver was used; optional CalculiX/Elmer references have separate pinned profiles and cannot close native coverage | Q1 |
 | TST-015 | Missing fixtures/licenses/runners/oracles produce blocked/incomplete required coverage, never an implicit pass | Q0 |
 | TST-016 | Retries cannot erase failures; flaky tests and quarantines remain visible and cannot remove mandatory gate coverage | Q1 |
 | TST-017 | GitHub is the source/work-tracking platform; GitHub Actions and local drivers run the same checks, with protected-branch required checks | Q0 |
@@ -484,7 +497,7 @@ Use CTest for compiled unit/physics tests and a pinned Python test runner for ap
 | SUITE-EXCHANGE | Syntax/semantic preservation, native IR mappings, source IDs, fidelity reports, STEP-TAS validation and public round-trip cases |
 | SUITE-VENDOR | Exact-version TD/SINDA/RadCAD and ESATAN reference runs, changed-model reopen/run, source-native equivalent edits, cross-tool exchange; Q2 FLUINT/legacy additions |
 | SUITE-API | Transactions, preview/apply, actor/project idempotency, revisions, concurrency, jobs, cancellation and stale-result guards |
-| SUITE-GUI | Unattended FreeCAD commands/editors/selection/undo/save/reopen, visible mappings, host-thread dispatch, result/display assertions and stable-view checks |
+| SUITE-GUI | Unattended FreeCAD commands/editors/selection/undo/save/reopen, FEM adapter/API probes, units/entity mappings, host-thread dispatch, canonical result/display and stale-field assertions and stable-view checks |
 | SUITE-MCP | Real stdio client lifecycle, schemas/resources, bounded queries, parity, offline operation, reconnect and application job cancellation |
 | SUITE-CAMPAIGN | Variant identity, sweeps, uncertainty/sensitivity replay, synthetic sensor correlation/holdout and report/table provenance |
 | SUITE-SECURITY | Publication privacy, outgoing history/metadata/prose/media/artifact checks, malicious/archive/parser corpus, fuzz regressions, imported code inertness, scope/budget enforcement, isolation, secret redaction and no default listener |
