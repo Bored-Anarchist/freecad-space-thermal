@@ -1,0 +1,125 @@
+{
+  "schema_version": 1,
+  "criterion_version": "q0-numerical-v1",
+  "rule": "abs(value-reference) <= atol + rtol*abs(reference); reject nonfinite, missing, duplicate, skipped, blocked or unexpected required records",
+  "integration": {
+    "rtol": 1e-10,
+    "atol": 1e-10
+  },
+  "temperature_K": {
+    "atol": 2e-05,
+    "rtol": 0.0,
+    "normalization_floor": 1.0
+  },
+  "energy_J": {
+    "atol": 2e-05,
+    "rtol": 1e-06,
+    "normalization_floor": 1e-06
+  },
+  "algebraic_W": {
+    "atol": 1e-08,
+    "rtol": 0.0,
+    "normalization_floor": 1e-08
+  },
+  "jacobian": {
+    "atol": 1e-07,
+    "rtol": 0.0,
+    "normalization_floor": 1e-08
+  },
+  "event_time_s": {
+    "atol": 2e-05,
+    "rtol": 0.0,
+    "normalization_floor": 1e-06
+  },
+  "restart_K": {
+    "atol": 2e-05,
+    "rtol": 0.0,
+    "normalization_floor": 1.0
+  },
+  "scale_error": {
+    "atol": 1e-11,
+    "rtol": 0.0,
+    "normalization_floor": 1e-12
+  },
+  "scale_residual": {
+    "atol": 1e-10,
+    "rtol": 0.0,
+    "normalization_floor": 1e-12
+  },
+  "oracle": {
+    "step_s": 0.004,
+    "refined_step_s": 0.002,
+    "refinement_atol_K": 1e-07
+  },
+  "performance": {
+    "replicates": 3,
+    "small_nodes": 128,
+    "scale_nodes": [
+      1000,
+      10000,
+      100000
+    ],
+    "max_seconds": 60,
+    "max_memory_bytes": 17179869184,
+    "timing_policy": "Correctness before timing; all repetitions retained; median and range reported; comparisons valid only within the same frozen machine/toolchain profile"
+  },
+  "statistical_policy": {
+    "version": "radiation-ensemble-v1",
+    "seeds": [
+      1701,
+      2903,
+      4421,
+      6151,
+      8233,
+      10427,
+      13007,
+      16111,
+      19423,
+      23003,
+      27011,
+      31337,
+      36007,
+      41011,
+      46301,
+      52009
+    ],
+    "samples_per_replicate": [
+      4096,
+      16384,
+      65536
+    ],
+    "replicates": 16,
+    "estimator": "Bernoulli hit fraction with two-sided Wilson score interval; independent replicate streams",
+    "coverage": 0.95,
+    "multiplicity": "Bonferroni family alpha 0.05 across all predeclared benchmark quantities; enumerate quantities before execution",
+    "practical_absolute_error": 0.01,
+    "convergence": "Compare all three sample counts; aggregate RMS error must decrease; retain every seed and investigate every interval miss; no selective rerun-to-pass",
+    "scope": "Policy frozen for WP-12 radiation implementation; Q0 does not execute or qualify a ray tracer",
+    "simultaneous_interval_coverage": "1 - 0.05/M per interval for M predeclared family quantities"
+  },
+  "required_cases": [
+    "coverage",
+    "analytic-seed-dense",
+    "analytic-seed-band",
+    "stiff-nonlinear-heater-dense",
+    "stiff-nonlinear-heater-band",
+    "oracle-refinement",
+    "backend-equivalence",
+    "restart-dense",
+    "restart-band",
+    "invalid-input",
+    "inconsistent-initialization",
+    "scale-dense-128",
+    "scale-band-128",
+    "scale-band-1000",
+    "scale-band-10000",
+    "scale-band-100000",
+    "engine-only-install",
+    "steady-dense",
+    "steady-band",
+    "analytic-seed-adams",
+    "stiff-nonlinear-heater-adams",
+    "restart-adams",
+    "property-domain"
+  ]
+}

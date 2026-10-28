@@ -12,4 +12,5 @@ def evaluate(expected: list[str], records: list[dict]) -> dict:
     if any(row.get("status") != "passed" for row in records):
         problems.append("required_case_not_passed")
     return {"status": "failed" if problems else "passed", "problems": problems,
-            "expected": len(expected), "collected": len(records)}
+            "expected": len(expected), "collected": len(records),
+            "missing": sorted(set(expected) - set(ids)), "unexpected": sorted(set(ids) - set(expected))}

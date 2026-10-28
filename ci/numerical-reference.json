@@ -1,0 +1,22 @@
+{
+  "hardware": {
+    "architecture": "AMD64",
+    "cpu": "Intel64 Family 6 Model 165 Stepping 2, GenuineIntel",
+    "os_build": "10.0.26200",
+    "ram_bytes": 16929980416,
+    "threads": 1
+  },
+  "build": {
+    "abi": "x64-dynamic-CRT",
+    "cmake": "3.31.6",
+    "compiler": "MSVC",
+    "compiler_version": "19.31.31107.0",
+    "execution_mode": "fcst_native",
+    "fast_math": false,
+    "floating_point": "strict",
+    "scope": "q0_prototype",
+    "sundials": "7.3.0",
+    "threads": 1
+  },
+  "configuration": "Release"
+}

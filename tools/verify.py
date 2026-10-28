@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "numerical-checkpoint"]
 
 
 def command(args, log, env=None):
@@ -91,6 +91,8 @@ def main():
         "install": [cmake, "--install", str(ROOT / "out" / args.preset), "--config", config, "--prefix", str(install)],
         "contract-conformance": [sys.executable, "tools/check_contracts.py", "--worker", str(install / "bin/fcst-worker.exe"),
                                  "--report", str(output / "contracts.json")],
+        "numerical-checkpoint": [sys.executable, "tools/check_numerical.py", "--configuration", config,
+                                  "--report", str(output / "numerical.json")],
     }
     for case_id in STEPS:
         start = time.monotonic()
@@ -121,12 +123,19 @@ def main():
                     record(case_id, "passed" if okay else "failed")
                 except (OSError, ValueError, subprocess.SubprocessError):
                     record(case_id, "failed", reason="host_execution_unavailable")
+            elif case_id in {"performance-reference-profile", "Q0-numerical-backend-qualification"}:
+                try:
+                    numerical = json.loads((output / "numerical.json").read_bytes())
+                    okay = numerical["gate"]["status"] == "passed" and numerical["provenance"]["reference_match"]
+                    record(case_id, "passed" if okay else "blocked", reason="requires_frozen_reference_profile")
+                except (OSError, ValueError, KeyError):
+                    record(case_id, "blocked", reason="requires_numerical_evidence")
             else:
-                # Product/vendor/numerical qualification is a separate Q0 gate.
+                # Exact licensed vendor execution remains with its adapter work packages.
                 record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
         expected += manifest["full_prerequisites"]
     verdict = evaluate(expected, records)
-    report = {"schema_version": 1, "scope": "WP-02 foundation and WP-03 contracts; no thermal or compatibility qualification",
+    report = {"schema_version": 1, "scope": "WP-02 foundation, WP-03 contracts and WP-04 numerical prototype; no production or compatibility qualification",
               "candidate": revision, "preset": args.preset, "tier": args.tier,
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
               "coverage_manifest_sha256": hashlib.sha256((ROOT / "ci/coverage.json").read_bytes()).hexdigest(),

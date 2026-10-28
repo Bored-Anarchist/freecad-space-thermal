@@ -1,0 +1,91 @@
+{
+  "work_package": "WP-04",
+  "status": "complete",
+  "scope": "Q0 native numerical suitability and deployment checkpoint; no production or vendor qualification",
+  "decision": "docs/decisions/0001-q0-numerical.md",
+  "requirements": [
+    "ARC-013",
+    "TST-001",
+    "TST-002",
+    "TST-013",
+    "TST-015",
+    "TST-021"
+  ],
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "required_checks": 84,
+      "unit_cases": 70,
+      "contract_cases": 98,
+      "numerical_cases": 23,
+      "report_sha256": "ec5afc11aa838adec4e92b7d7538e47bcaa0fa1079a05ca9b448dd67a0ef236d",
+      "numerical_report_sha256": "73555e8cd61f1ad7764d0adaadeaafb00e9975da482c802c628c4dac944e8109"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "required_checks": 84,
+      "unit_cases": 70,
+      "contract_cases": 98,
+      "numerical_cases": 23,
+      "report_sha256": "9801641aee3bba20aeae1618b6fed3db327c5480615b7be9c8fd4dec304b67b0",
+      "numerical_report_sha256": "5972b4ecc148ec8002640697446a7db06d092d6969a41707cdc46161a911bd5c"
+    },
+    {
+      "id": "frozen-reference",
+      "status": "passed",
+      "command": "python tools/check_numerical.py --require-reference",
+      "cases": 23,
+      "manifest_sha256": "c98c86af612ce809b174b44881db7800769e829978f2f2a248bdc59849ddf4d4",
+      "evidence": "plans/evidence/numerical-baseline.json",
+      "evidence_sha256": "a33b53bc3469e9f90cf67fc6500276f11c64a220c0c74f8eb01368c1d1df8b37"
+    },
+    {
+      "id": "security-regressions",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "cases": 70
+    },
+    {
+      "id": "inventory-reconciliation",
+      "status": "passed",
+      "evidence": "All 12 acquired compatibility profiles remain unqualified; inventory/gaps.json retains its later-package owners; native seed executes without a vendor runtime"
+    }
+  ],
+  "tested_input_sha256": {
+    "ci/coverage.json": "3844c31a0a6ae1b2c7843c74ea9f8b110acc984464c8b0f106e5fb96dc14f159",
+    "ci/numerical-reference.json": "1f9762f104cd174d02ead57c8b308c33c3cec89eb8801d8123f3ac6d3d92b236",
+    "ci/probe-sources.json": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+    "plans/automated-test-requirements.csv": "bebb9cfd909c722d60831a41807050e5aa246893306ff31c25aeeb691c4f002e",
+    "plans/compatibility-test-plan.csv": "cc4d55a626e01ad47955a5fa1fcefc17e709d205f8de665d03943ad74345ff4d",
+    "plans/requirement-traceability.csv": "ba93c93392ae17b1b6c9c67ef155f5318e14f55b55f6c7a8e31b8e627cd47991",
+    "prototypes/numerical/CMakeLists.txt": "62ba631325345fb3036808b75cb1ddd97b83d1d80d7300d607e99be41640841f",
+    "prototypes/numerical/main.cpp": "33de5ef0c51d660e4b031c5dee3ecb74912ae2fefbd1c1232420b5971bc81cdb",
+    "python/fcst_contracts/__init__.py": "b88f3e1a26ddd3757b43a019d6c3f36ff73d8a3d520cf538b65d92ab92aad479",
+    "python/fcst_contracts/bundle.json": "de6fbd9a9bb197de6756c4e6278678540b3011bfe210a90046500a69e2c0573c",
+    "python/fcst_tools/gate.py": "e3e9a6fd7acf36589713a722452f2b756258e169b7ec23b86a3e39c1514ca409",
+    "python/fcst_tools/numerical.py": "c7c630bb56e48f86a27f3bf96a564028bd0c04cf4a069ac19991ee6e43de3aff",
+    "spec/compatibility-profiles.csv": "04ccab6d887a066839cbbc97544a7d4608fd57acd190954daf94ee5f8a02cb22",
+    "spec/requirements.csv": "f507d190c3844b65172660a19f97404b7bf8c03f548353352bbd529a5f7f876f",
+    "tests/fixtures/contracts/analytic-seed-native.json": "fdbdc75745c4ae3606e052f39ecb091585794ca147081e7b469d1dbe109861ac",
+    "tests/fixtures/public/two-node-analytic.json": "4e6293b186488d724f1e10b505608cfc6a44fc81a4527eeb1604c68e7def0699",
+    "tools/build_dependencies.py": "ce420e024eb6be52a640f2958ded2a90473d58b7d4cbfa95e20f7ac86a9701be",
+    "tools/check_numerical.py": "af26c12b17ce9d35c48be6819d4eeff42dc10e616d0f0735293deea75b806ea5",
+    "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec"
+  },
+  "criteria_sha256": "ade493eba9c1f67ebbb501dffb7190d2f2c882ef2df367b699c1abb95a3b2c5c",
+  "fixture_sha256": "b18c785abb59858974c889185f436f9c3cace2493d484fa652b719eab17df15e",
+  "blockers": [],
+  "remaining_obligations": [
+    "WP-05 production package storage and transactional operations",
+    "WP-06 durable job/checkpoint authorization and cancellation deadlines",
+    "WP-11 general DAE/index and arbitrary sparse network production qualification",
+    "WP-12 geometric radiation and execution of the predeclared statistical ensemble",
+    "WP-08/WP-09/WP-10/WP-19 source/runtime/schema/rights and paired vendor comparisons",
+    "Later host GUI, API parity and full product performance qualification"
+  ],
+  "evidence_policy": "Bounded synthetic summaries and hashes are public. Sealed raw observations, failed/interrupted/superseded attempts, compiler logs, binaries and authorized engineering originals remain local. Actual staged/outgoing history, metadata, generated reports and PR/project payloads require TST-021 preflight before publication."
+}

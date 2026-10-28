@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "id": "q0-native-network-v1",
+  "license": "MIT OR Apache-2.0",
+  "units": {"temperature": "K", "time": "s", "capacity": "J/K", "capacity_slope": "J/K^2", "conductance": "W/K", "conductance_slope": "1/K", "radiation": "W/K^4", "power": "W", "energy": "J"},
+  "discretization": "Two lumped capacitive nodes, one eliminated monotone algebraic node, one prescribed boundary; no spatial mesh",
+  "parameter_order": ["c1", "c2", "slope1", "slope2", "g1", "g2", "gb", "gslope", "radiation", "boundary", "power", "low", "high"],
+  "cases": {
+    "analytic-seed": {
+      "parameters": [10, 1, 0, 0, 2, 0, 0, 0, 0, 300, 1, 100, 1000],
+      "initial": [300, 300, 0], "end_s": 20, "sample_s": 0.25,
+      "oracle": "T=300.5-0.5*exp(-t/5); integral external heat=10*(T-300)",
+      "source": "tests/fixtures/public/two-node-analytic.json"
+    },
+    "stiff-nonlinear-heater": {
+      "parameters": [1, 100, 0.002, 0.01, 2, 1, 0.5, 0.001, 1e-9, 300, 4, 300.5, 301],
+      "initial": [300, 300, 0], "end_s": 20, "sample_s": 0.25,
+      "oracle": "Independent Newton elimination and step-refined RK4 with event bisection; enthalpy integral and algebraic balance checked at every sample"
+    }
+  },
+  "equations": {
+    "conductance": "g=g1*(1+gslope*(T1+Ta-2*Tb)); q1=g*(T1-Ta)",
+    "algebraic": "q1=g2*(Ta-T2)+radiation*(Ta^4-Tb^4)",
+    "capacitive": "(c1+slope1*(T1-Tb))*T1dot=P-q1; (c2+slope2*(T2-Tb))*T2dot=g2*(Ta-T2)-gb*(T2-Tb)",
+    "energy": "H=sum(ci*(Ti-Tb)+slopei*(Ti-Tb)^2/2); Hdot=P-gb*(T2-Tb)-radiation*(Ta^4-Tb^4)",
+    "events": "Heater starts on; upward T1=high switches off, downward T1=low switches on; locate roots before restarting integration",
+    "analytic_reduction": "g2=0 selects prescribed Ta=Tb and fixed T2; Hdot=P-q1",
+    "scale": "Aii=12, Aij=-1 for 0<abs(i-j)<=5; x_i=1+i/n; b=A*x; 10*n-30 directed links"
+  },
+  "expected_failure_categories": ["invalid_input", "inconsistent_initial_state", "property_domain", "backend_failure"],
+  "scope": "Synthetic Q0 prototype only; no imported-model or production solver qualification"
+}

@@ -43,7 +43,7 @@
       "name": "SUNDIALS",
       "cmake_package": "SUNDIALS",
       "license": "BSD-3-Clause",
-      "status": "not_selected"
+      "status": "selected_for_q0_prototype"
     },
     {
       "name": "PETSc",
@@ -76,5 +76,12 @@
     "driver": "tools/build_dependencies.py",
     "scope": "Active Windows source builds, installs and consumers for SUNDIALS HDF5 Embree OCCT; no production adoption or numerical qualification",
     "petsc_windows": "Native MSVC unsupported; any Linux assessment is an optional stretch goal outside the work packages"
+  },
+  "numerical_checkpoint": {
+    "decision": "docs/decisions/0001-q0-numerical.md",
+    "criteria": "ci/numerical-criteria-v1.json",
+    "reference": "ci/numerical-reference.json",
+    "source_lock": "ci/probe-sources.json",
+    "production_adoption": false
   }
 }

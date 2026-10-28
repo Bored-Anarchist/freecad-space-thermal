@@ -1,0 +1,305 @@
+{
+  "cases": [
+    {
+      "id": "coverage",
+      "status": "passed"
+    },
+    {
+      "id": "engine-only-install",
+      "status": "passed"
+    },
+    {
+      "events": 0,
+      "id": "analytic-seed-dense",
+      "max_algebraic_residual_W": 0,
+      "max_energy_error_J": 6.544098596350523e-12,
+      "max_temperature_error_K": 4.2598458094289526e-10,
+      "p95_temperature_error_K": 4.0381564758718014e-10,
+      "peak_memory_bytes": 5586944,
+      "problems": [],
+      "rhs_evaluations": 196,
+      "rms_temperature_error_K": 1.6271330291424052e-10,
+      "seconds": 0.0023957,
+      "status": "passed",
+      "steps": 176
+    },
+    {
+      "events": 0,
+      "id": "analytic-seed-band",
+      "max_algebraic_residual_W": 0,
+      "max_energy_error_J": 6.544098596350523e-12,
+      "max_temperature_error_K": 4.2598458094289526e-10,
+      "p95_temperature_error_K": 4.0381564758718014e-10,
+      "peak_memory_bytes": 5582848,
+      "problems": [],
+      "rhs_evaluations": 196,
+      "rms_temperature_error_K": 1.6271330291424052e-10,
+      "seconds": 0.0012714,
+      "status": "passed",
+      "steps": 176
+    },
+    {
+      "events": 0,
+      "id": "analytic-seed-adams",
+      "max_algebraic_residual_W": 0,
+      "max_energy_error_J": 3.1112890042095387e-12,
+      "max_temperature_error_K": 3.2173375075217336e-11,
+      "p95_temperature_error_K": 1.892885848064907e-11,
+      "peak_memory_bytes": 5599232,
+      "problems": [],
+      "rhs_evaluations": 81,
+      "rms_temperature_error_K": 8.364766001873654e-12,
+      "seconds": 0.0016085,
+      "status": "passed",
+      "steps": 62
+    },
+    {
+      "events": 33,
+      "id": "stiff-nonlinear-heater-dense",
+      "max_algebraic_residual_W": 1.7283396935852124e-13,
+      "max_energy_error_J": 8.600617107390462e-09,
+      "max_temperature_error_K": 4.049978201692284e-06,
+      "p95_temperature_error_K": 1.0742124345597404e-06,
+      "peak_memory_bytes": 5611520,
+      "problems": [],
+      "rhs_evaluations": 1912,
+      "rms_temperature_error_K": 5.941945565527114e-07,
+      "seconds": 0.0125576,
+      "status": "passed",
+      "steps": 1261
+    },
+    {
+      "events": 33,
+      "id": "stiff-nonlinear-heater-band",
+      "max_algebraic_residual_W": 1.7283396935852124e-13,
+      "max_energy_error_J": 8.600617107390462e-09,
+      "max_temperature_error_K": 4.049978201692284e-06,
+      "p95_temperature_error_K": 1.0742124345597404e-06,
+      "peak_memory_bytes": 5627904,
+      "problems": [],
+      "rhs_evaluations": 1912,
+      "rms_temperature_error_K": 5.941945565527114e-07,
+      "seconds": 0.01122,
+      "status": "passed",
+      "steps": 1261
+    },
+    {
+      "events": 33,
+      "id": "stiff-nonlinear-heater-adams",
+      "max_algebraic_residual_W": 1.707800567629647e-13,
+      "max_energy_error_J": 2.277603883271695e-09,
+      "max_temperature_error_K": 1.2158806157458457e-06,
+      "p95_temperature_error_K": 3.213264676560357e-07,
+      "peak_memory_bytes": 5603328,
+      "problems": [],
+      "rhs_evaluations": 1152,
+      "rms_temperature_error_K": 1.8586635326879758e-07,
+      "seconds": 0.0089104,
+      "status": "passed",
+      "steps": 610
+    },
+    {
+      "id": "steady-dense",
+      "status": "passed"
+    },
+    {
+      "id": "steady-band",
+      "status": "passed"
+    },
+    {
+      "id": "oracle-refinement",
+      "max_error_K": 1.2749978850479238e-10,
+      "status": "passed"
+    },
+    {
+      "id": "backend-equivalence",
+      "max_error": 6.043822008194866e-06,
+      "status": "passed"
+    },
+    {
+      "id": "restart-dense",
+      "max_error": 3.432137098968724e-07,
+      "status": "passed"
+    },
+    {
+      "id": "restart-band",
+      "max_error": 3.432137098968724e-07,
+      "status": "passed"
+    },
+    {
+      "id": "restart-adams",
+      "max_error": 1.1436824820520997e-09,
+      "status": "passed"
+    },
+    {
+      "id": "invalid-input",
+      "status": "passed"
+    },
+    {
+      "id": "inconsistent-initialization",
+      "status": "passed"
+    },
+    {
+      "id": "property-domain",
+      "status": "passed"
+    },
+    {
+      "id": "scale-dense-128",
+      "median_seconds": 0.0003332,
+      "peak_memory_bytes": 5541888,
+      "range_seconds": [
+        0.0002844,
+        0.0004404
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "scale-band-128",
+      "median_seconds": 0.0002428,
+      "peak_memory_bytes": 5423104,
+      "range_seconds": [
+        0.0002252,
+        0.0005498
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "scale-band-1000",
+      "median_seconds": 0.000378,
+      "peak_memory_bytes": 5562368,
+      "range_seconds": [
+        0.0003518,
+        0.0004714
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "scale-band-10000",
+      "median_seconds": 0.0020907,
+      "peak_memory_bytes": 7020544,
+      "range_seconds": [
+        0.0019374,
+        0.0026429
+      ],
+      "status": "passed"
+    },
+    {
+      "id": "scale-band-100000",
+      "median_seconds": 0.0208086,
+      "peak_memory_bytes": 21417984,
+      "range_seconds": [
+        0.0200538,
+        0.0306875
+      ],
+      "status": "passed"
+    }
+  ],
+  "gate": {
+    "collected": 23,
+    "expected": 23,
+    "missing": [],
+    "problems": [],
+    "status": "passed",
+    "unexpected": []
+  },
+  "manifest_sha256": "c98c86af612ce809b174b44881db7800769e829978f2f2a248bdc59849ddf4d4",
+  "provenance": {
+    "artifacts": {
+      "assessment.json": "e20c32066509ba9b422198d4007689f4c94e720431895220530fe7c6ada7ed7c",
+      "criteria.json": "ade493eba9c1f67ebbb501dffb7190d2f2c882ef2df367b699c1abb95a3b2c5c",
+      "fixture.json": "b18c785abb59858974c889185f436f9c3cace2493d484fa652b719eab17df15e",
+      "observations.json": "2a833bd12be567b8bcfdce3c306f24d62afc3e062716e3eeb951aa6c791ea865"
+    },
+    "backend_source": {
+      "bytes": 32190509,
+      "id": "sundials",
+      "license_file": "LICENSE",
+      "license_sha256": "5fa5c15f6262163679bf1fe70db6cbf5bc49e60726b39560330d402fd1dc79f8",
+      "repository": "LLNL/sundials",
+      "revision": "cb681a4e3a46bcad903fb966284d6f53e85bdb94",
+      "sha256": "a1aa9261c4034da363db379ffe2db0a3b77980f526ee0471f5f56dc53a9c2ed2",
+      "url": "https://codeload.github.com/LLNL/sundials/tar.gz/cb681a4e3a46bcad903fb966284d6f53e85bdb94",
+      "version": "7.3.0"
+    },
+    "build": {
+      "abi": "x64-dynamic-CRT",
+      "cmake": "3.31.6",
+      "compiler": "MSVC",
+      "compiler_version": "19.31.31107.0",
+      "execution_mode": "fcst_native",
+      "fast_math": false,
+      "floating_point": "strict",
+      "scope": "q0_prototype",
+      "sundials": "7.3.0",
+      "threads": 1
+    },
+    "candidate": "74dba8cf9c771ca7aee3cea0082b8a43d61af688",
+    "ci": {
+      "GITHUB_JOB": "local",
+      "GITHUB_RUN_ATTEMPT": "local",
+      "GITHUB_RUN_ID": "local",
+      "GITHUB_SHA": "local",
+      "GITHUB_WORKFLOW": "local"
+    },
+    "configuration": "Release",
+    "criteria_sha256": "ade493eba9c1f67ebbb501dffb7190d2f2c882ef2df367b699c1abb95a3b2c5c",
+    "driver": "tools/check_numerical.py",
+    "ended_utc": "2026-10-28T13:40:18.984639+00:00",
+    "execution_mode": "fcst_native",
+    "fixture_sha256": "b18c785abb59858974c889185f436f9c3cace2493d484fa652b719eab17df15e",
+    "hardware": {
+      "architecture": "AMD64",
+      "cpu": "Intel64 Family 6 Model 165 Stepping 2, GenuineIntel",
+      "os_build": "10.0.26200",
+      "ram_bytes": 16929980416,
+      "threads": 1
+    },
+    "installed_artifacts": {
+      "fcst-numerical.exe": "3f7e54b200fd8afe42e546b051347a9bd9b3d13630e8e8820fc4cf384d5df6df",
+      "sundials_core.dll": "ecf34bba079bfb33ee5200ff9e50b611a554c9ab27b67213ede72a62fe629424",
+      "sundials_cvode.dll": "ad85162f8200a36d927c5dc942566e16efd8c2ad39fcf5de3477ed00f48a569d",
+      "sundials_nvecserial.dll": "4e8090ee711e3cde9bdef7ccc2ab2ca11ea38ed210015ad25fcf34352220e160",
+      "sundials_sunlinsolband.dll": "8fcb6de039afe5213169792c1f95e47b1c9c8f461c80308389dc86ef0c60bb43",
+      "sundials_sunlinsoldense.dll": "b089f777af16891a7bd59349ef5e2ce8c796fd5012c328d7f5a66cd12fd7020a",
+      "sundials_sunmatrixband.dll": "4b725edcff92c648f3402d4d86cb8af81db02c8cf240f42f7ba27dae06e41180",
+      "sundials_sunmatrixdense.dll": "7853ca545f7aa17d0ec4e8186cfd0ae709730f13d60c1d3518ac24d668f64d25"
+    },
+    "local_artifacts": {
+      "build.log": "fd830a252fc1e527634bc207a374cece2563584e0a4254d09127d9aa623c9a5b",
+      "configure.log": "789ef3aefb1412b2d2cac341a70804ff637ab2c75a477f0333e4b5db83fdb145",
+      "dependency-build.log": "07b5d8d26ac0209b6adbc4747a77f384a1300d565c61e18b41ba712b106ebb1e",
+      "dependency-configure.log": "f63a01d1c9db580f8c221880c32584f5426f8908ba4e7cf310e067c5f0b9f33a",
+      "dependency-install.log": "8f5e74d22117cad5307fea18167669df8d6cdcd1fdcdfc174f789d9aa6b49a43",
+      "install.log": "62b60c080520189618b9bd2dc6139e35cd9b9dd6172f138524d22d97e455c01d",
+      "started.json": "c8d57db19f3c915f8ff65b30660b108bcc9158e1902434b8d917f2c9d39302bc"
+    },
+    "python": "3.11.3",
+    "reference_match": true,
+    "require_reference": true,
+    "scope": "q0_prototype",
+    "source_artifacts": {
+      "ci/coverage.json": "3844c31a0a6ae1b2c7843c74ea9f8b110acc984464c8b0f106e5fb96dc14f159",
+      "ci/numerical-reference.json": "1f9762f104cd174d02ead57c8b308c33c3cec89eb8801d8123f3ac6d3d92b236",
+      "ci/probe-sources.json": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "plans/automated-test-requirements.csv": "bebb9cfd909c722d60831a41807050e5aa246893306ff31c25aeeb691c4f002e",
+      "plans/compatibility-test-plan.csv": "cc4d55a626e01ad47955a5fa1fcefc17e709d205f8de665d03943ad74345ff4d",
+      "plans/requirement-traceability.csv": "ba93c93392ae17b1b6c9c67ef155f5318e14f55b55f6c7a8e31b8e627cd47991",
+      "prototypes/numerical/CMakeLists.txt": "62ba631325345fb3036808b75cb1ddd97b83d1d80d7300d607e99be41640841f",
+      "prototypes/numerical/main.cpp": "33de5ef0c51d660e4b031c5dee3ecb74912ae2fefbd1c1232420b5971bc81cdb",
+      "python/fcst_contracts/__init__.py": "b88f3e1a26ddd3757b43a019d6c3f36ff73d8a3d520cf538b65d92ab92aad479",
+      "python/fcst_contracts/bundle.json": "de6fbd9a9bb197de6756c4e6278678540b3011bfe210a90046500a69e2c0573c",
+      "python/fcst_tools/gate.py": "e3e9a6fd7acf36589713a722452f2b756258e169b7ec23b86a3e39c1514ca409",
+      "python/fcst_tools/numerical.py": "c7c630bb56e48f86a27f3bf96a564028bd0c04cf4a069ac19991ee6e43de3aff",
+      "spec/compatibility-profiles.csv": "04ccab6d887a066839cbbc97544a7d4608fd57acd190954daf94ee5f8a02cb22",
+      "spec/requirements.csv": "f507d190c3844b65172660a19f97404b7bf8c03f548353352bbd529a5f7f876f",
+      "tests/fixtures/contracts/analytic-seed-native.json": "fdbdc75745c4ae3606e052f39ecb091585794ca147081e7b469d1dbe109861ac",
+      "tests/fixtures/public/two-node-analytic.json": "4e6293b186488d724f1e10b505608cfc6a44fc81a4527eeb1604c68e7def0699",
+      "tools/build_dependencies.py": "ce420e024eb6be52a640f2958ded2a90473d58b7d4cbfa95e20f7ac86a9701be",
+      "tools/check_numerical.py": "af26c12b17ce9d35c48be6819d4eeff42dc10e616d0f0735293deea75b806ea5",
+      "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec"
+    },
+    "started_utc": "2026-10-28T13:39:33.466147+00:00",
+    "state": "completed"
+  },
+  "scope": "Q0 numerical prototype; no production or compatibility qualification"
+}

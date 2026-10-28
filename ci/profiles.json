@@ -31,8 +31,10 @@
     "reason": "No authorized exact-version vendor runtimes or fixture stores configured"
   },
   "performance_runner": {
-    "status": "blocked",
-    "reason": "Reference hardware not frozen at Q0"
+    "status": "frozen_q0_prototype_reference",
+    "profile": "ci/numerical-reference.json",
+    "driver": "tools/check_numerical.py --require-reference",
+    "scope": "Local fixed-bandwidth prototype; hosted CI correctness is not a replacement reference"
   },
   "policy": "Record actual compiler/CMake/Python versions with each run. Candidate runner labels are not immutable toolchain qualification. Freeze exact compiler and runner image builds at the Q0 numerical decision.",
   "foundation_evidence": "plans/evidence/foundation-profiles.json",
