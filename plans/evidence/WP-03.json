@@ -23,7 +23,7 @@
     {
       "id": "publication-security-regressions",
       "status": "passed",
-      "command": "python tools/check_security.py",
+      "command": "python -S tools/check_security.py",
       "evidence": "All 58 required regression cases pass, including planted private data, history/metadata, staged bytes, nested archives and safe-report tests"
     },
     {
@@ -39,8 +39,10 @@
     "engine/src/contracts.cpp": "ed5cda83b85da77992b9c95f89f449f4f0fbcff88f4ac9a5551f24049810064c",
     "engine/worker/main.cpp": "7546cab0874ce164b593e7012445d679be087c53740de1f1e65f55fdb655fd1c",
     "tests/fixtures/contracts/cases.json": "5a3a0d82c16aad17bbd97f831775f4816359f26e52e35288d39dd07e02398986",
+    "tests/test_contracts.py": "3df38f33f62c18e7ee91c44e7301cc7b89d11bb41231dd2ac802275abebad67e",
     "tools/check_contracts.py": "3b5952cec6842b944f77d83c7146417d47ff9120747ee18353e3775120b106a0",
-    "tools/generate_contracts.py": "baef75fe1a24392feee2486fce3847e689f6a562638b920bbc47f2aaadd6ca44"
+    "tools/generate_contracts.py": "4ff16d2bd638ffd2ae61645eff8a87adea6529cf2dc46321fea61b9aeefaa856",
+    "tools/verify.py": "1744b83308870a4873dd55e96874769dd93005a63ad2a4b2ec9db3217bd13d14"
   },
   "blockers": [],
   "remaining_obligations": [

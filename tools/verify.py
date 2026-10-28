@@ -82,7 +82,7 @@ def main():
         "specification": [sys.executable, "spec/tools/validate_spec.py"],
         "inventory": [sys.executable, "tools/check_inventory.py"],
         "workflow-lint": [sys.executable, "tools/check_workflows.py"],
-        "contract-generation": [sys.executable, "tools/generate_contracts.py", "--check"],
+        "contract-generation": [sys.executable, "tools/generate_contracts.py", "--check", "--validate"],
         "python-package": [sys.executable, "-m", "pip", "install", "--no-deps", "--no-build-isolation", "--no-index", "-e", "."],
         "python-imports": [sys.executable, "-I", "-c", "import fcst_app,fcst_cli,fcst_mcp; assert not fcst_app.capabilities()['solver_available']"],
         "configure": [cmake, "--preset", args.preset, "-DFCST_SOURCE_REVISION=" + revision],

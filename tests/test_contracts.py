@@ -33,13 +33,23 @@ class ContractTests(unittest.TestCase):
         self.assertGreaterEqual(len(records), 63)
         self.assertTrue(all(r["status"] == "passed" for r in records))
 
-    def test_independent_standard_schema_reader(self):
-        from jsonschema import Draft202012Validator
+    def test_schema_vocabulary_is_closed(self):
+        keywords = {"$schema", "$id", "$defs", "$ref", "oneOf", "type", "const", "enum", "required",
+                    "additionalProperties", "properties", "items", "minItems", "maxItems", "uniqueItems",
+                    "pattern", "minLength", "maxLength", "minimum", "maximum", "exclusiveMinimum"}
+        def check(schema, root):
+            self.assertFalse(set(schema) - keywords)
+            if "$ref" in schema:
+                self.assertIn(schema["$ref"].split("/")[-1], root["$defs"])
+            for key in ("$defs", "properties"):
+                for child in schema.get(key, {}).values():
+                    check(child, root)
+            for child in schema.get("oneOf", []):
+                check(child, root)
+            if "items" in schema:
+                check(schema["items"], root)
         for schema in BUNDLE["schemas"].values():
-            Draft202012Validator.check_schema(schema)
-        for case in fixture("cases")["cases"]:
-            if case["status"] == "passed":
-                Draft202012Validator(BUNDLE["schemas"][case["kind"]]).validate(fixture(case["id"]))
+            check(schema, schema)
 
     def test_hash_preserves_identity_topology_ordered_arrays_and_exact_artifacts(self):
         base = fixture("all-entities")

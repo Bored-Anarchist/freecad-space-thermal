@@ -217,6 +217,7 @@ def outputs():
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true")
+    parser.add_argument("--validate", action="store_true", help="Run the independent standard schema reader (locked tooling environment)")
     args = parser.parse_args()
     for name, content in outputs():
         path = ROOT / name
@@ -226,6 +227,17 @@ def main():
         else:
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_text(content, encoding="utf-8", newline="\n")
+    if args.validate:
+        from jsonschema import Draft202012Validator
+        bundle = build()
+        for schema in bundle["schemas"].values():
+            Draft202012Validator.check_schema(schema)
+        fixtures = ROOT / "tests/fixtures/contracts"
+        cases = json.loads((fixtures / "cases.json").read_text(encoding="utf-8"))["cases"]
+        for case in cases:
+            if case["status"] == "passed":
+                Draft202012Validator(bundle["schemas"][case["kind"]]).validate(
+                    json.loads((fixtures / case["path"]).read_text(encoding="utf-8")))
     print("contract_generation: passed")
 
 
