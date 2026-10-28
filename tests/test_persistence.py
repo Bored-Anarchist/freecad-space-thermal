@@ -125,7 +125,9 @@ class PersistenceTests(unittest.TestCase):
         (flat / 'manifest.json').write_bytes(encode(package.manifest))
         (flat / 'model/snapshot.json').write_bytes(package.files['model/snapshot.json'])
         self.assertEqual(Package.open(flat).model, package.model)
-        (flat / 'CON.txt').write_bytes(b'bad')
+        # Reserved Windows names are tested in memory above. Creating a device
+        # name on disk depends on runner OS/filesystem device-name handling.
+        (flat / 'undeclared.json').write_bytes(b'{}')
         with self.assertRaises(PersistenceError):
             Package.open(flat)
 

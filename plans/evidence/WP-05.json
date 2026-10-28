@@ -24,7 +24,7 @@
       "numerical_cases": 23,
       "persistence_cases": 7,
       "report_sha256": "9f5802a63ab3f7f3c342f1ab47f7b8e1f8eff462766e33a193cbc03382de607b",
-      "persistence_report_sha256": "29154d00ff82de398893216876699983296ad4f7568de3d8f74bc5e1dcb8e12e"
+      "persistence_report_sha256": "485df397163f51dade7fcaa54dc5c7992cd4aaad2959dff37f3e2f40ae4f9f5a"
     },
     {
       "id": "windows-release",
@@ -36,7 +36,7 @@
       "numerical_cases": 23,
       "persistence_cases": 7,
       "report_sha256": "f9f2faac75d49144fb005283a7b79b62b100472e69c690518e0fe5bd0afa68e8",
-      "persistence_report_sha256": "29154d00ff82de398893216876699983296ad4f7568de3d8f74bc5e1dcb8e12e"
+      "persistence_report_sha256": "485df397163f51dade7fcaa54dc5c7992cd4aaad2959dff37f3e2f40ae4f9f5a"
     },
     {
       "id": "final-security-regressions",
@@ -58,9 +58,9 @@
       "evidence": "Real process exits at all eight ZIP and expanded save boundaries and three SQLite commit boundaries; previous or committed snapshot recovery; fresh-process portable retry reconstruction; hard-link and HDF5 external/virtual/filter/size attacks rejected"
     },
     {
-      "id": "archive-codec-allocation-guard",
+      "id": "archive-codec-and-runner-fixture-followup",
       "status": "passed",
-      "evidence": "Stored and Deflate members only; BZip2 and LZMA entries are rejected before decompressor construction. All 89 security regressions and both seven-case persistence suites rerun on these exact source bytes."
+      "evidence": "All 89 standard-library cases and both seven-case persistence suites rerun on the final bytes. BZip2/LZMA are rejected before decompressor construction. The flat-directory negative fixture uses an ordinary undeclared member; Windows reserved names are tested in memory without creating OS device files."
     }
   ],
   "coverage": {
@@ -91,7 +91,7 @@
     "python/fcst_app/store.py": "0336ed3fa59e96f25919a2ed05ee1f3c30390da2f3603376207304687504cf49",
     "python/fcst_app/arrays.py": "3e39e808ff26800b20ce08c213be2d74984b3304b67802d5ffdf6dfe7a895bab",
     "python/fcst_cli/__main__.py": "368b0a3f74af351e472d9e417d683819afe9ae9b0a3f7d8bd127d81607d9c6ed",
-    "tests/test_persistence.py": "6702687a73e0a782ac8a71348cc421cd3da6405ae69332cae524567ee1fabd67",
+    "tests/test_persistence.py": "61a02461d671bcec0bc29a32395c16f74bacbfefded503004c84fc67e5e87af9",
     "tests/fixtures/persistence/legacy-0.9.json": "b2c8bd79021fd9387ba32715af3310ab7f243485486ebadff3e099babee9d712",
     "tests/fixtures/contracts/network.json": "856953a18cc4f3e633c99d24be86201bb2f08776b3b8968f660eff656292c806",
     "tools/check_persistence.py": "98a835bb41e1bba7b50dbc768c2bece6e82091a4856d1ee75f25a4ad7921ac31",
