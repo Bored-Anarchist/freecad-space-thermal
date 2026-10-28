@@ -1,6 +1,26 @@
 {
   "schema_version": 1,
-  "production": [],
+  "production": [
+    {
+      "name": "h5py",
+      "version": "3.12.1",
+      "scope": "optional standalone arrays extra",
+      "source": "https://pypi.org/project/h5py/3.12.1/",
+      "license": "BSD-3-Clause",
+      "hashes": "ci/requirements.lock",
+      "notices": "Installed wheel dist-info LICENSE and bundled HDF5 license; do not strip on redistribution",
+      "windows_bundled_hdf5": "1.14.2"
+    },
+    {
+      "name": "NumPy",
+      "version": "2.2.3",
+      "scope": "optional standalone arrays extra",
+      "source": "https://pypi.org/project/numpy/2.2.3/",
+      "license": "BSD-3-Clause and bundled third-party notices",
+      "hashes": "ci/requirements.lock",
+      "notices": "Installed wheel dist-info LICENSE.txt includes bundled-library licenses; do not strip on redistribution"
+    }
+  ],
   "build": [
     {
       "name": "PyYAML",
@@ -83,5 +103,12 @@
     "reference": "ci/numerical-reference.json",
     "source_lock": "ci/probe-sources.json",
     "production_adoption": false
+  },
+  "array_storage": {
+    "contract": "spec/contracts/hdf5-v1.json",
+    "driver": "tools/check_persistence.py",
+    "host_abi_qualified": false,
+    "binary_redistribution_qualified": false,
+    "native_solver_dependency": false
   }
 }

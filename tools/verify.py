@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "numerical-checkpoint"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "numerical-checkpoint", "persistence-conformance"]
 
 
 def command(args, log, env=None):
@@ -93,6 +93,7 @@ def main():
                                  "--report", str(output / "contracts.json")],
         "numerical-checkpoint": [sys.executable, "tools/check_numerical.py", "--configuration", config,
                                   "--report", str(output / "numerical.json")],
+        "persistence-conformance": [sys.executable, "tools/check_persistence.py", "--report", str(output / "persistence.json")],
     }
     for case_id in STEPS:
         start = time.monotonic()
@@ -135,7 +136,7 @@ def main():
                 record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
         expected += manifest["full_prerequisites"]
     verdict = evaluate(expected, records)
-    report = {"schema_version": 1, "scope": "WP-02 foundation, WP-03 contracts and WP-04 numerical prototype; no production or compatibility qualification",
+    report = {"schema_version": 1, "scope": "WP-02 foundation, WP-03 contracts, WP-04 numerical prototype and WP-05 persistence; no production solver or compatibility qualification",
               "candidate": revision, "preset": args.preset, "tier": args.tier,
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
               "coverage_manifest_sha256": hashlib.sha256((ROOT / "ci/coverage.json").read_bytes()).hexdigest(),

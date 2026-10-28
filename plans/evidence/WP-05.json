@@ -1,0 +1,108 @@
+{
+  "work_package": "WP-05",
+  "status": "complete",
+  "scope": "Portable persistence and transaction service; synthetic host coordination boundary; no GUI worker solver or vendor qualification",
+  "requirements": [
+    "ARC-002",
+    "DAT-006",
+    "DAT-008",
+    "DAT-009",
+    "DAT-013",
+    "API-001",
+    "API-003",
+    "TST-021"
+  ],
+  "contract": "docs/persistence.md",
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "required_checks": 104,
+      "unit_cases": 89,
+      "contract_cases": 98,
+      "numerical_cases": 23,
+      "persistence_cases": 7,
+      "report_sha256": "9f5802a63ab3f7f3c342f1ab47f7b8e1f8eff462766e33a193cbc03382de607b",
+      "persistence_report_sha256": "561a5a68b48a248b148cab06d011b1e46c6262559d45cb33a47784b04e2f795e"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "required_checks": 104,
+      "unit_cases": 89,
+      "contract_cases": 98,
+      "numerical_cases": 23,
+      "persistence_cases": 7,
+      "report_sha256": "f9f2faac75d49144fb005283a7b79b62b100472e69c690518e0fe5bd0afa68e8",
+      "persistence_report_sha256": "561a5a68b48a248b148cab06d011b1e46c6262559d45cb33a47784b04e2f795e"
+    },
+    {
+      "id": "final-security-regressions",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "required_cases": 89,
+      "report_sha256": "52fd57a4a37b49748baeb6a965862859a74b3ae71f7cd783dc88c97cdab7e968"
+    },
+    {
+      "id": "final-exact-byte-recovery-followup",
+      "status": "passed",
+      "command": "python tools/check_persistence.py --report .local/persistence.json",
+      "required_cases": 7,
+      "evidence": "Both per-configuration persistence summaries rerun after the final prior-manifest exact-byte checksum guard; the 89-case security rerun includes its tampering regression"
+    },
+    {
+      "id": "process-and-storage-boundaries",
+      "status": "passed",
+      "evidence": "Real process exits at all eight ZIP and expanded save boundaries and three SQLite commit boundaries; previous or committed snapshot recovery; fresh-process portable retry reconstruction; hard-link and HDF5 external/virtual/filter/size attacks rejected"
+    }
+  ],
+  "coverage": {
+    "unit_cases": 89,
+    "wp05_unit_cases": 19,
+    "persistence_cases": 7,
+    "save_process_kill_configurations": 16,
+    "sqlite_process_kill_configurations": 3
+  },
+  "portable_store": {
+    "storage_version": 1,
+    "audit_retention": "Entire project history; explicit atomic failure at 1 MiB rather than pruning durable deduplication",
+    "operational_database_required_for_reopen": false,
+    "schema_migration": "Explicit fixture-defined 0.9 model-only envelope to v1 with retained exact original; unknown versions and lossy downgrade fail"
+  },
+  "array_storage": {
+    "layout": "spec/contracts/hdf5-v1.json",
+    "optional_runtime": [
+      "h5py 3.12.1",
+      "NumPy 2.2.3"
+    ],
+    "windows_wheel_hdf5": "1.14.2",
+    "host_abi_qualified": false,
+    "numerical_backend_adoption": false
+  },
+  "tested_input_sha256": {
+    "python/fcst_app/persistence.py": "0696cdba9bca9602e5a6247c54d6cfe2a0a0709df48488b76769da07ddeb999c",
+    "python/fcst_app/store.py": "0336ed3fa59e96f25919a2ed05ee1f3c30390da2f3603376207304687504cf49",
+    "python/fcst_app/arrays.py": "3e39e808ff26800b20ce08c213be2d74984b3304b67802d5ffdf6dfe7a895bab",
+    "python/fcst_cli/__main__.py": "368b0a3f74af351e472d9e417d683819afe9ae9b0a3f7d8bd127d81607d9c6ed",
+    "tests/test_persistence.py": "bdbf10fc289efb6fb0821fb281c1fb0398c8e1c22f22459ae1d3e56fc88b1db6",
+    "tests/fixtures/persistence/legacy-0.9.json": "b2c8bd79021fd9387ba32715af3310ab7f243485486ebadff3e099babee9d712",
+    "tests/fixtures/contracts/network.json": "856953a18cc4f3e633c99d24be86201bb2f08776b3b8968f660eff656292c806",
+    "tools/check_persistence.py": "98a835bb41e1bba7b50dbc768c2bece6e82091a4856d1ee75f25a4ad7921ac31",
+    "tools/verify.py": "f372ab25e356f50a0359a4e421ff651f34ec7af156a5c6391d2082800ee2392f",
+    "ci/coverage.json": "94b4ba0e53d0c15dfdb4238785d19f74660fab7ce947cb5c7460508786928d9f",
+    "ci/requirements.lock": "94dd6d5c404e06fd90c76e09635a8bfaa93b3a15117a3da490cb3ec5ce79cce8",
+    "pyproject.toml": "8717603fa88b2018fbcc35f1977e46246c9b15004f879673aa767d03e66a8d6f",
+    ".github/workflows/ci.yml": "ece9af1b8b0b8fba629f85d2285d68a8d10d222a5bde3e41d253f025c8875118"
+  },
+  "blockers": [],
+  "remaining_obligations": [
+    "WP-06 isolated workers durable job lifecycle and result publication",
+    "WP-07/08/09 source adapters and vendor qualification",
+    "WP-13 actual FreeCAD edit notifications inverse Undo and host UI integration",
+    "WP-14/15 client authorization transport and GUI/CLI/MCP workflow parity",
+    "WP-19 complete product installation host ABI binary notices redistribution and later schema migrations"
+  ],
+  "evidence_policy": "Only synthetic fixtures bounded statuses and exact source/report hashes are public. Generated packages HDF5 SQLite/WAL host files raw crash logs and acquired engineering originals remain local. TST-021 scans exact staged/outgoing history identities generated summaries and final PR/project prose before publication."
+}

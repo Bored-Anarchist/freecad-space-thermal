@@ -12,6 +12,8 @@ Track the 21 work packages in the [FCST implementation project](https://github.c
 
 [WP-04's numerical checkpoint](docs/decisions/0001-q0-numerical.md) adds a separate C++/SUNDIALS experiment with independent analytic/nonlinear oracles, energy/event/restart checks, dense/banded and BDF/Adams comparisons, scale probes and sealed evidence. Both Windows verification configurations execute it unattended. It retains C++ as the implementation baseline; production solving, GUI workflows and vendor compatibility remain later work.
 
+[WP-05 persistence](docs/persistence.md) supplies bounded ZIP/expanded packages, exact original-byte retention, versioned HDF5 result/mesh arrays, durable SQLite transactions with portable JSON journals, scoped retries/previews, atomic edits/undo, dependency invalidation, migration and coordinated host/package recovery. Both Windows drivers run transaction and crash regressions plus HDF5 conformance. The host adapter, live jobs and production physics remain their later work packages.
+
 [WP-01's completed acquired inventory](inventory/README.md) records acquired Thermal Desktop/SINDA and ESATAN examples, pinned hashes, rights/dependency dispositions and feature mappings. Raw originals remain local; vendor execution is blocked by unavailable licensed runners and no compatibility profile is qualified.
 
 **Publication privacy:** remove private/personal information before any online code, documentation, issue/PR/comment/post, log, image or release upload. The [standing repository instructions](AGENTS.md) and plan requirement TST-021 require checks before publication, sanitized outputs and separate preservation of authorized engineering originals.

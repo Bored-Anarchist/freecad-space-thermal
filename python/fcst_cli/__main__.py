@@ -5,10 +5,48 @@ from fcst_app import capabilities
 
 
 def main() -> int:
-    parser = argparse.ArgumentParser(description="FCST application skeleton")
-    parser.add_argument("--capabilities", action="store_true", required=True)
-    parser.parse_args()
-    print(json.dumps(capabilities(), sort_keys=True))
+    parser = argparse.ArgumentParser(description="FCST application and portable project tools")
+    parser.add_argument("--capabilities", action="store_true")
+    commands = parser.add_subparsers(dest="command")
+    inspect = commands.add_parser("project-inspect")
+    inspect.add_argument("path")
+    inspect.add_argument("--previous", action="store_true")
+    migrate = commands.add_parser("project-migrate")
+    migrate.add_argument("source")
+    migrate.add_argument("destination")
+    recover = commands.add_parser("project-recover")
+    recover.add_argument("source")
+    recover.add_argument("destination")
+    recover.add_argument("--previous", action="store_true")
+    args = parser.parse_args()
+    if args.capabilities and args.command:
+        parser.error("Choose a command or --capabilities")
+    if args.capabilities:
+        result = capabilities()
+    elif args.command:
+        from fcst_contracts import ContractError
+        from pathlib import Path
+        from fcst_app.persistence import PersistenceError, recover_package, migrate_project, semantic_hash, save_package
+        try:
+            if args.command == "project-inspect":
+                package = recover_package(args.path, previous=args.previous)
+                result = {"project_id": package.model["project_id"], "revision": package.model["revision"],
+                          "semantic_hash": semantic_hash(package.model), "artifacts": len(package.manifest["artifacts"])}
+            elif args.command == "project-migrate":
+                result = migrate_project(args.source, args.destination)
+            else:
+                if Path(args.destination).exists() or Path(args.source).resolve() == Path(args.destination).resolve():
+                    raise PersistenceError("recovery_requires_new_target")
+                result = save_package(recover_package(args.source, previous=args.previous), args.destination)
+        except (ContractError, PersistenceError) as error:
+            print(json.dumps({"code": str(error)}))
+            return 2
+        except OSError:
+            print(json.dumps({"code": "storage_unavailable"}))
+            return 2
+    else:
+        parser.error("Choose a command or --capabilities")
+    print(json.dumps(result, sort_keys=True))
     return 0
 
 

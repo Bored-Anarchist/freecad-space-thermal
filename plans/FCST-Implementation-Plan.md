@@ -132,6 +132,8 @@ WP-03 extends that executable publication boundary to the generated v1 schemas, 
 
 WP-04 adds an exact pre-upload scan of each `numerical.json` summary. Its inputs are synthetic SI fixtures and independently frozen criteria; public evidence contains bounded metrics, source/backend/artifact hashes and public hardware/toolchain attributes. Raw per-attempt observations, compiler logs, executable/DLL files and restricted originals remain local. Sealed attempt manifests preserve failed/interrupted/superseded results. TST-021 acceptance executes the planted regressions plus staged/outgoing-history/identity and final prose/evidence scans before push; CI scans the final generated numerical summary before upload. No scanner suppression or authorization to publish engineering originals is added.
 
+WP-05 adds the exact generated `persistence.json` summary to both Windows CI pre-upload scans. Synthetic package/migration fixtures, typed store/array sources, completion evidence and final PR prose are checked with the staged/outgoing-history/approved-identity preflight before publication. Generated `.fcst`, HDF5, SQLite/WAL and synthetic host files plus raw crash/array diagnostics stay local. Imported engineering originals remain unchanged in their authorized storage and are never uploaded by this workflow. TST-021 acceptance includes planted privacy regressions and exact report/prose scans; neither an inert-source role nor successful persistence validation grants publication clearance.
+
 ## 3. Build sequence and dependencies
 
 Each package below specifies concrete tasks and completion evidence. Its register row identifies a lead role, prerequisites, expected outputs, and automated suites. Dependencies describe interface availability; packages can deliver a minimal slice before their complete Q1 capability. Every completion reference must point to an immutable test artifact, not a checklist marked by hand.
@@ -225,6 +227,10 @@ The [Q0 numerical decision](../docs/decisions/0001-q0-numerical.md) implements t
 9. Implement schema migration, read compatibility, recoverable backups and explicit downgrade export where supported.
 
 **Outputs:** package store, operation engine, revision/invalidation graph, migration/recovery tools. **Completion:** fault injection at write/flush/replace/journal/sync boundaries yields the previous valid revision or a clearly recoverable committed state. Restarted retries cannot duplicate entities/jobs. No failure reports a false clean save.
+
+The [WP-05 implementation contract](../docs/persistence.md) documents the portable package/generation layouts, operational SQLite store and reconstructable JSON journal, explicit audit-capacity failure, supported migration/downgrade envelope, HDF5 layout enforcement and host reconciliation boundary. The required Windows driver executes the frozen persistence acceptance IDs, including fresh-process package reconstruction and hard termination at every publication boundary; standard-library cases cover SQLite crash/retry/race behavior. Job scheduling remains WP-06 and actual FreeCAD notifications/Undo integration remain WP-13; this package supplies their durable transaction/host boundary without claiming those later workflows.
+
+[Completion evidence](evidence/WP-05.json) records both 104-check Windows configurations, 89 standard-library regressions and seven persistence integration cases. The final exact-byte prior-manifest guard is covered by the security rerun and both persistence summaries. Generated engineering containers and raw crash diagnostics remain local.
 
 ### Step 6 — WP-06: implement isolated workers and durable jobs
 
