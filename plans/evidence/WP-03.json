@@ -1,0 +1,55 @@
+{
+  "work_package": "WP-03",
+  "status": "complete",
+  "contract_version": "1.0.0",
+  "scope": "Frozen native model, manifest, operation, response, result, HDF5 layout and bounded worker contracts; independent readers and synthetic conformance only",
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "required_checks": 71,
+      "contract_cases": 76,
+      "evidence": "58 Python cases and 13 driver steps; generated-byte drift, installed native reader, frozen hashes, normalized bytes/diagnostics, framed control messages, CTest and engine-only rejection of unimplemented solving all pass"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "required_checks": 71,
+      "contract_cases": 76,
+      "evidence": "58 Python cases and 13 driver steps; generated-byte drift, installed native reader, frozen hashes, normalized bytes/diagnostics, framed control messages, CTest and engine-only rejection of unimplemented solving all pass"
+    },
+    {
+      "id": "publication-security-regressions",
+      "status": "passed",
+      "command": "python tools/check_security.py",
+      "evidence": "All 58 required regression cases pass, including planted private data, history/metadata, staged bytes, nested archives and safe-report tests"
+    },
+    {
+      "id": "inventory-contract-reconciliation",
+      "status": "passed",
+      "evidence": "spec/contracts/README.md maps acquired identity, units, expressions, geometry, materials and result needs to v1 contracts; all 12 compatibility profiles remain unqualified and inventory/gaps.json retains later-package owners"
+    }
+  ],
+  "tested_input_sha256": {
+    "python/fcst_contracts/bundle.json": "de6fbd9a9bb197de6756c4e6278678540b3011bfe210a90046500a69e2c0573c",
+    "python/fcst_contracts/__init__.py": "c27b8bc11542a888df0b769cf707d087b63084c112f697a2759d8c5f0a8cae03",
+    "python/fcst_contracts/worker.py": "a8da22e6d4c3534ce73494312fd0641ed10bfb2866ab34ef87a196a9827fbadf",
+    "engine/src/contracts.cpp": "ed5cda83b85da77992b9c95f89f449f4f0fbcff88f4ac9a5551f24049810064c",
+    "engine/worker/main.cpp": "7546cab0874ce164b593e7012445d679be087c53740de1f1e65f55fdb655fd1c",
+    "tests/fixtures/contracts/cases.json": "5a3a0d82c16aad17bbd97f831775f4816359f26e52e35288d39dd07e02398986",
+    "tools/check_contracts.py": "3b5952cec6842b944f77d83c7146417d47ff9120747ee18353e3775120b106a0",
+    "tools/generate_contracts.py": "baef75fe1a24392feee2486fce3847e689f6a562638b920bbc47f2aaadd6ca44"
+  },
+  "blockers": [],
+  "remaining_obligations": [
+    "WP-04 numerical/backend decision and Q0 closure",
+    "WP-05 package/HDF5 persistence, transactions and migrations",
+    "WP-06 actual isolated workers and durable jobs",
+    "WP-07/08/09 source semantics and vendor qualification",
+    "WP-11/12/16/17 owned physics, advanced properties, radiation and environments",
+    "WP-14 live API/MCP authorization and runtime operation execution"
+  ],
+  "evidence_policy": "Synthetic contract fixtures are public inputs, not executed solver results. Raw build/test logs, executables, array files and original engineering models remain local. TST-021 preflight must clear exact staged/outgoing history, metadata, bounded reports and PR payload before publication. Full Q1 requirements and physics/compatibility suites remain planned."
+}

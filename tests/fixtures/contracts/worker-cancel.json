@@ -1,0 +1,7 @@
+{
+  "contract_version": "1.0.0",
+  "type": "cancel",
+  "job_id": "00000000-0000-4000-8000-000000000061",
+  "sequence": 0,
+  "payload": {}
+}

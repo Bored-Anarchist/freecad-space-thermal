@@ -1,0 +1,497 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "id": "network",
+      "kind": "model",
+      "path": "network.json",
+      "status": "passed",
+      "semantic_hash": "38cec72cd7591611fb3e7a97c19e52cfa0416906f8566547d658dcc8a42662c0"
+    },
+    {
+      "id": "all-entities",
+      "kind": "model",
+      "path": "all-entities.json",
+      "status": "passed",
+      "semantic_hash": "60acd0f4789b386f9d44b8bed4d3b58041addc0da72d83cc6edf8b82bb4065c9"
+    },
+    {
+      "id": "network-si-reordered",
+      "kind": "model",
+      "path": "network-si-reordered.json",
+      "status": "passed",
+      "same_hash_as": "network",
+      "semantic_hash": "38cec72cd7591611fb3e7a97c19e52cfa0416906f8566547d658dcc8a42662c0"
+    },
+    {
+      "id": "all-entities-si",
+      "kind": "model",
+      "path": "all-entities-si.json",
+      "status": "passed",
+      "same_hash_as": "all-entities",
+      "semantic_hash": "60acd0f4789b386f9d44b8bed4d3b58041addc0da72d83cc6edf8b82bb4065c9"
+    },
+    {
+      "id": "result",
+      "kind": "result",
+      "path": "result.json",
+      "status": "passed",
+      "semantic_hash": "8c380c2d0dea654b818b27c81ce74dcc622aec8c8ec3738cc359ca7cd07c2823"
+    },
+    {
+      "id": "manifest",
+      "kind": "manifest",
+      "path": "manifest.json",
+      "status": "passed",
+      "semantic_hash": "fa9bba4556999a95a80069e0b16177da6ae0ef1292aa4b36b53c841f2b3e5a65"
+    },
+    {
+      "id": "manifest-cycle",
+      "kind": "manifest",
+      "path": "manifest-cycle.json",
+      "status": "failed",
+      "code": "cycle"
+    },
+    {
+      "id": "manifest-missing-dependency",
+      "kind": "manifest",
+      "path": "manifest-missing-dependency.json",
+      "status": "failed",
+      "code": "reference"
+    },
+    {
+      "id": "manifest-path-collision",
+      "kind": "manifest",
+      "path": "manifest-path-collision.json",
+      "status": "failed",
+      "code": "duplicate_id"
+    },
+    {
+      "id": "analytic-seed-native",
+      "kind": "model",
+      "path": "analytic-seed-native.json",
+      "status": "passed",
+      "semantic_hash": "0873b867e79df1fdba2c526d34a10f8fd8753ae8bec27f42d47f7723371f0d09"
+    },
+    {
+      "id": "unicode-label",
+      "kind": "model",
+      "path": "unicode-label.json",
+      "status": "passed",
+      "semantic_hash": "91518ebb1c75e498b93da5459313a372301fb819d0e5c0f9041fa1427b7d7b3e"
+    },
+    {
+      "id": "operation-model.validate",
+      "kind": "operation",
+      "path": "operation-model.validate.json",
+      "status": "passed",
+      "semantic_hash": "6c0566b5ea94dd73e2293944bb0a946a9e72b8a96b908e665114e953a7bb81b5"
+    },
+    {
+      "id": "operation-model.hash",
+      "kind": "operation",
+      "path": "operation-model.hash.json",
+      "status": "passed",
+      "semantic_hash": "e57870bc35ed47295f53d685dd5ad095c123bdd461b77e798ba9e8fce866d2b9"
+    },
+    {
+      "id": "operation-capabilities.get",
+      "kind": "operation",
+      "path": "operation-capabilities.get.json",
+      "status": "passed",
+      "semantic_hash": "de7e2748404d98f6ebb8628e2893edc591f5cc6f7ae8946ecfa4c058c0ec0542"
+    },
+    {
+      "id": "operation-thermal.conductor.create",
+      "kind": "operation",
+      "path": "operation-thermal.conductor.create.json",
+      "status": "passed",
+      "semantic_hash": "15d58252a14d9dab402563e96970604b4138bf4fea66350f4edae1baa7c477a3"
+    },
+    {
+      "id": "operation-job.submit",
+      "kind": "operation",
+      "path": "operation-job.submit.json",
+      "status": "passed",
+      "semantic_hash": "dcf78dbe86df8c07bb1ee51784d2de36467c50f287e9741639a454cd3d2d6b99"
+    },
+    {
+      "id": "operation-job.cancel",
+      "kind": "operation",
+      "path": "operation-job.cancel.json",
+      "status": "passed",
+      "semantic_hash": "ee108cfe511bd5714dd184c5d181643ea06b302bfc1c18225eefa84ee6af46fb"
+    },
+    {
+      "id": "operation-result.query",
+      "kind": "operation",
+      "path": "operation-result.query.json",
+      "status": "passed",
+      "semantic_hash": "185b886f115f30297c1840f8b7ec2f5c948ff6f8a321edeb6f4985e38cff45d6"
+    },
+    {
+      "id": "response-model.validate",
+      "kind": "response",
+      "path": "response-model.validate.json",
+      "status": "passed",
+      "semantic_hash": "2b2e3de922e1a89a03a4ff6ec2aedae8361df61603f562658218509720b8d416"
+    },
+    {
+      "id": "response-model.hash",
+      "kind": "response",
+      "path": "response-model.hash.json",
+      "status": "passed",
+      "semantic_hash": "25d250cb223542945b59a7b460449d2a42fefc3ce47e729a5cd1735336cb9249"
+    },
+    {
+      "id": "response-capabilities.get",
+      "kind": "response",
+      "path": "response-capabilities.get.json",
+      "status": "passed",
+      "semantic_hash": "3b1354768f5ff7c930c143420015d73a6bb30e02c31c03f0c3645ca191e12cb4"
+    },
+    {
+      "id": "response-thermal.conductor.create",
+      "kind": "response",
+      "path": "response-thermal.conductor.create.json",
+      "status": "passed",
+      "semantic_hash": "c817ebc53c1a81598cfae488daaeb307ecbf613364599908daf6a02c7ce4b3c6"
+    },
+    {
+      "id": "response-job.submit",
+      "kind": "response",
+      "path": "response-job.submit.json",
+      "status": "passed",
+      "semantic_hash": "dc6606c489073e72afe4800865ea36960f4aea1593234437da9dae9f8fc361c9"
+    },
+    {
+      "id": "response-job.cancel",
+      "kind": "response",
+      "path": "response-job.cancel.json",
+      "status": "passed",
+      "semantic_hash": "390ba63b75a8a13969232b0ecc1c5262c85499324663281b0de85b841b8a5345"
+    },
+    {
+      "id": "response-result.query",
+      "kind": "response",
+      "path": "response-result.query.json",
+      "status": "passed",
+      "semantic_hash": "acd3baef372a777b85e91b1bdf3a32a648635a3bffa455dac77b12b1a0142ffc"
+    },
+    {
+      "id": "response-error",
+      "kind": "response",
+      "path": "response-error.json",
+      "status": "passed",
+      "semantic_hash": "2a1bbce7d174fb3feba115e6255f2f8286f2019b56a0f56f7cc1787949c3dfa0"
+    },
+    {
+      "id": "worker-handshake",
+      "kind": "worker",
+      "path": "worker-handshake.json",
+      "status": "passed",
+      "semantic_hash": "bd3ebaf968da98e9ad57f5b4a94bb75aeb6786e4a53c56458892206d93805993"
+    },
+    {
+      "id": "worker-submit",
+      "kind": "worker",
+      "path": "worker-submit.json",
+      "status": "passed",
+      "semantic_hash": "e1b34a5a6d7a46f0dac4a0156d274f903418ba52fcdc372d2cc27d483e24d75b"
+    },
+    {
+      "id": "worker-progress",
+      "kind": "worker",
+      "path": "worker-progress.json",
+      "status": "passed",
+      "semantic_hash": "b782fad6c6ac247a271caf731238db4ec79c8e3fe9b808d3bcc6c419f652d1fb"
+    },
+    {
+      "id": "worker-diagnostic",
+      "kind": "worker",
+      "path": "worker-diagnostic.json",
+      "status": "passed",
+      "semantic_hash": "123c38d0590403d743d7fcd747fcbffe62ee43c39629028660bc0313ceb3f041"
+    },
+    {
+      "id": "worker-cancel",
+      "kind": "worker",
+      "path": "worker-cancel.json",
+      "status": "passed",
+      "semantic_hash": "3da90c4c51f4966fe69b602f96bbe6ccd1b8575fc0f39d0dfe8454d740c5d713"
+    },
+    {
+      "id": "worker-terminal",
+      "kind": "worker",
+      "path": "worker-terminal.json",
+      "status": "passed",
+      "semantic_hash": "aba1fefc0315e4aded46d31b5fdf2b9fb5449ce874cde76c5974956617f48a06"
+    },
+    {
+      "id": "worker-checkpoint",
+      "kind": "worker",
+      "path": "worker-checkpoint.json",
+      "status": "passed",
+      "semantic_hash": "12394f3dbe0cec088e85953d5b536d23f8bb45a671ff67dba765de21430a6b6c"
+    },
+    {
+      "id": "unknown-field",
+      "kind": "model",
+      "path": "unknown-field.json",
+      "status": "failed",
+      "code": "schema"
+    },
+    {
+      "id": "version-mismatch",
+      "kind": "model",
+      "path": "version-mismatch.json",
+      "status": "failed",
+      "code": "version"
+    },
+    {
+      "id": "reader-mismatch",
+      "kind": "model",
+      "path": "reader-mismatch.json",
+      "status": "failed",
+      "code": "version"
+    },
+    {
+      "id": "duplicate-uuid",
+      "kind": "model",
+      "path": "duplicate-uuid.json",
+      "status": "failed",
+      "code": "duplicate_id"
+    },
+    {
+      "id": "source-collision",
+      "kind": "model",
+      "path": "source-collision.json",
+      "status": "failed",
+      "code": "duplicate_id"
+    },
+    {
+      "id": "dangling-reference",
+      "kind": "model",
+      "path": "dangling-reference.json",
+      "status": "failed",
+      "code": "reference"
+    },
+    {
+      "id": "wrong-reference-kind",
+      "kind": "model",
+      "path": "wrong-reference-kind.json",
+      "status": "failed",
+      "code": "reference"
+    },
+    {
+      "id": "dimension-mismatch",
+      "kind": "model",
+      "path": "dimension-mismatch.json",
+      "status": "failed",
+      "code": "dimension"
+    },
+    {
+      "id": "negative-kelvin",
+      "kind": "model",
+      "path": "negative-kelvin.json",
+      "status": "failed",
+      "code": "range"
+    },
+    {
+      "id": "algebraic-capacity",
+      "kind": "model",
+      "path": "algebraic-capacity.json",
+      "status": "failed",
+      "code": "range"
+    },
+    {
+      "id": "singular-frame",
+      "kind": "model",
+      "path": "singular-frame.json",
+      "status": "failed",
+      "code": "frame"
+    },
+    {
+      "id": "reflected-frame",
+      "kind": "model",
+      "path": "reflected-frame.json",
+      "status": "failed",
+      "code": "frame"
+    },
+    {
+      "id": "frame-cycle",
+      "kind": "model",
+      "path": "frame-cycle.json",
+      "status": "failed",
+      "code": "cycle"
+    },
+    {
+      "id": "tensor-negative",
+      "kind": "model",
+      "path": "tensor-negative.json",
+      "status": "failed",
+      "code": "range"
+    },
+    {
+      "id": "tensor-nonsymmetric",
+      "kind": "model",
+      "path": "tensor-nonsymmetric.json",
+      "status": "failed",
+      "code": "range"
+    },
+    {
+      "id": "optics-range",
+      "kind": "model",
+      "path": "optics-range.json",
+      "status": "failed",
+      "code": "range"
+    },
+    {
+      "id": "mapping-kind",
+      "kind": "model",
+      "path": "mapping-kind.json",
+      "status": "failed",
+      "code": "reference"
+    },
+    {
+      "id": "mapping-weight",
+      "kind": "model",
+      "path": "mapping-weight.json",
+      "status": "failed",
+      "code": "range"
+    },
+    {
+      "id": "attachment-signature-only",
+      "kind": "model",
+      "path": "attachment-signature-only.json",
+      "status": "failed",
+      "code": "attachment"
+    },
+    {
+      "id": "attachment-stale",
+      "kind": "model",
+      "path": "attachment-stale.json",
+      "status": "failed",
+      "code": "attachment"
+    },
+    {
+      "id": "expression-cycle",
+      "kind": "model",
+      "path": "expression-cycle.json",
+      "status": "failed",
+      "code": "cycle"
+    },
+    {
+      "id": "expression-undefined",
+      "kind": "model",
+      "path": "expression-undefined.json",
+      "status": "failed",
+      "code": "reference"
+    },
+    {
+      "id": "expression-type",
+      "kind": "model",
+      "path": "expression-type.json",
+      "status": "failed",
+      "code": "dimension"
+    },
+    {
+      "id": "expression-temperature-add",
+      "kind": "model",
+      "path": "expression-temperature-add.json",
+      "status": "failed",
+      "code": "dimension"
+    },
+    {
+      "id": "table-discontinuity",
+      "kind": "model",
+      "path": "table-discontinuity.json",
+      "status": "failed",
+      "code": "expression"
+    },
+    {
+      "id": "unsafe-artifact",
+      "kind": "model",
+      "path": "unsafe-artifact.json",
+      "status": "failed",
+      "code": "schema"
+    },
+    {
+      "id": "artifact-traversal",
+      "kind": "model",
+      "path": "artifact-traversal.json",
+      "status": "failed",
+      "code": "artifact"
+    },
+    {
+      "id": "unsupported-operation",
+      "kind": "operation",
+      "path": "unsupported-operation.json",
+      "status": "failed",
+      "code": "unsupported_operation"
+    },
+    {
+      "id": "result-unknown-field",
+      "kind": "result",
+      "path": "result-unknown-field.json",
+      "status": "failed",
+      "code": "schema"
+    },
+    {
+      "id": "worker-false-success",
+      "kind": "worker",
+      "path": "worker-false-success.json",
+      "status": "failed",
+      "code": "artifact"
+    },
+    {
+      "id": "nonfinite",
+      "kind": "model",
+      "path": "nonfinite.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "overflow",
+      "kind": "model",
+      "path": "overflow.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "underflow",
+      "kind": "model",
+      "path": "underflow.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "duplicate-key",
+      "kind": "model",
+      "path": "duplicate-key.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "trailing-json",
+      "kind": "model",
+      "path": "trailing-json.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "unpaired-surrogate",
+      "kind": "model",
+      "path": "unpaired-surrogate.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "depth-limit",
+      "kind": "model",
+      "path": "depth-limit.json",
+      "status": "failed",
+      "code": "invalid_json"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "contract_version": "1.0.0",
+  "operation": "model.hash",
+  "result": {
+    "semantic_hash": "0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "contract_version": "1.0.0",
+  "project_id": "00000000-0000-4000-8000-000000000001",
+  "expected_revision": 0,
+  "idempotency_key": "00000000-0000-4000-8000-000000000062",
+  "operation": "job.cancel",
+  "arguments": {
+    "job_id": "00000000-0000-4000-8000-000000000061"
+  }
+}

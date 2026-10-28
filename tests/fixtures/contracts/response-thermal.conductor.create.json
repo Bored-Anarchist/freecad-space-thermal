@@ -1,0 +1,8 @@
+{
+  "contract_version": "1.0.0",
+  "operation": "thermal.conductor.create",
+  "result": {
+    "entity_id": "00000000-0000-4000-8000-000000000060",
+    "revision": 1
+  }
+}

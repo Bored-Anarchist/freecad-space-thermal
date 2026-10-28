@@ -1,0 +1,16 @@
+{
+  "contract_version": "1.0.0",
+  "project_id": "00000000-0000-4000-8000-000000000001",
+  "expected_revision": 0,
+  "idempotency_key": "00000000-0000-4000-8000-000000000062",
+  "operation": "result.query",
+  "arguments": {
+    "result_id": "00000000-0000-4000-8000-000000000050",
+    "quantity": "temperature",
+    "entity_ids": [
+      "00000000-0000-4000-8000-000000000004"
+    ],
+    "offset": 0,
+    "limit": 1024
+  }
+}

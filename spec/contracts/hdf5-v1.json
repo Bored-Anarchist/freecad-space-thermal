@@ -1,0 +1,112 @@
+{
+  "contract_version": "1.0.0",
+  "byte_order": "little",
+  "index_base": 0,
+  "compression": "none",
+  "chunking": "time-major; max 256 time samples and 1024 entities per chunk",
+  "root_attributes": {
+    "contract_version": "UTF-8 scalar 1.0.0",
+    "semantic_hash": "ASCII lowercase SHA-256",
+    "artifact_role": "result|radiation_mesh|conduction_mesh"
+  },
+  "datasets": {
+    "/index/node_uuid": {
+      "dtype": "uint8",
+      "shape": [
+        "N",
+        16
+      ],
+      "unit": "1"
+    },
+    "/time": {
+      "dtype": "float64",
+      "shape": [
+        "T"
+      ],
+      "unit": "s"
+    },
+    "/temperature": {
+      "dtype": "float64",
+      "shape": [
+        "T",
+        "N"
+      ],
+      "unit": "K"
+    },
+    "/power": {
+      "dtype": "float64",
+      "shape": [
+        "T",
+        "N"
+      ],
+      "unit": "W"
+    },
+    "/residual": {
+      "dtype": "float64",
+      "shape": [
+        "T",
+        "N"
+      ],
+      "unit": "W"
+    }
+  },
+  "mesh_datasets": {
+    "/index/entity_uuid": {
+      "dtype": "uint8",
+      "shape": [
+        "E",
+        16
+      ],
+      "unit": "1"
+    },
+    "/vertices": {
+      "dtype": "float64",
+      "shape": [
+        "V",
+        3
+      ],
+      "unit": "m"
+    },
+    "/connectivity/offsets": {
+      "dtype": "uint64",
+      "shape": [
+        "E+1"
+      ],
+      "unit": "1"
+    },
+    "/connectivity/vertex_index": {
+      "dtype": "uint64",
+      "shape": [
+        "L"
+      ],
+      "unit": "1"
+    },
+    "/normals": {
+      "dtype": "float64",
+      "shape": [
+        "E",
+        3
+      ],
+      "unit": "1"
+    }
+  },
+  "role_datasets": {
+    "result": [
+      "/index/node_uuid",
+      "/time"
+    ],
+    "radiation_mesh": [
+      "/index/entity_uuid",
+      "/vertices",
+      "/connectivity/offsets",
+      "/connectivity/vertex_index",
+      "/normals"
+    ],
+    "conduction_mesh": [
+      "/index/entity_uuid",
+      "/vertices",
+      "/connectivity/offsets",
+      "/connectivity/vertex_index"
+    ]
+  }
+}

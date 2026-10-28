@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "inventory", "workflow-lint", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance"]
 
 
 def command(args, log, env=None):
@@ -82,12 +82,15 @@ def main():
         "specification": [sys.executable, "spec/tools/validate_spec.py"],
         "inventory": [sys.executable, "tools/check_inventory.py"],
         "workflow-lint": [sys.executable, "tools/check_workflows.py"],
+        "contract-generation": [sys.executable, "tools/generate_contracts.py", "--check"],
         "python-package": [sys.executable, "-m", "pip", "install", "--no-deps", "--no-build-isolation", "--no-index", "-e", "."],
         "python-imports": [sys.executable, "-I", "-c", "import fcst_app,fcst_cli,fcst_mcp; assert not fcst_app.capabilities()['solver_available']"],
         "configure": [cmake, "--preset", args.preset, "-DFCST_SOURCE_REVISION=" + revision],
         "build": [cmake, "--build", "--preset", args.preset, "--parallel", "2"],
         "ctest": [ctest, "--preset", args.preset],
         "install": [cmake, "--install", str(ROOT / "out" / args.preset), "--config", config, "--prefix", str(install)],
+        "contract-conformance": [sys.executable, "tools/check_contracts.py", "--worker", str(install / "bin/fcst-worker.exe"),
+                                 "--report", str(output / "contracts.json")],
     }
     for case_id in STEPS:
         start = time.monotonic()
@@ -123,7 +126,7 @@ def main():
                 record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
         expected += manifest["full_prerequisites"]
     verdict = evaluate(expected, records)
-    report = {"schema_version": 1, "scope": "WP-02 foundation; no thermal or compatibility qualification",
+    report = {"schema_version": 1, "scope": "WP-02 foundation and WP-03 contracts; no thermal or compatibility qualification",
               "candidate": revision, "preset": args.preset, "tier": args.tier,
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
               "coverage_manifest_sha256": hashlib.sha256((ROOT / "ci/coverage.json").read_bytes()).hexdigest(),

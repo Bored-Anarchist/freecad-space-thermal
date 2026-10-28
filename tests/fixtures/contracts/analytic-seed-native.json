@@ -1,0 +1,147 @@
+{
+  "contract_version": "1.0.0",
+  "minimum_reader": "1.0.0",
+  "project_id": "00000000-0000-4000-8000-000000000001",
+  "revision": 0,
+  "entities": [
+    {
+      "id": "00000000-0000-4000-8000-000000000002",
+      "kind": "submodel"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000003",
+      "kind": "submodel"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000004",
+      "kind": "node",
+      "submodel_id": "00000000-0000-4000-8000-000000000002",
+      "classification": "capacitive",
+      "temperature": {
+        "value": 300,
+        "unit": "K"
+      },
+      "capacity": {
+        "value": 10,
+        "unit": "J/K"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000005",
+      "kind": "node",
+      "submodel_id": "00000000-0000-4000-8000-000000000003",
+      "classification": "prescribed",
+      "temperature": {
+        "value": 300,
+        "unit": "K"
+      },
+      "capacity": {
+        "value": 0,
+        "unit": "J/K"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000006",
+      "kind": "conductor",
+      "from_node_id": "00000000-0000-4000-8000-000000000004",
+      "to_node_id": "00000000-0000-4000-8000-000000000005",
+      "conductance": {
+        "value": 2,
+        "unit": "W/K"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000008",
+      "kind": "frame",
+      "origin": [
+        {
+          "value": 0,
+          "unit": "m"
+        },
+        {
+          "value": 0,
+          "unit": "m"
+        },
+        {
+          "value": 0,
+          "unit": "m"
+        }
+      ],
+      "rotation": [
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ]
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000017",
+      "kind": "load",
+      "node_id": "00000000-0000-4000-8000-000000000004",
+      "power": {
+        "value": 1,
+        "unit": "W"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000019",
+      "kind": "environment",
+      "frame_id": "00000000-0000-4000-8000-000000000008",
+      "background_temperature": {
+        "value": 300,
+        "unit": "K"
+      },
+      "solar_flux": {
+        "value": 0,
+        "unit": "W/m2"
+      },
+      "epoch": "2000-01-01T12:00:00",
+      "time_scale": "TAI",
+      "time_origin": {
+        "value": 0,
+        "unit": "s"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000022",
+      "kind": "case",
+      "mode": "transient",
+      "start": {
+        "value": 0,
+        "unit": "s"
+      },
+      "end": {
+        "value": 20,
+        "unit": "s"
+      },
+      "environment_id": "00000000-0000-4000-8000-000000000019",
+      "load_ids": [
+        "00000000-0000-4000-8000-000000000017"
+      ],
+      "control_ids": [],
+      "overlays": []
+    }
+  ],
+  "assumptions": [],
+  "limitations": [],
+  "source_maps": [],
+  "mappings": [],
+  "attachments": [],
+  "audit": {
+    "timestamp": "2026-01-01"
+  },
+  "gui": {
+    "selection": []
+  }
+}

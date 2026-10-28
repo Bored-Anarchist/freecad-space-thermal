@@ -15,3 +15,6 @@ fcst = "fcst_cli.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["python"]
+
+[tool.setuptools.package-data]
+fcst_contracts = ["bundle.json"]

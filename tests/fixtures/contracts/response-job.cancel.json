@@ -1,0 +1,8 @@
+{
+  "contract_version": "1.0.0",
+  "operation": "job.cancel",
+  "result": {
+    "job_id": "00000000-0000-4000-8000-000000000061",
+    "accepted": true
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "contract_version": "1.0.0",
+  "operation": "capabilities.get",
+  "result": {
+    "contract_version": "1.0.0",
+    "minimum_reader": "1.0.0",
+    "operations": [
+      "model.validate",
+      "model.hash",
+      "capabilities.get",
+      "thermal.conductor.create",
+      "job.submit",
+      "job.cancel",
+      "result.query"
+    ],
+    "solver_available": false,
+    "execution_mode": "fcst_native"
+  }
+}

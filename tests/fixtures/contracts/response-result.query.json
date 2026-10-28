@@ -1,0 +1,13 @@
+{
+  "contract_version": "1.0.0",
+  "operation": "result.query",
+  "result": {
+    "artifact": {
+      "path": "results/query.h5",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "byte_length": 0
+    },
+    "offset": 0,
+    "count": 2
+  }
+}
