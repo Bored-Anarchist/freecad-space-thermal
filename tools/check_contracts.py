@@ -45,10 +45,13 @@ def check(worker=None):
         encoded = struct.pack("<I", len(raw)) + raw
         frames = [("valid", encoded), ("short", encoded[:3]), ("truncated", encoded[:-1]),
                   ("trailing", encoded + b"x"), ("oversize", struct.pack("<I", 65537)), ("empty", struct.pack("<I", 0))]
+        for case_id in ("checkpoint-time-w", "checkpoint-time-min"):
+            raw = (fixtures / (case_id + ".json")).read_bytes()
+            frames.append((case_id, struct.pack("<I", len(raw)) + raw))
         for name, data in frames:
             result = inspect("worker-frame", data)
             native = subprocess.run([str(worker), "--contract", "worker-frame"], input=data, capture_output=True, timeout=30)
-            okay = result == json.loads(native.stdout) and native.returncode == (0 if name == "valid" else 1)
+            okay = result == json.loads(native.stdout) and native.returncode == (0 if name in ("valid", "checkpoint-time-min") else 1)
             records.append({"id": "frame-" + name, "status": "passed" if okay else "failed", "fixture_sha256": sha256(data).hexdigest()})
         if sorted("frame-" + name for name, _ in frames) != sorted(coverage["contract_frames"]):
             records.append({"id": "frame_coverage", "status": "failed"})

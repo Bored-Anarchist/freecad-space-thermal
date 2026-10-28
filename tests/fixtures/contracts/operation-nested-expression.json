@@ -1,0 +1,190 @@
+{
+  "contract_version": "1.0.0",
+  "project_id": "00000000-0000-4000-8000-000000000001",
+  "expected_revision": 0,
+  "idempotency_key": "00000000-0000-4000-8000-000000000062",
+  "operation": "model.validate",
+  "arguments": {
+    "snapshot": {
+      "contract_version": "1.0.0",
+      "minimum_reader": "1.0.0",
+      "project_id": "00000000-0000-4000-8000-000000000001",
+      "revision": 0,
+      "entities": [
+        {
+          "id": "00000000-0000-4000-8000-000000000002",
+          "kind": "submodel"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000003",
+          "kind": "submodel"
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000004",
+          "kind": "node",
+          "submodel_id": "00000000-0000-4000-8000-000000000002",
+          "classification": "capacitive",
+          "temperature": {
+            "value": 20,
+            "unit": "degC"
+          },
+          "capacity": {
+            "value": 100,
+            "unit": "J/K"
+          }
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000005",
+          "kind": "node",
+          "submodel_id": "00000000-0000-4000-8000-000000000003",
+          "classification": "prescribed",
+          "temperature": {
+            "value": 300,
+            "unit": "K"
+          },
+          "capacity": {
+            "value": 0,
+            "unit": "J/K"
+          }
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000006",
+          "kind": "conductor",
+          "from_node_id": "00000000-0000-4000-8000-000000000004",
+          "to_node_id": "00000000-0000-4000-8000-000000000005",
+          "conductance": {
+            "value": 2,
+            "unit": "W/K"
+          }
+        },
+        {
+          "id": "00000000-0000-4000-8000-000000000200",
+          "kind": "expression",
+          "dimension": "power",
+          "ast": {
+            "op": "negate",
+            "args": [
+              {
+                "op": "negate",
+                "args": [
+                  {
+                    "op": "negate",
+                    "args": [
+                      {
+                        "op": "negate",
+                        "args": [
+                          {
+                            "op": "negate",
+                            "args": [
+                              {
+                                "op": "negate",
+                                "args": [
+                                  {
+                                    "op": "negate",
+                                    "args": [
+                                      {
+                                        "op": "negate",
+                                        "args": [
+                                          {
+                                            "op": "negate",
+                                            "args": [
+                                              {
+                                                "op": "negate",
+                                                "args": [
+                                                  {
+                                                    "op": "negate",
+                                                    "args": [
+                                                      {
+                                                        "op": "negate",
+                                                        "args": [
+                                                          {
+                                                            "op": "negate",
+                                                            "args": [
+                                                              {
+                                                                "op": "negate",
+                                                                "args": [
+                                                                  {
+                                                                    "op": "negate",
+                                                                    "args": [
+                                                                      {
+                                                                        "op": "negate",
+                                                                        "args": [
+                                                                          {
+                                                                            "op": "literal",
+                                                                            "quantity": {
+                                                                              "value": 1,
+                                                                              "unit": "W"
+                                                                            }
+                                                                          }
+                                                                        ]
+                                                                      }
+                                                                    ]
+                                                                  }
+                                                                ]
+                                                              }
+                                                            ]
+                                                          }
+                                                        ]
+                                                      }
+                                                    ]
+                                                  }
+                                                ]
+                                              }
+                                            ]
+                                          }
+                                        ]
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "assumptions": [],
+      "limitations": [],
+      "source_maps": [
+        {
+          "id": "00000000-0000-4000-8000-000000000007",
+          "version": "1.0.0",
+          "source_revision": "0000000000000000000000000000000000000000000000000000000000000000",
+          "source_tool": "synthetic",
+          "source_version": "1.0",
+          "entries": [
+            {
+              "namespace": "submodel-a",
+              "handle": "101",
+              "entity_id": "00000000-0000-4000-8000-000000000004",
+              "submodel_handle": "a",
+              "node_number": 101
+            },
+            {
+              "namespace": "submodel-b",
+              "handle": "101",
+              "entity_id": "00000000-0000-4000-8000-000000000005",
+              "submodel_handle": "b",
+              "node_number": 101
+            }
+          ]
+        }
+      ],
+      "mappings": [],
+      "attachments": [],
+      "audit": {
+        "timestamp": "2026-01-01"
+      },
+      "gui": {
+        "selection": []
+      }
+    }
+  }
+}

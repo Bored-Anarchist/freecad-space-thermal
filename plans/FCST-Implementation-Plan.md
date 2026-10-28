@@ -193,6 +193,8 @@ See [WP-01 evidence](evidence/WP-01.json) and [inventory](../inventory/README.md
 
 WP-03 implementation is documented in the [v1 contract bundle](../spec/contracts/README.md), with executable evidence in [WP-03.json](evidence/WP-03.json). The shared local/CI fast driver checks generated-byte drift, frozen positive hashes, exact required case IDs, independent C++/Python normalized bytes/diagnostics/hashes, standard schema conformance and bounded native control frames. The acquired WP-01 feature reconciliation is included in the contract document; all vendor qualification gaps retain their owners. This freezes the native interface baseline; persistence, operation execution, actual worker jobs, thermal solving and complete Q0 closure remain subsequent work packages.
 
+The WP-03 verification follow-up adds frozen 64/65-record graph boundaries in both serialization and dependency-ID directions, valid and over-limit nested ASTs, checkpoint time-unit/frame cases and decoded Unicode-key cases. Both readers use complete-graph longest paths rather than cached traversal depth. TST-021 preflight scans the new synthetic JSON inputs and updated evidence as actual outgoing bytes; no raw engineering models, binary frames or local audit logs enter publication.
+
 ### Step 4 — WP-04: build numerical oracles and pass the Q0 prototype checkpoint
 
 1. Create fixture manifests with analytical equations or independently derived expected values, declared discretization, comparison quantities, tolerances, units, normalization floors and expected failure categories.

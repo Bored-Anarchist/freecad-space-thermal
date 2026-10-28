@@ -492,6 +492,147 @@
       "path": "depth-limit.json",
       "status": "failed",
       "code": "invalid_json"
+    },
+    {
+      "id": "expression-chain-64-ascending",
+      "kind": "model",
+      "path": "expression-chain-64-ascending.json",
+      "status": "passed",
+      "semantic_hash": "f1b7f81b5a91ccb237363ef827e9c801b663de9c56861e0bb0c9c817003facd5"
+    },
+    {
+      "id": "expression-chain-64-descending",
+      "kind": "model",
+      "path": "expression-chain-64-descending.json",
+      "status": "passed",
+      "same_hash_as": "expression-chain-64-ascending",
+      "semantic_hash": "f1b7f81b5a91ccb237363ef827e9c801b663de9c56861e0bb0c9c817003facd5"
+    },
+    {
+      "id": "expression-chain-65-ascending",
+      "kind": "model",
+      "path": "expression-chain-65-ascending.json",
+      "status": "failed",
+      "code": "expression"
+    },
+    {
+      "id": "expression-chain-65-descending",
+      "kind": "model",
+      "path": "expression-chain-65-descending.json",
+      "status": "failed",
+      "code": "expression"
+    },
+    {
+      "id": "expression-chain-65-leaf-first-ids",
+      "kind": "model",
+      "path": "expression-chain-65-leaf-first-ids.json",
+      "status": "failed",
+      "code": "expression"
+    },
+    {
+      "id": "manifest-chain-64-ascending",
+      "kind": "manifest",
+      "path": "manifest-chain-64-ascending.json",
+      "status": "passed",
+      "semantic_hash": "fb524c1525d7cdf20c2d9ff6819fcc697f9f16eab6c05ea850bc4dc760cde74d"
+    },
+    {
+      "id": "manifest-chain-64-descending",
+      "kind": "manifest",
+      "path": "manifest-chain-64-descending.json",
+      "status": "passed",
+      "semantic_hash": "b88d467075973d4de7a2dbd25a61a8c8faa8713ea225bfaef6cf7a363c65c139"
+    },
+    {
+      "id": "manifest-chain-65-ascending",
+      "kind": "manifest",
+      "path": "manifest-chain-65-ascending.json",
+      "status": "failed",
+      "code": "artifact"
+    },
+    {
+      "id": "manifest-chain-65-descending",
+      "kind": "manifest",
+      "path": "manifest-chain-65-descending.json",
+      "status": "failed",
+      "code": "artifact"
+    },
+    {
+      "id": "manifest-chain-65-leaf-first-ids",
+      "kind": "manifest",
+      "path": "manifest-chain-65-leaf-first-ids.json",
+      "status": "failed",
+      "code": "artifact"
+    },
+    {
+      "id": "expression-nesting-16",
+      "kind": "model",
+      "path": "expression-nesting-16.json",
+      "status": "passed",
+      "semantic_hash": "261f1c082a59967550feb987dbe7d70472977b19a6aec3293e1aacb2bcce7c67"
+    },
+    {
+      "id": "operation-nested-expression",
+      "kind": "operation",
+      "path": "operation-nested-expression.json",
+      "status": "passed",
+      "semantic_hash": "3e6d4f2e382c17fd076018810697eecddd982da777bd2386384dd31b9d714d7c"
+    },
+    {
+      "id": "expression-nesting-29",
+      "kind": "model",
+      "path": "expression-nesting-29.json",
+      "status": "passed",
+      "semantic_hash": "c876ace9a64f39e725cc098b87dc4d5e3843c22c680a265f18534761e1227ed9"
+    },
+    {
+      "id": "expression-nesting-30",
+      "kind": "model",
+      "path": "expression-nesting-30.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "checkpoint-time-w",
+      "kind": "worker",
+      "path": "checkpoint-time-w.json",
+      "status": "failed",
+      "code": "dimension"
+    },
+    {
+      "id": "checkpoint-time-degc",
+      "kind": "worker",
+      "path": "checkpoint-time-degc.json",
+      "status": "failed",
+      "code": "dimension"
+    },
+    {
+      "id": "checkpoint-time-min",
+      "kind": "worker",
+      "path": "checkpoint-time-min.json",
+      "status": "passed",
+      "semantic_hash": "c1800ca10b394b3393a99fc3d202b9ac6c32baad517d80fa3a3d8ef7d957e305"
+    },
+    {
+      "id": "unpaired-surrogate-key",
+      "kind": "model",
+      "path": "unpaired-surrogate-key.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "unpaired-surrogate-nested-key",
+      "kind": "model",
+      "path": "unpaired-surrogate-nested-key.json",
+      "status": "failed",
+      "code": "invalid_json"
+    },
+    {
+      "id": "valid-unicode-unknown-key",
+      "kind": "model",
+      "path": "valid-unicode-unknown-key.json",
+      "status": "failed",
+      "code": "schema"
     }
   ]
 }

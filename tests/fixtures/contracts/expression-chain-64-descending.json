@@ -1,0 +1,668 @@
+{
+  "contract_version": "1.0.0",
+  "minimum_reader": "1.0.0",
+  "project_id": "00000000-0000-4000-8000-000000000001",
+  "revision": 0,
+  "entities": [
+    {
+      "id": "00000000-0000-4000-8000-000000000163",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "literal",
+        "quantity": {
+          "value": 1,
+          "unit": "W"
+        }
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000162",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000163"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000161",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000162"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000160",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000161"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000159",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000160"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000158",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000159"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000157",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000158"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000156",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000157"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000155",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000156"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000154",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000155"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000153",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000154"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000152",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000153"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000151",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000152"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000150",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000151"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000149",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000150"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000148",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000149"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000147",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000148"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000146",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000147"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000145",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000146"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000144",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000145"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000143",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000144"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000142",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000143"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000141",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000142"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000140",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000141"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000139",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000140"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000138",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000139"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000137",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000138"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000136",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000137"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000135",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000136"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000134",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000135"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000133",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000134"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000132",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000133"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000131",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000132"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000130",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000131"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000129",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000130"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000128",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000129"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000127",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000128"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000126",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000127"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000125",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000126"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000124",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000125"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000123",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000124"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000122",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000123"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000121",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000122"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000120",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000121"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000119",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000120"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000118",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000119"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000117",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000118"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000116",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000117"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000115",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000116"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000114",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000115"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000113",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000114"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000112",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000113"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000111",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000112"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000110",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000111"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000109",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000110"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000108",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000109"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000107",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000108"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000106",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000107"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000105",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000106"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000104",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000105"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000103",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000104"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000102",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000103"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000101",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000102"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000100",
+      "kind": "expression",
+      "dimension": "power",
+      "ast": {
+        "op": "symbol",
+        "expression_id": "00000000-0000-4000-8000-000000000101"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000006",
+      "kind": "conductor",
+      "from_node_id": "00000000-0000-4000-8000-000000000004",
+      "to_node_id": "00000000-0000-4000-8000-000000000005",
+      "conductance": {
+        "value": 2,
+        "unit": "W/K"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000005",
+      "kind": "node",
+      "submodel_id": "00000000-0000-4000-8000-000000000003",
+      "classification": "prescribed",
+      "temperature": {
+        "value": 300,
+        "unit": "K"
+      },
+      "capacity": {
+        "value": 0,
+        "unit": "J/K"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000004",
+      "kind": "node",
+      "submodel_id": "00000000-0000-4000-8000-000000000002",
+      "classification": "capacitive",
+      "temperature": {
+        "value": 20,
+        "unit": "degC"
+      },
+      "capacity": {
+        "value": 100,
+        "unit": "J/K"
+      }
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000003",
+      "kind": "submodel"
+    },
+    {
+      "id": "00000000-0000-4000-8000-000000000002",
+      "kind": "submodel"
+    }
+  ],
+  "assumptions": [],
+  "limitations": [],
+  "source_maps": [
+    {
+      "id": "00000000-0000-4000-8000-000000000007",
+      "version": "1.0.0",
+      "source_revision": "0000000000000000000000000000000000000000000000000000000000000000",
+      "source_tool": "synthetic",
+      "source_version": "1.0",
+      "entries": [
+        {
+          "namespace": "submodel-a",
+          "handle": "101",
+          "entity_id": "00000000-0000-4000-8000-000000000004",
+          "submodel_handle": "a",
+          "node_number": 101
+        },
+        {
+          "namespace": "submodel-b",
+          "handle": "101",
+          "entity_id": "00000000-0000-4000-8000-000000000005",
+          "submodel_handle": "b",
+          "node_number": 101
+        }
+      ]
+    }
+  ],
+  "mappings": [],
+  "attachments": [],
+  "audit": {
+    "timestamp": "2026-01-01"
+  },
+  "gui": {
+    "selection": []
+  }
+}

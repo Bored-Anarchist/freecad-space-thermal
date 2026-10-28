@@ -7,9 +7,11 @@
 #include <charconv>
 #include <cmath>
 #include <cstdint>
+#include <functional>
 #include <iomanip>
 #include <limits>
 #include <map>
+#include <queue>
 #include <regex>
 #include <set>
 #include <sstream>
@@ -156,10 +158,10 @@ const J& bundle() {
   return b;
 }
 bool contains(const J& a,const J& v) { return std::find(a.arr().begin(),a.arr().end(),v)!=a.arr().end(); }
-void validate(const J& s,const J& j,const J& root,int depth=0) {
-  if(depth>64) fail("schema");
-  if(s.has("$ref")) { auto r=s.at("$ref").str(); return validate(root.at("$defs").at(r.substr(r.rfind('/')+1)),j,root,depth+1); }
-  if(s.has("oneOf")) { int count=0; for(const auto& c:s.at("oneOf").arr()) { try {validate(c,j,root,depth+1);++count;} catch(const Error&) {} } if(count!=1) fail("schema"); return; }
+void validate(const J& s,const J& j,const J& root,int depth=0,int schema_hops=0) {
+  if(depth>64 || schema_hops>64) fail("schema");
+  if(s.has("$ref")) { auto r=s.at("$ref").str(); return validate(root.at("$defs").at(r.substr(r.rfind('/')+1)),j,root,depth,schema_hops+1); }
+  if(s.has("oneOf")) { int count=0; for(const auto& c:s.at("oneOf").arr()) { try {validate(c,j,root,depth,schema_hops+1);++count;} catch(const Error&) {} } if(count!=1) fail("schema"); return; }
   if(s.has("const") && !(s.at("const")==j)) fail("schema");
   if(s.has("enum") && !contains(s.at("enum"),j)) fail("schema");
   if(!s.has("type")) return;
@@ -209,14 +211,40 @@ const J& target(const Entities& es,const std::string& id,const std::string& kind
 double det(const J& r) {
   double out=0; for(std::size_t i=0;i<3;++i) out+=r.at(0).at(i).num()*(r.at(1).at((i+1)%3).num()*r.at(2).at((i+2)%3).num()-r.at(1).at((i+2)%3).num()*r.at(2).at((i+1)%3).num()); return out;
 }
+using Graph=std::map<std::string,std::set<std::string>>;
+std::vector<std::string> dependency_order(const Graph& graph,const std::string& limit_code,bool entity_context=false) {
+  std::map<std::string,std::vector<std::string>> parents;
+  std::map<std::string,std::size_t> remaining,heights;
+  auto reject=[&](const std::string& code,const std::string& key) {throw Error{code,entity_context?key:"",{}};};
+  for(const auto& [key,children]:graph) {remaining[key]=children.size();heights[key]=1;}
+  for(const auto& [key,children]:graph) for(const auto& child:children) {
+    if(!graph.contains(child)) reject("reference",key);
+    parents[child].push_back(key);
+  }
+  std::priority_queue<std::string,std::vector<std::string>,std::greater<std::string>> ready;
+  for(const auto& [key,count]:remaining) if(count==0) ready.push(key);
+  std::vector<std::string> order;
+  while(!ready.empty()) {
+    auto child=ready.top();ready.pop();order.push_back(child);
+    for(const auto& parent:parents[child]) {
+      heights[parent]=std::max(heights[parent],heights[child]+1);
+      if(--remaining[parent]==0) ready.push(parent);
+    }
+  }
+  if(order.size()!=graph.size()) for(const auto& [key,count]:remaining) if(count!=0) reject("cycle",key);
+  for(const auto& [key,height]:heights) if(height>64) reject(limit_code,key);
+  return order;
+}
+void expression_symbols(const J& ast,std::set<std::string>& symbols) {
+  auto op=ast.at("op").str();
+  if(op=="symbol") symbols.insert(ast.at("expression_id").str());
+  else if(op=="table") expression_symbols(ast.at("input"),symbols);
+  else if(ast.has("args")) for(const auto& child:ast.at("args").arr()) expression_symbols(child,symbols);
+}
 struct Expressions {
   const Entities& es;
   std::map<std::string,std::string> visited;
-  std::set<std::string> active;
   std::string id(const std::string& key) {
-    const auto& e=target(es,key,"expression"); if(active.contains(key)) fail("cycle");
-    if(active.size()>=64) fail("expression");
-    if(!visited.contains(key)) { active.insert(key); auto d=infer(e.at("ast")); if(d!=e.at("dimension").str()) fail("dimension"); visited[key]=d; active.erase(key); }
     return visited.at(key);
   }
   std::string infer(const J& ast) {
@@ -318,13 +346,21 @@ void check_model(const J& m) {
     target(es,a.at("entity_id").str(),"facet element load"); const auto& f=target(es,a.at("face_id").str(),"face"); const auto& g=target(es,f.at("geometry_id").str(),"geometry");
     if(a.at("state").str()!="resolved" || a.at("source_revision")!=g.at("revision") || a.at("persistent_ref")!=f.at("persistent_ref") || a.at("signature")!=f.at("signature")) fail("attachment");
   }
-  Expressions expressions{es,{}, {}};
-  for(const auto& [id,e]:es) if(e.at("kind").str()=="expression") {
-    try { expressions.id(id); } catch(Error& error) {
-      error.entity=id;
-      for(const auto& source:m.at("source_maps").arr()) for(const auto& entry:source.at("entries").arr()) if(entry.at("entity_id").str()==id && error.source.empty()) error.source=source.at("id").str();
-      throw;
+  Expressions expressions{es,{}};
+  Graph graph;
+  for(const auto& [id,e]:es) if(e.at("kind").str()=="expression") expression_symbols(e.at("ast"),graph[id]);
+  try {
+    for(const auto& id:dependency_order(graph,"expression",true)) {
+      try {
+        const auto& e=es.at(id);
+        auto dimension=expressions.infer(e.at("ast"));
+        if(dimension!=e.at("dimension").str()) fail("dimension");
+        expressions.visited[id]=dimension;
+      } catch(Error& error) {error.entity=id;throw;}
     }
+  } catch(Error& error) {
+    for(const auto& source:m.at("source_maps").arr()) for(const auto& entry:source.at("entries").arr()) if(entry.at("entity_id").str()==error.entity && error.source.empty()) error.source=source.at("id").str();
+    throw;
   }
 }
 void artifacts(const J& j) {
@@ -359,12 +395,12 @@ J read(const std::string& kind,J j) {
       if(!by_id.emplace(r.at("id").str(),r).second || !paths.insert(path).second) fail("duplicate_id");
     }
     auto model=j.at("model_artifact_id").str(); if(!by_id.contains(model) || by_id.at(model).at("role").str()!="model") fail("reference");
-    std::set<std::string> active,visited;
-    auto visit=[&](auto&& self,const std::string& key)->void {
-      if(!by_id.contains(key)) fail("reference"); if(active.contains(key)) fail("cycle"); if(active.size()>=64) fail("artifact");
-      if(!visited.contains(key)) { active.insert(key); for(const auto& d:by_id.at(key).at("dependencies").arr()) self(self,d.str()); active.erase(key);visited.insert(key); }
-    };
-    for(const auto& [key,v]:by_id) { (void)v;visit(visit,key); }
+    Graph graph;
+    for(const auto& [key,v]:by_id) {
+      auto& children=graph[key];
+      for(const auto& child:v.at("dependencies").arr()) children.insert(child.str());
+    }
+    dependency_order(graph,"artifact");
   }
   if(kind=="operation") {
     auto op=j.at("operation").str(); auto& args=j.at("arguments");
@@ -372,6 +408,7 @@ J read(const std::string& kind,J j) {
     if(op=="thermal.conductor.create") { quantity(args.at("conductance"),"conductance",0); std::set<std::string> ids{args.at("id").str(),args.at("from_node_id").str(),args.at("to_node_id").str()}; if(ids.size()!=3) fail("reference"); }
   }
   if(kind=="worker" && j.at("type").str()=="terminal" && ((j.at("payload").at("outcome").str()=="succeeded")!=j.at("payload").has("result"))) fail("artifact");
+  if(kind=="worker" && j.at("type").str()=="checkpoint") quantity(j.at("payload").at("time"),"time");
   return j;
 }
 J snapshot(J m) {

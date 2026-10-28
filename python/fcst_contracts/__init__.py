@@ -61,6 +61,9 @@ def loads(raw):
                 fail("invalid_json")
             if isinstance(v, str):
                 v.encode("utf-8")
+            if isinstance(v, dict):
+                for key in v:
+                    key.encode("utf-8")
             for x in (v.values() if isinstance(v, dict) else v if isinstance(v, list) else []):
                 bounded(x, depth + 1)
         bounded(value)
@@ -71,18 +74,18 @@ def loads(raw):
         fail("invalid_json")
 
 
-def validate(schema, value, root=None, depth=0):
+def validate(schema, value, root=None, depth=0, schema_hops=0):
     """The frozen schema vocabulary; unknown keywords are never accepted in bundles."""
-    if depth > 64:
+    if depth > 64 or schema_hops > 64:
         fail("schema")
     root = root or schema
     if "$ref" in schema:
-        return validate(root["$defs"][schema["$ref"].split("/")[-1]], value, root, depth + 1)
+        return validate(root["$defs"][schema["$ref"].split("/")[-1]], value, root, depth, schema_hops + 1)
     if "oneOf" in schema:
         count = 0
         for choice in schema["oneOf"]:
             try:
-                validate(choice, value, root, depth + 1)
+                validate(choice, value, root, depth, schema_hops + 1)
                 count += 1
             except ContractError:
                 pass
@@ -176,24 +179,49 @@ def quantity(value, dimension, minimum=None, strict=False):
     return number
 
 
+def dependency_order(graph, limit_code, entity_context=False):
+    """Children first, with longest-path limits independent of input/cache order."""
+    import heapq
+    parents = {key: [] for key in graph}
+    remaining = {key: len(children) for key, children in graph.items()}
+    heights = dict.fromkeys(graph, 1)
+    def reject(code, key):
+        raise ContractError(code, "/entities" if entity_context else "", key if entity_context else None)
+    for key in sorted(graph):
+        for child in sorted(graph[key]):
+            if child not in graph:
+                reject("reference", key)
+            parents[child].append(key)
+    ready = [key for key in graph if not remaining[key]]
+    heapq.heapify(ready)
+    order = []
+    while ready:
+        child = heapq.heappop(ready)
+        order.append(child)
+        for parent in parents[child]:
+            heights[parent] = max(heights[parent], heights[child] + 1)
+            remaining[parent] -= 1
+            if not remaining[parent]:
+                heapq.heappush(ready, parent)
+    if len(order) != len(graph):
+        reject("cycle", min(key for key in graph if remaining[key]))
+    for key in sorted(graph):
+        if heights[key] > 64:
+            reject(limit_code, key)
+    return order
+
+
 def expression_types(entities):
     expressions = {key: value for key, value in entities.items() if value["kind"] == "expression"}
-    visited, active = {}, set()
+    def symbols(ast):
+        if ast["op"] == "symbol":
+            return {ast["expression_id"]}
+        children = [ast["input"]] if ast["op"] == "table" else ast.get("args", [])
+        return set().union(*(symbols(child) for child in children))
+    order = dependency_order({key: symbols(e["ast"]) for key, e in expressions.items()}, "expression", True)
+    visited = {}
     dims = BUNDLE["dimensions"]
     def infer_id(key):
-        if key not in expressions:
-            fail("reference")
-        if key in active:
-            fail("cycle")
-        if len(active) >= 64:
-            fail("expression")
-        if key not in visited:
-            active.add(key)
-            inferred = infer(expressions[key]["ast"])
-            if inferred != expressions[key]["dimension"]:
-                fail("dimension")
-            visited[key] = inferred
-            active.remove(key)
         return visited[key]
     def infer(ast):
         op = ast["op"]
@@ -238,9 +266,12 @@ def expression_types(entities):
             if name not in ("temperature", "angle") and dimensions == target:
                 return name
         fail("dimension")
-    for key in expressions:
+    for key in order:
         try:
-            infer_id(key)
+            inferred = infer(expressions[key]["ast"])
+            if inferred != expressions[key]["dimension"]:
+                fail("dimension")
+            visited[key] = inferred
         except ContractError as error:
             error.diagnostic = Diagnostic(error.diagnostic.code, "/entities", key)
             raise
@@ -412,22 +443,7 @@ def read(kind, document):
             fail("duplicate_id")
         if value["model_artifact_id"] not in by_id or by_id[value["model_artifact_id"]]["role"] != "model":
             fail("reference")
-        active, visited = set(), set()
-        def visit(key):
-            if key not in by_id:
-                fail("reference")
-            if key in active:
-                fail("cycle")
-            if len(active) >= 64:
-                fail("artifact")
-            if key not in visited:
-                active.add(key)
-                for dependency in by_id[key]["dependencies"]:
-                    visit(dependency)
-                active.remove(key)
-                visited.add(key)
-        for key in by_id:
-            visit(key)
+        dependency_order({key: set(r["dependencies"]) for key, r in by_id.items()}, "artifact")
     if kind == "operation":
         op, args = value["operation"], value["arguments"]
         if op in ("model.hash", "model.validate"):
@@ -439,6 +455,8 @@ def read(kind, document):
     if kind == "worker" and value["type"] == "terminal":
         if (value["payload"]["outcome"] == "succeeded") != ("result" in value["payload"]):
             fail("artifact")
+    if kind == "worker" and value["type"] == "checkpoint":
+        quantity(value["payload"]["time"], "time")
     return value
 
 

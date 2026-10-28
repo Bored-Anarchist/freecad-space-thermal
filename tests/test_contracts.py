@@ -2,6 +2,7 @@
 import copy
 from hashlib import sha256
 import json
+import random
 from pathlib import Path
 import struct
 import subprocess
@@ -21,6 +22,61 @@ def fixture(name):
 
 
 class ContractTests(unittest.TestCase):
+    def test_dependency_limits_hold_for_permutations_and_shared_paths(self):
+        rng = random.Random(3)
+        for kind, prefix, field, code in (("model", "expression", "entities", "expression"),
+                                          ("manifest", "manifest", "artifacts", "artifact")):
+            for count in (64, 65):
+                model = fixture(f"{prefix}-chain-{count}-ascending")
+                original = inspect(kind, json.dumps(model).encode())
+                for _ in range(4):
+                    rng.shuffle(model[field])
+                    observed = inspect(kind, json.dumps(model).encode())
+                    self.assertEqual(observed["status"], "passed" if count == 64 else "failed")
+                    if count == 65:
+                        self.assertEqual(observed["code"], code)
+                    elif kind == "model":
+                        self.assertEqual(observed["semantic_hash"], original["semantic_hash"])
+            # The terminal has the smallest UUID, so prior memoization cannot hide
+            # the actual longest path through nodes already visited by UUID order.
+            observed = inspect(kind, json.dumps(fixture(f"{prefix}-chain-65-leaf-first-ids")).encode())
+            self.assertEqual(observed["code"], code)
+        manifest = fixture("manifest-chain-64-ascending")
+        root = copy.deepcopy(manifest["artifacts"][0])
+        root["id"] = "00000000-0000-4000-8000-000000000999"
+        root["artifact"]["path"] = "arrays/shared-root.json"
+        root["dependencies"] = [r["id"] for r in manifest["artifacts"]]
+        manifest["artifacts"].append(root)
+        self.assertEqual(inspect("manifest", json.dumps(manifest).encode())["code"], "artifact")
+
+    def test_expression_nesting_uses_document_depth(self):
+        for levels in (16, 29):
+            raw = (FIXTURES / f"expression-nesting-{levels}.json").read_bytes()
+            self.assertEqual(inspect("model", raw)["status"], "passed")
+        raw = (FIXTURES / "expression-nesting-30.json").read_bytes()
+        self.assertEqual(inspect("model", raw)["code"], "invalid_json")
+        self.assertEqual(inspect("operation", (FIXTURES / "operation-nested-expression.json").read_bytes())["status"], "passed")
+
+    def test_checkpoint_time_units_are_checked_in_messages_and_frames(self):
+        for name in ("checkpoint-time-w", "checkpoint-time-degc"):
+            message = fixture(name)
+            with self.assertRaises(ContractError) as caught:
+                frame(message)
+            self.assertEqual(caught.exception.diagnostic.code, "dimension")
+            raw = json.dumps(message).encode()
+            self.assertEqual(inspect("worker-frame", struct.pack("<I", len(raw)) + raw)["code"], "dimension")
+        normalized = unframe(frame(fixture("checkpoint-time-min")))
+        self.assertEqual(normalized["payload"]["time"], {"value": 180, "unit": "s"})
+
+    def test_unicode_keys_validate_in_nested_objects(self):
+        for name in ("unpaired-surrogate-key", "unpaired-surrogate-nested-key"):
+            with self.assertRaises(ContractError) as caught:
+                loads((FIXTURES / (name + ".json")).read_bytes())
+            self.assertEqual(caught.exception.diagnostic.code, "invalid_json")
+        escaped_pair = chr(92) + "ud83d" + chr(92) + "ude80"
+        value = loads('{"' + escaped_pair + '":1}')
+        self.assertEqual(list(value), ["\U0001f680"])
+
     def test_generated_bundle_and_native_table_cannot_drift(self):
         result = subprocess.run([sys.executable, str(ROOT / "tools/generate_contracts.py"), "--check"],
                                 capture_output=True, timeout=30)

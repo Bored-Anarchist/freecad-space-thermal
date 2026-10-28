@@ -8,23 +8,23 @@
       "id": "windows-debug",
       "status": "passed",
       "command": "python tools/verify.py --preset windows-debug",
-      "required_checks": 71,
-      "contract_cases": 76,
-      "evidence": "58 Python cases and 13 driver steps; generated-byte drift, installed native reader, frozen hashes, normalized bytes/diagnostics, framed control messages, CTest and engine-only rejection of unimplemented solving all pass"
+      "required_checks": 75,
+      "contract_cases": 98,
+      "evidence": "62 Python cases and 13 driver steps; 98 independent C++/Python contract and framing cases pass, including longest dependency paths at 64/65 records in both array and UUID directions, valid nested ASTs and JSON depth limits, checkpoint time dimensions and decoded Unicode keys"
     },
     {
       "id": "windows-release",
       "status": "passed",
       "command": "python tools/verify.py --preset windows-release",
-      "required_checks": 71,
-      "contract_cases": 76,
-      "evidence": "58 Python cases and 13 driver steps; generated-byte drift, installed native reader, frozen hashes, normalized bytes/diagnostics, framed control messages, CTest and engine-only rejection of unimplemented solving all pass"
+      "required_checks": 75,
+      "contract_cases": 98,
+      "evidence": "62 Python cases and 13 driver steps; 98 independent C++/Python contract and framing cases pass, including longest dependency paths at 64/65 records in both array and UUID directions, valid nested ASTs and JSON depth limits, checkpoint time dimensions and decoded Unicode keys"
     },
     {
       "id": "publication-security-regressions",
       "status": "passed",
       "command": "python -S tools/check_security.py",
-      "evidence": "All 58 required regression cases pass, including planted private data, history/metadata, staged bytes, nested archives and safe-report tests"
+      "evidence": "All 62 standard-library regression cases pass, including the four verification fixes and planted privacy/history/metadata/archive cases"
     },
     {
       "id": "inventory-contract-reconciliation",
@@ -34,13 +34,13 @@
   ],
   "tested_input_sha256": {
     "python/fcst_contracts/bundle.json": "de6fbd9a9bb197de6756c4e6278678540b3011bfe210a90046500a69e2c0573c",
-    "python/fcst_contracts/__init__.py": "c27b8bc11542a888df0b769cf707d087b63084c112f697a2759d8c5f0a8cae03",
+    "python/fcst_contracts/__init__.py": "b88f3e1a26ddd3757b43a019d6c3f36ff73d8a3d520cf538b65d92ab92aad479",
     "python/fcst_contracts/worker.py": "a8da22e6d4c3534ce73494312fd0641ed10bfb2866ab34ef87a196a9827fbadf",
-    "engine/src/contracts.cpp": "ed5cda83b85da77992b9c95f89f449f4f0fbcff88f4ac9a5551f24049810064c",
+    "engine/src/contracts.cpp": "895d714e1021a60525af03c276718f4990e81d0074769f55466b0ea74151a83d",
     "engine/worker/main.cpp": "7546cab0874ce164b593e7012445d679be087c53740de1f1e65f55fdb655fd1c",
-    "tests/fixtures/contracts/cases.json": "5a3a0d82c16aad17bbd97f831775f4816359f26e52e35288d39dd07e02398986",
-    "tests/test_contracts.py": "3df38f33f62c18e7ee91c44e7301cc7b89d11bb41231dd2ac802275abebad67e",
-    "tools/check_contracts.py": "3b5952cec6842b944f77d83c7146417d47ff9120747ee18353e3775120b106a0",
+    "tests/fixtures/contracts/cases.json": "c9964bb6cd8995f56771f304b4ea4945758584fc267e76bd78caaff818096c97",
+    "tests/test_contracts.py": "1ed1e1529d354877d482afdc604af871d850e1133199a658c2053683ec1c650c",
+    "tools/check_contracts.py": "5f7d2d0dbddf6450d956714d73779b6b07e3b4b13906a89e497636d06d52569d",
     "tools/generate_contracts.py": "4ff16d2bd638ffd2ae61645eff8a87adea6529cf2dc46321fea61b9aeefaa856",
     "tools/verify.py": "1744b83308870a4873dd55e96874769dd93005a63ad2a4b2ec9db3217bd13d14"
   },
@@ -53,5 +53,13 @@
     "WP-11/12/16/17 owned physics, advanced properties, radiation and environments",
     "WP-14 live API/MCP authorization and runtime operation execution"
   ],
-  "evidence_policy": "Synthetic contract fixtures are public inputs, not executed solver results. Raw build/test logs, executables, array files and original engineering models remain local. TST-021 preflight must clear exact staged/outgoing history, metadata, bounded reports and PR payload before publication. Full Q1 requirements and physics/compatibility suites remain planned."
+  "evidence_policy": "Synthetic contract fixtures are public inputs, not executed solver results. Raw build/test logs, executables, array files and original engineering models remain local. TST-021 preflight must clear exact staged/outgoing history, metadata, bounded reports and PR payload before publication. Full Q1 requirements and physics/compatibility suites remain planned.",
+  "verification_followup": {
+    "status": "passed",
+    "dependency_limits": "Iterative children-first graph validation computes longest paths independently of memoization, UUID direction or serialization order; deterministic cycle/reference errors remain enforced",
+    "nesting_limits": "Input child depth and per-value schema traversal budgets are separate; valid 16/29-level expressions pass and over-limit JSON rejects",
+    "checkpoint_units": "Direct and framed readers require the time dimension and normalize minutes to seconds",
+    "unicode_keys": "Decoded keys and values, including nested objects, reject unpaired surrogates consistently",
+    "contract_compatibility": "Published contract version and prior positive semantic hashes remain unchanged; this corrects implementation against the existing v1 rules"
+  }
 }
