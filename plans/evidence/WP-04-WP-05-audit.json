@@ -1,0 +1,136 @@
+{
+  "work_packages": [
+    "WP-04",
+    "WP-05"
+  ],
+  "status": "complete",
+  "scope": "Verification corrections for the bounded Q0 prototype and native persistence/transaction service; later product and vendor obligations remain unchanged",
+  "tested_candidate": "f7b7b05b42753a0bcd87ec225b9201e2967da489",
+  "decision": "docs/decisions/0002-wp04-wp05-verification.md",
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "required_checks": 114,
+      "unit_cases": 99,
+      "contract_cases": 98,
+      "numerical_cases": 23,
+      "persistence_cases": 8,
+      "report_sha256": "8a170f5de73c988685db18d8a2ba6d576fd4cdf360fe096844f9b3a2fc812dcf",
+      "numerical_report_sha256": "082eb0be5122f0cc12819edc748872bd294c32bb63c572beefe90a31c51da3b0",
+      "persistence_report_sha256": "029caa76989f4490c9edf14d196b6d435da588b9a14692cd801639a4f3d4c1d8"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "required_checks": 114,
+      "unit_cases": 99,
+      "contract_cases": 98,
+      "numerical_cases": 23,
+      "persistence_cases": 8,
+      "report_sha256": "5039ab8941b9e3ded7a657628c5b67b65fe71f5f01db50c0d0b028b849877fcb",
+      "numerical_report_sha256": "a57162f74d07459452c81e891a7c641a8b0baf1899c42a638a5971d7ff34ec68",
+      "persistence_report_sha256": "029caa76989f4490c9edf14d196b6d435da588b9a14692cd801639a4f3d4c1d8"
+    },
+    {
+      "id": "frozen-reference",
+      "status": "passed",
+      "command": "python tools/check_numerical.py --require-reference",
+      "required_cases": 23,
+      "manifest_sha256": "45b85fa96f7b5bfce387b620492e0ed22550a871c26d0182e4a7db35c730e313",
+      "report_sha256": "477172f083806afc1c8f4addb976fbe76e65e6bbf7007c1e8438a2ae3787701a"
+    },
+    {
+      "id": "security-regressions",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "required_cases": 99,
+      "report_sha256": "75c0173a7851ec8bc701a1c0e653a36d76bc693e0609f79530cc7d97435593bf"
+    }
+  ],
+  "findings": [
+    {
+      "id": "WP04-R01",
+      "status": "fixed",
+      "problem": "Restart prefix comparisons could accept truncated output or mismatched time/control/algebraic/energy/Jacobian state",
+      "correction": "Complete checkpoint/resume sample and event coverage with typed finite state and SI-specific criteria"
+    },
+    {
+      "id": "WP04-R02",
+      "status": "fixed",
+      "problem": "Steady assessment trusted a reported negative or nonfinite norm",
+      "correction": "Finite nonnegative norm plus independent heat balances"
+    },
+    {
+      "id": "WP04-R03",
+      "status": "fixed",
+      "problem": "Deep Windows checkouts exceeded native linker path limits",
+      "correction": "Short checkout-scoped native dependency and prototype build cache; sealed evidence stays with each attempt"
+    },
+    {
+      "id": "WP05-R01",
+      "status": "fixed",
+      "problem": "Create-only authority accepted deletions and batches",
+      "correction": "Exactly one new insertion with no deletions or replacement"
+    },
+    {
+      "id": "WP05-R02",
+      "status": "fixed",
+      "problem": "Re-export rehashed corrupt originals and dropped model graph or audit identity metadata",
+      "correction": "Original manifest pins verified before mutations and export; preserve dependency edges paths audit IDs and collision-free generated IDs"
+    },
+    {
+      "id": "WP05-R03",
+      "status": "fixed",
+      "problem": "Result data dependencies could be absent or disagree with actual HDF5 metadata",
+      "correction": "Closed typed references plus matching role semantic hash node order time count quantities and scalar attributes"
+    },
+    {
+      "id": "WP05-R04",
+      "status": "fixed",
+      "problem": "A delayed save captured an old snapshot before the destination lock",
+      "correction": "Select snapshots after acquiring the destination lock"
+    },
+    {
+      "id": "WP05-R05",
+      "status": "fixed",
+      "problem": "Overlapping host syncs could adopt competing bytes or collide with operational paths",
+      "correction": "Project and destination leases prepared-journal checks and target-alias rejection"
+    },
+    {
+      "id": "WP05-R06",
+      "status": "fixed",
+      "problem": "Stat-then-read and direct in-memory manifests could exceed inspected byte budgets",
+      "correction": "Bound actual reads and enforce the same JSON budget before store creation"
+    }
+  ],
+  "tested_input_sha256": {
+    "python/fcst_tools/numerical.py": "0628323d5b18a0596e03e91000e33f0b8f6bfcd820f721a5978e0d92d5ccec57",
+    "tools/check_numerical.py": "e8d4f33968d72d02b0718c95eeda72ce29935a3a4f2840f02d8a26b448316d3f",
+    "tests/test_numerical.py": "a2862a0b288d7e9764f792a8792948a4f606962bb000dbff2e38d72f9dd65f43",
+    "python/fcst_app/persistence.py": "46f585dfa18deccea7995c73f271f18adae4995276d764cb819e5a5700bb6e94",
+    "python/fcst_app/store.py": "cc68d83227f21828af7f2ccb97771e73c14ba4468ff21915a5946ea856966e66",
+    "python/fcst_app/arrays.py": "1bbb1a369796ff4da422ed63edd898a5479aec4db782c20bb4b2a016556f14ab",
+    "tests/test_persistence.py": "b99f73258f4db635ada9431e94aacce4c29bd7330207e1bb9008b6d466292ac9",
+    "tools/check_persistence.py": "d7549351bc56a1212272bf1cd340fd965e3e87ec0c51b20b6e78ad6ea3b95af1",
+    "ci/coverage.json": "5d105d68e211025a684d2effe82fa3636649da8e5d25dc55dd2977ba126dd6ac",
+    "ci/numerical-criteria-v1.json": "ade493eba9c1f67ebbb501dffb7190d2f2c882ef2df367b699c1abb95a3b2c5c",
+    "ci/numerical-reference.json": "1f9762f104cd174d02ead57c8b308c33c3cec89eb8801d8123f3ac6d3d92b236",
+    "tests/fixtures/numerical/checkpoint-v1.json": "b18c785abb59858974c889185f436f9c3cace2493d484fa652b719eab17df15e",
+    "plans/automated-test-requirements.csv": "d26caae49259f987f75b4801e907f5871b7eae67d0d43f60763056b16d386e93",
+    "plans/requirement-traceability.csv": "1968fe57df9e4a6f5055dd5f7c4e04a805f0fc800e0ed35e3c4c7673b8bbdf51"
+  },
+  "preserved_numerical_baseline_sha256": "a33b53bc3469e9f90cf67fc6500276f11c64a220c0c74f8eb01368c1d1df8b37",
+  "criteria_changed": false,
+  "statistical_policy_changed": false,
+  "blockers": [],
+  "remaining_obligations": [
+    "Production physics and general DAE/sparse graphs in their owning packages",
+    "WP-06 worker/job lifecycle and immutable result publication",
+    "WP-13/14/15 actual host workflows authorization transports and application parity",
+    "All vendor qualification and complete release/redistribution obligations"
+  ],
+  "evidence_policy": "Synthetic public regressions bounded verdicts and exact source/report hashes only. Original baseline plus sealed failed and successful attempts remain preserved. Raw models generated packages arrays databases host documents compiler/crash logs and cache paths remain local. Exact staged/history/identity and report/prose scans precede publication."
+}

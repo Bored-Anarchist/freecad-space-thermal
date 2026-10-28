@@ -109,5 +109,14 @@
     "WP-14/15 client authorization transport and GUI/CLI/MCP workflow parity",
     "WP-19 complete product installation host ABI binary notices redistribution and later schema migrations"
   ],
-  "evidence_policy": "Only synthetic fixtures bounded statuses and exact source/report hashes are public. Generated packages HDF5 SQLite/WAL host files raw crash logs and acquired engineering originals remain local. TST-021 scans exact staged/outgoing history identities generated summaries and final PR/project prose before publication."
+  "evidence_policy": "Only synthetic fixtures bounded statuses and exact source/report hashes are public. Generated packages HDF5 SQLite/WAL host files raw crash logs and acquired engineering originals remain local. TST-021 scans exact staged/outgoing history identities generated summaries and final PR/project prose before publication.",
+  "verification_audit": {
+    "status": "passed",
+    "evidence": "plans/evidence/WP-04-WP-05-audit.json",
+    "decision": "docs/decisions/0002-wp04-wp05-verification.md",
+    "required_windows_checks": 114,
+    "unit_cases": 99,
+    "numerical_cases": 23,
+    "persistence_cases": 8
+  }
 }

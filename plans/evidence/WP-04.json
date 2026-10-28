@@ -87,5 +87,14 @@
     "WP-08/WP-09/WP-10/WP-19 source/runtime/schema/rights and paired vendor comparisons",
     "Later host GUI, API parity and full product performance qualification"
   ],
-  "evidence_policy": "Bounded synthetic summaries and hashes are public. Sealed raw observations, failed/interrupted/superseded attempts, compiler logs, binaries and authorized engineering originals remain local. Actual staged/outgoing history, metadata, generated reports and PR/project payloads require TST-021 preflight before publication."
+  "evidence_policy": "Bounded synthetic summaries and hashes are public. Sealed raw observations, failed/interrupted/superseded attempts, compiler logs, binaries and authorized engineering originals remain local. Actual staged/outgoing history, metadata, generated reports and PR/project payloads require TST-021 preflight before publication.",
+  "verification_audit": {
+    "status": "passed",
+    "evidence": "plans/evidence/WP-04-WP-05-audit.json",
+    "decision": "docs/decisions/0002-wp04-wp05-verification.md",
+    "required_windows_checks": 114,
+    "unit_cases": 99,
+    "numerical_cases": 23,
+    "persistence_cases": 8
+  }
 }
