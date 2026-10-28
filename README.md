@@ -8,6 +8,8 @@ Project development uses [the GitHub source repository](https://github.com/Bored
 
 Track the 21 work packages in the [FCST implementation project](https://github.com/users/Bored-Anarchist/projects/1), with requirement IDs, delivery gates, prerequisites and evidence-backed states.
 
+[FreeCAD FEM reuse](docs/decisions/0003-freecad-fem-reuse.md) is a required assessment before overlapping WP-13 host and WP-16 mesh work. Evaluate existing mesh, selection/material/load and result tools before replacing them; retain the standalone owned engine. FEM is currently a design reference, with no implemented FEM integration or adopted FEM source. Component selection, pinned API/license checks and unattended host/mesh acceptance remain planned.
+
 [WP-03 contracts](spec/contracts/README.md) freeze native model, operation, result, HDF5 layout and worker protocol version 1.0.0. Independent C++ and Python readers validate typed entities, references, quantities, frames and expression types, and agree on normalized snapshots and semantic hashes. Both Windows configurations run the same positive/negative fixtures and bounded framing checks.
 
 [WP-04's numerical checkpoint](docs/decisions/0001-q0-numerical.md) adds a separate C++/SUNDIALS experiment with independent analytic/nonlinear oracles, energy/event/restart checks, dense/banded and BDF/Adams comparisons, scale probes and sealed evidence. Both Windows verification configurations execute it unattended. It retains C++ as the implementation baseline; production solving, GUI workflows and vendor compatibility remain later work.
