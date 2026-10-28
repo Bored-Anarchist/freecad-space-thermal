@@ -20,7 +20,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
-from fcst_tools.numerical import canonical, compare, digest, oracle, within, assess_attempt, steady_oracle, validate_policy
+from fcst_tools.numerical import (canonical, compare, compare_restart, compare_steady, digest, oracle,
+                                  within, assess_attempt, steady_oracle, validate_policy, native_cache_root)
 from fcst_contracts import read as read_contract
 from profile_support import cmake_tools, run, revision, ProbeFailure
 from build_dependencies import source_tree, OPTIONS
@@ -53,8 +54,8 @@ def source_manifest():
 def build(configuration, work):
     cmake, _ = cmake_tools()
     item = next(x for x in json.loads((ROOT / "ci/probe-sources.json").read_bytes())["sources"] if x["id"] == "sundials")
-    dep = ROOT / ".local/numerical-dependency"
-    dep.mkdir(exist_ok=True)
+    dep = native_cache_root(ROOT, os.environ.get("LOCALAPPDATA", ROOT / ".local"))
+    dep.mkdir(parents=True, exist_ok=True)
     source = source_tree(item, dep)
     # Reused extraction directories are mutable: verify actual build inputs,
     # not only the cached archive and its license file.
@@ -72,10 +73,11 @@ def build(configuration, work):
          *["-D"+v for v in OPTIONS["sundials"]]], ROOT, work / "dependency-configure.log")
     run([cmake, "--build", str(dep / "build"), "--config", "Release", "--parallel", "2"], ROOT, work / "dependency-build.log")
     run([cmake, "--install", str(dep / "build"), "--config", "Release"], ROOT, work / "dependency-install.log")
-    run([cmake, "-S", str(ROOT / "prototypes/numerical"), "-B", str(work / "build"), *generator,
+    prototype_build = dep / "attempts" / work.name
+    run([cmake, "-S", str(ROOT / "prototypes/numerical"), "-B", str(prototype_build), *generator,
          "-DCMAKE_PREFIX_PATH=" + str(install)], ROOT, work / "configure.log")
-    run([cmake, "--build", str(work / "build"), "--config", configuration, "--parallel", "2"], ROOT, work / "build.log")
-    run([cmake, "--install", str(work / "build"), "--config", configuration, "--prefix", str(work / "install")], ROOT, work / "install.log")
+    run([cmake, "--build", str(prototype_build), "--config", configuration, "--parallel", "2"], ROOT, work / "build.log")
+    run([cmake, "--install", str(prototype_build), "--config", configuration, "--prefix", str(work / "install")], ROOT, work / "install.log")
     # This copy is outside both build trees, with only installed runtime files.
     destination = work / "engine-only"
     shutil.copytree(work / "install/bin", destination)
@@ -194,9 +196,7 @@ def main():
         equilibrium = steady_oracle(nonlinear["parameters"])
         for backend in ("dense", "band"):
             code, result = execute(executable, ["steady", backend], payload(nonlinear, criteria))
-            values = result["samples"][0]["state"][:2] + [result["samples"][0]["algebraic_K"]]
-            record("steady-"+backend, code == 0 and result["residual"] < 1e-10 and all(
-                within(a,b,criteria["temperature_K"]) for a,b in zip(values,equilibrium)))
+            record("steady-"+backend, code == 0 and compare_steady(nonlinear["parameters"], result, equilibrium, criteria))
             observations["steady-"+backend] = result
         coarse = oracle(nonlinear, criteria["oracle"]["step_s"])
         fine = references["stiff-nonlinear-heater"]
@@ -212,12 +212,10 @@ def main():
             code2, resumed = execute(executable, ["integrate", backend], payload(nonlinear, criteria,
                 start=10, initial=last["state"], heater=last["heater"]))
             expected = results["stiff-nonlinear-heater-"+backend]
-            error = max(abs(a-b) for x, y in zip(resumed["samples"], expected["samples"][40:]) for a, b in zip(x["state"], y["state"]))
-            event_ref = [x for x in expected["events_s"] if x > 10]
-            okay = code == code2 == 0 and partial["status"] == "cancelled" and error <= criteria["restart_K"]["atol"] and len(resumed["events_s"]) == len(event_ref)
-            okay = okay and all(within(a,b,criteria["event_time_s"]) for a,b in zip(resumed["events_s"], event_ref))
+            errors, metrics = compare_restart(partial, resumed, expected, 10, criteria)
+            okay = code == code2 == 0 and not errors
             observations["restart-"+backend] = {"partial": partial, "resumed": resumed}
-            record("restart-"+backend, okay, max_error=error)
+            record("restart-"+backend, okay, problems=errors, **metrics)
         for key, text, expected_code in [("invalid-input", "nan", "invalid_input"),
                 ("inconsistent-initialization", payload(nonlinear, criteria, initial=[302,300,0]), "inconsistent_initial_state"),
                 ("property-domain", payload(nonlinear, criteria, initial=[-1,300,0]), "property_domain")]:

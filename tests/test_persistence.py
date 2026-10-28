@@ -1,5 +1,6 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 from copy import deepcopy
+from contextlib import contextmanager
 from hashlib import sha256
 import io
 import json
@@ -440,6 +441,135 @@ with ProjectStore(sys.argv[1], fault=fault) as store:
         request = json.loads((FIXTURES/'operation-job.submit.json').read_text())
         with self.assertRaisesRegex(PersistenceError, "not_implemented"):
             store.dispatch("synthetic-actor", {"job.submit"}, request)
+
+    def test_create_scope_cannot_delete_replace_or_batch_entities(self):
+        store = self.store()
+        before = store.snapshot()
+        new = {"id": str(uuid.uuid4()), "kind": "submodel"}
+        for payload in ({"upsert": [new], "delete": [before["entities"][-1]["id"]]},
+                        {"upsert": [new, {"id": str(uuid.uuid4()), "kind": "submodel"}], "delete": []}, change()):
+            with self.assertRaises(PersistenceError):
+                store.apply("synthetic-actor", {"entity.create"}, self.project, 0, "create", payload, operation="entity.create")
+            self.assertEqual(store.snapshot(), before)
+            self.assertFalse(store.state()["dedup"])
+        store.apply("synthetic-actor", {"entity.create"}, self.project, 0, "create", {"upsert": [new], "delete": []}, operation="entity.create")
+
+    def test_original_blob_and_metadata_corruption_fail_before_rehashing(self):
+        artifact_id = str(uuid.uuid4())
+        original = b"synthetic exact original"
+        package = Package.create(model(), [(artifact_id, "source_original", "sources/original.dat", original, [])])
+        with ProjectStore.create(self.root/"pins.db", package=package) as store:
+            store.db.execute("UPDATE artifacts SET data=? WHERE id=?", (b"synthetic corruption", artifact_id))
+            with self.assertRaises(ContractError): store.export_package()
+            with self.assertRaises(ContractError): self.apply(store)
+            self.assertEqual(store.snapshot()["revision"], 0)
+            store.db.execute("UPDATE artifacts SET data=?, role=? WHERE id=?", (original, "source_dependency", artifact_id))
+            with self.assertRaisesRegex(PersistenceError, "artifact_integrity"): store.export_package()
+            store.db.execute("UPDATE artifacts SET role=? WHERE id=?", ("source_original", artifact_id))
+            self.assertEqual(store.export_package().files["sources/original.dat"], original)
+            # A legacy operational DB cannot invent missing original-byte pins.
+            store.db.execute("DELETE FROM package_manifest")
+            with self.assertRaisesRegex(PersistenceError, "store_integrity_upgrade_required"): store.export_package()
+
+    def test_package_graph_model_path_and_audit_identity_survive_reconstruction(self):
+        reserved_id = str(uuid.uuid5(uuid.UUID(self.project), "fcst:state"))
+        collision = Package.create(model(), [(reserved_id, "source_original", "sources/collision.dat", b"synthetic", [])])
+        with ProjectStore.create(self.root/"collision.db", package=collision) as store:
+            exported = store.export_package()
+            ids = [r["id"] for r in exported.manifest["artifacts"]]
+            self.assertEqual(len(ids), len(set(ids)))
+            self.assertEqual(store.export_package().manifest, exported.manifest)
+        source_id = str(uuid.uuid4())
+        with ProjectStore.create(self.root/"initial.db", package=Package.create(model(),
+                [(source_id, "source_original", "sources/original.dat", b"synthetic", [])])) as store:
+            package = store.export_package()
+        manifest = deepcopy(package.manifest)
+        files = dict(package.files)
+        model_record = next(r for r in manifest["artifacts"] if r["role"] == "model")
+        state_record = next(r for r in manifest["artifacts"] if r["artifact"]["path"] == "audit/state.json")
+        old_path = model_record["artifact"]["path"]
+        model_record["artifact"]["path"] = "model/native.json"
+        model_record["dependencies"] = [source_id]
+        state_record["id"] = str(uuid.uuid4())
+        state_record["dependencies"] = [model_record["id"]]
+        files["model/native.json"] = files.pop(old_path)
+        package = Package(manifest, files)
+        with ProjectStore.create(self.root/"graph.db", package=package) as store:
+            self.apply(store)
+            exported = store.export_package()
+            actual_model = next(r for r in exported.manifest["artifacts"] if r["role"] == "model")
+            actual_audit = next(r for r in exported.manifest["artifacts"] if r["artifact"]["path"] == "audit/state.json")
+            self.assertEqual(actual_model["dependencies"], [source_id])
+            self.assertEqual(actual_model["artifact"]["path"], "model/native.json")
+            self.assertEqual(actual_audit["id"], state_record["id"])
+            self.assertEqual(actual_audit["dependencies"], state_record["dependencies"])
+
+    def test_result_array_dependency_must_close_in_package(self):
+        result = json.loads((FIXTURES/"result.json").read_bytes())
+        with self.assertRaisesRegex(PersistenceError, "dependency_closure"):
+            Package.create(model(), [(str(uuid.uuid4()), "result", "results/result.json", encode(result), [])])
+        # A shallow but wide dependency graph can exceed the JSON byte budget
+        # without exceeding the member count or graph-depth limits.
+        leaves = [str(uuid.uuid4()) for _ in range(180)]
+        artifacts = [(key,"source_original",f"sources/leaf-{i}.dat",b"",[]) for i,key in enumerate(leaves)]
+        artifacts += [(str(uuid.uuid4()),"source_original",f"sources/parent-{i}.dat",b"",leaves) for i in range(180)]
+        with self.assertRaisesRegex(ContractError, "invalid_json"):
+            Package.create(model(), artifacts)
+
+    def test_delayed_save_selects_snapshot_after_destination_lock(self):
+        store = self.store()
+        destination = self.root/"serial.fcst"
+        delayed = [True]
+        @contextmanager
+        def lock(path):
+            if delayed[0]:
+                delayed[0] = False
+                with ProjectStore(store.path) as writer:
+                    self.apply(writer)
+                    writer.save(path)
+            with publication_lock(path):
+                yield
+        with patch("fcst_app.store.publication_lock", lock), patch("fcst_app.persistence.publication_lock", lock):
+            receipt = store.save(destination)
+        self.assertEqual(receipt["revision"], 1)
+        self.assertEqual(Package.open(destination).model["revision"], 1)
+
+    def test_host_sync_overlap_and_target_aliases_cannot_lose_writes(self):
+        store = self.store()
+        host_path, package_path = self.root/"host.FCStd", self.root/"paired.fcst"
+        blocked = []
+        def overlapping(point):
+            if point == "host_replace":
+                with ProjectStore(store.path) as other:
+                    try:
+                        other.synchronize_host(host_path, b"synthetic second host", package_path, expected_revision=0)
+                    except PersistenceError as error:
+                        blocked.append(error.code)
+        outcome = store.synchronize_host(host_path, b"synthetic first host", package_path, expected_revision=0, fault=overlapping)
+        self.assertEqual(blocked, ["save_busy"])
+        self.assertEqual(host_path.read_bytes(), b"synthetic first host")
+        self.assertEqual(outcome["artifact_sha256"], sha256(host_path.read_bytes()).hexdigest())
+        before = store.state()
+        for host, package in ((host_path,host_path), (store.path,package_path),
+                              (host_path,store.path), (package_path.with_name(package_path.name+".previous"),package_path)):
+            with self.assertRaisesRegex(PersistenceError, "host_target_collision"):
+                store.synchronize_host(host, b"synthetic", package, expected_revision=0)
+            self.assertEqual(store.state(), before)
+
+    def test_directory_reads_remain_bounded_when_size_changes_after_stat(self):
+        package = Package.create(model())
+        flat = self.root/"flat-bounded"; (flat/"model").mkdir(parents=True)
+        (flat/"manifest.json").write_bytes(encode(package.manifest))
+        target = flat/"model/snapshot.json"
+        target.write_bytes(package.files["model/snapshot.json"])
+        original_open = Path.open
+        def growing(path, *args, **kwargs):
+            if path == target:
+                with original_open(path, "wb") as stream:
+                    stream.write(b"0" * 5001)
+            return original_open(path, *args, **kwargs)
+        with patch.object(Path, "open", growing), self.assertRaisesRegex(PersistenceError, "package_limit"):
+            Package.open(flat, limits=Limits(item_bytes=5000))
 
 
 if __name__ == "__main__":

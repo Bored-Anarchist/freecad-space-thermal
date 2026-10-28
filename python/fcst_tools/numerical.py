@@ -35,13 +35,29 @@ def digest(value):
     return hashlib.sha256(value).hexdigest()
 
 
+def native_cache_root(checkout, local_app_data):
+    """Keep MSVC object/library paths short and isolate concurrent checkouts."""
+    key = digest(str(Path(checkout).resolve()).casefold().encode("utf-8"))[:12]
+    return Path(local_app_data) / "fcst-q0" / key
+
+
 def canonical(value):
     return json.dumps(value, sort_keys=True, separators=(",", ":"), allow_nan=False).encode()
 
 
 def within(value, reference, criterion):
-    return (math.isfinite(value) and math.isfinite(reference) and
+    return (finite_number(value) and finite_number(reference) and
             abs(value - reference) <= criterion["atol"] + criterion["rtol"] * abs(reference))
+
+
+def finite_number(value):
+    return type(value) in (int, float) and math.isfinite(value)
+
+
+def valid_sample(row):
+    return (isinstance(row, dict) and isinstance(row.get("state"), list) and len(row["state"]) == 3
+            and isinstance(row.get("heater"), bool)
+            and all(finite_number(v) for v in [row.get("time_s"), row.get("algebraic_K"), *row["state"]]))
 
 
 def algebraic(p, y):
@@ -139,8 +155,7 @@ def compare(case, observation, reference, criteria):
     p = case["parameters"]
     temps, energy, balances = [], [], []
     for row, ref in zip(rows, expected):
-        if len(row.get("state", [])) != 3 or not isinstance(row.get("heater"), bool) or not all(
-                isinstance(v, (int, float)) and math.isfinite(v) for v in [row.get("time_s", math.nan), row.get("algebraic_K", math.nan), *row["state"]]):
+        if not valid_sample(row):
             return ["invalid_sample"], {}
         if row["time_s"] != ref["time_s"] or row["heater"] != ref["heater"]:
             errors.append("sample_or_control_mismatch")
@@ -169,6 +184,62 @@ def compare(case, observation, reference, criteria):
         "rms_temperature_error_K": math.sqrt(sum(x*x for x in temps)/len(temps)),
         "p95_temperature_error_K": sorted(temps)[math.ceil(.95*len(temps))-1],
         "max_energy_error_J": max(energy), "max_algebraic_residual_W": max(balances), "events": len(events)}
+
+
+def compare_restart(partial, resumed, uninterrupted, split, criteria):
+    """Compare complete checkpoint/resume coverage, controls and SI quantities.
+
+    Prefix zip comparisons are insufficient: a shortened successful-looking
+    resume must fail even when every remaining value is accurate.
+    """
+    errors, temperature_errors, energy_errors = [], [], []
+    expected = uninterrupted.get("samples", [])
+    if uninterrupted.get("status") != "completed" or not expected or not all(valid_sample(r) for r in expected):
+        return ["invalid_reference"], {}
+    for observed, rows, status in ((partial, [r for r in expected if r["time_s"] <= split], "cancelled"),
+                                    (resumed, [r for r in expected if r["time_s"] >= split], "completed")):
+        actual = observed.get("samples", [])
+        if observed.get("status") != status:
+            errors.append("execution_incomplete")
+        if not within(observed.get("jacobian_error"), 0, criteria["jacobian"]):
+            errors.append("jacobian_error")
+        if not rows or len(actual) != len(rows) or not all(valid_sample(r) for r in actual):
+            errors.append("sample_coverage")
+            continue
+        if (status == "cancelled" and actual[-1]["time_s"] != split
+                or status == "completed" and actual[0]["time_s"] != split):
+            errors.append("checkpoint_time")
+        for row, reference in zip(actual, rows):
+            if row["time_s"] != reference["time_s"] or row["heater"] != reference["heater"]:
+                errors.append("sample_or_control_mismatch")
+            for value, target in zip(row["state"][:2] + [row["algebraic_K"]], reference["state"][:2] + [reference["algebraic_K"]]):
+                temperature_errors.append(abs(value-target))
+                if not within(value, target, criteria["restart_K"]):
+                    errors.append("restart_temperature")
+            energy_errors.append(abs(row["state"][2]-reference["state"][2]))
+            if not within(row["state"][2], reference["state"][2], criteria["energy_J"]):
+                errors.append("restart_energy")
+        events = [t for t in uninterrupted.get("events_s", []) if (t <= split if status == "cancelled" else t > split)]
+        actual_events = observed.get("events_s", [])
+        if len(actual_events) != len(events) or any(not within(a,b,criteria["event_time_s"]) for a,b in zip(actual_events,events)):
+            errors.append("event_error")
+    return sorted(set(errors)), {"max_temperature_error_K": max(temperature_errors, default=0),
+                                "max_energy_error_J": max(energy_errors, default=0)}
+
+
+def compare_steady(parameters, observation, reference, criteria):
+    rows = observation.get("samples", [])
+    if observation.get("status") != "completed" or len(rows) != 1 or not valid_sample(rows[0]):
+        return False
+    row, residual = rows[0], observation.get("residual")
+    if (not finite_number(residual) or not 0 <= residual < 1e-10 or row["time_s"] != 0 or not row["heater"]
+            or not all(within(a,b,criteria["temperature_K"]) for a,b in zip(row["state"][:2]+[row["algebraic_K"]], reference))):
+        return False
+    # Independently check physical heat balance rather than trusting a reported norm.
+    p, y, a = parameters, row["state"], row["algebraic_K"]
+    q = p[4]*(1+p[7]*(y[0]+a-2*p[9]))*(y[0]-a)
+    return all(within(value, 0, criteria["algebraic_W"]) for value in
+               (p[10]-q, p[5]*(a-y[1])-p[6]*(y[1]-p[9]), q-p[5]*(a-y[1])-p[8]*(a**4-p[9]**4)))
 
 
 def assess_attempt(path):

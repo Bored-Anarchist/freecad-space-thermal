@@ -7,7 +7,7 @@ import unittest
 from pathlib import Path
 from fcst_tools.gate import evaluate
 from fcst_tools.numerical import (assess_attempt, canonical, compare, digest, oracle,
-                                  steady_oracle, validate_policy, within)
+                                  compare_restart, compare_steady, native_cache_root, steady_oracle, validate_policy, within)
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -112,6 +112,54 @@ class NumericalTests(unittest.TestCase):
         result = evaluate(["fixture-a", "runner-b"], [{"id":"fixture-a", "status":"blocked"}])
         self.assertEqual(result["status"], "failed")
         self.assertEqual(result["missing"], ["runner-b"])
+
+    def test_restart_rejects_truncation_wrong_time_controls_and_nonfinite_state(self):
+        full = self.observation
+        split = 1
+        partial = {**copy.deepcopy(full), "status": "cancelled",
+                   "samples": copy.deepcopy([r for r in full["samples"] if r["time_s"] <= split]),
+                   "events_s": [t for t in full["events_s"] if t <= split]}
+        resumed = {**copy.deepcopy(full), "samples": copy.deepcopy([r for r in full["samples"] if r["time_s"] >= split]),
+                   "events_s": [t for t in full["events_s"] if t > split]}
+        self.assertEqual(compare_restart(partial, resumed, full, split, self.criteria)[0], [])
+        for mutation in ("short_rows", "short_state", "time", "heater", "nonfinite", "algebraic", "energy", "events", "status", "jacobian"):
+            broken = copy.deepcopy(resumed)
+            if mutation == "short_rows": broken["samples"].pop()
+            elif mutation == "short_state": broken["samples"][0]["state"].pop()
+            elif mutation == "time": broken["samples"][0]["time_s"] += .01
+            elif mutation == "heater": broken["samples"][0]["heater"] = not broken["samples"][0]["heater"]
+            elif mutation == "nonfinite": broken["samples"][0]["state"][0] = math.nan
+            elif mutation == "algebraic": broken["samples"][0]["algebraic_K"] += .01
+            elif mutation == "energy": broken["samples"][0]["state"][2] += .01
+            elif mutation == "events": broken["events_s"].append(2)
+            elif mutation == "jacobian": broken["jacobian_error"] = .1
+            else: broken["status"] = "cancelled"
+            with self.subTest(mutation=mutation):
+                self.assertTrue(compare_restart(partial, broken, full, split, self.criteria)[0])
+        partial["samples"].pop()
+        self.assertTrue(compare_restart(partial, resumed, full, split, self.criteria)[0])
+
+    def test_native_build_cache_is_short_stable_and_checkout_scoped(self):
+        base = Path("synthetic-local-data")
+        checkout = Path("synthetic-checkout") / ("long-folder/" * 12)
+        cache = native_cache_root(checkout, base)
+        self.assertEqual(cache.parent, base/"fcst-q0")
+        self.assertEqual(cache, native_cache_root(checkout, base))
+        self.assertNotEqual(cache, native_cache_root(checkout/"another", base))
+        self.assertEqual(len(cache.name), 12)
+        self.assertLess(len(str(cache)), len(str(checkout)))
+
+    def test_steady_requires_finite_nonnegative_norm_and_independent_balance(self):
+        reference = steady_oracle(self.case["parameters"])
+        observed = {"status": "completed", "residual": 0, "samples": [{"time_s": 0,
+                    "state": reference[:2] + [0], "algebraic_K": reference[2], "heater": True}]}
+        self.assertTrue(compare_steady(self.case["parameters"], observed, reference, self.criteria))
+        for residual in (-1, -math.inf, math.nan, True):
+            with self.subTest(residual=residual):
+                self.assertFalse(compare_steady(self.case["parameters"], {**observed, "residual": residual}, reference, self.criteria))
+        broken = copy.deepcopy(observed)
+        broken["samples"][0]["state"][0] += 1e-5  # Within temperature tolerance, outside heat-balance tolerance.
+        self.assertFalse(compare_steady(self.case["parameters"], broken, reference, self.criteria))
 
 
 if __name__ == "__main__":

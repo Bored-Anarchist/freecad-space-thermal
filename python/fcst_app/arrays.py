@@ -36,8 +36,8 @@ def _validate(file, max_bytes):
     for key in file.attrs:
         if file.attrs.get_id(key).get_storage_size() > 256:
             reject("hdf5_limit")
-    role, digest = file.attrs["artifact_role"], file.attrs["semantic_hash"]
-    if (file.attrs["contract_version"] != "1.0.0" or not isinstance(digest, str)
+    version, role, digest = (file.attrs[k] for k in ("contract_version", "artifact_role", "semantic_hash"))
+    if (not all(isinstance(v, str) for v in (version, role, digest)) or version != "1.0.0"
             or not re.fullmatch(r"[a-f0-9]{64}", digest)
             or role not in {"result", "radiation_mesh", "conduction_mesh"}):
         reject("hdf5_contract")
@@ -137,7 +137,12 @@ def read_arrays(data, max_bytes=64 * 1024 * 1024):
 
 def validate_arrays(data, max_bytes=64 * 1024 * 1024):
     result = read_arrays(data, max_bytes)
-    return {"role": result["role"], "semantic_hash": result["semantic_hash"]}
+    metadata = {"role": result["role"], "semantic_hash": result["semantic_hash"]}
+    if result["role"] == "result":
+        metadata.update(node_ids=[str(uuid.UUID(bytes=bytes(row))) for row in result["arrays"]["index/node_uuid"]],
+                        time_count=len(result["arrays"]["time"]),
+                        quantities=sorted(set(result["arrays"]) - {"index/node_uuid", "time"}))
+    return metadata
 
 
 def write_arrays(role, semantic_hash, arrays):
@@ -149,7 +154,7 @@ def write_arrays(role, semantic_hash, arrays):
             if name not in LAYOUT:
                 reject("hdf5_contract")
             source = np.asarray(values)
-            if source.dtype.kind not in "uif" or source.ndim not in (1, 2) or source.size > 8 * 1024 * 1024:
+            if source.dtype.kind not in "uif" or source.ndim not in (1, 2) or source.size > 8 * 1024 * 1024 or 0 in source.shape:
                 reject("hdf5_limit")
             target = source.astype(LAYOUT[name][0])
             if not np.array_equal(source, target):

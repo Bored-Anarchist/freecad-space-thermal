@@ -18,6 +18,7 @@ import re
 import stat
 import uuid
 import zipfile
+import zlib
 
 from fcst_contracts import VERSION, loads, read, snapshot, canonical, verify_artifact
 
@@ -38,6 +39,14 @@ def is_link(path):
         return path.is_symlink() or bool(getattr(path.lstat(), "st_file_attributes", 0) & 0x400)
     except FileNotFoundError:
         return False
+
+
+def read_bounded(path, limit):
+    with Path(path).open("rb") as stream:
+        data = stream.read(limit + 1)
+    if len(data) > limit:
+        reject("package_limit")
+    return data
 
 
 def encode(value):
@@ -100,7 +109,9 @@ def _check_members(files, limits):
 
 class Package:
     def __init__(self, manifest, files, *, limits=Limits(), check_arrays=True):
-        self.manifest = read("manifest", manifest)
+        # Direct application callers must obey the same JSON byte/depth budget
+        # as file readers; otherwise an accepted store can be impossible to reopen.
+        self.manifest = read("manifest", loads(encode(manifest)))
         self.files = dict(files)
         self.limits = limits
         _check_members({"manifest.json": encode(self.manifest), **self.files}, limits)
@@ -126,6 +137,7 @@ class Package:
                 for child in value:
                     inspect(child)
         inspect(self.model)
+        results, array_metadata = [], {}
         for record in records:
             name = record["artifact"]["path"]
             suffix = Path(name).suffix.lower()
@@ -140,29 +152,56 @@ class Package:
                 if not check_arrays:
                     reject("array_validation_required")
                 from .arrays import validate_arrays
-                validate_arrays(self.files[name], limits.item_bytes)
+                array_metadata[name] = validate_arrays(self.files[name], limits.item_bytes)
+                if (record["role"] == "result" and array_metadata[name]["role"] != "result"
+                        or record["role"] == "mesh" and array_metadata[name]["role"] not in {"radiation_mesh", "conduction_mesh"}):
+                    reject("storage_format")
             if record["role"] == "result" and suffix == ".json":
-                read("result", loads(self.files[name]))
+                result = read("result", loads(self.files[name]))
+                inspect(result)
+                results.append(result)
             if record["role"] in {"audit", "evidence"}:
                 if suffix != ".json":
                     reject("storage_format")
                 loads(self.files[name])
+        for result in results:
+            metadata = array_metadata.get(result["data"]["path"])
+            if (result["project_id"] != self.model["project_id"] or not metadata or metadata["role"] != "result"
+                    or metadata["semantic_hash"] != result["semantic_hash"]
+                    or metadata["node_ids"] != result["node_ids"] or metadata["time_count"] != result["time_count"]
+                    or sorted(metadata["quantities"]) != sorted(result["quantities"])):
+                reject("result_mismatch")
+        for entity in self.model["entities"]:
+            if entity["kind"] == "mesh":
+                metadata = array_metadata.get(entity["artifact"]["path"])
+                if not metadata or metadata["role"] != entity["role"] + "_mesh":
+                    reject("storage_format")
         if "audit/state.json" in self.files:
+            if next(r for r in records if r["artifact"]["path"] == "audit/state.json")["role"] != "audit":
+                reject("storage_format")
             from .store import validate_state
             state = loads(self.files["audit/state.json"])
             validate_state(state, self.model)
+            inspect(state)
             if state["model_artifact_id"] != self.manifest["model_artifact_id"]:
                 reject("invalid_journal")
 
     @classmethod
-    def create(cls, model, artifacts=(), *, state=None, model_artifact_id=None):
+    def create(cls, model, artifacts=(), *, state=None, model_artifact_id=None, model_record=None, state_record=None):
         model = read("model", model)
         model_id = model_artifact_id or (state or {}).get("model_artifact_id") or str(uuid.uuid5(uuid.UUID(model["project_id"]), "fcst:model"))
-        entries = [(model_id, "model", "model/snapshot.json", encode(model), [])]
+        entries = [(model_id, "model", model_record["artifact"]["path"] if model_record else "model/snapshot.json",
+                    encode(model), model_record["dependencies"] if model_record else [])]
         entries.extend(artifacts)
         if state is not None:
-            entries.append((str(uuid.uuid5(uuid.UUID(model["project_id"]), "fcst:state")),
-                            "audit", "audit/state.json", encode(state), []))
+            state_id = state_record["id"] if state_record else str(uuid.uuid5(uuid.UUID(model["project_id"]), "fcst:state"))
+            if state_record is None:
+                used = {entry[0] for entry in entries}
+                suffix = 0
+                while state_id in used:
+                    suffix += 1
+                    state_id = str(uuid.uuid5(uuid.UUID(model["project_id"]), "fcst:state:" + str(suffix)))
+            entries.append((state_id, "audit", "audit/state.json", encode(state), state_record["dependencies"] if state_record else []))
         records, files = [], {}
         for artifact_id, role, name, data, dependencies in entries:
             if name in files:
@@ -219,7 +258,7 @@ class Package:
                     if len(data) != member.file_size:
                         reject("package_limit")
                     files[name] = data
-        except (zipfile.BadZipFile, NotImplementedError, RuntimeError, EOFError):
+        except (zipfile.BadZipFile, NotImplementedError, RuntimeError, EOFError, zlib.error):
             reject("invalid_archive")
         _check_members({**files, **{name + "/directory-marker": b"" for name in directories}}, limits)
         if "manifest.json" not in files:
@@ -236,13 +275,15 @@ class Package:
                 reject("unsafe_member")
             if path.stat().st_size > limits.total_bytes + limits.items * 512:
                 reject("package_limit")
-            return cls.from_zip(path.read_bytes(), limits=limits)
+            return cls.from_zip(read_bounded(path, limits.total_bytes + limits.items * 512), limits=limits)
         if not path.is_dir():
             reject("missing_package")
         if (path / "HEAD.json").exists():
             if is_link(path / "HEAD.json") or (path / "HEAD.json").stat().st_size > 4096:
                 reject("invalid_head")
-            pointer = loads((path / "HEAD.json").read_bytes())
+            pointer = loads(read_bounded(path / "HEAD.json", 4096))
+            if not isinstance(pointer, dict):
+                reject("invalid_head")
             generation = pointer.get("generation", "")
             if not re.fullmatch(r"[a-f0-9]{32}", generation):
                 reject("invalid_head")
@@ -273,7 +314,7 @@ class Package:
                         reject("unsafe_member")
                     if child.stat().st_size > limits.item_bytes or len(files) >= limits.items:
                         reject("package_limit")
-                    files[name] = child.read_bytes()
+                    files[name] = read_bounded(child, min(limits.item_bytes, limits.total_bytes - sum(map(len, files.values()))))
                     if sum(map(len, files.values())) > limits.total_bytes:
                         reject("package_limit")
                 else:
@@ -441,7 +482,9 @@ def recover_package(path, *, previous=False):
         if (is_link(path) or is_link(path / "revisions") or is_link(path / "PREVIOUS.json")
                 or (path / "PREVIOUS.json").stat().st_size > 4096):
             reject("invalid_head")
-        pointer = loads((path / "PREVIOUS.json").read_bytes())
+        pointer = loads(read_bounded(path / "PREVIOUS.json", 4096))
+        if not isinstance(pointer, dict):
+            reject("invalid_head")
         generation = pointer.get("generation", "")
         if not re.fullmatch(r"[a-f0-9]{32}", generation):
             reject("invalid_head")

@@ -2,7 +2,7 @@
 """Durable project transactions. SQLite is operational; audit JSON is portable."""
 from __future__ import annotations
 
-from contextlib import contextmanager
+from contextlib import contextmanager, ExitStack
 from copy import deepcopy
 from hashlib import sha256
 import hmac
@@ -11,9 +11,9 @@ import sqlite3
 import time
 import uuid
 
-from fcst_contracts import VERSION, ContractError, loads, read, normalize, dependency_order
+from fcst_contracts import VERSION, ContractError, loads, read, normalize, dependency_order, verify_artifact
 from .persistence import (Package, PersistenceError, encode, reject, semantic_hash,
-                          save_package, atomic_file, _fault)
+                          save_package, publication_lock, _save_package, atomic_file, _fault)
 
 MAX_STATE_BYTES = 1048576  # No silent audit/dedup pruning; explicit capacity failure.
 DERIVED_KINDS = {"geometry", "mesh", "optics", "environment", "solve", "comparison", "acceptance"}
@@ -155,6 +155,7 @@ class ProjectStore:
         self.db.execute("PRAGMA foreign_keys=ON")
         self.db.execute("CREATE TABLE IF NOT EXISTS project (id INTEGER PRIMARY KEY CHECK(id=1), data BLOB NOT NULL)")
         self.db.execute("CREATE TABLE IF NOT EXISTS artifacts (id TEXT PRIMARY KEY, role TEXT NOT NULL, path TEXT UNIQUE NOT NULL, dependencies BLOB NOT NULL, data BLOB NOT NULL)")
+        self.db.execute("CREATE TABLE IF NOT EXISTS package_manifest (id INTEGER PRIMARY KEY CHECK(id=1), data BLOB NOT NULL)")
 
     def close(self):
         self.db.close()
@@ -183,6 +184,7 @@ class ProjectStore:
                 if store.db.execute("SELECT 1 FROM project").fetchone():
                     reject("project_exists")
                 store.db.execute("INSERT INTO project VALUES(1, ?)", (encode(state),))
+                store.db.execute("INSERT INTO package_manifest VALUES(1, ?)", (encode(package.manifest),))
                 for record in package.manifest["artifacts"]:
                     if record["id"] == package.manifest["model_artifact_id"] or record["artifact"]["path"] == "audit/state.json":
                         continue
@@ -245,6 +247,8 @@ class ProjectStore:
                 reject("invalid_changes")
             value["upsert"].sort(key=lambda x: x["id"])
             value["delete"].sort()
+            if operation == "entity.create" and (value["delete"] or len(value["upsert"]) != 1):
+                reject("invalid_changes")
             return value
         if operation == "changes.undo":
             if not isinstance(payload, dict) or set(payload) != {"revision"} or type(payload["revision"]) not in (int, float):
@@ -311,10 +315,44 @@ class ProjectStore:
             reject("stale_revision")
 
     def _validate_artifacts(self, model):
-        Package.create(model, self._artifacts(), model_artifact_id=self.state()["model_artifact_id"])
+        candidate = initial_state(model)
+        candidate["model_artifact_id"] = self.state()["model_artifact_id"]
+        Package.create(model, self._artifacts(), state=candidate, **self._package_metadata())
+
+    def _manifest(self):
+        row = self.db.execute("SELECT data FROM package_manifest WHERE id=1").fetchone()
+        if row:
+            return read("manifest", loads(row[0]))
+        if self.db.execute("SELECT 1 FROM artifacts LIMIT 1").fetchone():
+            # Old operational stores did not retain immutable byte-hash pins.
+            # Reconstruct from the checked portable manifest instead of blessing
+            # whatever bytes happen to be present in an unpinned database.
+            reject("store_integrity_upgrade_required")
+        state = self.state()
+        return Package.create(state["model"], model_artifact_id=state["model_artifact_id"]).manifest
+
+    def _package_metadata(self):
+        manifest = self._manifest()
+        return {"model_artifact_id": manifest["model_artifact_id"],
+                "model_record": next(r for r in manifest["artifacts"] if r["id"] == manifest["model_artifact_id"]),
+                "state_record": next((r for r in manifest["artifacts"] if r["artifact"]["path"] == "audit/state.json"), None)}
 
     def _artifacts(self):
-        return [(r[0], r[1], r[2], r[4], loads(r[3])) for r in self.db.execute("SELECT * FROM artifacts ORDER BY id")]
+        manifest = self._manifest()
+        pins = {r["id"]: r for r in manifest["artifacts"] if r["id"] != manifest["model_artifact_id"]
+                and r["artifact"]["path"] != "audit/state.json"}
+        rows = self.db.execute("SELECT * FROM artifacts ORDER BY id").fetchall()
+        if {r[0] for r in rows} != set(pins):
+            reject("artifact_integrity")
+        artifacts = []
+        for artifact_id, role, path, dependencies, data in rows:
+            record = pins[artifact_id]
+            dependencies = loads(dependencies)
+            if (role != record["role"] or path != record["artifact"]["path"] or dependencies != record["dependencies"]):
+                reject("artifact_integrity")
+            verify_artifact(record["artifact"], data)
+            artifacts.append((artifact_id, role, path, data, dependencies))
+        return artifacts
 
     def apply(self, actor, scopes, project_id, expected_revision, key, payload,
               *, operation="changes.apply", plan_id=None, plan_hash=None):
@@ -413,12 +451,15 @@ class ProjectStore:
         self.db.execute("BEGIN")
         try:
             state = self.state()
-            return Package.create(state["model"], self._artifacts(), state=state)
+            return Package.create(state["model"], self._artifacts(), state=state, **self._package_metadata())
         finally:
             self.db.execute("ROLLBACK")
 
     def save(self, path, *, expanded=False, fault=None):
-        return save_package(self.export_package(), path, expanded=expanded, fault=fault)
+        # Select the committed snapshot after acquiring the destination lock;
+        # a delayed save cannot overwrite a newer publication with an old export.
+        with publication_lock(path):
+            return _save_package(self.export_package(), path, expanded=expanded, fault=fault)
 
     def mark_host_dirty(self):
         with self.transaction():
@@ -427,6 +468,24 @@ class ProjectStore:
             self._write(state)
 
     def synchronize_host(self, host_path, host_bytes, package_path, *, expected_revision, fault=None):
+        host_path, package_path = Path(host_path), Path(package_path)
+        database_files = [self.path, *[self.path.with_name(self.path.name + suffix) for suffix in ("-wal", "-shm", "-journal")]]
+        package_files = [package_path, *[package_path.with_name(package_path.name + suffix) for suffix in (".previous", ".save.json", ".lock")]]
+        def same(left, right):
+            return left.resolve() == right.resolve() or left.exists() and right.exists() and left.samefile(right)
+        if (any(same(host_path, path) for path in [*database_files, *package_files])
+                or any(same(package_path, path) for path in database_files)):
+            reject("host_target_collision")
+        project_lock = self.path.with_name(self.path.name + ".host-sync")
+        # A project lease plus both destinations prevents a competing sync from
+        # replacing the pending journal/bytes between the two publication halves.
+        with ExitStack() as stack:
+            for target in sorted((project_lock, host_path, package_path), key=lambda p: str(p.resolve()).casefold()):
+                stack.enter_context(publication_lock(target))
+            return self._synchronize_host(host_path, host_bytes, package_path,
+                                          expected_revision=expected_revision, fault=fault)
+
+    def _synchronize_host(self, host_path, host_bytes, package_path, *, expected_revision, fault=None):
         """Host bytes come from the trusted adapter, never from imported code.
 
         Journal each half of the two-file save. Every interrupted state is dirty;
@@ -437,6 +496,7 @@ class ProjectStore:
             self._revision(state, state["model"]["project_id"], expected_revision)
             state["host"] = {"status": "prepared", "dirty": True, "revision": expected_revision,
                              "semantic_hash": semantic_hash(state["model"]), "artifact_sha256": sha256(host_bytes).hexdigest()}
+            prepared = deepcopy(state["host"])
             self._write(state)
         _fault(fault, "host_prepared")
         atomic_file(host_path, host_bytes)
@@ -444,9 +504,11 @@ class ProjectStore:
         with self.transaction():
             state = self.state()
             self._revision(state, state["model"]["project_id"], expected_revision)
+            if state["host"] != prepared:
+                reject("host_reconciliation_required")
             state["host"]["status"] = "host_written"
             self._write(state)
-        self.save(package_path, fault=fault)
+        _save_package(self.export_package(), package_path, fault=fault)
         _fault(fault, "package_saved")
         return self.reconcile_host(host_path, package_path)
 

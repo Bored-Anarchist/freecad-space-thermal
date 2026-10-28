@@ -53,6 +53,24 @@ class PersistenceAcceptance(unittest.TestCase):
         result = subprocess.run([sys.executable, "-I", "-c", script, str(target)], capture_output=True, timeout=30)
         self.assertEqual(result.returncode, 0)
 
+    def test_result_manifest_and_hdf5_provenance_identity_shape_must_agree(self):
+        raw = write_arrays("result", semantic_hash(network()), result_arrays())
+        result = json.loads((ROOT/"tests/fixtures/contracts/result.json").read_bytes())
+        result.update(semantic_hash=semantic_hash(network()), data={"path":"results/run.h5", "sha256":sha256(raw).hexdigest(), "byte_length":len(raw)})
+        array_id, result_id = str(uuid.uuid4()), str(uuid.uuid4())
+        def package(document, data=raw):
+            return Package.create(network(), [(array_id,"result","results/run.h5",data,[]),
+                (result_id,"result","results/run.json",encode(document),[array_id])])
+        self.assertEqual(package(result).files["results/run.h5"],raw)
+        for field, value in (("semantic_hash","0"*64), ("time_count",3), ("node_ids",list(reversed(result["node_ids"]))),
+                             ("quantities",["temperature"]), ("project_id",str(uuid.uuid4()))):
+            broken = {**result, field:value}
+            with self.subTest(field=field), self.assertRaisesRegex(PersistenceError,"result_mismatch"):
+                package(broken)
+        broken = {**result, "data":{**result["data"],"path":"results/missing.h5"}}
+        with self.assertRaisesRegex(PersistenceError,"dependency_closure"):
+            package(broken)
+
     def test_hdf5_mesh_connectivity_normals_and_dtypes(self):
         mesh = {"index/entity_uuid": [list(uuid.uuid4().bytes)], "vertices": [[0.,0.,0.],[1.,0.,0.],[0.,1.,0.]],
                 "connectivity/offsets": [0, 3], "connectivity/vertex_index": [0, 1, 2], "normals": [[0.,0.,1.]]}
@@ -74,7 +92,7 @@ class PersistenceAcceptance(unittest.TestCase):
                 write_arrays("result", "0"*64, {**arrays, name: value})
         h5py, _ = libraries()
         data = write_arrays("result", "0"*64, arrays)
-        for key, value in (("contract_version", "99.0"), ("semantic_hash", "invalid")):
+        for key, value in (("contract_version", "99.0"), ("semantic_hash", "invalid"), ("contract_version", ["1.0.0"])):
             stream = io.BytesIO(data)
             with h5py.File(stream, "r+") as file: file.attrs[key] = value
             with self.assertRaises(PersistenceError): read_arrays(stream.getvalue())

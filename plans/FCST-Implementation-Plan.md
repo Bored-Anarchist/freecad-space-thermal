@@ -134,6 +134,8 @@ WP-04 adds an exact pre-upload scan of each `numerical.json` summary. Its inputs
 
 WP-05 adds the exact generated `persistence.json` summary to both Windows CI pre-upload scans. Synthetic package/migration fixtures, typed store/array sources, completion evidence and final PR prose are checked with the staged/outgoing-history/approved-identity preflight before publication. Generated `.fcst`, HDF5, SQLite/WAL and synthetic host files plus raw crash/array diagnostics stay local. Imported engineering originals remain unchanged in their authorized storage and are never uploaded by this workflow. TST-021 acceptance includes planted privacy regressions and exact report/prose scans; neither an inert-source role nor successful persistence validation grants publication clearance.
 
+The WP-04/WP-05 verification audit adds synthetic truncation, residual, authority, original-corruption, dependency/result-binding, save/host-race and growing-file regressions. Its [decision record](../docs/decisions/0002-wp04-wp05-verification.md) documents corrected behavior and executable acceptance. New sealed numerical attempts and bounded audit summaries supplement the retained original baseline. Exact source/evidence/prose and generated report scans precede upload; raw inputs, databases, binary containers and diagnostics remain local.
+
 ## 3. Build sequence and dependencies
 
 Each package below specifies concrete tasks and completion evidence. Its register row identifies a lead role, prerequisites, expected outputs, and automated suites. Dependencies describe interface availability; packages can deliver a minimal slice before their complete Q1 capability. Every completion reference must point to an immutable test artifact, not a checklist marked by hand.
