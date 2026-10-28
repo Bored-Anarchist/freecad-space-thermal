@@ -21,6 +21,10 @@ def validate():
                 if "uses" in step:
                     assert re.fullmatch(r"actions/[a-z-]+@[a-f0-9]{40}", step["uses"]), "Unpinned workflow dependency"
     workflow = yaml.load((ROOT / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader)
+    for job in workflow["jobs"].values():
+        for step in job.get("steps", []):
+            if step.get("uses", "").startswith("actions/checkout@"):
+                assert step.get("with", {}).get("ref") == "${{ github.event.pull_request.head.sha || github.sha }}", "Every handoff job must test the same published candidate"
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
