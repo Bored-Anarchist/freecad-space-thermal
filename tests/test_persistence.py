@@ -90,6 +90,12 @@ class PersistenceTests(unittest.TestCase):
             output.writestr("bomb.json", b"0" * 100000)
         with self.assertRaises(PersistenceError):
             Package.from_zip(stream.getvalue())
+        for compression in (zipfile.ZIP_BZIP2, zipfile.ZIP_LZMA):
+            stream = io.BytesIO()
+            with zipfile.ZipFile(stream, "w", compression=compression) as output:
+                output.writestr("small.json", b"{}")
+            with self.assertRaisesRegex(PersistenceError, "unsupported_compression"):
+                Package.from_zip(stream.getvalue())
         with self.assertRaises(PersistenceError):
             Package.from_zip(Package.create(model()).zip_bytes(), limits=Limits(items=1))
         with self.assertRaises(PersistenceError):

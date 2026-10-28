@@ -198,6 +198,8 @@ class Package:
                     if (member.flag_bits & 1 or stat.S_IFMT(mode) not in (0, stat.S_IFREG, stat.S_IFDIR)
                             or member.external_attr & 0x400):
                         reject("unsafe_member")
+                    if member.compress_type not in {zipfile.ZIP_STORED, zipfile.ZIP_DEFLATED}:
+                        reject("unsupported_compression")
                     if name.lower() in seen:
                         reject("path_collision")
                     seen.add(name.lower())
