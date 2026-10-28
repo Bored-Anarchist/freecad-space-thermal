@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "numerical-checkpoint", "persistence-conformance"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation"]
 
 
 def command(args, log, env=None):
@@ -94,6 +94,7 @@ def main():
         "numerical-checkpoint": [sys.executable, "tools/check_numerical.py", "--configuration", config,
                                   "--report", str(output / "numerical.json")],
         "persistence-conformance": [sys.executable, "tools/check_persistence.py", "--report", str(output / "persistence.json")],
+        "spatial-foundation": [sys.executable, "tools/check_spatial.py", "--worker", str(install / "bin/fcst-worker.exe"), "--report", str(output / "spatial.json")],
     }
     for case_id in STEPS:
         start = time.monotonic()

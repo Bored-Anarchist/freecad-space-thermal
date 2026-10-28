@@ -33,7 +33,7 @@ jobs:
       - name: Clear exact public reports
         id: clear
         if: always()
-        run: python tools/publication_preflight.py --file .local/${{ matrix.preset }}/verification.json --file .local/${{ matrix.preset }}/build-info.json --file .local/${{ matrix.preset }}/contracts.json --file .local/${{ matrix.preset }}/numerical.json --file .local/${{ matrix.preset }}/persistence.json
+        run: python tools/publication_preflight.py --file .local/${{ matrix.preset }}/verification.json --file .local/${{ matrix.preset }}/build-info.json --file .local/${{ matrix.preset }}/contracts.json --file .local/${{ matrix.preset }}/numerical.json --file .local/${{ matrix.preset }}/persistence.json --file .local/${{ matrix.preset }}/spatial.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always() && steps.clear.outcome == 'success'
         with:
@@ -44,6 +44,7 @@ jobs:
             .local/${{ matrix.preset }}/contracts.json
             .local/${{ matrix.preset }}/numerical.json
             .local/${{ matrix.preset }}/persistence.json
+            .local/${{ matrix.preset }}/spatial.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
@@ -66,16 +67,20 @@ jobs:
           python -m pip install --require-hashes --only-binary=:all: -r ci/requirements.lock
       - name: Exact host document and geometry smoke
         run: python tools/host_smoke.py
+      - name: Pinned FEM foundation probes
+        run: python tools/fem_probe.py
       - name: Clear exact host report
         id: clear
         if: always()
         shell: bash
-        run: python tools/publication_preflight.py --file .local/host/*/host-smoke.json
+        run: python tools/publication_preflight.py --file .local/host/*/host-smoke.json --file .local/fem-probe/fem-probe.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always() && steps.clear.outcome == 'success'
         with:
           name: host-${{ matrix.os }}
-          path: .local/host/*/host-smoke.json
+          path: |
+            .local/host/*/host-smoke.json
+            .local/fem-probe/fem-probe.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
@@ -125,3 +130,28 @@ jobs:
           HOST: ${{ needs.host.result }}
           PACKAGES: ${{ needs.dependencies.result }}
         run: test "$RESULT" = success && test "$HOST" = success && test "$PACKAGES" = success
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.11.9'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: foundation-*
+          path: .local/handoff-reports
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: host-windows-2022
+          path: .local/handoff-reports/host
+      - name: Candidate-bound TST-022 handoff
+        run: python tools/check_foundation_handoff.py --reports .local/handoff-reports --report .local/handoff.json
+      - name: Clear final handoff report
+        run: python tools/publication_preflight.py --file .local/handoff.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: foundation-handoff
+          path: .local/handoff.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30

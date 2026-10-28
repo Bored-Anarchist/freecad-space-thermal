@@ -377,9 +377,12 @@ void artifacts(const J& j) {
   }
   for(const auto& [k,v]:j.obj()) { (void)k; artifacts(v); }
 }
+std::string sha256(const std::string& bytes);
+#include "spatial.inc"
 J read(const std::string& kind,J j) {
   if(!j.isobj()) fail("schema");
-  if(!j.has("contract_version") || j.at("contract_version")!=J("1.0.0") || (j.has("minimum_reader") && j.at("minimum_reader")!=J("1.0.0"))) fail("version");
+  J version((kind=="spatial" || kind=="manifest2")?"2.0.0":"1.0.0");
+  if(!j.has("contract_version") || j.at("contract_version")!=version || (j.has("minimum_reader") && j.at("minimum_reader")!=version)) fail("version");
   if(kind=="operation" && (!j.has("operation") || !contains(bundle().at("operations"),j.at("operation")))) fail("unsupported_operation");
   if(!bundle().at("schemas").has(kind)) fail("schema"); const auto& schema=bundle().at("schemas").at(kind); validate(schema,j,schema);
   try { j=normalize(j); } catch(Error& error) {
@@ -388,7 +391,8 @@ J read(const std::string& kind,J j) {
   }
   artifacts(j);
   if(kind=="model") check_model(j);
-  if(kind=="manifest") {
+  if(kind=="spatial") check_spatial(j);
+  if(kind=="manifest" || kind=="manifest2") {
     std::map<std::string,J> by_id; std::set<std::string> paths;
     for(const auto& r:j.at("artifacts").arr()) {
       auto path=r.at("artifact").at("path").str(); std::transform(path.begin(),path.end(),path.begin(),[](unsigned char c){return static_cast<char>(std::tolower(c));});

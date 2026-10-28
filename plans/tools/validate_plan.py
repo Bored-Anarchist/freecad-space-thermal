@@ -132,7 +132,9 @@ def main() -> None:
 
     all_requirements = {**baseline, **testing}
     foundation_cases = read_rows(PLANS / "WP-05.5-acceptance.csv", "case_id")
-    require(not validate_foundation_acceptance(list(foundation_cases.values()), all_requirements, suites),
+    foundation_evidence_path = PLANS / "evidence/WP-05.5.json"
+    foundation_evidence = json.loads(foundation_evidence_path.read_text(encoding="utf-8")) if foundation_evidence_path.is_file() else None
+    require(not validate_foundation_acceptance(list(foundation_cases.values()), all_requirements, suites, foundation_evidence),
             "Foundation acceptance coverage, references or planned status differ")
     require(set(trace) == set(all_requirements),
             f"Traceability mismatch: missing={set(all_requirements) - set(trace)}, extra={set(trace) - set(all_requirements)}")

@@ -1,0 +1,204 @@
+{
+  "cases": [
+    {
+      "id": "solid-surface-rotated",
+      "kind": "spatial",
+      "path": "solid-surface-rotated.json",
+      "status": "passed",
+      "semantic_hash": "aeb25546453207fc2667f75cb3f1fa02353675e6bb704edf4de44d21aaa4a9ed",
+      "sha256": "49c3eba18add86b72acc6f750d249c68397baf60315a82b3dc95d0a6f256c301"
+    },
+    {
+      "id": "higher-order",
+      "kind": "spatial",
+      "path": "higher-order.json",
+      "status": "failed",
+      "code": "schema",
+      "sha256": "5dc5108cf04b68a71cbdb0db4f933c0738309891f91f1b890255dfdff326bc44"
+    },
+    {
+      "id": "midside-truncation",
+      "kind": "spatial",
+      "path": "midside-truncation.json",
+      "status": "failed",
+      "code": "schema",
+      "sha256": "bba877e2721ad2db1345bd28f47f180689b19097d71b84c8d5a3d2d2f02e7d2d"
+    },
+    {
+      "id": "reversed-tet",
+      "kind": "spatial",
+      "path": "reversed-tet.json",
+      "status": "failed",
+      "code": "spatial_orientation",
+      "sha256": "8b64c363d6221d032d7fcec3bcef28f966f88db7bef27ab58b56de302959d8fa"
+    },
+    {
+      "id": "degenerate-tet",
+      "kind": "spatial",
+      "path": "degenerate-tet.json",
+      "status": "failed",
+      "code": "spatial_orientation",
+      "sha256": "6c3b78693f3b3d8de42961051881a8d53372218dd7b912a1e5326285cdd0c03a"
+    },
+    {
+      "id": "bad-connectivity",
+      "kind": "spatial",
+      "path": "bad-connectivity.json",
+      "status": "failed",
+      "code": "spatial_connectivity",
+      "sha256": "40ec7219115ffe771f12d1a05d6b6a5124e34c2b1da58a576ee3a32f569a7f40"
+    },
+    {
+      "id": "duplicate-identity",
+      "kind": "spatial",
+      "path": "duplicate-identity.json",
+      "status": "failed",
+      "code": "spatial_identity",
+      "sha256": "8717f59bd2af418354488a82dce4a6ad06051f15fb2e97c1d024cfc856eb5bb8"
+    },
+    {
+      "id": "reordered-field",
+      "kind": "spatial",
+      "path": "reordered-field.json",
+      "status": "failed",
+      "code": "spatial_reference",
+      "sha256": "032928535245e51e86cab62a172347c0d886e5f8ec3322213cb948ec92b1e39b"
+    },
+    {
+      "id": "wrong-flux-unit",
+      "kind": "spatial",
+      "path": "wrong-flux-unit.json",
+      "status": "failed",
+      "code": "schema",
+      "sha256": "d5b466bbcae3c8b797dfd0503977c9d26d830af3da3d1f8cf2eeade22776b415"
+    },
+    {
+      "id": "wrong-rank",
+      "kind": "spatial",
+      "path": "wrong-rank.json",
+      "status": "failed",
+      "code": "schema",
+      "sha256": "ae036e12c3b8dc1f02e37cc7caeeba887a4a086193450e9da74595dc5b226c9a"
+    },
+    {
+      "id": "integration-point",
+      "kind": "spatial",
+      "path": "integration-point.json",
+      "status": "failed",
+      "code": "schema",
+      "sha256": "e9b938be89b784a5ce92d29ac84f3d987ec39f782504e9ba23c0fa98c7bd3132"
+    },
+    {
+      "id": "unknown-projection",
+      "kind": "spatial",
+      "path": "unknown-projection.json",
+      "status": "failed",
+      "code": "schema",
+      "sha256": "b056f7d95173a3ba25763c768a1e575f75d244f3580b33c0ec2d486ac9996481"
+    },
+    {
+      "id": "field-shape",
+      "kind": "spatial",
+      "path": "field-shape.json",
+      "status": "failed",
+      "code": "spatial_shape",
+      "sha256": "0b92c13c126b7a2f60fca7be419a778db74c9736a68e7cbb4b3a02a9674787c1"
+    },
+    {
+      "id": "negative-kelvin",
+      "kind": "spatial",
+      "path": "negative-kelvin.json",
+      "status": "failed",
+      "code": "spatial_range",
+      "sha256": "5eb046f1d531615f8965fbe70dded11a6a5bfa11a7e627c6e762e8dca5e82683"
+    },
+    {
+      "id": "bad-frame",
+      "kind": "spatial",
+      "path": "bad-frame.json",
+      "status": "failed",
+      "code": "spatial_frame",
+      "sha256": "7d87ca7d0021fbb6abf83ce81de490cecf3e94471464d4b2cc619b3f0290393d"
+    },
+    {
+      "id": "indefinite-material",
+      "kind": "spatial",
+      "path": "indefinite-material.json",
+      "status": "failed",
+      "code": "spatial_material",
+      "sha256": "41acfd098bc72a6e6f671e32115881b3666e824982178f3984c3ae130993aeff"
+    },
+    {
+      "id": "missing-frame",
+      "kind": "spatial",
+      "path": "missing-frame.json",
+      "status": "failed",
+      "code": "spatial_reference",
+      "sha256": "f91aac5aec2d84a3d8eff88f6d02500ba4976b938dfec190d72ab24b333d55c7"
+    },
+    {
+      "id": "weight-sum",
+      "kind": "spatial",
+      "path": "weight-sum.json",
+      "status": "failed",
+      "code": "spatial_weight",
+      "sha256": "6ba61c27f8d997740a2349fca85e190fdffddc4c8e49e778be8b7c0a58218429"
+    },
+    {
+      "id": "dangling-map",
+      "kind": "spatial",
+      "path": "dangling-map.json",
+      "status": "failed",
+      "code": "spatial_reference",
+      "sha256": "29f4effdd89c45e34b14dcce780746bc1dd782fec6099a54caac20fc26103b99"
+    },
+    {
+      "id": "wrong-boundary-unit",
+      "kind": "spatial",
+      "path": "wrong-boundary-unit.json",
+      "status": "failed",
+      "code": "spatial_boundary",
+      "sha256": "be6b12c771af73b16f29547f16560b2c7fa0dba6ce0aead7a3bf5e87dd39ced1"
+    },
+    {
+      "id": "time-order",
+      "kind": "spatial",
+      "path": "time-order.json",
+      "status": "failed",
+      "code": "spatial_time",
+      "sha256": "3560d0f170ece2f30a4d15ed952b4a9dd8aa64b8d0c8c0f306e3d0912169c6a3"
+    },
+    {
+      "id": "stale-mesh-revision",
+      "kind": "spatial",
+      "path": "stale-mesh-revision.json",
+      "status": "failed",
+      "code": "spatial_mesh_revision",
+      "sha256": "5ebf532a919c1ade667426066c44a752fb0995b1a35614dcff4c49ee906eb712"
+    },
+    {
+      "id": "unknown-major",
+      "kind": "spatial",
+      "path": "unknown-major.json",
+      "status": "failed",
+      "code": "version",
+      "sha256": "65aab692f2fa4f8c5723efeaf6c99f4c6efbce872d142ad018b9e7681ca87462"
+    },
+    {
+      "id": "minimum-reader",
+      "kind": "spatial",
+      "path": "minimum-reader.json",
+      "status": "failed",
+      "code": "version",
+      "sha256": "d39cbc200d638588b62c83bac88bfc6556000c06e945304396090ecfd7fde29d"
+    },
+    {
+      "id": "unknown-field",
+      "kind": "spatial",
+      "path": "unknown-field.json",
+      "status": "failed",
+      "code": "schema",
+      "sha256": "c3dcff2f0a4a68e2d1f42b1eaeb92174ed9ba47eb5ebf0468d3765b94603e7c9"
+    }
+  ]
+}

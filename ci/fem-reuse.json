@@ -1,0 +1,275 @@
+{
+  "schema_version": 1,
+  "source_revision": "4fd3bf320d9566a27e60069fc8387448aaa3a094",
+  "host_profile": "ci/host-profile.json",
+  "asset_sha256": "4828741fc91ee37fafcdb97a1abacb18b04ba451ac4372d9ff7a7349b36f4d6d",
+  "groups": [
+    {
+      "group": "analysis",
+      "disposition": "reuse_api",
+      "files": [
+        {
+          "asset_path": "Mod/Fem/ObjectsFem.py",
+          "source_path": "src/Mod/Fem/ObjectsFem.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/ObjectsFem.py",
+          "sha256": "b10d44a7241518e833d758f57615b0a5fcd8894073fe2ef0a69b3c99111e403a",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "a4f43b36f65e96308cf325c035ba1833c7354071b9c9a1642cee844c44280123",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        }
+      ],
+      "symbols": [
+        "makeAnalysis"
+      ],
+      "consumer": "WP-13",
+      "dependencies": [
+        "official FreeCAD 1.1.4 bundle",
+        "embedded cp311"
+      ],
+      "reason": "FreeCAD document grouping and transactions",
+      "maintenance": "Thin value adapter; re-run exact host probes for every host upgrade",
+      "deployment": "Verified official bundle; offline UNV importer needs no external mesher or solver",
+      "evidence": "tools/fem_probe.py",
+      "replacement_justification": null
+    },
+    {
+      "group": "mesh",
+      "disposition": "reuse_api",
+      "files": [
+        {
+          "asset_path": "Mod/Fem/feminout/importInpMesh.py",
+          "source_path": "src/Mod/Fem/feminout/importInpMesh.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/feminout/importInpMesh.py",
+          "sha256": "510ca35061d99343b3eb05f21dbc4febf8ed2023430ef649b7e95f04eecc7835",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "b420adb5b5ad6b21a8cbed1531b20eef82e21a1df206f7be16e31275a6cbe959",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        },
+        {
+          "asset_path": "Mod/Fem/femmesh/gmshtools.py",
+          "source_path": "src/Mod/Fem/femmesh/gmshtools.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/femmesh/gmshtools.py",
+          "sha256": "a8bf574dd781de5544dec9121f0ed3675b70abf3dc86c44a90f806fce9c08039",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "c97d3f89f8c15052fe0caf3a177fa96d63f4b0503bf29e7f51a4a8eec0e9fdcf",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        },
+        {
+          "asset_path": "Mod/Fem/femmesh/netgentools.py",
+          "source_path": "src/Mod/Fem/femmesh/netgentools.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/femmesh/netgentools.py",
+          "sha256": "e11399cb892b12d35b096cfa5a3a7ef2230f6d46673790dd5746e6e5687c1498",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "518c92f17f36f3383277a55c659b4effc6dfd493956db7391594e97d6e212bfa",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        }
+      ],
+      "symbols": [
+        "Fem.FemMesh",
+        "Fem.read",
+        "FemMesh.write"
+      ],
+      "consumer": "WP-16",
+      "dependencies": [
+        "official FreeCAD 1.1.4 bundle",
+        "embedded cp311"
+      ],
+      "reason": "Select offline UNV round trip; Gmsh and Netgen generation deferred pending production qualification",
+      "maintenance": "Thin value adapter; re-run exact host probes for every host upgrade",
+      "deployment": "Verified official bundle; offline UNV importer needs no external mesher or solver",
+      "evidence": "tools/fem_probe.py",
+      "replacement_justification": null
+    },
+    {
+      "group": "material_selection_load",
+      "disposition": "reuse_api",
+      "files": [
+        {
+          "asset_path": "Mod/Fem/femobjects/material_common.py",
+          "source_path": "src/Mod/Fem/femobjects/material_common.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/femobjects/material_common.py",
+          "sha256": "bfd1a30aea149d659e8d5c5d303e09e6bba3e15c1260bcb593986d4234339f13",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "0e7603ffb54e49b9e10c685da26c982357f0df937ceb22c42bae0fde5481d063",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        },
+        {
+          "asset_path": "Mod/Fem/ObjectsFem.py",
+          "source_path": "src/Mod/Fem/ObjectsFem.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/ObjectsFem.py",
+          "sha256": "b10d44a7241518e833d758f57615b0a5fcd8894073fe2ef0a69b3c99111e403a",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "a4f43b36f65e96308cf325c035ba1833c7354071b9c9a1642cee844c44280123",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        }
+      ],
+      "symbols": [
+        "makeMaterialSolid",
+        "makeConstraintHeatflux",
+        "References"
+      ],
+      "consumer": "WP-13",
+      "dependencies": [
+        "official FreeCAD 1.1.4 bundle",
+        "embedded cp311"
+      ],
+      "reason": "Use references and assignment objects; FCST adapter owns SI and tensor semantics",
+      "maintenance": "Thin value adapter; re-run exact host probes for every host upgrade",
+      "deployment": "Verified official bundle; offline UNV importer needs no external mesher or solver",
+      "evidence": "tools/fem_probe.py",
+      "replacement_justification": null
+    },
+    {
+      "group": "result",
+      "disposition": "reuse_api",
+      "files": [
+        {
+          "asset_path": "Mod/Fem/femobjects/result_mechanical.py",
+          "source_path": "src/Mod/Fem/femobjects/result_mechanical.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/femobjects/result_mechanical.py",
+          "sha256": "c44904a926db33bf4cd6f0be14f203fae9fc25c7d53e5966aaa45c6d13804a58",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "55bbad0ce8fdeb3ba579e9121b148da2557adb4736b405e1d94662807f8a1a2b",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        }
+      ],
+      "symbols": [
+        "makeResultMechanical",
+        "Temperature",
+        "HeatFlux",
+        "NodeNumbers"
+      ],
+      "consumer": "WP-13",
+      "dependencies": [
+        "official FreeCAD 1.1.4 bundle",
+        "embedded cp311"
+      ],
+      "reason": "Raw result object selected; contour GUI and time-series widgets remain later work",
+      "maintenance": "Thin value adapter; re-run exact host probes for every host upgrade",
+      "deployment": "Verified official bundle; offline UNV importer needs no external mesher or solver",
+      "evidence": "tools/fem_probe.py",
+      "replacement_justification": null
+    },
+    {
+      "group": "examples_tests",
+      "disposition": "defer",
+      "files": [
+        {
+          "asset_path": "Mod/Fem/femtest/app/test_result.py",
+          "source_path": "src/Mod/Fem/femtest/app/test_result.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/femtest/app/test_result.py",
+          "sha256": "8be0c6eb438c589846e97c3c99123215213acc806b7597a99c5808816e58f4cd",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "6ab4c03e8b33b9b4a4205f806de7412e6f023f348d5712a931ce4105bc154b18",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        }
+      ],
+      "symbols": [
+        "TestResult"
+      ],
+      "consumer": "WP-16",
+      "dependencies": [
+        "official FreeCAD 1.1.4 bundle",
+        "embedded cp311"
+      ],
+      "reason": "Inspect upstream patterns only; independently authored public fixtures and oracles avoid shared expected-value code",
+      "maintenance": "Thin value adapter; re-run exact host probes for every host upgrade",
+      "deployment": "Verified official bundle; offline UNV importer needs no external mesher or solver",
+      "evidence": "docs/spatial-foundation.md",
+      "replacement_justification": null
+    },
+    {
+      "group": "external_reference",
+      "disposition": "defer",
+      "files": [
+        {
+          "asset_path": "Mod/Fem/femsolver/calculix/writer.py",
+          "source_path": "src/Mod/Fem/femsolver/calculix/writer.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/femsolver/calculix/writer.py",
+          "sha256": "ce7c58caf7b14bda5ffa0e1df7f8b5820f56b922c3f8c52ff48de78b0c9b32c0",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "76f8a3feb89b2fffb57810e6886b92d9e62295d04c912fa976172801ac75712b",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        },
+        {
+          "asset_path": "Mod/Fem/femsolver/elmer/writer.py",
+          "source_path": "src/Mod/Fem/femsolver/elmer/writer.py",
+          "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/femsolver/elmer/writer.py",
+          "sha256": "1440d4e690fb1e7e52ebb4ae4e7722267c69bce76625e236cf8f557a28801b29",
+          "license": "LGPL-2.0-or-later",
+          "notice_sha256": "1243d90b6a30a213b0285bf154c3ee9f9e33c3cce5f427a952b73a71448da251",
+          "notice_range": "first 30 lines of exact asset file",
+          "source_adoption": "API inspection only; no copied source; upstream notices retained in official bundle"
+        }
+      ],
+      "symbols": [
+        "FemInputWriter"
+      ],
+      "consumer": "WP-16",
+      "dependencies": [
+        "official FreeCAD 1.1.4 bundle",
+        "embedded cp311"
+      ],
+      "reason": "Neither external solver selected; no external comparison is claimed",
+      "maintenance": "Thin value adapter; re-run exact host probes for every host upgrade",
+      "deployment": "Verified official bundle; offline UNV importer needs no external mesher or solver",
+      "evidence": "docs/spatial-foundation.md",
+      "replacement_justification": null
+    }
+  ],
+  "selected_mesh_path": {
+    "format": "UNV",
+    "api": [
+      "FemMesh.write",
+      "Fem.read"
+    ],
+    "units": "host mm, canonical m; explicit factor 1000",
+    "options": {
+      "node_base": 1,
+      "canonical_base": 0,
+      "order": 1
+    },
+    "families": [
+      "tet4",
+      "tri3"
+    ],
+    "identity": "IDs stored separately from host row numbers; order changes require explicit remapping",
+    "offline_install": "Extract verified official host bundle; no pip changes inside host",
+    "unsupported": [
+      "Gmsh generation",
+      "Netgen generation",
+      "higher order",
+      "shell thickness formulations",
+      "integration point fields"
+    ]
+  },
+  "external_profiles": [
+    {
+      "name": "CalculiX",
+      "disposition": "deferred",
+      "owner": "Numerical and test leads",
+      "gate": "WP-16/Q1",
+      "execution_mode": "reference_external",
+      "qualified": false,
+      "reason": "No comparison profile selected in this foundation handoff"
+    },
+    {
+      "name": "Elmer",
+      "disposition": "deferred",
+      "owner": "Numerical and test leads",
+      "gate": "WP-16/Q1",
+      "execution_mode": "reference_external",
+      "qualified": false,
+      "reason": "No comparison profile selected in this foundation handoff"
+    }
+  ]
+}

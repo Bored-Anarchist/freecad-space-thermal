@@ -13,7 +13,7 @@ import uuid
 
 from fcst_contracts import VERSION, ContractError, loads, read, normalize, dependency_order, verify_artifact
 from .persistence import (Package, PersistenceError, encode, reject, semantic_hash,
-                          save_package, publication_lock, _save_package, atomic_file, _fault)
+                          save_package, publication_lock, _save_package, atomic_file, _fault, read_manifest)
 
 MAX_STATE_BYTES = 1048576  # No silent audit/dedup pruning; explicit capacity failure.
 DERIVED_KINDS = {"geometry", "mesh", "optics", "environment", "solve", "comparison", "acceptance"}
@@ -322,7 +322,7 @@ class ProjectStore:
     def _manifest(self):
         row = self.db.execute("SELECT data FROM package_manifest WHERE id=1").fetchone()
         if row:
-            return read("manifest", loads(row[0]))
+            return read_manifest(loads(row[0]))
         if self.db.execute("SELECT 1 FROM artifacts LIMIT 1").fetchone():
             # Old operational stores did not retain immutable byte-hash pins.
             # Reconstruct from the checked portable manifest instead of blessing
@@ -454,6 +454,16 @@ class ProjectStore:
             return Package.create(state["model"], self._artifacts(), state=state, **self._package_metadata())
         finally:
             self.db.execute("ROLLBACK")
+
+    def spatial_result(self, artifact_id, *, historical=False):
+        from .spatial_arrays import read_spatial
+        self.derived(artifact_id, historical=historical)
+        item=next((a for a in self._artifacts() if a[0]==artifact_id and a[1]=="spatial"),None)
+        if item is None: reject("unknown_derived")
+        value=read_spatial(item[3])
+        if not historical and value["model_hash"]!=semantic_hash(self.snapshot()):
+            reject("stale_result")
+        return value
 
     def save(self, path, *, expanded=False, fault=None):
         # Select the committed snapshot after acquiring the destination lock;

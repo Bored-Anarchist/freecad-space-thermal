@@ -1,0 +1,28 @@
+{
+  "work_package": "WP-05.5",
+  "requirement": "TST-022",
+  "consumers": {
+    "WP-06": "Versioned immutable spatial envelopes; no live host pointers; worker lifecycle remains WP-06",
+    "WP-07": "Manifest v2 and spatial v2 readers; explicit supported subset and lossy export rejection",
+    "WP-13": "Selected FEM API/UNV path and transaction/result adapter; full workbench remains WP-13",
+    "WP-16": "tet4/tri3 identities and raw vertex fields, independent oracles and frozen refinement criteria; production formulation/mesher qualification remains WP-16"
+  },
+  "artifacts": [
+    "ci/fem-reuse.json",
+    "ci/spatial-fixtures.json",
+    "ci/spatial-criteria-v1.json",
+    "ci/foundation-issues.json",
+    "spec/schemas/spatial-v2.schema.json",
+    "spec/schemas/manifest-v2.schema.json",
+    "docs/spatial-foundation.md",
+    "python/fcst_app/fem_adapter.py",
+    "tools/fem_probe.py",
+    "tools/check_spatial.py"
+  ],
+  "commands": [
+    "python tools/verify.py --preset windows-debug",
+    "python tools/verify.py --preset windows-release",
+    "python tools/fem_probe.py",
+    "python tools/check_foundation_handoff.py --reports .local/handoff-reports --report .local/handoff.json"
+  ]
+}
