@@ -10,6 +10,12 @@
 #include <io.h>
 #endif
 int main(int argc, char* argv[]) {
+  if (argc == 4 && std::string_view(argv[1]) == "--worker") {
+#ifdef _WIN32
+    if (_setmode(_fileno(stdin), _O_BINARY) == -1 || _setmode(_fileno(stdout), _O_BINARY) == -1) return 2;
+#endif
+    return fcst::run_worker(argv[2], argv[3]);
+  }
   if (argc == 3 && std::string_view(argv[1]) == "--contract") {
 #ifdef _WIN32
     if (_setmode(_fileno(stdin), _O_BINARY) == -1) return 2;

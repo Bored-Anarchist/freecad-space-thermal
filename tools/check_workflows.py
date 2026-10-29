@@ -31,6 +31,7 @@ def validate():
     assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies"}, "Profile jobs absent from required gate"
     assert workflow["jobs"]["host"]["strategy"]["matrix"]["os"] == ["windows-2022"], "Windows-only host matrix required"
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
+    assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
     assert "fem_probe.py" in str(workflow["jobs"]["host"]), "FEM probes absent"
     assert "check_foundation_handoff.py" in str(workflow["jobs"]["gate"]), "TST-022 aggregate absent"
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]

@@ -39,6 +39,15 @@
     "test_inventory.InventoryTests.test_syntax_and_retained_originals_cannot_claim_qualification",
     "test_inventory.InventoryTests.test_unknown_version_requires_explicit_blocker",
     "test_inventory.InventoryTests.test_unpinned_or_missing_file_provenance_rejected",
+    "test_jobs.JobTests.test_artifact_root_hash_and_size_authorization",
+    "test_jobs.JobTests.test_budgets_paging_and_failed_submission_rollback",
+    "test_jobs.JobTests.test_cancel_acknowledgement_and_forced_deadline",
+    "test_jobs.JobTests.test_crash_timeout_and_disconnect_never_succeed",
+    "test_jobs.JobTests.test_durable_idempotency_snapshot_conflict_and_scope",
+    "test_jobs.JobTests.test_frozen_submit_cancel_dispatch_and_exact_retry",
+    "test_jobs.JobTests.test_protocol_sequences_limits_and_checkpoint_binding",
+    "test_jobs.JobTests.test_queued_cancellation_and_terminal_callbacks_are_idempotent",
+    "test_jobs.JobTests.test_restart_lease_and_linked_fresh_attempt",
     "test_numerical.NumericalTests.test_criteria_observations_and_manifest_tampering_invalidate_evidence",
     "test_numerical.NumericalTests.test_critical_node_and_energy_errors_cannot_hide_in_averages",
     "test_numerical.NumericalTests.test_failed_attempt_is_preserved_when_new_criteria_are_assessed",
@@ -273,5 +282,14 @@
     "WP055-STORE-004",
     "WP055-TOOL-001",
     "WP055-TOOL-002"
+  ],
+  "job_cases": [
+    "test_checkpoint_restart_preserves_state_and_rejects_changed_identity",
+    "test_local_cli_submit_poll_run_cancel_and_resume_diagnostic",
+    "test_native_worker_is_engine_only_and_reports_unsupported_physics",
+    "test_partial_mismatched_late_and_badexit_results_are_never_published",
+    "test_real_process_kill_points_preserve_job_truth",
+    "test_success_can_win_a_requested_cancellation_race",
+    "test_success_publication_attachment_and_historical_snapshot"
   ]
 }

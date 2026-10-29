@@ -8,6 +8,9 @@
 #include <cmath>
 #include <cstdint>
 #include <functional>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 #include <iomanip>
 #include <limits>
 #include <map>
@@ -428,6 +431,61 @@ std::string sha256(const std::string& bytes) {
   if(status<0) fail("artifact"); return hex(std::string_view(reinterpret_cast<const char*>(digest.data()),digest.size()));
 }
 } // namespace
+int run_worker(const std::string& root, const std::string& job_id) {
+  // This boundary stays engine-only. Physics remains WP-11; unsupported work
+  // produces a truthful failed terminal rather than a fabricated thermal result.
+  try {
+    if (!std::regex_match(job_id,std::regex("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"))) fail("schema");
+    auto emit=[&](const J& message) {
+      auto bytes=dump(read("worker",message));
+      if(bytes.empty() || bytes.size()>65536) fail("schema");
+      auto n=static_cast<std::uint32_t>(bytes.size());
+      for(unsigned i=0;i<4;++i) std::cout.put(static_cast<char>((n>>(8*i))&255));
+      std::cout.write(bytes.data(),static_cast<std::streamsize>(bytes.size())); std::cout.flush();
+    };
+    auto message=[&](const char* type,double sequence,J payload) {
+      return J(J::O{{"contract_version",J("1.0.0")},{"type",J(type)},{"job_id",J(job_id)},
+                    {"sequence",J(sequence)},{"payload",std::move(payload)}});
+    };
+    emit(message("handshake",0,J(J::O{{"capabilities",J(J::O{
+      {"contract_version",J("1.0.0")},{"minimum_reader",J("1.0.0")},
+      {"operations",J(J::A{J("job.submit"),J("job.cancel")})},
+      {"solver_available",J(false)},{"execution_mode",J("fcst_native")}})}})));
+    std::uint32_t length=0;
+    for(unsigned i=0;i<4;++i) { auto c=std::cin.get(); if(c==EOF) fail("invalid_json"); length|=static_cast<std::uint32_t>(static_cast<unsigned char>(c))<<(8*i); }
+    if(length==0 || length>65536) fail("invalid_json");
+    std::string bytes(length,'\0'); std::cin.read(bytes.data(),length);
+    if(static_cast<std::uint32_t>(std::cin.gcount())!=length) fail("invalid_json");
+    auto submit=read("worker",Parser{bytes}.parse());
+    if(submit.at("type").str()!="submit" || submit.at("job_id").str()!=job_id || submit.at("sequence").num()!=1) fail("reference");
+    const auto& payload=submit.at("payload"); const auto& ref=payload.at("snapshot");
+    std::filesystem::path base=std::filesystem::absolute(root), path=base;
+    // The authorized artifact root is set by the trusted launcher. Reject
+    // reparse points and hard links before opening any model file.
+    if((GetFileAttributesW(base.c_str()) & FILE_ATTRIBUTE_REPARSE_POINT)!=0) fail("artifact");
+    for(const auto& part:std::filesystem::path(ref.at("path").str())) {
+      path/=part;
+      auto attributes=GetFileAttributesW(path.c_str());
+      if(attributes==INVALID_FILE_ATTRIBUTES || (attributes & FILE_ATTRIBUTE_REPARSE_POINT)!=0) fail("artifact");
+    }
+    auto size=std::filesystem::file_size(path);
+    if(size>1048576 || static_cast<double>(size)!=ref.at("byte_length").num() || std::filesystem::hard_link_count(path)!=1) fail("artifact");
+    std::ifstream input(path,std::ios::binary); std::string model_bytes(static_cast<std::size_t>(size),'\0');
+    input.read(model_bytes.data(),static_cast<std::streamsize>(size));
+    if(static_cast<std::uintmax_t>(input.gcount())!=size || sha256(model_bytes)!=ref.at("sha256").str()) fail("artifact");
+    auto model=read("model",Parser{model_bytes}.parse());
+    if(sha256(std::string("FCST-semantic-v1\0",17)+canonical(snapshot(model)))!=payload.at("semantic_hash").str()) fail("artifact");
+    bool found=false;
+    for(const auto& entity:model.at("entities").arr()) if(entity.at("kind").str()=="case" && entity.at("id")==payload.at("case_id")) found=true;
+    if(!found) fail("reference");
+    emit(message("diagnostic",2,J(J::O{{"code",J("not_implemented")},{"pointer",J("")}})));
+    emit(message("terminal",3,J(J::O{{"outcome",J("failed")}})));
+    return 0;
+  } catch(...) {
+    // Malformed input disconnects without success; no paths or model text leak.
+    return 2;
+  }
+}
 std::string inspect_contract(std::string_view kind,std::string_view input) {
   try {
     if(kind=="worker-frame") {

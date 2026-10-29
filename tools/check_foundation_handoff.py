@@ -30,6 +30,8 @@ def check(directory):
         if evaluate(expected,v["cases"])["status"]!="passed": raise ValueError("configuration_coverage")
         reports[preset]=load(path.parent/"spatial.json")
         numerical=load(path.parent/"numerical.json");persistence=load(path.parent/"persistence.json")
+        jobs=load(path.parent/"jobs.json")
+        if jobs["gate"]["status"]!="passed": raise ValueError("job_lifecycle_regression")
         if numerical["gate"]["status"]!="passed" or persistence["gate"]["status"]!="passed": raise ValueError("baseline_regression")
         contracts=load(path.parent/"contracts.json")
         if contracts["status"]!="passed": raise ValueError("contract_regression")
@@ -54,7 +56,7 @@ def check(directory):
     scanner=Scanner(load(POLICY_PATH))
     # Every exact report and every candidate path is inspected before publication.
     for path in sorted(directory.rglob("*.json")):
-        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json"}:
+        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json","jobs.json"}:
             scanner.scan(path.name,path.read_bytes())
     # Full outgoing history is additionally required locally before push. CI checks
     # the actual checked-out candidate (checkout may intentionally be shallow).
