@@ -35,7 +35,7 @@ def main() -> int:
         from pathlib import Path
         from fcst_app.persistence import PersistenceError, recover_package, migrate_project, semantic_hash, save_package
         try:
-            if args.command=='td-probe' or args.command.startswith('sinda-'):
+            if args.command.startswith(('td-','sinda-')):
                 from .td import execute
                 result=execute(args)
             elif args.command.startswith("exchange-"):

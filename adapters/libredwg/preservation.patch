@@ -1,0 +1,142 @@
+--- a/include/dwg.h
++++ b/include/dwg.h
+@@ -11471,6 +11471,9 @@
+   unsigned int num_acis_sab_hdl;  // temporary, until we can parse acds for SAB data, r2013+
+   BITCODE_H *acis_sab_hdl;
+   BITCODE_RLL next_hdl; // for add_document handle holes
++
++  BITCODE_RL fcst_acds_size;
++  BITCODE_TF fcst_acds_raw;
+ 
+   BITCODE_BL prev_entity_index; // for speedup find_prev_entity
+ 
+--- a/src/spec.h
++++ b/src/spec.h
+@@ -575,7 +575,7 @@
+ #  define HANDLE_UNKNOWN_BITS                                                 \
+     {                                                                         \
+       unsigned num_bytes = obj->num_unknown_bits / 8;                         \
+-      if (obj->num_unknown_bits & 8)                                          \
++      if (obj->num_unknown_bits & 7)                                          \
+         num_bytes++;                                                          \
+       KEY (num_unknown_bits);                                                 \
+       VALUE_RL (obj->num_unknown_bits, 0);                                    \
+@@ -609,7 +609,7 @@
+ #  define UNKNOWN_BITS_REST                                                   \
+     {                                                                         \
+       unsigned num_bytes = obj->num_unknown_rest / 8;                         \
+-      if (obj->num_unknown_rest & 8)                                          \
++      if (obj->num_unknown_rest & 7)                                          \
+         num_bytes++;                                                          \
+       KEY (num_unknown_rest);                                                 \
+       VALUE_RL (obj->num_unknown_rest, 0);                                    \
+--- a/src/out_json.c
++++ b/src/out_json.c
+@@ -1864,7 +1864,7 @@
+           int i = obj->type - 500;
+           Dwg_Class *klass = NULL;
+           int num_bytes = obj->num_unknown_bits / 8;
+-          if (obj->num_unknown_bits & 8)
++          if (obj->num_unknown_bits & 7)
+             num_bytes++;
+ 
+           if (obj->fixedtype == DWG_TYPE_FREED)
+--- a/src/encode.c
++++ b/src/encode.c
+@@ -2269,7 +2269,7 @@
+                    klass->item_class_id);
+         SINCE (R_2004a)
+         {
+-          if (!klass->dwg_version)
++          if (!klass->dwg_version && dwg->header.from_version != dwg->header.version)
+             {
+               klass->dwg_version = (BITCODE_BL)dwg->header.dwg_version;
+               klass->maint_version = (BITCODE_BL)dwg->header.maint_version;
+@@ -2331,7 +2331,7 @@
+                    klass->item_class_id);
+         SINCE (R_2004a)
+         {
+-          if (!klass->dwg_version)
++          if (!klass->dwg_version && dwg->header.from_version != dwg->header.version)
+             {
+               klass->dwg_version = (BITCODE_BL)dwg->header.dwg_version;
+               klass->maint_version = (BITCODE_BL)dwg->header.maint_version;
+@@ -2995,11 +2995,11 @@
+           // pre-R13b1 must stay 0 (set by dxf_fixup_header or decode)
+           _obj->dwg_version = _verp->dwg_version;
+       }
+-    if (_verp && !_obj->maint_rel_version)
++    if (_verp && !_obj->maint_rel_version && ((dwg->opts & DWG_OPTS_IN) || _obj->from_version != _obj->version))
+       _obj->maint_rel_version = _verp->maint_rel_version;
+-    if (!_obj->app_dwg_version)
++    if (!_obj->app_dwg_version && ((dwg->opts & DWG_OPTS_IN) || _obj->from_version != _obj->version))
+       _obj->app_dwg_version = _obj->dwg_version;
+-    if (!_obj->app_maint_version)
++    if (!_obj->app_maint_version && ((dwg->opts & DWG_OPTS_IN) || _obj->from_version != _obj->version))
+       _obj->app_maint_version = _obj->maint_version;
+     if (!_obj->codepage)
+       _obj->codepage = dat->codepage;
+@@ -3769,6 +3769,17 @@
+             break;
+           case SECTION_ACDS:
+             {
++              /* FCST: do not discard unparsed ACIS/datastorage sections. */
++              if (dwg->fcst_acds_size)
++                {
++                  if (!dwg->fcst_acds_raw || dwg->fcst_acds_size > 67108864
++                      || dwg->header.from_version != dwg->header.version)
++                    return DWG_ERR_INVALIDDWG;
++                  bit_chain_alloc (&sec_dat[type]);
++                  str_dat = hdl_dat = dat = &sec_dat[type];
++                  bit_chain_set_version (dat, old_dat);
++                  bit_write_TF (dat, dwg->fcst_acds_raw, dwg->fcst_acds_size);
++                }
+ #if 0
+               Dwg_AcDs *_obj = &dwg->acds;
+               bit_chain_alloc (&sec_dat[type]);
+--- a/src/free.c
++++ b/src/free.c
+@@ -1749,6 +1749,8 @@
+           FREE_IF (dwg->acis_sab_hdl[i]);
+         }
+       FREE_IF (dwg->acis_sab_hdl);
++      FREE_IF (dwg->fcst_acds_raw);
++      dwg->fcst_acds_size = 0;
+       FREE_IF (dwg->object);
+       if (dwg->object_map)
+         {
+--- a/src/decode.c
++++ b/src/decode.c
+@@ -3352,6 +3352,14 @@
+   dat = &sec_dat; // restrict in size
+   bit_chain_set_version (&old_dat, dat);
+ 
++  /* FCST: retain unsupported datastorage bytes for same-version passthrough. */
++  if (sec_dat.size > 67108864)
++    { free (sec_dat.chain); return DWG_ERR_VALUEOUTOFBOUNDS; }
++  dwg->fcst_acds_raw = (BITCODE_TF)malloc (sec_dat.size);
++  if (!dwg->fcst_acds_raw && sec_dat.size)
++    { free (sec_dat.chain); return DWG_ERR_OUTOFMEM; }
++  dwg->fcst_acds_size = (BITCODE_RL)sec_dat.size;
++  memcpy (dwg->fcst_acds_raw, sec_dat.chain, sec_dat.size);
+   error |= acds_private (dat, dwg);
+   error &= ~DWG_ERR_SECTIONNOTFOUND;
+ 
+--- a/src/dwg.spec
++++ b/src/dwg.spec
+@@ -3850,15 +3850,6 @@
+     FIELD_HANDLE (plotstyle, 5, 0);
+   }
+   SINCE (R_2007a) {
+-    ENCODER {
+-#ifndef DEBUG_CLASSES
+-      if (_obj->material)
+-        {
+-          _obj->material->absolute_ref = 0;
+-          _obj->material->handleref.value = 0;
+-        }
+-#endif
+-    }
+     FIELD_HANDLE (material, 5, 0);
+   }
+   SINCE (R_13b1) {

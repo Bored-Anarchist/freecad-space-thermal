@@ -28,7 +28,11 @@ def validate():
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
-    assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies"}, "Profile jobs absent from required gate"
+    assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies", "dwg"}, "Profile jobs absent from required gate"
+    native=workflow['jobs']['dwg']['steps']
+    assert any('build_independent_dwg.py' in step.get('run','') for step in native), 'Independent backend build absent'
+    assert any('publication_preflight.py' in step.get('run','') and 'dwg-backend.json' in step['run'] for step in native), 'Native report lacks clearance'
+    assert any(step.get('with',{}).get('name')=='foundation-dwg' for step in native), 'Native report absent from handoff'
     assert workflow["jobs"]["host"]["strategy"]["matrix"]["os"] == ["windows-2022"], "Windows-only host matrix required"
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"

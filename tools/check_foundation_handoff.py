@@ -47,6 +47,16 @@ def check(directory):
     hosts=list(directory.rglob("fem-probe.json"))
     if len(hosts)!=1: raise ValueError("missing_or_duplicate_host_report")
     host=load(hosts[0]);inputs=input_hashes(ROOT)
+    native_reports=list(directory.rglob('dwg-backend.json'))
+    if len(native_reports)!=1:raise ValueError('missing_or_duplicate_native_backend_report')
+    native=load(native_reports[0]);native_profile=load(ROOT/'ci/dwg-backend.json')
+    if (native.get('candidate')!=candidate or native.get('profile')!=native_profile['runtime']
+            or native.get('input_sha256')!=native_profile['source_inputs']
+            or any(sha256((ROOT/name).read_bytes()).hexdigest()!=value for name,value in native_profile['source_inputs'].items())
+            or native.get('gate',{}).get('status')!='passed'
+            or evaluate(native_profile['required_cases'],native.get('cases',[]))['status']!='passed'
+            or native.get('qualified') is not False or native.get('vendor_runtime_required') is not False):
+        raise ValueError('native_backend_identity_or_regression')
     assess_reports(reports["windows-debug"],reports["windows-release"],host,inputs,candidate)
     profile=load(ROOT/"ci/host-profile.json")
     if (host["asset_sha256"]!=profile["platforms"]["Windows"]["sha256"] or host["python_abi"]!="cp311"
@@ -65,7 +75,7 @@ def check(directory):
     scanner=Scanner(load(POLICY_PATH))
     # Every exact report and every candidate path is inspected before publication.
     for path in sorted(directory.rglob("*.json")):
-        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json","jobs.json","exchange.json","td.json"}:
+        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json","jobs.json","exchange.json","td.json","dwg-backend.json"}:
             scanner.scan(path.name,path.read_bytes())
     # Full outgoing history is additionally required locally before push. CI checks
     # the actual checked-out candidate (checkout may intentionally be shallow).

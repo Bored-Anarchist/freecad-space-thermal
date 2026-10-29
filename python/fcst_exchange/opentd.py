@@ -25,19 +25,7 @@ EDIT_FIELDS={'Node':{'InitialTemp','MassVol'},'Conductor':{'Value'},'HeatLoad':{
              'OpticalProps':{'Alph','Emis'}}
 
 
-@dataclass(frozen=True)
-class TdLimits:
-    files:int=2048
-    file_bytes:int=67108864
-    total_bytes:int=268435456
-    include_depth:int=32
-    timeout_seconds:float=180
-    log_bytes:int=1048576
-    memory_mb:int=4096
-
-    def __post_init__(self):
-        if (any(type(getattr(self,k)) is not int or getattr(self,k)<=0 for k in ('files','file_bytes','total_bytes','include_depth','log_bytes','memory_mb'))
-                or not math.isfinite(self.timeout_seconds) or not 0<self.timeout_seconds<=1800 or self.memory_mb>16384):reject('td_limits')
+from .source_tree import ProjectLimits as TdLimits
 
 
 @dataclass(frozen=True)

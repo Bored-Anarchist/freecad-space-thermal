@@ -9,7 +9,7 @@ the independent container experiment does not establish thermal compatibility.
 The OpenTD implementation below is retained only for optional external reference
 work and cannot satisfy the product's import/export requirement.
 
-WP-08 supplies an implementation delivery for the pinned TD 6.3 path. **Q1
+WP-08 supplies independent format slices and optional pinned TD 6.3 reference tooling. **Q1
 qualification remains open.** The user authorized pushing this tested delivery
 with the dependent qualification holds retained. No licensed AutoCAD host is
 available on the development machine. Owned-engine thermal/radiation/environment
@@ -22,6 +22,26 @@ The actual assembly targets **.NET Framework 4.6**. The owned C# sidecar builds
 with the Windows x64 Framework compiler against the separately installed assembly;
 it does not redistribute vendor DLLs. 2025 R2 and 2026 R1 profiles are explicitly
 unimplemented. An absent or mismatched profile fails before source mutation.
+
+## Independent native DWG container slice
+
+`python tools/build_independent_dwg.py` builds the locked separate GPL backend
+and runs an owned synthetic rewrite/fresh-process reopen. Its trusted installation
+receipt is selected explicitly, outside imported project data.
+
+```text
+fcst td-preview source main.dwg --backend .local/dwg-backend/install/backend.json --work .local/new-preview
+fcst td-export-source source main.dwg derived-source --backend .local/dwg-backend/install/backend.json --work .local/new-export-preview
+```
+
+These commands require no TD/OpenTD/AutoCAD/SINDA installation or license. They
+inspect container records and preserve complete source trees; they do not map
+TD thermal classes. Any thermal edit or native-ready request is rejected.
+`td-audit-rewrite` runs a private structural preservation audit. All native class
+records, opaque bytes/datastorage and logical standard fields are checked after
+fresh-process reopen; derived research drawings are never user exports.
+See the decision and `adapters/libredwg/README.md` for scope, pinned provenance
+and component license obligations. Raw inventories and source data remain local.
 
 ## SINDA 6.3 constant-network profile
 
@@ -86,6 +106,17 @@ map to safe hash-derived package paths; an inert evidence map retains the origin
 relative names and dependency graph. Exact original bytes are preserved. Packages,
 source maps and fidelity inventories containing real source data remain local
 until independently cleared for publication.
+
+## New-model SINDA export
+
+`fcst sinda-write-model native.fcst new-source` with the same explicit unit flags
+as preview writes a deterministic new constant-network deck. It accepts only
+submodels, nodes, linear conductors and scalar loads, assigns stable source IDs
+and reopens the deck through the independent parser before an atomic commit.
+Every mapped quantity/identity/reference must match within the declared numeric
+precision. Unsupported fields, overlapping load aggregation and unrepresentable
+precision fail before publication. Labels are escaped inert annotations; the
+receipt records native-to-source identities. No original deck or vendor is needed.
 
 ## Optional external reference: OpenTD sidecar and copied DWG projects
 
@@ -185,8 +216,9 @@ source logic inertness, controlled edits, TPRINT identity/time/units, source-cop
 guards, native-readiness limits and false-qualification rejection. Public tests
 never claim licensed TD execution; the separate installed-API smoke is local evidence.
 
-TST-021 scans actual adapter/C# sources, fixtures, summaries, evidence and final
-GitHub prose. Policy v4 adds `.cs` to inspected text types with unchanged sensitive
+TST-021 scans actual adapter/C#/native bridge/configuration/patch sources, preserved
+third-party notices, locked public provenance, fixtures, summaries, evidence and final
+GitHub prose. Policy v5 inspects `.cs`, native `.h` and `.patch` text with unchanged sensitive
 patterns, binary rejection and inspection budgets. Originals, property databases,
 DWG/deck/result bytes, private profiles, compiled sidecars, vendor DLLs and raw logs
 stay local. Scan staged bytes and outgoing history before upload; the scopes may

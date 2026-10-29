@@ -30,6 +30,17 @@ class PrivacyTests(unittest.TestCase):
         self.scanner.scan("fixtures/model.json", b'{"nodes":[{"id":"n1","temperature_K":300}]}')
         self.assertEqual(self.scanner.report()["status"], "passed")
 
+    def test_native_header_and_patch_are_scanned_as_text_without_binary_exemptions(self):
+        for name in ('config.h','preservation.patch'):
+            scanner=Scanner(self.policy);scanner.scan(name,b'/* owned synthetic source */\n')
+            self.assertEqual(scanner.report()['status'],'passed')
+            secret='synthetic'+'@'+'example.invalid'
+            scanner=Scanner(self.policy);scanner.scan(name,secret.encode())
+            self.assertIn('contact',{row['category'] for row in scanner.findings})
+            self.assertNotIn(secret,json.dumps(scanner.report()))
+            scanner=Scanner(self.policy);scanner.scan(name,b'\x00\xffbinary')
+            self.assertEqual(scanner.report()['status'],'failed')
+
     def test_public_project_url_is_distinct_from_real_home_paths(self):
         self.scanner.scan("project.json", b'{"url":"https://github.com/users/sample/projects/1"}')
         self.assertEqual(self.scanner.report()["status"], "passed")

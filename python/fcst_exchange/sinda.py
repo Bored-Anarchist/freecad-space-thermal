@@ -304,7 +304,7 @@ class SindaAdapter:
 
     def probe(self):
         return {'profile':self.profile,'available':True,'runtime':'python-standard-library','dialect':'SINDA 6.3 constant-network subset',
-                'operations':['preview','unchanged-export','controlled-edit'],'vendor_qualified':False,'native_solver_available':False}
+                'operations':['preview','unchanged-export','controlled-edit','write-model'],'vendor_qualified':False,'native_solver_available':False}
 
     def preview(self,root,entry,*,limits=Limits()):
         sources,graph,errors=_resolve(Path(root),entry,limits)

@@ -59,63 +59,58 @@ parsers/translators; do not execute imported Fortran or use SINDA as the solver.
 An export from a new native model needs a separately tested canonical-to-source
 writer; an unchanged source copy does not establish that capability.
 
-## Measured feasibility and rejected shortcuts
+## Corrected independent container implementation
 
-A local read-only experiment used the official LibreDWG 0.14 Windows x64 release.
-The archive, executables and runtime DLLs are hash-pinned in
-[the probe profile](../../ci/independent-dwg-probe.json). The source drawing,
-decoded inventories, rewritten drawing and raw diagnostics stay in ignored local
-storage. No vendor process, assembly, registry or license was used. The original
-drawing hash remained unchanged.
+`adapters/libredwg` builds a separate static Windows executable from the locked
+LibreDWG 0.14 source and an owned preservation patch. `ci/dwg-backend.json` pins
+the public source archive, compiler archive, exact patch pre/post images, owned
+bridge/configuration/build sources and runtime protocol. CMake builds without
+an installed vendor product. The component retains GPL-3.0-or-later notices;
+its README records distribution and corresponding-source obligations. Core
+Python/engine licensing remains separate; this is not a linked core dependency.
+No executable or proprietary model is published by these checks.
 
-The reader decoded an acquired `AC1032` drawing and the writer produced another
-`AC1032` drawing which the reader reopened. An exploratory JSON comparison found
-matching opaque-object identities, bit-count declarations and stored payload
-strings. This establishes a viable independent container experiment, not a
-lossless or thermal compatibility result. The strict audit found these blockers:
+The initial stock-binary research profile is historical. Its discovered losses
+are addressed in the corrected backend: partial-byte rounding, layer material
+references, zero class/producer versions, and complete unparsed AcDs datastorage.
+The native protocol retains complete opaque bit strings and class records.
+Standard JSON fields retain every ordered key occurrence, including repeated
+subclass fields, instead of discarding values in a dictionary. Comparison excludes
+only documented regenerated physical offsets, page IDs/counts, checksums and
+encoded object sizes; all logical fields and opaque native records are compared.
 
-- The serializer emits duplicate JSON keys. A normal JSON dictionary reader
-  silently discards earlier values; the new audit rejects this ambiguity.
-- Serialized opaque payload byte counts can disagree with the declared bit
-  count. Upstream `src/out_json.c` at tag `0.14` computes the extra byte using
-  `num_unknown_bits & 8`; a non-byte-aligned bit count requires a remainder
-  check. Agreement between two truncated JSON representations is insufficient.
-- The exploratory rewrite changes a decoded class field and standard object
-  fields. These must be fixed or given independently verified semantics before
-  promoting rewritten files. Matching opaque payloads alone cannot pass export.
-- No owned TD-specific thermal field codec exists yet. A successfully opened
-  drawing cannot be labeled native-ready or used to claim complete import.
+A private same-version AC1032 experiment preserved 1,219 object records, 54 class
+records, 1,025 objects with opaque payloads and the complete raw datastorage
+section through rewrite and fresh-process reopen. All logical standard fields
+matched. Original bytes remained unchanged. These observations establish the
+tested container slice only: no owned TD thermal class field codec exists yet,
+and warning bits for unhandled classes/unparsed datastorage remain explicit.
+AC1032 does not identify the TD release. Semantic dependency closure, edited
+thermal DWG and new-model DWG export remain unimplemented and unqualified.
 
-Use a verified native API binding or a corrected, pinned serialization bridge
-that preserves every bit and distinct field. Evaluate the writer independently.
-LibreDWG is currently a research candidate, not an adopted product dependency.
-Its GPL-3.0-or-later distribution and corresponding-source requirements require
-an explicit packaging/license disposition before shipping a component. Keep
-any adopted component's original notices and exact source/build provenance.
+The independently usable product slice exposes `td-preview` and
+`td-export-source`: inspect native container records and retain the entire
+immutable source tree exactly, including opaque companions and empty directories.
+These operations never construct a runnable thermal model. Thermal edits reject
+before export. `td-audit-rewrite` is a private preservation experiment and is
+never promoted to a user export. No operation imports or falls back to OpenTD.
 
-ACadSharp is another open-source candidate, with an MIT license and modern DWG
-reading/writing. The inspected revision
-`25b534813c1e5beb19ce78dd8f671781fd4d052f` deliberately rejects `UnknownEntity`
-in its DWG writer, while its unknown-object classes retain basic metadata rather
-than the complete custom payload. It therefore cannot be substituted unchanged
-as a lossless TD converter. An extension would need full payload/reference and
-class-codec support, not only a different DLL.
-
-References: [LibreDWG project](https://www.gnu.org/software/libredwg/),
-[pinned 0.14 serializer source](https://github.com/LibreDWG/libredwg/blob/0.14/src/out_json.c),
-[LibreDWG 0.14 release](https://github.com/LibreDWG/libredwg/releases/tag/0.14),
-[pinned ACadSharp writer](https://github.com/DomCR/ACadSharp/blob/25b534813c1e5beb19ce78dd8f671781fd4d052f/src/ACadSharp/IO/DWG/DwgStreamWriters/DwgObjectWriter.cs).
-Older LibreDWG documentation understates newer writer capabilities; the measured
-0.14 same-version experiment, its failures and exact binary hashes take precedence
-over an inferred modern-write support claim.
+The direct SINDA path now also writes a new source tree from a native FCST model,
+without needing an imported deck. Its closed constant-network subset covers
+submodels, capacitive/prescribed/algebraic nodes, linear conductors and scalar
+loads. It assigns deterministic source IDs, uses explicit units and reopens the
+generated deck to compare every mapped identity, connection and quantity.
+Unsupported semantics, ambiguous load aggregation and precision loss reject
+before atomic publication. This does not qualify full SINDA language execution.
 
 ## Implementation and unattended acceptance
 
 WP-08 remains in progress. Deliver these slices in order:
 
-1. Correct and pin the independent container bridge. Verify real bit lengths,
-   duplicate-free field representation, handle/reference closure and every
-   unrequested field through same-version rewrites. Preserve all source files.
+1. Retain the corrected container bridge and its native/ordered-field contracts.
+   Its owned fixture is built, rewritten and reopened unattended in public CI.
+   Extend independently verified preservation coverage before thermal promotion;
+   container agreement alone never establishes class semantics.
 2. Specify owned class codecs from authorized file-format observations and
    independently authored fixtures. Start with nodes, linear conductors and
    scalar loads, then required geometry/material/optical/case/logic classes.
@@ -136,20 +131,24 @@ WP-08 remains in progress. Deliver these slices in order:
    claims still require sufficient target-format evidence. Missing reference
    evidence must be reported rather than invented.
 
-The repeatable local research driver is
-`python tools/probe_independent_dwg.py --drawing <local.dwg> --tools <pinned-tool-directory> --work <new-private-directory> --report <new-local-report.json>`.
-It downloads nothing, uses the existing bounded converter runner and operates on
-copies in a fresh directory. Its derivatives are research artifacts, never user
-exports. A successful probe invocation means the experiment completed; the
-bounded verdict still reports blocked decoder contracts and always reports
-`native_ready=false`, `qualified=false`.
+Build and self-test with `python tools/build_independent_dwg.py`. This downloads
+only locked public source/toolchain assets, keeps build artifacts local and
+produces a bounded `dwg-backend.json` report. Foundation CI requires that job and
+checks its candidate, source hashes, five cases and nonqualification flags in
+the final handoff. It publishes only the privacy-cleared summary.
 
-`tests/test_independent_dwg.py` uses owned synthetic fixtures to test missing
-opaque bits, changed references/properties/classes, duplicate JSON/identities,
-size/depth/value budgets and private-value withholding. Its SINDA end-to-end
-case forbids vendor-related imports while running preview, export and .fcst
-packaging. These tests are included in unattended Windows verification. They
-cannot qualify unimplemented TD thermal codecs.
+For private corpus research use
+`python tools/probe_independent_dwg.py --drawing <local.dwg> --backend <trusted-install/backend.json> --work <new-private-directory> --report <new-local-report.json>`.
+The driver downloads nothing and preserves originals. Decoder values and derived
+drawings remain local. Success always retains `native_ready=false` and
+`qualified=false` because thermal codecs remain unmapped.
+
+`tests/test_native_dwg.py`, `tests/test_sinda_writer.py` and the existing SINDA,
+container and optional-reference tests run in both Windows configurations and
+the standard-library security job. They cover retained duplicate occurrences,
+partial payload bytes, unrequested field changes, safe source patches/caches,
+source overlap/staleness, exact source copies, new-model SINDA generation and
+vendor-import rejection. No manual acceptance execution is assigned to the user.
 
 ## Publication privacy
 

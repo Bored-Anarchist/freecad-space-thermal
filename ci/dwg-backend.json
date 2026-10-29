@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "source": {
+    "url": "https://github.com/LibreDWG/libredwg/releases/download/0.14/libredwg-0.14.tar.xz",
+    "filename": "libredwg-0.14.tar.xz",
+    "bytes": 11108920,
+    "sha256": "62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275"
+  },
+  "compiler": {
+    "url": "https://github.com/skeeto/w64devkit/releases/download/v2.11.0/w64devkit-x64-2.11.0.7z.exe",
+    "filename": "w64devkit-x64-2.11.0.7z.exe",
+    "bytes": 68801240,
+    "sha256": "54c2bb9962e8a30c8270e34c5efc3d5fee579f53087fa7d435b95fbba2af7b2b"
+  },
+  "runtime": {
+    "protocol": "fcst-dwg-native/1",
+    "backend": "LibreDWG",
+    "version": "0.14",
+    "source_sha256": "62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275",
+    "patch_sha256": "7a2b5333904197a9c1d9c6efa45e2fc2d01c7406209e07ea87aef441abab513a",
+    "bridge_source_sha256": "1f2d929ec77fe2a811bb9306dfdc05059ab942c864adafcb0942b12b03a50d6b",
+    "configuration_sha256": "9fc697b346e90dd0410f5969bac5e25797133f4fde4c272b327f13a22a70b371",
+    "cmake_sha256": "9a496fbd09f134ab80ae140b6d9bb72dcc11f9ff4cc8a079231ca09a5ae54a0e",
+    "scope": "independent container structures and opaque data; no TD thermal class semantics"
+  },
+  "modified_files": {
+    "include/dwg.h": {
+      "before": "7ea181127d114fa32e2e0c512db54c3b36e83cda80e617792de4e10169b10955",
+      "after": "15e853188168f7bc85c6835bb828ec9ebde1f5bf719d91abcd4b737c8aa32119"
+    },
+    "src/spec.h": {
+      "before": "d5698e3b31a66141674d25aa7d6452959334b058b2db113fa47a0a2bac6d0ab2",
+      "after": "9261eb2bcc4bb2edbd22c31021c483c3ce412f1b0695e3fdf6173754e80c6ea6"
+    },
+    "src/out_json.c": {
+      "before": "0fbf436393485655a5b99c78efe0385ea6579ca88d8f390743d860549af08b1a",
+      "after": "43a2dc5d9fe4ec23ac1dbcdca16733ffe54c6f25b272549659073119fc5361ff"
+    },
+    "src/encode.c": {
+      "before": "c38cabf2be1d3daaeb50647e406d0d88bbb2691e7240aa6b0113429c79ecda84",
+      "after": "41909ba83285d1c105989504ca037150b7b7b02efb18a1ac45190ff536a3f43c"
+    },
+    "src/free.c": {
+      "before": "0e527bc532b1cb8929da7074728797baf2eea3ef6d9a4b11b5819f87e0117049",
+      "after": "3db526d01805ea84d71c4b17a52e7b78f40a7701fd3713036a068a41dcfd74a7"
+    },
+    "src/decode.c": {
+      "before": "02c00923c2089f01d78e369098cb9a1005ff18f50bf45da0539335dbcd127623",
+      "after": "868d555c4307c6a7072fae0c97ffbf4d555aeda8a0b2a4313804d417da05866c"
+    },
+    "src/dwg.spec": {
+      "before": "3309c218a54a06de741fafeeef9d5e2e45dce39c448e1cb9e9f1be13b595348c",
+      "after": "e390f6131f948c8bcabb3a1cf2362b180bb837182f8b93db260e01dc04495309"
+    }
+  },
+  "source_inputs": {
+    "adapters/libredwg/main.cpp": "1f2d929ec77fe2a811bb9306dfdc05059ab942c864adafcb0942b12b03a50d6b",
+    "adapters/libredwg/CMakeLists.txt": "9a496fbd09f134ab80ae140b6d9bb72dcc11f9ff4cc8a079231ca09a5ae54a0e",
+    "adapters/libredwg/config-windows.h": "9fc697b346e90dd0410f5969bac5e25797133f4fde4c272b327f13a22a70b371",
+    "adapters/libredwg/LICENSE": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "adapters/libredwg/README.md": "24b28a24d345c5c7c063257bd88b4d25bd13ca6a423368231edd71e3dfe53c1f",
+    "adapters/libredwg/preservation.patch": "7a2b5333904197a9c1d9c6efa45e2fc2d01c7406209e07ea87aef441abab513a",
+    "tools/build_independent_dwg.py": "7dc198beb3da15afc75077813c1e88c8c58cca061f506f116282010ce1f51997",
+    "tools/dwg_build_support.py": "2f7abe1e15feece16651f9542987f5c5e61be9dcbf37a6fff6e61a530278ca59",
+    "python/fcst_exchange/dwg-profile.json": "616597ff569146fd6855e73f2f25292eb75e283ead34f8c994d25a712a0c5d39",
+    "python/fcst_exchange/dwg_native.py": "8cb28a6bb02d47bbf094360fcda39c317628e4103999bc30e35d9fc6b0800f3c",
+    "python/fcst_exchange/dwg_container.py": "e31c2477d444b90a592d7b1d054789ffe66da6e35aaefdcd5e9a7a7e3789b231",
+    "python/fcst_exchange/tools.py": "f8161776a79504e411a49f7ef225124e854be29fe4addcdb6cba8223269334c0",
+    "python/fcst_exchange/core.py": "934f44ed58a9e74cb919eee2836b917f922bbe6415d1700e3f5540e98834dbfd",
+    "python/fcst_app/process_limits.py": "fbae3c77add596d49b2cd7e9c3fd0dab54012cd97bd42f293cacb07462e975f4",
+    "python/fcst_app/persistence.py": "ceca343f03e5f2b42c108475955c833f618c4f7c0cb0eb71c41f586b3dd57778"
+  },
+  "license": "GPL-3.0-or-later; separate executable and linked backend; not linked into the thermal engine",
+  "required_cases": [
+    "owned-fixture-read",
+    "fresh-native-reopen",
+    "class-identity-and-version-preservation",
+    "vendor-free-runtime",
+    "no-false-thermal-qualification"
+  ],
+  "qualification_holds": [
+    "unmapped TD class serialization semantics",
+    "source-version and dependency mapping",
+    "owned-engine and paired ESA comparisons"
+  ]
+}
