@@ -2,6 +2,7 @@
 """Owned synthetic decoder fixtures; never copies of restricted TD payloads."""
 from copy import deepcopy
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -101,7 +102,8 @@ raise SystemExit(main())
             units=['--temperature-unit','K','--capacity-unit','J/K','--conductance-unit','W/K','--power-unit','W','--time-unit','s']
             for command,destination in (('sinda-preview',None),('sinda-export',root/'exported'),('sinda-package',root/'portable.fcst')):
                 args=[command,str(source),'main.inp']+([str(destination)] if destination else [])+units
-                result=subprocess.run([sys.executable,'-c',script,*args],capture_output=True,text=True,timeout=30)
+                env=dict(os.environ,PYTHONPATH=str(Path(__file__).resolve().parents[1]/'python'))
+                result=subprocess.run([sys.executable,'-S','-c',script,*args],env=env,capture_output=True,text=True,timeout=30)
                 self.assertEqual(result.returncode,0,result.stdout+result.stderr)
             self.assertEqual((root/'exported/main.inp').read_bytes(),(source/'main.inp').read_bytes())
             self.assertTrue((root/'portable.fcst').is_file())
