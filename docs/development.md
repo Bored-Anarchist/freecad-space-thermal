@@ -87,6 +87,15 @@ python tools/publication_preflight.py --staged --revision HEAD --verify-clearanc
 
 Omit `--revision HEAD` only before the first commit. Pre-commit checks staged bytes; pre-push checks every reachable commit/tree and both author/committer identities. Clearance binds policy version/hash, exact bytes, locations and metadata. Recheck after any change. Native Git hooks cover ordinary pushes; direct API writes must call the same preflight explicitly. `tools/setup_github.py` scans its exact outgoing JSON payloads before posting.
 
+Within one history inspection, unchanged `(path, mode, blob)` versions share a
+content scan. Every commit's metadata/identities and every tree's entry modes are
+still checked. Reusing the same bytes under another path, file type or mode gets
+a separate scan. The cache is not reused across invocations or policies, and
+staged content is inspected separately. This keeps repeated historical snapshots
+within the existing byte/item budgets without skipping any distinct content or
+path context. Regression cases cover history metadata, deleted secrets, different
+path classifications, executable modes and budget enforcement.
+
 For prose or generated assets, select the actual outgoing files:
 
 ```text

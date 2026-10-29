@@ -5,12 +5,12 @@
 | Field | Baseline |
 |---|---|
 | Document | FCST-SYS-SPEC-001 |
-| Revision | 0.7 — Windows delivery; optional platform stretch goals |
+| Revision | 0.8 — independent Thermal Desktop import and export |
 | Prepared | 2026-10-27 |
 | Product name | FreeCAD Space Thermal (FCST), working name |
 | User decisions | Open-source add-on and independently maintained C++ engine; Python integration; existing solvers may be starting points; local-first; equal priority for Thermal Desktop and ESATAN-TMS; NASA/ESA refers to existing-tool file compatibility |
 | Intended audience | Thermal analysts, implementation engineers, and software testers |
-| Current evidence | Research-backed design; no implemented file converters or solver results |
+| Current evidence | Design and implemented foundation/SINDA subset; independent DWG thermal codecs and production solver unimplemented |
 | Change owner | Product owner for scope; thermal and software leads for numerical and compatibility test criteria |
 
 **Decision:** implement an independently maintained **C++ numerical engine**, with **Python for FreeCAD integration, automation/MCP, tests, and reference prototypes**. A versioned application/model/job interface connects these components and permits other front ends. Rust remains an optional implementation experiment; it is not a required production dependency. The default implementation is C++ unless the Q0 comparison checkpoint produces evidence for an explicitly accepted change.
@@ -18,6 +18,8 @@
 **Solver ownership decision:** the production target is our own independently maintained thermal engine. PyCanha and other solvers may inform implementation, provide compatible reusable code/components, generate comparison cases, or run temporary prototypes. A permanent wrapper around another solver is not the target. The owned engine must execute the required supported physics after model import, without delegating the solve to PyCanha, SINDA, ESATAN, or another external thermal solver. Low-level numerical libraries, meshers, and documented property libraries remain permitted dependencies.
 
 **Native creation and file independence:** FCST must also create models from scratch, save them in its own versioned `.fcst` project format, reopen and edit them, solve them with the owned engine, and inspect results without an imported vendor model, proprietary thermal/CAD runtime, vendor license, or vendor service. Thermal Desktop and ESATAN backward compatibility is an additional required adapter capability. The legacy-model inventory defines compatibility coverage; it is not a prerequisite for native authoring or solving. This clarification applies to ARC-001, ARC-003, ARC-009 and the native persistence/installation acceptance workflows.
+
+**Legacy file independence:** TD/SINDA import, edit, export and reopen must also work with Thermal Desktop, OpenTD, AutoCAD/CRTechCAD, SINDA/FLUINT, their licenses and conversion services absent. A prior source-tool conversion is not a prerequisite. Use independent file readers/writers and owned versioned thermal codecs. The [independent exchange decision](../docs/decisions/0004-independent-thermal-exchange.md) supersedes the OpenTD-first migration path. Existing OpenTD code is optional external reference tooling only; full direct DWG thermal conversion remains unimplemented.
 
 **Primary benchmark/starting-point references:** SINDA/FLUINT and Thermal Desktop shall guide required thermal/fluid model behavior, source-model semantics, analyst workflows, and comparative benchmark cases. Existing ESATAN-TMS compatibility remains equally required. For proprietary products, a starting point means documented methods and interfaces, modeling concepts, authorized model fixtures and reference runs; source-code reuse applies only where the code is actually available under suitable terms. PyCanha and other open implementations remain additional adoption/reference candidates.
 
@@ -29,7 +31,7 @@ The end-state requirement is backward compatibility with existing Thermal Deskto
 
 Revision 0.2 removes the agency-governance requirements introduced in revision 0.1. Retired requirement IDs GOV-001, GOV-004, GOV-005, GOV-007, and VNV-008 are not reused. File-format specifications remain technical implementation references, not agency process obligations.
 
-Revision 0.3 resolves native-versus-bridged execution in favor of the owned solver. Vendor APIs may remain necessary for proprietary file extraction, migration, re-export, and reference comparisons; these are separate from production thermal solving.
+Revision 0.3 resolved native-versus-bridged execution in favor of the owned solver. Its allowance for mandatory TD APIs during extraction/migration/re-export is superseded by revision 0.8; vendor tools may now supply optional external comparison evidence only for the TD path.
 
 Revision 0.4 explicitly adds SINDA/FLUINT and Thermal Desktop as required benchmark and behavioral starting-point references, alongside the owned Rust solver direction.
 
@@ -96,7 +98,7 @@ flowchart TB
     ENGINE --> RESULTS[Results / diagnostics / evidence]
     RESULTS --> GUI
     API --> ADAPTERS[Versioned import / export adapters]
-    ADAPTERS <--> TD[Windows OpenTD sidecar / installed TD]
+    ADAPTERS <--> TD[Independent DWG container and owned TD codecs]
     ADAPTERS <--> ESA[ESATAN tools / STEP-TAS / ESA adapters]
 ```
 
@@ -286,9 +288,9 @@ Profile names `TD-NATIVE` and `ESA-NATIVE` refer to original source-project file
 
 | Profile | Source / proposed versions | Required path | Qualification boundary |
 |---|---|---|---|
-| TD-NATIVE | TD 6.3, 2025 R2, 2026 R1; extend from inventory | Version-matched Windows OpenTD sidecar; inventory DWG custom thermal entities and dependent files; extract/edit/export copies through supported APIs | Every required feature has read/represent/edit/execute/write coverage; exact runtime/compiler combinations frozen per profile |
+| TD-NATIVE | TD 6.3, 2025 R2, 2026 R1; extend from inventory | Independent DWG reader/writer plus owned versioned thermal-class and companion-file codecs; OpenTD is optional external reference tooling | Every required feature has read/represent/edit/execute/write coverage; exact runtime/compiler combinations frozen per profile |
 | TD-NETWORK | SINDA/FLUINT decks associated with TD-NATIVE | Reviewed parser/writer for declared `.inp`/`.sin` dialect; required includes/logic mapped to owned-engine semantics | Original content retained; source execution supplies comparisons, not native completion |
-| TD-RESULTS | Source solver versions matching corpus | OpenTD results facilities or documented file readers | Temperatures, heat flows, time grids, registers, IDs and units; proprietary result formats not guessed |
+| TD-RESULTS | Source solver versions matching corpus | Independent documented result-file readers; OpenTD only for optional external reference retrieval | Temperatures, heat flows, time grids, registers, IDs and units; proprietary result formats not guessed |
 | ESA-NATIVE | ESATAN-TMS 2021 and 2025; extend from inventory | Version-matched native export/import or scripting plus STEP-TAS and TMM adapters | Every required feature has read/represent/edit/execute/write coverage; STEP-TAS alone may omit campaign content |
 | ESA-NETWORK | ESATAN-TMS `.d` dialects from corpus | Reviewed parser/writer; required expressions, tables, includes and user logic mapped to owned-engine semantics | Owned-engine execution compared with declared source-language behavior |
 | ESA-RESULTS | ESATAN versions matching corpus | Documented/native export or API, with node/time/units mapping | No invented binary results grammar |
@@ -316,7 +318,7 @@ There is no independent requirement to implement a fixed set of full STEP-TAS co
 | INT-002 | TD and ESATAN core profile qualification shall pass at the same Q1 gate; success in one shall not substitute for the other. | T/I: paired profile acceptance reports. | User | Q1 |
 | INT-003 | Every conversion shall produce a machine-readable feature inventory and fidelity report per entity/case, operation, and version profile with source and target IDs. | T: complete inventories for positive, partial, and malformed fixtures; execution does not imply edit/write support. | S06 P | Q1 |
 | INT-004 | Retained-opaque, approximated, and unsupported statuses shall remain distinct from executable compatibility. | T: opaque code cannot satisfy a solver/profile release check. | P | Q1 |
-| INT-005 | TD source-project import/export shall preserve thermal semantics through a declared API/adapter; generic DWG/DXF import shall be labeled geometry-only. | T: semantic inventory and source-tool reopen/run. | S17 P | Q1 |
+| INT-005 | TD source-project import and export shall preserve thermal semantics through independent file codecs without TD, OpenTD, AutoCAD/CRTechCAD, SINDA/FLUINT, vendor licenses, prior vendor conversion or vendor services; generic geometry import shall be labeled geometry-only. | T: offline vendor-absent first import, controlled edit, source export and independent reopen; complete semantic/dependency inventory and round-trip comparisons. | S17 P | Q1 |
 | INT-006 | ESATAN imports shall reconstruct required case, property, GMM/TMM mapping, and user-logic data, using source-access bridges only where needed for extraction/exchange. | T: core cases execute on the owned engine at Q1; remaining mandatory runtime semantics close at Q2 against source comparisons. | S12 S19 P | Q1 |
 | INT-007 | All source units, node classes/numbers, submodels, frames, normals, active sides, properties, tables, and expressions shall map explicitly. | T: semantic fixtures including collisions, offsets, and front/back surfaces. | P | Q1 |
 | INT-008 | Native parsers shall implement documented, versioned dialects and diagnose unknown syntax with source location. | T: grammar, malformed-input, and future-field tests. | P | Q1 |
@@ -327,7 +329,7 @@ There is no independent requirement to implement a fixed set of full STEP-TAS co
 | INT-013 | STEP-TAS reader/writer shall correctly parse and emit required datasets against the pinned schema, preserving their thermal data and diagnosing unsupported content. | T: source-generated files import, exported files reopen in target tools, and malformed datasets report actionable errors. | S06 P | Q1 |
 | INT-014 | Published STEP-TAS support shall identify tested entities, dataset types, versions and directions without implying support for untested content. | I/T: capability matrix matches actual conversion fixtures and results. | P | Q1 |
 | INT-015 | Vendor runtime, compiler, API, and license prerequisites shall be discovered and reported before a bridge operation. | T: absent/mismatched runtimes fail before source mutation. | S17 P | Q1 |
-| INT-016 | Vendor bridges shall use open-source adapter code while proprietary binaries remain separately installed and user-provided. | I/D: ordinary native operation remains independent of vendor installations. | User P | Q1 |
+| INT-016 | TD/SINDA product import/export shall use independently deployable open-source adapters; proprietary runtime bridges shall be optional external reference tools and shall not satisfy product import/export acceptance. | I/T: isolated offline import/edit/export/reopen with vendor installations, assemblies, license services and conversion servers absent; attempted vendor calls fail the test. | User P | Q1 |
 | INT-017 | Required source results shall retain time grids, identity, quantity, units, sign convention, and interpolation provenance. | T: direct result-query and plotted-data comparisons. | P | Q1 |
 | INT-018 | All mandatory legacy-corpus features shall achieve owned-engine execution plus tested editing/re-export where required before the full backward-compatibility and solver-independence target is complete. | T/I: zero unresolved required entities/cases; required solves run without external thermal solvers and all required round trips pass. | User | Q2 |
 | INT-019 | Source-version changes and adapter upgrades shall trigger targeted requalification; previous compatibility evidence shall remain immutable. | T/I: release/profile dependency and regression audit. | P | Q1 |

@@ -123,15 +123,27 @@ class OpenTdTests(unittest.TestCase):
 
     def test_qualification_rejects_missing_stale_mock_external_and_unpaired_evidence(self):
         self.assertFalse(assess([],candidate='candidate')['qualified'])
-        records=[{'id':name,'status':'passed','candidate':'candidate','profile':PROFILE,'fixture_kind':'licensed-source',
+        from fcst_exchange.td_qualification import PROFILE as INDEPENDENT_PROFILE,FILE_CASES
+        records=[{'id':name,'status':'passed','candidate':'candidate','profile':INDEPENDENT_PROFILE,'fixture_kind':'owned-source',
                   'execution_mode':'fcst_native','native_engine_sha256':'1'*64,'source_reference_sha256':'2'*64,
-                  'criteria_sha256':'3'*64,'observations_sha256':'4'*64,'independent_edit_receipt_sha256':'5'*64} for name in REQUIRED]
+                  'criteria_sha256':'3'*64,'observations_sha256':'4'*64,'independent_edit_receipt_sha256':'5'*64,
+                  'vendor_absent':True,'vendor_call_attempts':0,'unresolved_required':0,
+                  'codec_sha256':'6'*64,'input_sha256':'7'*64,'output_sha256':'8'*64} for name in REQUIRED]
+        for record in records:
+            if record['id'] in FILE_CASES:record['execution_mode']='fcst_independent_file_codec'
         self.assertTrue(assess(records,candidate='candidate')['qualified'])
         for field,value in [('execution_mode','fallback_external'),('fixture_kind','sdk-shim'),('candidate','stale')]:
             changed=deepcopy(records);next(r for r in changed if r['id']=='owned_thermal_comparison')[field]=value
             self.assertFalse(assess(changed,candidate='candidate')['qualified'])
         self.assertFalse(assess(records[:-1],candidate='candidate')['qualified'])
         self.assertFalse(assess(records+[records[0]],candidate='candidate')['qualified'])
+        self.assertFalse(assess(records,candidate='candidate',profile=PROFILE)['qualified'])
+        for name,field,value in [('vendor_absent_import_export','vendor_absent',False),
+                                 ('vendor_absent_import_export','vendor_call_attempts',1),
+                                 ('independent_td_class_coverage','unresolved_required',1),
+                                 ('new_model_export_reopen','output_sha256','')]:
+            changed=deepcopy(records);next(r for r in changed if r['id']==name)[field]=value
+            self.assertFalse(assess(changed,candidate='candidate')['qualified'])
 
     def test_managed_sidecar_source_is_text_but_private_values_and_binary_payloads_are_not_cleared(self):
         from fcst_tools.privacy import Scanner,POLICY_PATH

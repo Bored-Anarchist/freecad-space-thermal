@@ -1,5 +1,14 @@
 # Thermal Desktop / SINDA implementation (WP-08)
 
+**29 October scope correction:** product import/export must be independent of
+TD, OpenTD, AutoCAD and SINDA installations. The
+[independent exchange decision](decisions/0004-independent-thermal-exchange.md)
+supersedes the OpenTD-first migration design. The direct SINDA subset already
+works without those tools. Direct DWG thermal codecs remain unimplemented;
+the independent container experiment does not establish thermal compatibility.
+The OpenTD implementation below is retained only for optional external reference
+work and cannot satisfy the product's import/export requirement.
+
 WP-08 supplies an implementation delivery for the pinned TD 6.3 path. **Q1
 qualification remains open.** The user authorized pushing this tested delivery
 with the dependent qualification holds retained. No licensed AutoCAD host is
@@ -78,7 +87,7 @@ relative names and dependency graph. Exact original bytes are preserved. Package
 source maps and fidelity inventories containing real source data remain local
 until independently cleared for publication.
 
-## OpenTD sidecar and copied DWG projects
+## Optional external reference: OpenTD sidecar and copied DWG projects
 
 `adapters/opentd63/Program.cs` is owned adapter source compiled against the installed
 API. `Runtime.probe()` and `discover_runtime()` only read installation metadata and
@@ -144,11 +153,14 @@ nonmonotonic time grids fail. Original result hashes and unit/sign/time provenan
 survive conversion to WP-07's SI results/query interface. Other vendor output layouts
 require separately reviewed readers and are not guessed.
 
-`td_qualification.assess` retains the Q1 gates for exact runtimes, controlled
-licensed host, dependency closure, unchanged/edited reopen/run, independent native
-source edits, result provenance, owned thermal/radiation/environment comparisons
-and paired ESA qualification. Missing/stale/duplicate cases, SDK shims, parser-only
-tests, upstream output and external fallback labels cannot close those gates.
+`td_qualification.assess` now requires the independent product profile, complete
+class/dependency coverage, offline vendor-absent import/edit/export/reopen and
+new-model export evidence with exact codec/input/output hashes. A vendor call
+attempt or unresolved required class blocks qualification. Owned thermal/radiation/
+environment comparisons and paired ESA evidence remain required. Licensed hosts
+are optional external reference infrastructure, not product prerequisites.
+Missing/stale/duplicate cases, SDK shims, parser-only tests, upstream output and
+external fallback labels cannot close the independent product gates.
 
 ```text
 fcst td-probe

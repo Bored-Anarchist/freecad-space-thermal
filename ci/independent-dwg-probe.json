@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "backend": "LibreDWG",
+  "version": "0.14",
+  "status": "research_only_unqualified",
+  "distribution_url": "https://github.com/LibreDWG/libredwg/releases/download/0.14/libredwg-0.14-win64.zip",
+  "distribution_sha256": "1ad7e15344d20b3426c3435b078d82fb84b35062815946b2cca9c5fc9810fea8",
+  "upstream_license": "GPL-3.0-or-later",
+  "deployment_adoption": "not_adopted; separate dependency and distribution-license assessment required",
+  "tested_container": "AC1032",
+  "files": {
+    "dwgread.exe": "4b4e829cc545b237860f8c1359a80c48bda0e6821ac71727307f58bcdc8459c0",
+    "dwgwrite.exe": "5939d6e8e8ab9e86126de3f26d27762f32142831df2f5a6ef0ca32b3fa5ae932",
+    "libredwg-0.dll": "cc86e25e755ac225eadc839eaa232c2f2233c7a1b60fcd77b2cd1915761aef12",
+    "libiconv-2.dll": "ff31fa811f9c07cc7fdaa68c9e8bca3a7b4fdf6e0a079a58175ea58ba139c7ae",
+    "libpcre2-16-0.dll": "3e8dbd40f92e96ae24f7386bd129fb055865da8f55f2fb03eb7744315976942f",
+    "libpcre2-8-0.dll": "a499fb8a7eff453d6e4f0842576bc5171d40a1505d8f7f13fff6cee51b738a62"
+  },
+  "known_holds": [
+    "duplicate decoder JSON keys discard distinct serialized fields",
+    "opaque bit length serialization mismatch",
+    "decoded class and object fields changed during rewrite",
+    "Thermal Desktop custom class codecs not implemented",
+    "complete source project dependencies not mapped",
+    "product deployment and license assessment pending"
+  ]
+}

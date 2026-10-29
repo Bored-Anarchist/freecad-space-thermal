@@ -2,7 +2,6 @@
 import json
 from pathlib import Path
 from fcst_exchange.sinda import SindaAdapter,SindaUnits
-from fcst_exchange.opentd import discover_runtime
 
 
 def parsers(commands):
@@ -16,7 +15,9 @@ def parsers(commands):
 
 
 def execute(args):
-    if args.command=='td-probe':return discover_runtime().probe()
+    if args.command=='td-probe':
+        from fcst_exchange.opentd import discover_runtime
+        return discover_runtime().probe()
     units=SindaUnits(args.temperature_unit,args.capacity_unit,args.conductance_unit,args.power_unit,args.time_unit)
     adapter=SindaAdapter(units);staged=adapter.preview(args.root,args.entry)
     if args.command=='sinda-preview':return staged.report

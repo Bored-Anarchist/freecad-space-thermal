@@ -175,3 +175,45 @@ class PrivacyTests(unittest.TestCase):
             changed = Scanner(self.policy)
             inspect_git(changed, root, None, True)
             self.assertNotEqual(first["payload_sha256"], changed.report()["payload_sha256"])
+
+    def test_unchanged_history_versions_share_content_budget_but_all_commits_are_bound(self):
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as temporary:
+            root=Path(temporary)
+            def git(*args):
+                return subprocess.run(['git','-C',str(root),*args],check=True,capture_output=True).stdout
+            git('init','-q'); identity=self.policy['approved_identities'][0]
+            git('config','user.name',identity['name']);git('config','user.email',identity['email'])
+            payload=b'public synthetic content\n'*1024
+            (root/'unchanged.txt').write_bytes(payload);git('add','unchanged.txt')
+            for index in range(4):
+                git('-c','core.hooksPath=','commit','--allow-empty','-qm','Synthetic history '+str(index))
+            policy=copy.deepcopy(self.policy);policy['max_total_bytes']=len(payload)+4096
+            scanner=Scanner(policy);inspect_git(scanner,root,'HEAD',False)
+            self.assertEqual(scanner.report()['status'],'passed')
+            self.assertEqual(sum(item['sha256']==sha(payload) for item in scanner.items),1)
+            self.assertEqual(len(scanner.items),5)  # one content version plus every commit
+            first=scanner.report()['payload_sha256']
+            git('-c','core.hooksPath=','commit','--allow-empty','-qm','Additional bound metadata')
+            scanner=Scanner(policy);inspect_git(scanner,root,'HEAD',False)
+            self.assertNotEqual(first,scanner.report()['payload_sha256'])
+
+    def test_history_reused_blob_is_rechecked_for_every_path_and_mode(self):
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as temporary:
+            root=Path(temporary)
+            def git(*args):
+                return subprocess.run(['git','-C',str(root),*args],check=True,capture_output=True).stdout
+            git('init','-q'); identity=self.policy['approved_identities'][0]
+            git('config','user.name',identity['name']);git('config','user.email',identity['email'])
+            (root/'safe.txt').write_text('synthetic reused bytes');git('add','safe.txt')
+            git('-c','core.hooksPath=','commit','-qm','Synthetic text context')
+            git('update-index','--chmod=+x','safe.txt')
+            git('-c','core.hooksPath=','commit','-qm','Synthetic executable mode')
+            (root/'restricted').mkdir()
+            (root/'restricted/reused.txt').write_text('synthetic reused bytes')
+            (root/'reused.png').write_text('synthetic reused bytes')
+            git('add','restricted/reused.txt','reused.png')
+            git('-c','core.hooksPath=','commit','-qm','Synthetic different path contexts')
+            scanner=Scanner(self.policy);inspect_git(scanner,root,'HEAD',False)
+            categories={item['category'] for item in scanner.findings}
+            self.assertTrue({'restricted_or_unsafe_path','unchecked_type'}<=categories)
+            self.assertEqual(sum(item['sha256']==sha(b'synthetic reused bytes') for item in scanner.items),4)
