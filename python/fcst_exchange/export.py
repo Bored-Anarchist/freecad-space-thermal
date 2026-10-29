@@ -37,11 +37,16 @@ def rename_new(source, destination):
             time.sleep(.05)
 
 
-def export_tree(staged, destination, patches=(), *, limits=Limits()):
+def export_tree(staged, destination, patches=(), *, limits=Limits(), adapter=None):
+    if adapter is not None and adapter.profile != staged.dialect:
+        reject("adapter_profile_mismatch")
+    name_check = adapter.path_name if adapter is not None else path_name
+    source_path = adapter.checked_path if adapter is not None else checked_path
+    tree_check = adapter.preservation_check if adapter is not None else preservation_check
     report = staged.report
     if not next(r for r in report["operations"] if r["operation"] == "unchanged-export")["supported"]:
         reject("dependency_closure")
-    if preservation_check(staged.root,staged.sources,limits):
+    if tree_check(staged.root,staged.sources,limits):
         reject("stale_source_tree")
     destination = Path(destination).absolute()
     if destination.exists() or destination.resolve().is_relative_to(staged.root.resolve()) or staged.root.resolve().is_relative_to(destination.resolve()):
@@ -50,7 +55,7 @@ def export_tree(staged, destination, patches=(), *, limits=Limits()):
         reject("unsafe_export_parent")
     files = {s.path:s.content for s in staged.sources}
     for name, raw in files.items():
-        path = checked_path(staged.root, name)
+        path = source_path(staged.root, name)
         try:
             with path.open("rb") as stream:
                 current = stream.read(limits.file_bytes+1)
@@ -65,18 +70,23 @@ def export_tree(staged, destination, patches=(), *, limits=Limits()):
     for patch in patches:
         if type(patch.start) is not int or type(patch.end) is not int or not isinstance(patch.replacement, bytes):
             reject("invalid_patch")
-        path_name(patch.path)
+        name_check(patch.path)
         source = next((s for s in staged.sources if s.path == patch.path), None)
         record = next((r for r in source.records if r.start == patch.start and r.end == patch.end), None) if source else None
-        if not record or record.kind not in {"ENTITY","CASE","MAPPING","ATTACHMENT","EXPRESSION","PROCEDURE"} or record.digest != patch.original_sha256:
+        if not record or record.digest != patch.original_sha256:
             reject("unsupported_patch")
         # Preserve line termination, record kind and source identity. No include/code injection.
-        replacement = parse(patch.path, patch.replacement, limits)
-        if len(replacement) != 1 or replacement[0].code or replacement[0].kind != record.kind:
-            reject("unsupported_patch")
-        before, after = record.value, replacement[0].value
-        if any(before.get(k) != after.get(k) for k in ("namespace","handle")):
-            reject("identity_edit")
+        if adapter is not None:
+            adapter.validate_patch(record,patch.replacement,limits)
+        else:
+            if record.kind not in {"ENTITY","CASE","MAPPING","ATTACHMENT","EXPRESSION","PROCEDURE"}:
+                reject("unsupported_patch")
+            replacement = parse(patch.path, patch.replacement, limits)
+            if len(replacement) != 1 or replacement[0].code or replacement[0].kind != record.kind:
+                reject("unsupported_patch")
+            before, after = record.value, replacement[0].value
+            if any(before.get(k) != after.get(k) for k in ("namespace","handle")):
+                reject("identity_edit")
         ending = b"\r\n" if record.content.endswith(b"\r\n") else b"\n" if record.content.endswith(b"\n") else b""
         new_ending = b"\r\n" if patch.replacement.endswith(b"\r\n") else b"\n" if patch.replacement.endswith(b"\n") else b""
         if ending != new_ending:
@@ -91,13 +101,13 @@ def export_tree(staged, destination, patches=(), *, limits=Limits()):
     temporary = Path(tempfile.mkdtemp(prefix=".fcst-export-", dir=destination.parent))
     try:
         for name, raw in files.items():
-            target = temporary / path_name(name)
+            target = temporary / name_check(name)
             target.parent.mkdir(parents=True, exist_ok=True)
             with target.open("xb") as stream:
                 stream.write(raw)
                 stream.flush()
                 os.fsync(stream.fileno())
-        validated = preview(temporary, staged.entry, dialect=staged.dialect, limits=limits)
+        validated = adapter.preview(temporary,staged.entry,limits=limits) if adapter is not None else preview(temporary, staged.entry, dialect=staged.dialect, limits=limits)
         if patches and not validated.report["runnable"]:
             reject("unsafe_edit")
         if len(validated.sources) != len(staged.sources):

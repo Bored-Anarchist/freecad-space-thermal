@@ -41,6 +41,17 @@ The [FCST implementation project](https://github.com/users/Bored-Anarchist/proje
 
 ## Publication privacy (TST-021)
 
+WP-08 adds the [TD/SINDA implementation](td-sinda.md), its source-only C# sidecar
+and runtime-independent `td.json` summary. Both Windows CI presets execute the
+frozen cases and scan that exact summary before upload. Local installed-API
+receipts contain hashes and bounded status only. Q1 vendor/native/paired ESA
+qualification remains open. Policy v4 inspects `.cs` as text with the same
+privacy patterns, binary rejection and budgets; compiled sidecars, vendor DLLs,
+original DWG/decks/property/result files, private runner profiles and raw logs
+are not public artifacts. Staged bytes and outgoing history are both required
+preflight scopes and may be scanned separately to avoid counting the same tree
+twice against a combined invocation's inspection budget.
+
 WP-07 adds the [shared exchange SDK](exchange.md), versioned synthetic grammar,
 fidelity schema and `ci/exchange-acceptance.json`. Both Windows drivers execute
 `tools/check_exchange.py` and privacy-clear the exact `exchange.json` summary before

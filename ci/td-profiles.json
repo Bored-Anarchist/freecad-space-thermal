@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "profiles": [{
+    "id": "opentd-6.3/1",
+    "thermal_desktop_version": "6.3.022",
+    "sinda_version": "6.3.15",
+    "assembly_name": "OpenTDv63.dll",
+    "assembly_version": "6.3.0.0",
+    "assembly_sha256": "9c63befc118c3be5c4d518e7f458827b28fce8b4b0e60e06aa6821e8e3b72e5b",
+    "target_framework": ".NETFramework,Version=v4.6",
+    "compiler_profile": "Windows .NET Framework x64 csc with installed vendor assembly; no proprietary DLL redistribution",
+    "dialect": "sinda-6.3-network/1",
+    "status": "implementation_only_unqualified"
+  }],
+  "unimplemented_version_profiles": ["2025 R2", "2026 R1"],
+  "qualification_requires": [
+    "exact licensed AutoCAD/TD/SINDA host and controlled source-open policy",
+    "source dependency closure and unchanged/edited source reopen/run evidence",
+    "owned-engine thermal/radiation/environment comparisons from WP-11/WP-12",
+    "paired ESATAN qualification from WP-09"
+  ],
+  "policy": "A successful offline API build, synthetic test or external solve cannot qualify owned-engine execution or vendor compatibility. Installed paths, license data, proprietary binaries, original projects and raw logs remain local."
+}

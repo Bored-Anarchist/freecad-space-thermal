@@ -151,6 +151,15 @@ tools/check_security.py`, staged/outgoing-history and approved-identity scans, p
 exact generated-report/PR-prose preflight remain executable acceptance. Tool
 authorization is recorded by hash without exposing actor identity or installed paths.
 
+WP-08 extends TST-021 to the exact `td.json` public acceptance summary, managed
+sidecar sources, SINDA/TD fixtures, bounded offline API receipts and final GitHub
+prose. Policy v4 adds `.cs` to text inspection with the same sensitive patterns,
+binary rejection and budgets. Both Windows jobs clear `td.json` before upload;
+original projects/decks/property databases/results, private runner profiles,
+compiled sidecars/vendor DLLs and raw logs stay local. Required staged-byte and
+outgoing-history scans may run separately; neither scope may be skipped. Q1 holds
+are recorded explicitly and are not replaced with parser or external-run success.
+
 FEM reuse work applies TST-021 to exact outgoing decision/assessment text, upstream attribution/license manifests, synthetic fixtures, bounded host/mesh/comparison reports and final issue/PR prose. Run `python -S tools/check_security.py` and `python tools/publication_preflight.py --staged --revision HEAD` before commit/push; scan each final generated report or post with `--file` before upload. Generated FreeCAD documents, raw solver decks, screenshots, mesh/result containers and logs stay local unless separately sanitized and cleared. Use synthetic inputs for public tests, preserve authorized originals unchanged, and do not weaken privacy policy to admit upstream examples or generated diagnostics.
 
 The WP-04/WP-05 verification audit adds synthetic truncation, residual, authority, original-corruption, dependency/result-binding, save/host-race and growing-file regressions. Its [decision record](../docs/decisions/0002-wp04-wp05-verification.md) documents corrected behavior and executable acceptance. New sealed numerical attempts and bounded audit summaries supplement the retained original baseline. Exact source/evidence/prose and generated report scans precede upload; raw inputs, databases, binary containers and diagnostics remain local.
@@ -317,6 +326,17 @@ full dialect and paired qualification obligations.
 **Outputs:** adapter SDK, syntax/semantic IR, fidelity schema, safe resolver and result readers. **Completion:** positive, partial, malformed and malicious fixtures yield complete reports; comments/code/logs cannot execute or alter authorization. Required unknown semantics block a runnable/qualified status.
 
 ### Step 8 — WP-08: implement the Thermal Desktop/SINDA path
+
+The [TD/SINDA implementation delivery](../docs/td-sinda.md) targets the discovered
+TD 6.3.022 / SINDA 6.3.15 / OpenTD 6.3.0.0 profile and actual .NET Framework 4.6
+API. `ci/td-acceptance.json` freezes its unattended public cases; both Windows
+drivers run `tools/check_td.py`. The separate installed-API smoke compiles owned
+C# source against the vendor DLL and checks SI conversion/native DTO mapping
+without opening a drawing. The user authorized pushing the tested implementation
+with Q1 holds retained and confirmed no licensed AutoCAD host is available.
+Full native physics comparisons, paired ESA qualification, source-tool reopen/run,
+remaining source semantics and other target versions stay open. This delivery
+does not change the completion criteria below or qualify a vendor profile.
 
 1. Create a version-profiled Windows bridge with a discovery-only runtime probe. Select its .NET/compiler/runtime from the actual OpenTD release requirements; do not assume one binary covers every target.
 2. On a copied source project, inventory custom thermal entities, submodels, node IDs/classes, GMM/TMM assignments, properties, optics, conductors, cases, controls, references and dependencies. Include external property databases such as those actually referenced by the fixture.

@@ -9,9 +9,9 @@ from .delivery import FOUNDATION_CASES
 
 def input_hashes(root):
     result = {}
-    for name in ("python", "engine", "tests", "tools", "ci", "spec/schemas", "spec/contracts"):
+    for name in ("python", "engine", "adapters", "tests", "tools", "ci", "spec/schemas", "spec/contracts"):
         for path in sorted((root/name).rglob("*")):
-            if path.is_file() and path.suffix in {".py", ".cpp", ".hpp", ".inc", ".json", ".lock"}:
+            if path.is_file() and path.suffix in {".py", ".cpp", ".cs", ".hpp", ".inc", ".json", ".lock"}:
                 result[path.relative_to(root).as_posix()] = sha256(path.read_bytes()).hexdigest()
     for name in ("CMakeLists.txt", "CMakePresets.json", "pyproject.toml", ".github/workflows/ci.yml"):
         result[name] = sha256((root/name).read_bytes()).hexdigest()

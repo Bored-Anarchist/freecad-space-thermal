@@ -1,0 +1,145 @@
+{
+  "work_package": "WP-08",
+  "status": "in_progress",
+  "implementation_delivery": "implemented_and_tested_unqualified",
+  "verification_base_revision": "9b71634a4f08ad382f1b79b357c0e86de63e50ec",
+  "verification_identity": "Exact implementation input hashes below; final candidate-bound Windows reports and CI must pass before push",
+  "input_sha256": {
+    "ci/td-acceptance.json": "d09c92f989d1a374354c3844381b46944d0cce45e9e8f4c6549790923208c344",
+    "ci/td-profiles.json": "e5b3a9af9dae1a6cd3563ddc87a3c48268143a28c1712aba1e84e509938b5981",
+    "adapters/opentd63/Program.cs": "5e56fbcee5da97316519c81dd09690d9721ba6e875bba57a0eadab60ad6cb13b",
+    "tests/test_sinda.py": "c90a71d2db83ba75c20527858553eacf941c6318b9a07813bc3f83af09a116c5",
+    "tests/test_opentd.py": "f9dc3b911d049fd5fecdb2d21dcfada39bd9b146b14de56e8a13e4bf02511dab",
+    "python/fcst_exchange/__init__.py": "c0b8878319521c32bac18ae2f74eeb0b8fcaea6bddd0dca342913528fce548ed",
+    "python/fcst_exchange/core.py": "934f44ed58a9e74cb919eee2836b917f922bbe6415d1700e3f5540e98834dbfd",
+    "python/fcst_exchange/export.py": "daacae0d4f3d9180c651c827487cd1016418aa0dcc74015d7be4ecfe4d51ff70",
+    "python/fcst_exchange/logic.py": "a94961ae77ecba9b93ea366164fcb8cb42c5250fcf8f64454cff100b94733b3f",
+    "python/fcst_exchange/opentd.py": "70ed9b1b235aa891ad7197789f56d5721effe433bef3abddf90cf6680ec205ce",
+    "python/fcst_exchange/results.py": "ad3bb3a9c0a62020899b2620b532d9e4cf328102bc48c4cbd36733ea9e4c149a",
+    "python/fcst_exchange/sinda.py": "c8dedf5bd884bf6ce7eaaff18d53ed80ed7c8c9f028a7849bc799c47823aa052",
+    "python/fcst_exchange/sinda_results.py": "28b5bf1372708985a182fda3c8b63d2d8f7ef37a934fa2f40a2e9cd60cd238ff",
+    "python/fcst_exchange/source_package.py": "c61987f577fba98e507f0483487c125306a56bad1a41b3d547fd33fedb6b620f",
+    "python/fcst_exchange/syntax.py": "86ba72e58f39211f006fb00512251d615adf4f656194d88d09939c89c008be27",
+    "python/fcst_exchange/td_project.py": "30cd893a032a5137adf6b01716a162138875424e9f6c0aeb548a195255764543",
+    "python/fcst_exchange/td_qualification.py": "349f55823d7d8560d0091965e91e3d67c38a861b81324384efcd041363a33d57",
+    "python/fcst_exchange/td_reference.py": "fc121100061252aea790f14a13ef80664e996260cd8353358bbb97dce19e391c",
+    "python/fcst_exchange/tools.py": "f8161776a79504e411a49f7ef225124e854be29fe4addcdb6cba8223269334c0",
+    "python/fcst_exchange/vendor_paths.py": "997d30a6ca5e2d5420231f4f3e673acb1b6b5b6731629b1b8636611a70351dc3"
+  },
+  "profile": "opentd-6.3/1",
+  "dialect": "sinda-6.3-network/1",
+  "scope": "Bounded implementation delivery authorized with Q1 qualification holds retained; no licensed host or owned-engine qualification claim",
+  "contract": "docs/td-sinda.md",
+  "acceptance_register": "ci/td-acceptance.json",
+  "checks": [
+    {
+      "id": "td-runtime-independent",
+      "status": "passed",
+      "command": "python tools/check_td.py",
+      "required_cases": 29,
+      "report_sha256": "23cbb0dc564eee0ca933472ac3aba3e78d8b795ebfa32abd2b5aefba891573e0"
+    },
+    {
+      "id": "shared-exchange-regression",
+      "status": "passed",
+      "command": "python tools/check_exchange.py",
+      "required_cases": 33,
+      "report_sha256": "1833df736c5a2334cb363c73cc9f12175f9e68b3e83e0b5c53910cbfaf27943f"
+    },
+    {
+      "id": "installed-api-smoke",
+      "status": "passed",
+      "command": "python tools/probe_td.py --api-smoke",
+      "scope": "offline API types and unit conversion; no host or solver qualification",
+      "source_sha256": "5e56fbcee5da97316519c81dd09690d9721ba6e875bba57a0eadab60ad6cb13b",
+      "assembly_sha256": "9c63befc118c3be5c4d518e7f458827b28fce8b4b0e60e06aa6821e8e3b72e5b",
+      "target_framework": ".NETFramework,Version=v4.6",
+      "report_sha256": "863cfaf394f982cd5345fc4b36c743b4e1027ea2afc10bab3451645d228399da"
+    },
+    {
+      "id": "original-corpus-preservation",
+      "status": "passed",
+      "command": "python tools/check_inventory.py --local",
+      "files": 55,
+      "report_sha256": "9fbbe2f04c30499a00d9080452897ca560e9d0f8b7d5ad4fcfb946baee9ec4d9"
+    },
+    {
+      "id": "exact-implementation-publication-preflight",
+      "status": "passed",
+      "policy_version": 4,
+      "payload_sha256": "a98d4a1422f8528abeaf7567a977c81d477116e0db1db31fcf548b768861481c",
+      "policy_sha256": "edae9f61de3509362a69b20c55711c03a6cfb83869d79891d4fe44dd8c0535d2"
+    }
+  ],
+  "acceptance": [
+    "test_sinda.SindaTests.test_collisions_missing_references_bad_units_and_invalid_node_capacity_fail",
+    "test_sinda.SindaTests.test_complete_reports_cover_malformed_and_future_source_records",
+    "test_sinda.SindaTests.test_duplicate_source_ids_across_submodels_and_d_exponents_are_distinct",
+    "test_sinda.SindaTests.test_end_of_data_and_explicit_submodel_boundaries_cannot_be_bypassed",
+    "test_sinda.SindaTests.test_explicit_units_and_versioned_dialect_are_required",
+    "test_sinda.SindaTests.test_insert_repetition_and_section_leakage_are_rejected",
+    "test_sinda.SindaTests.test_insert_sections_and_vendor_filenames_preserve_original_bytes",
+    "test_sinda.SindaTests.test_malicious_insert_paths_depth_and_file_budgets_fail_closed",
+    "test_sinda.SindaTests.test_real_sinda_grammar_maps_static_registers_nodes_conductors_and_loads",
+    "test_sinda.SindaTests.test_safe_controlled_edit_reopens_without_changing_original",
+    "test_sinda.SindaTests.test_saved_package_preserves_vendor_filenames_in_a_private_alias_map",
+    "test_sinda.SindaTests.test_sinda_cli_preview_export_package_and_discovery_are_unattended",
+    "test_sinda.SindaTests.test_static_and_malformed_sinda_fuzz_never_executes_or_loses_bytes",
+    "test_sinda.SindaTests.test_static_expression_translation_is_bounded_and_never_evaluates_source_code",
+    "test_sinda.SindaTests.test_static_gen_nodes_and_conductors_expand_with_full_identity_inventory",
+    "test_sinda.SindaTests.test_unknown_logic_radiation_tables_and_controls_block_native_readiness",
+    "test_opentd.OpenTdTests.test_authorization_binds_candidate_source_and_reviewed_execution_kind",
+    "test_opentd.OpenTdTests.test_complete_copied_project_preserves_bytes_and_rejects_stale_or_original_targets",
+    "test_opentd.OpenTdTests.test_controlled_edit_validation_and_every_unrequested_field_are_checked",
+    "test_opentd.OpenTdTests.test_discovery_is_inert_and_missing_runtime_does_not_start_processes",
+    "test_opentd.OpenTdTests.test_dynamic_source_expressions_and_external_databases_block_native_readiness",
+    "test_opentd.OpenTdTests.test_empty_sdk_logic_units_metadata_is_inert_but_nonempty_source_code_blocks",
+    "test_opentd.OpenTdTests.test_external_synthetic_reference_oracle_checks_identity_time_and_thermal_curve",
+    "test_opentd.OpenTdTests.test_geometry_cases_tables_procedures_and_gmm_are_inventoried_not_silently_dropped",
+    "test_opentd.OpenTdTests.test_invalid_api_versions_and_unmapped_connections_cannot_gain_native_status",
+    "test_opentd.OpenTdTests.test_managed_sidecar_source_is_text_but_private_values_and_binary_payloads_are_not_cleared",
+    "test_opentd.OpenTdTests.test_network_inventory_maps_actual_api_dimensions_classes_and_connections",
+    "test_opentd.OpenTdTests.test_qualification_rejects_missing_stale_mock_external_and_unpaired_evidence",
+    "test_opentd.OpenTdTests.test_tprint_results_map_source_nodes_time_units_and_quantity_without_guessing"
+  ],
+  "full_windows_gate": "Required in both presets before pushing; final reports bind the pushed candidate and are retained by GitHub Actions",
+  "qualification": {
+    "profile": "opentd-6.3/1",
+    "candidate": "e97eab49b26b1c0e1e369318ad97623233cee1e1",
+    "status": "blocked",
+    "qualified": false,
+    "missing_or_invalid": [
+      "controlled_edit_reopen_run",
+      "dependency_closure",
+      "independent_source_native_edits",
+      "licensed_host_policy",
+      "owned_environment_comparison",
+      "owned_radiation_comparison",
+      "owned_thermal_comparison",
+      "paired_esa_qualification",
+      "runtime_exact",
+      "source_results",
+      "unchanged_reopen_run"
+    ],
+    "scope": "Q1 Thermal Desktop/SINDA qualification; implemented adapter support is recorded separately"
+  },
+  "qualified": false,
+  "blockers": [
+    "licensed_autocad_host_missing",
+    "source_tool_reopen_run_unqualified",
+    "owned_engine_WP11_WP12_comparisons_pending",
+    "paired_ESATAN_WP09_qualification_pending",
+    "2025_R2_and_2026_R1_profiles_not_implemented",
+    "full_required_source_semantics_not_qualified"
+  ],
+  "publication": {
+    "policy_version": 4,
+    "approved_identity": "Bored-Anarchist",
+    "commands": [
+      "python tools/publication_preflight.py --staged",
+      "python tools/publication_preflight.py --revision HEAD"
+    ],
+    "withheld": "Original DWG, SINDA decks, property and result bytes, private host profiles, vendor DLLs, compiled sidecars and raw logs"
+  },
+  "github": "Update existing PR #28; retain issue #8 and project status In progress until full Q1 qualification"
+}

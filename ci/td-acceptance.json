@@ -1,0 +1,95 @@
+{
+  "work_package": "WP-08",
+  "scope": "Implemented SINDA 6.3 subset and OpenTD 6.3 sidecar contracts; Q1 remains unqualified",
+  "required_cases": [
+    "test_sinda.SindaTests.test_collisions_missing_references_bad_units_and_invalid_node_capacity_fail",
+    "test_sinda.SindaTests.test_complete_reports_cover_malformed_and_future_source_records",
+    "test_sinda.SindaTests.test_duplicate_source_ids_across_submodels_and_d_exponents_are_distinct",
+    "test_sinda.SindaTests.test_end_of_data_and_explicit_submodel_boundaries_cannot_be_bypassed",
+    "test_sinda.SindaTests.test_explicit_units_and_versioned_dialect_are_required",
+    "test_sinda.SindaTests.test_insert_repetition_and_section_leakage_are_rejected",
+    "test_sinda.SindaTests.test_insert_sections_and_vendor_filenames_preserve_original_bytes",
+    "test_sinda.SindaTests.test_malicious_insert_paths_depth_and_file_budgets_fail_closed",
+    "test_sinda.SindaTests.test_real_sinda_grammar_maps_static_registers_nodes_conductors_and_loads",
+    "test_sinda.SindaTests.test_safe_controlled_edit_reopens_without_changing_original",
+    "test_sinda.SindaTests.test_saved_package_preserves_vendor_filenames_in_a_private_alias_map",
+    "test_sinda.SindaTests.test_sinda_cli_preview_export_package_and_discovery_are_unattended",
+    "test_sinda.SindaTests.test_static_and_malformed_sinda_fuzz_never_executes_or_loses_bytes",
+    "test_sinda.SindaTests.test_static_expression_translation_is_bounded_and_never_evaluates_source_code",
+    "test_sinda.SindaTests.test_static_gen_nodes_and_conductors_expand_with_full_identity_inventory",
+    "test_sinda.SindaTests.test_unknown_logic_radiation_tables_and_controls_block_native_readiness",
+    "test_opentd.OpenTdTests.test_authorization_binds_candidate_source_and_reviewed_execution_kind",
+    "test_opentd.OpenTdTests.test_complete_copied_project_preserves_bytes_and_rejects_stale_or_original_targets",
+    "test_opentd.OpenTdTests.test_controlled_edit_validation_and_every_unrequested_field_are_checked",
+    "test_opentd.OpenTdTests.test_discovery_is_inert_and_missing_runtime_does_not_start_processes",
+    "test_opentd.OpenTdTests.test_dynamic_source_expressions_and_external_databases_block_native_readiness",
+    "test_opentd.OpenTdTests.test_empty_sdk_logic_units_metadata_is_inert_but_nonempty_source_code_blocks",
+    "test_opentd.OpenTdTests.test_external_synthetic_reference_oracle_checks_identity_time_and_thermal_curve",
+    "test_opentd.OpenTdTests.test_geometry_cases_tables_procedures_and_gmm_are_inventoried_not_silently_dropped",
+    "test_opentd.OpenTdTests.test_invalid_api_versions_and_unmapped_connections_cannot_gain_native_status",
+    "test_opentd.OpenTdTests.test_managed_sidecar_source_is_text_but_private_values_and_binary_payloads_are_not_cleared",
+    "test_opentd.OpenTdTests.test_network_inventory_maps_actual_api_dimensions_classes_and_connections",
+    "test_opentd.OpenTdTests.test_qualification_rejects_missing_stale_mock_external_and_unpaired_evidence",
+    "test_opentd.OpenTdTests.test_tprint_results_map_source_nodes_time_units_and_quantity_without_guessing"
+  ],
+  "qualification_holds": [
+    "licensed_autocad_host_missing",
+    "source_tool_reopen_run_unqualified",
+    "owned_engine_WP11_WP12_comparisons_pending",
+    "paired_ESATAN_WP09_qualification_pending",
+    "2025_R2_and_2026_R1_profiles_not_implemented",
+    "full_required_source_semantics_not_qualified"
+  ],
+  "requirements": {
+    "INT-005": [
+      "test_sinda.SindaTests.test_collisions_missing_references_bad_units_and_invalid_node_capacity_fail",
+      "test_sinda.SindaTests.test_complete_reports_cover_malformed_and_future_source_records",
+      "test_sinda.SindaTests.test_duplicate_source_ids_across_submodels_and_d_exponents_are_distinct",
+      "test_sinda.SindaTests.test_end_of_data_and_explicit_submodel_boundaries_cannot_be_bypassed",
+      "test_sinda.SindaTests.test_explicit_units_and_versioned_dialect_are_required",
+      "test_sinda.SindaTests.test_insert_repetition_and_section_leakage_are_rejected",
+      "test_sinda.SindaTests.test_insert_sections_and_vendor_filenames_preserve_original_bytes",
+      "test_sinda.SindaTests.test_malicious_insert_paths_depth_and_file_budgets_fail_closed",
+      "test_sinda.SindaTests.test_real_sinda_grammar_maps_static_registers_nodes_conductors_and_loads",
+      "test_sinda.SindaTests.test_safe_controlled_edit_reopens_without_changing_original",
+      "test_sinda.SindaTests.test_saved_package_preserves_vendor_filenames_in_a_private_alias_map",
+      "test_sinda.SindaTests.test_sinda_cli_preview_export_package_and_discovery_are_unattended",
+      "test_sinda.SindaTests.test_static_and_malformed_sinda_fuzz_never_executes_or_loses_bytes",
+      "test_sinda.SindaTests.test_static_expression_translation_is_bounded_and_never_evaluates_source_code",
+      "test_sinda.SindaTests.test_static_gen_nodes_and_conductors_expand_with_full_identity_inventory",
+      "test_sinda.SindaTests.test_unknown_logic_radiation_tables_and_controls_block_native_readiness",
+      "test_opentd.OpenTdTests.test_authorization_binds_candidate_source_and_reviewed_execution_kind",
+      "test_opentd.OpenTdTests.test_complete_copied_project_preserves_bytes_and_rejects_stale_or_original_targets",
+      "test_opentd.OpenTdTests.test_controlled_edit_validation_and_every_unrequested_field_are_checked",
+      "test_opentd.OpenTdTests.test_discovery_is_inert_and_missing_runtime_does_not_start_processes",
+      "test_opentd.OpenTdTests.test_dynamic_source_expressions_and_external_databases_block_native_readiness",
+      "test_opentd.OpenTdTests.test_empty_sdk_logic_units_metadata_is_inert_but_nonempty_source_code_blocks",
+      "test_opentd.OpenTdTests.test_external_synthetic_reference_oracle_checks_identity_time_and_thermal_curve",
+      "test_opentd.OpenTdTests.test_geometry_cases_tables_procedures_and_gmm_are_inventoried_not_silently_dropped",
+      "test_opentd.OpenTdTests.test_invalid_api_versions_and_unmapped_connections_cannot_gain_native_status",
+      "test_opentd.OpenTdTests.test_managed_sidecar_source_is_text_but_private_values_and_binary_payloads_are_not_cleared",
+      "test_opentd.OpenTdTests.test_network_inventory_maps_actual_api_dimensions_classes_and_connections",
+      "test_opentd.OpenTdTests.test_qualification_rejects_missing_stale_mock_external_and_unpaired_evidence",
+      "test_opentd.OpenTdTests.test_tprint_results_map_source_nodes_time_units_and_quantity_without_guessing"
+    ],
+    "INT-015": [
+      "test_sinda.SindaTests.test_explicit_units_and_versioned_dialect_are_required",
+      "test_sinda.SindaTests.test_sinda_cli_preview_export_package_and_discovery_are_unattended",
+      "test_opentd.OpenTdTests.test_discovery_is_inert_and_missing_runtime_does_not_start_processes",
+      "test_opentd.OpenTdTests.test_invalid_api_versions_and_unmapped_connections_cannot_gain_native_status"
+    ],
+    "INT-016": [
+      "test_sinda.SindaTests.test_sinda_cli_preview_export_package_and_discovery_are_unattended",
+      "test_opentd.OpenTdTests.test_discovery_is_inert_and_missing_runtime_does_not_start_processes",
+      "test_opentd.OpenTdTests.test_qualification_rejects_missing_stale_mock_external_and_unpaired_evidence"
+    ],
+    "TST-021": [
+      "test_opentd.OpenTdTests.test_managed_sidecar_source_is_text_but_private_values_and_binary_payloads_are_not_cleared"
+    ],
+    "TST-010": [
+      "test_sinda.SindaTests.test_static_and_malformed_sinda_fuzz_never_executes_or_loses_bytes",
+      "test_sinda.SindaTests.test_static_expression_translation_is_bounded_and_never_evaluates_source_code",
+      "test_opentd.OpenTdTests.test_dynamic_source_expressions_and_external_databases_block_native_readiness"
+    ]
+  }
+}

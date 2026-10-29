@@ -12,6 +12,8 @@ def main() -> int:
     job_parsers(commands)
     from .exchange import parsers as exchange_parsers
     exchange_parsers(commands)
+    from .td import parsers as td_parsers
+    td_parsers(commands)
     inspect = commands.add_parser("project-inspect")
     inspect.add_argument("path")
     inspect.add_argument("--previous", action="store_true")
@@ -33,7 +35,10 @@ def main() -> int:
         from pathlib import Path
         from fcst_app.persistence import PersistenceError, recover_package, migrate_project, semantic_hash, save_package
         try:
-            if args.command.startswith("exchange-"):
+            if args.command=='td-probe' or args.command.startswith('sinda-'):
+                from .td import execute
+                result=execute(args)
+            elif args.command.startswith("exchange-"):
                 from .exchange import execute
                 result = execute(args)
             elif args.command.startswith("job-"):

@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange"]
 
 
 def command(args, log, env=None):
@@ -97,6 +97,7 @@ def main():
         "spatial-foundation": [sys.executable, "tools/check_spatial.py", "--worker", str(install / "bin/fcst-worker.exe"), "--report", str(output / "spatial.json")],
         "job-lifecycle": [sys.executable,"tools/check_jobs.py","--worker",str(install / "bin/fcst-worker.exe"),"--report",str(output / "jobs.json")],
         "exchange-conformance": [sys.executable,"tools/check_exchange.py","--report",str(output / "exchange.json")],
+        "td-exchange": [sys.executable,"tools/check_td.py","--report",str(output / "td.json")],
     }
     for case_id in STEPS:
         start = time.monotonic()
@@ -139,7 +140,7 @@ def main():
                 record(case_id, "blocked", reason="required_configuration_or_implementation_unavailable")
         expected += manifest["full_prerequisites"]
     verdict = evaluate(expected, records)
-    report = {"schema_version": 1, "scope": "Foundation, contracts, numerical prototype, persistence, spatial foundation, jobs and common source exchange; no production solver or vendor qualification",
+    report = {"schema_version": 1, "scope": "Foundation, contracts, numerical prototype, persistence, spatial foundation, jobs, shared exchange and TD/SINDA implementation contracts; no production solver or vendor qualification",
               "candidate": revision, "preset": args.preset, "tier": args.tier,
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
               "coverage_manifest_sha256": hashlib.sha256((ROOT / "ci/coverage.json").read_bytes()).hexdigest(),

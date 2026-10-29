@@ -36,6 +36,11 @@ def check(directory):
         if (exchange["candidate"]!=candidate or evaluate(load(ROOT/"ci/exchange-acceptance.json")["required_cases"],exchange["cases"])["status"]!="passed"
                 or exchange["gate"]["status"]!="passed"):
             raise ValueError("exchange_regression")
+        td=load(path.parent/"td.json")
+        if (td["candidate"]!=candidate or td.get("qualified") is not False
+                or evaluate(load(ROOT/"ci/td-acceptance.json")["required_cases"],td["cases"])["status"]!="passed"
+                or td["gate"]["status"]!="passed"):
+            raise ValueError("td_adapter_regression_or_false_qualification")
         if numerical["gate"]["status"]!="passed" or persistence["gate"]["status"]!="passed": raise ValueError("baseline_regression")
         contracts=load(path.parent/"contracts.json")
         if contracts["status"]!="passed": raise ValueError("contract_regression")
@@ -60,7 +65,7 @@ def check(directory):
     scanner=Scanner(load(POLICY_PATH))
     # Every exact report and every candidate path is inspected before publication.
     for path in sorted(directory.rglob("*.json")):
-        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json","jobs.json"}:
+        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json","jobs.json","exchange.json","td.json"}:
             scanner.scan(path.name,path.read_bytes())
     # Full outgoing history is additionally required locally before push. CI checks
     # the actual checked-out candidate (checkout may intentionally be shallow).

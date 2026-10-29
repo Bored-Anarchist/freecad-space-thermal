@@ -35,6 +35,8 @@ def validate():
     build_steps = workflow["jobs"]["build"]["steps"]
     assert any("publication_preflight.py" in step.get("run", "") and "exchange.json" in step["run"] for step in build_steps), "WP-07 report lacks pre-upload clearance"
     assert any("exchange.json" in step.get("with", {}).get("path", "") for step in build_steps if step.get("uses", "").startswith("actions/upload-artifact@")), "WP-07 report absent"
+    assert any("publication_preflight.py" in step.get("run", "") and "td.json" in step["run"] for step in build_steps), "WP-08 report lacks pre-upload clearance"
+    assert any("td.json" in step.get("with", {}).get("path", "") for step in build_steps if step.get("uses", "").startswith("actions/upload-artifact@")), "WP-08 report absent"
     assert "fem_probe.py" in str(workflow["jobs"]["host"]), "FEM probes absent"
     assert "check_foundation_handoff.py" in str(workflow["jobs"]["gate"]), "TST-022 aggregate absent"
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]

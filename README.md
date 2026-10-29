@@ -20,6 +20,12 @@ WP-08/WP-09/WP-10. Both Windows CI configurations run its frozen unattended case
 [Completion evidence](plans/evidence/WP-07.json) records the two 165-check Windows
 drivers, 33 exchange acceptance cases, security regressions and foundation handoff.
 
+WP-08 adds the [TD 6.3 / SINDA implementation path](docs/td-sinda.md): a version-pinned
+OpenTD sidecar, inert SINDA parsing, copied-project edits, source result queries and
+an automated reference driver. Q1 remains unqualified pending a licensed AutoCAD
+host, owned-engine comparisons and paired ESATAN qualification; public CI exercises
+runtime-independent contracts without proprietary software or data.
+
 [WP-03 contracts](spec/contracts/README.md) freeze native model, operation, result, HDF5 layout and worker protocol version 1.0.0. Independent C++ and Python readers validate typed entities, references, quantities, frames and expression types, and agree on normalized snapshots and semantic hashes. Both Windows configurations run the same positive/negative fixtures and bounded framing checks.
 
 [WP-04's numerical checkpoint](docs/decisions/0001-q0-numerical.md) adds a separate C++/SUNDIALS experiment with independent analytic/nonlinear oracles, energy/event/restart checks, dense/banded and BDF/Adams comparisons, scale probes and sealed evidence. Both Windows verification configurations execute it unattended. It retains C++ as the implementation baseline; production solving, GUI workflows and vendor compatibility remain later work.
