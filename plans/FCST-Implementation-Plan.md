@@ -99,7 +99,7 @@ python/
 freecad/FCST/                    Init files, commands, objects, editors, view providers
 adapters/
   common/ sinda/ esatan/ step_tas/ legacy/
-sidecars/opentd/                 Separately built, version-profiled vendor bridge
+sidecars/opentd/                 Optional external reference harness only
 tests/
   fixtures/public/               Synthetic files and generated reference cases
   fixtures/restricted-manifests/ Hashes and metadata; no unlicensed model contents
@@ -359,10 +359,12 @@ reference tooling. The direct SINDA subset is implemented; direct DWG thermal
 codecs and lossless changed-DWG export remain unimplemented. WP-08 stays in
 progress, and its historical evidence retains its narrower original scope.
 
-1. Pin and qualify an independent DWG container reader/writer. The measured
-   LibreDWG 0.14 AC1032 experiment is research only: fix duplicate serialization
-   keys, opaque bit-length handling and changed fields before accepting rewrites.
-   Freeze deployment, exact source/build hashes and dependency license disposition.
+1. Retain the corrected independent LibreDWG 0.14 native component, locked source,
+   compiler, preservation patch and GPL notices. Its implementation fixes observed
+   opaque bit-length, material/version-field and raw datastorage losses and retains
+   every ordered duplicate field occurrence. Require its owned fixture build and
+   fresh-process rewrite/reopen in CI. Container/source retention is implemented;
+   thermal class semantics and qualified edited/new-model DWG remain open.
 2. Implement owned versioned TD binary-class codecs and companion-file readers.
    Inventory submodels, nodes, geometry, GMM/TMM assignments, properties, optics,
    conductors, loads, cases, controls, expressions, handles and dependency closure.
@@ -592,14 +594,14 @@ Plan and prototype this work from WP-01 findings; do not wait for Q1 to discover
 ### Step 21 — WP-21: close Q2 legacy profiles and full inventory qualification
 
 1. Implement exact required SYSTEMA/THERMICA, THERMISOL, ESARAD, SYSBAS/VIF, TRASYS and additional customer dialect/version paths identified by the inventory.
-2. Handle GMM, mesh, TMM, properties, campaign and results jointly where required. Choose native APIs/schema paths or approved converter invocations per actual profile.
+2. Handle GMM, mesh, TMM, properties, campaign and results jointly where required. Use owned direct schema codecs or independently deployable open-source converters per actual profile; vendor APIs supply optional external reference evidence only for TD/ESATAN paths.
 3. Qualify every required direction independently. A VIF reader does not imply a writer; current THERMICA projects are not qualified by an old SYSBAS reader.
 4. Apply the same safe parse/preserve/edit/new-tree export, unchanged/controlled-edit source round trips and native-solve comparisons used for Q1.
 5. Run every mandatory entity/procedure/case/operation through the coverage evaluator. Required retained-opaque, unsupported, unapproved approximation or external-only execution entries block Q2.
 6. Re-run affected Q1 profiles, platform installations, security, performance and automation suites after advanced modules/adapters are added.
 7. Publish the exact supported inventory, remaining non-required limitations and immutable evidence bundle. Close all five Q2 specification requirements and applicable delivery-test requirements.
 
-**Outputs:** full required legacy adapters, advanced/native support matrix and Q2 qualification bundle. **Completion:** zero unresolved required coverage entries and all mandatory round trips/owned-engine executions pass. Compatibility claims stay bounded by the published inventory; proprietary source conversion may still require declared vendor tools.
+**Outputs:** full required legacy adapters, advanced/native support matrix and Q2 qualification bundle. **Completion:** zero unresolved required coverage entries and all mandatory round trips/owned-engine executions pass. Compatibility claims stay bounded by the published inventory; TD/ESATAN conversion retains the independent product requirement at Q2.
 
 
 ## 4. Mandatory automated-test delivery requirements
@@ -662,9 +664,11 @@ For thermal cases, compare quantities with `abs(x - reference) <= atol + rtol * 
 
 ### 4.2 How unattended vendor and GUI tests work
 
-Create dedicated licensed self-hosted runners for each declared vendor configuration, accessed only by controlled GitHub Actions workflows in the private validation repository described in section 2.1. The runner has a preprovisioned licensed installation and a disposable project/work directory. A supervisor checks prerequisites, creates the fixture copy, invokes documented vendor automation, waits with deadlines, retrieves results, compares them and collects artifacts. Test credentials/licenses stay outside projects and logs. Untrusted public changes cannot directly execute on restricted runners; promote reviewed source/build artifacts by verified candidate hash through a controlled job.
+Independent product acceptance first runs import, edit, new-model export and fresh-process reopen on offline Windows with vendor installations, APIs, assemblies, licenses and conversion endpoints absent. Attempted vendor use fails acceptance. These drivers run automatically and cannot be replaced by licensed reference jobs.
 
-For each round trip, the driver runs this complete chain: verify original hashes → run source baseline → import and inspect fidelity → run FCST natively → export a new derivative → reopen/run derivative in the exact source tool → compare identities/topology/fields/results and unchanged content. Controlled-edit cases also create an equivalent source-native edit automatically. Cross-tool directions use separate manifests and target runners.
+Optional external comparisons use dedicated licensed self-hosted runners for each declared vendor configuration, accessed only by controlled GitHub Actions workflows in the private validation repository described in section 2.1. The runner has a preprovisioned licensed installation and a disposable project/work directory. A supervisor checks prerequisites, creates the fixture copy, invokes documented vendor automation, waits with deadlines, retrieves results, compares them and collects artifacts. Test credentials/licenses stay outside projects and logs. Untrusted public changes cannot directly execute on restricted runners; promote reviewed source/build artifacts by verified candidate hash through a controlled job.
+
+For each optional source-tool comparison, the reference driver verifies original hashes, runs the source baseline, independently imports and inspects fidelity, runs FCST natively, independently exports a new derivative, then reopens/runs it in the exact source tool and compares identities/topology/fields/results and unchanged content. Controlled-edit comparisons also create an equivalent source-native edit automatically. Cross-tool directions use separate manifests and target runners. Missing licensed runners hold that optional evidence, without creating a product dependency or blocking independent codec development.
 
 If a vendor interface needs an interactive desktop, use a dedicated signed-in automation session with a test supervisor, timeouts and stable selectors. Prefer supported vendor APIs/commands wherever possible. Automating a supported UI does not remove license constraints. If no reliable unattended route exists, record a blocked profile and build the missing driver/path; do not replace it with a request for the user to click through tests or accept a screenshot as numerical evidence.
 
