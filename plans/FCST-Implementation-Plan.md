@@ -147,6 +147,8 @@ The WP-04/WP-05 verification audit adds synthetic truncation, residual, authorit
 
 WP-05.5 extends TST-021 to the exact reuse/license inventory, versioned field/mesh contracts, synthetic spatial fixtures, API/mesher/host probes, bounded handoff reports and final GitHub issue/project/PR text. Run planted privacy regressions and actual staged/history/identity/file preflight before publication; CI scans each final generated report before upload. Preserve upstream notices and original engineering bytes. Raw example/host/mesh/result containers, screenshots, operational databases and logs remain local until separately sanitized and cleared. Any scanner batching/cache optimization must retain every commit's metadata and path/mode/type/policy context, including identical blobs in unsafe locations and deleted-history findings.
 
+WP-06 extends TST-021 to the exact worker/lifecycle sources, synthetic protocol peer, CLI, acceptance register and bounded `jobs.json` report. Both Windows drivers run `tests/test_jobs.py` and `tools/check_jobs.py`; CI scans the final lifecycle report before artifact upload. Before pushing, scan all staged blobs and outgoing history/approved author metadata, then independently scan final GitHub prose and generated evidence. Public reports include only case IDs, verdicts and source/build hashes. Actor identities, snapshots, checkpoint state, operational SQLite/WAL files, native binaries, HDF5 results and raw process logs stay local. Portable result provenance omits actor identity but still requires separate exact-byte clearance before publication. See [job contract and executable acceptance](../docs/jobs.md); no privacy exceptions are introduced.
+
 ## 3. Build sequence and dependencies
 
 Each package below specifies concrete tasks and completion evidence. Its register row identifies a lead role, prerequisites, expected outputs, and automated suites. Dependencies describe interface availability; packages can deliver a minimal slice before their complete Q1 capability. Every completion reference must point to an immutable test artifact, not a checklist marked by hand.
@@ -272,6 +274,8 @@ Implement the detailed [WP-5.5 work package](WP-05.5-Foundation-Reconciliation.m
 8. Reject stale result attachment to live cases; provide an explicit historical snapshot/view path.
 
 **Outputs:** scheduler/job store, worker protocol, lifecycle/recovery manager. **Completion:** automated kill, disconnect, cancellation race, timeout, duplicate-submission, stale-result and restart tests preserve both job truth and project recovery. Native qualification runs prove external thermal solvers were unavailable.
+
+The [WP-06 implementation contract](../docs/jobs.md) defines the SQLite lifecycle, Windows process-tree containment, frozen v1 stream and bounded cancellation acknowledgement channel, opt-in compatible restart, atomic result publication/attachment and historical views. `python tools/check_jobs.py --worker PATH_TO_WORKER` exercises real process termination, exact restart state and synthetic successful HDF5 publication; both Windows drivers require this report. The standalone C++ worker validates snapshots with external solver search paths absent and reports unsupported physics truthfully; production thermal engine qualification remains WP-11 and full host workflows remain WP-13. Synthetic lifecycle success is never numerical qualification.
 
 ### Step 7 — WP-07: implement common adapter infrastructure and safe logic handling
 

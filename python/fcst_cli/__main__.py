@@ -8,6 +8,8 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="FCST application and portable project tools")
     parser.add_argument("--capabilities", action="store_true")
     commands = parser.add_subparsers(dest="command")
+    from .jobs import parsers as job_parsers
+    job_parsers(commands)
     inspect = commands.add_parser("project-inspect")
     inspect.add_argument("path")
     inspect.add_argument("--previous", action="store_true")
@@ -28,7 +30,10 @@ def main() -> int:
         from pathlib import Path
         from fcst_app.persistence import PersistenceError, recover_package, migrate_project, semantic_hash, save_package
         try:
-            if args.command == "project-inspect":
+            if args.command.startswith("job-"):
+                from .jobs import execute
+                result = execute(args)
+            elif args.command == "project-inspect":
                 package = recover_package(args.path, previous=args.previous)
                 result = {"project_id": package.model["project_id"], "revision": package.model["revision"],
                           "semantic_hash": semantic_hash(package.model), "artifacts": len(package.manifest["artifacts"])}

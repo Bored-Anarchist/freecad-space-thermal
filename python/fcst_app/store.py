@@ -144,7 +144,7 @@ class ProjectStore:
     """One project per database, FULL synchronous commits, no executable state.
 
     Actor and scopes must come from the trusted caller, never imported content.
-    Job scheduling/worker execution are deliberately deferred to WP-06.
+    JobStore supplies the durable WP-06 lifecycle on the same database.
     """
     def __init__(self, database, *, fault=None, clock=time.time):
         self.path = Path(database)
@@ -401,19 +401,24 @@ class ProjectStore:
             self._write(state)
         return outcome
 
-    def dispatch(self, actor, scopes, envelope):
+    def dispatch(self, actor, scopes, envelope, *, jobs=None, execution=None):
         request = read("operation", envelope)
         if request["project_id"] != self.snapshot()["project_id"]:
             reject("wrong_project")
         operation, args = request["operation"], request["arguments"]
         self._authorize(actor, scopes, operation)
+        if jobs is not None and operation in {"job.submit","job.cancel","result.query"}:
+            if jobs.project is not self:
+                reject("wrong_project")
+            return jobs.dispatch(actor,scopes,request,execution=execution)
         def response(result):
             return read("response", {"contract_version": VERSION, "operation": operation, "result": result})
         if operation in {"model.validate", "model.hash"}:
             return response({"valid": True} if operation == "model.validate" else {"semantic_hash": semantic_hash(args["snapshot"])})
         if operation == "capabilities.get":
             return response({"contract_version": VERSION, "minimum_reader": VERSION,
-                             "operations": ["model.validate", "model.hash", "capabilities.get", "thermal.conductor.create"],
+                             "operations": ["model.validate", "model.hash", "capabilities.get", "thermal.conductor.create"]
+                             + (["job.submit","job.cancel","result.query"] if jobs is not None else []),
                              "solver_available": False, "execution_mode": "fcst_native"})
         if operation == "thermal.conductor.create":
             outcome = self.apply(actor, {"entity.create"}, request["project_id"], request["expected_revision"],

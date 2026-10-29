@@ -6,4 +6,5 @@
 namespace fcst {
 // Bounded JSON input, safe diagnostic output. No Python or solver dependency.
 std::string inspect_contract(std::string_view kind, std::string_view input);
+int run_worker(const std::string& root, const std::string& job_id);
 }
