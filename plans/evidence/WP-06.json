@@ -1,0 +1,102 @@
+{
+  "work_package": "WP-06",
+  "status": "complete",
+  "tested_candidate": "23dd14cb14baa04229dee71d5bcc5d1d32f466e6",
+  "scope": "Durable isolated job lifecycle and standalone native snapshot boundary; no production thermal physics or full host/MCP qualification",
+  "requirements": [
+    "ARC-003",
+    "ARC-005",
+    "ARC-008",
+    "DAT-010",
+    "DAT-014",
+    "UX-008",
+    "API-004",
+    "API-006",
+    "TST-006",
+    "TST-021"
+  ],
+  "contract": "docs/jobs.md",
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "required_checks": 132,
+      "unit_cases": 115,
+      "job_acceptance_cases": 7,
+      "reports_sha256": {
+        "verification": "a082dba251cdf61439a3c0c61c0fb1a5241c1208dd390238ab01b440a67254d8",
+        "jobs": "dea0bca42cb97e0b5af23bd8fc3b10df4a988e5a12aafb9589e51dca7b534cb1",
+        "contracts": "c3e8938c7747824d6637465fbc147648b385dcab484865c36a7c51cd4bc49a50",
+        "numerical": "5a3f208d445688d3f267ce6e84f966c76321b11e01a258ea5a44657a3d258056",
+        "persistence": "a4d54531ec7a81017de40048aa5fd7a9629902075885581d0b05f3be59a38645",
+        "spatial": "2ea2c753023dabde762297bccb4fc5dd685fb74281178501e1d86dd586f0c0b8",
+        "build-info": "4df684d43f8765a1e934dbee0fb190c6cb3c5dcad51d0c2612c5b2a0aec0c64c"
+      }
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "required_checks": 132,
+      "unit_cases": 115,
+      "job_acceptance_cases": 7,
+      "reports_sha256": {
+        "verification": "b9fbdf464c6ef19dcd3844912e59f1eeebbabfc0af08856fedfb70774d3bff90",
+        "jobs": "7c1d68d17cc41fff03d8e2d3fafc01c8cd1299413fdd76f3e4952d571b64bb90",
+        "contracts": "c3e8938c7747824d6637465fbc147648b385dcab484865c36a7c51cd4bc49a50",
+        "numerical": "6219308aee4f43b69bc7dfa0fe690090bf2c72593d482c144a37e4fc3f377edd",
+        "persistence": "a4d54531ec7a81017de40048aa5fd7a9629902075885581d0b05f3be59a38645",
+        "spatial": "2ea2c753023dabde762297bccb4fc5dd685fb74281178501e1d86dd586f0c0b8",
+        "build-info": "4df684d43f8765a1e934dbee0fb190c6cb3c5dcad51d0c2612c5b2a0aec0c64c"
+      }
+    },
+    {
+      "id": "foundation-handoff",
+      "status": "passed",
+      "command": "python tools/check_foundation_handoff.py --reports .local/wp06-final-handoff --report .local/wp06-final-handoff.json",
+      "required_cases": 25,
+      "report_sha256": "cbd6e5310b1a734977fccdd4f87f355cfd18df5d3dc6b5461c0ab723ef4fb565"
+    },
+    {
+      "id": "pinned-host-foundation",
+      "status": "passed",
+      "command": "python tools/fem_probe.py",
+      "required_cases": 4,
+      "report_sha256": "a3447c50f0ba2562bef7c6e0571c9d48abfa154f0a7ec7524b268ab00192afa1"
+    },
+    {
+      "id": "exact-report-and-prose-privacy",
+      "status": "passed",
+      "command": "python tools/publication_preflight.py --file FINAL_REPORT --file FINAL_PROSE",
+      "payload_sha256": "104fafcfa0ff7d1a7992eeb993bebc2665fc25f28515d19505575645802f5a28",
+      "policy_sha256": "3d4b11a45604a142d9e725fc3372c683040443d8b4b830923ddd1894b9889946"
+    }
+  ],
+  "acceptance": [
+    "test_checkpoint_restart_preserves_state_and_rejects_changed_identity",
+    "test_local_cli_submit_poll_run_cancel_and_resume_diagnostic",
+    "test_native_worker_is_engine_only_and_reports_unsupported_physics",
+    "test_partial_mismatched_late_and_badexit_results_are_never_published",
+    "test_real_process_kill_points_preserve_job_truth",
+    "test_success_can_win_a_requested_cancellation_race",
+    "test_success_publication_attachment_and_historical_snapshot"
+  ],
+  "publication": {
+    "policy_version": 3,
+    "approved_identity": "Bored-Anarchist",
+    "staged_and_history_commands": [
+      "python tools/publication_preflight.py --staged --revision HEAD",
+      "pre-commit and pre-push exact-byte checks"
+    ],
+    "withheld": "Operational SQLite/WAL files; snapshots; checkpoints; HDF5 and host containers; native executables; raw process/build logs",
+    "portable_provenance": "Actor identity omitted; exported model/result artifacts still need independent clearance before upload"
+  },
+  "supported_limits": "Windows process-tree containment; one scheduler per project; bounded v1 frames/events; opt-in backend restart with exact compatibility",
+  "remaining_scope": [
+    "WP-11 production thermal assembly and solve/checkpoint formats",
+    "WP-13 full FreeCAD workbench workflows",
+    "WP-14 MCP gateway and additional policy profiles"
+  ],
+  "blockers": []
+}
