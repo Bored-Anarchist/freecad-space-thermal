@@ -66,6 +66,10 @@ def semantic_hash(model):
     return sha256(b"FCST-semantic-v1\0" + canonical(snapshot(model))).hexdigest()
 
 
+def read_manifest(value):
+    return read("manifest2" if value.get("contract_version") == "2.0.0" else "manifest", value)
+
+
 def safe_path(name):
     if not isinstance(name, str) or len(name) > 240 or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._/-]*", name):
         reject("unsafe_path")
@@ -111,7 +115,7 @@ class Package:
     def __init__(self, manifest, files, *, limits=Limits(), check_arrays=True):
         # Direct application callers must obey the same JSON byte/depth budget
         # as file readers; otherwise an accepted store can be impossible to reopen.
-        self.manifest = read("manifest", loads(encode(manifest)))
+        self.manifest = read_manifest(loads(encode(manifest)))
         self.files = dict(files)
         self.limits = limits
         _check_members({"manifest.json": encode(self.manifest), **self.files}, limits)
@@ -141,6 +145,15 @@ class Package:
         for record in records:
             name = record["artifact"]["path"]
             suffix = Path(name).suffix.lower()
+            if record["role"] == "spatial":
+                if suffix != ".h5" or not check_arrays:
+                    reject("storage_format")
+                from .spatial_arrays import read_spatial
+                spatial = read_spatial(self.files[name], limits.item_bytes)
+                if spatial["project_id"] != self.model["project_id"]:
+                    reject("snapshot_mismatch")
+                # Results retain the original model hash after subsequent edits.
+                continue
             # Original sources are inert exact bytes, regardless of their suffix.
             if record["role"] in {"source_original", "source_dependency"}:
                 continue
@@ -209,7 +222,8 @@ class Package:
             files[name] = bytes(data)
             records.append({"id": artifact_id, "role": role, "dependencies": list(dependencies),
                             "artifact": {"path": name, "sha256": sha256(data).hexdigest(), "byte_length": len(data)}})
-        return cls({"contract_version": VERSION, "minimum_reader": VERSION, "project_id": model["project_id"],
+        version = "2.0.0" if any(r["role"] == "spatial" for r in records) else VERSION
+        return cls({"contract_version": version, "minimum_reader": version, "project_id": model["project_id"],
                     "revision": model["revision"], "model_artifact_id": model_id, "artifacts": records}, files)
 
     def zip_bytes(self):

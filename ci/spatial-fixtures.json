@@ -1,0 +1,18 @@
+{
+  "authoring": "Independently authored synthetic values; no upstream source or engineering originals copied",
+  "license": "MIT OR Apache-2.0",
+  "rights": "redistributable",
+  "privacy": "synthetic",
+  "upstream_adaptation": false,
+  "modifications": "Initial spatial v2 conformance corpus",
+  "fixtures": [
+    "tests/fixtures/contracts/network.json",
+    "tests/fixtures/spatial/solid-surface-rotated.json"
+  ],
+  "coverage": [
+    "geometry-free network",
+    "solid tet4",
+    "surface tri3 and CAD mapping",
+    "rotated anisotropic material and heat flux"
+  ]
+}

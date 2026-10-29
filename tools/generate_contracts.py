@@ -187,6 +187,15 @@ def build():
     for name, body in {"model": model, "manifest": manifest, "operation": envelope, "response": response, "result": result, "worker": worker}.items():
         schemas[name] = {"$schema": "https://json-schema.org/draft/2020-12/schema", "$id": "urn:fcst:contract:" + name + ":1.0.0",
                          **body, "$defs": defs}
+    from spatial_schema import schema as spatial_schema
+    schemas["spatial"] = spatial_schema(obj, arr, enum)
+    from copy import deepcopy
+    schemas["manifest2"] = deepcopy(schemas["manifest"])
+    m2 = schemas["manifest2"]
+    m2["$id"] = "urn:fcst:contract:manifest:2.0.0"
+    for key in ("contract_version", "minimum_reader"):
+        m2["properties"][key] = {"const": "2.0.0"}
+    m2["properties"]["artifacts"]["items"]["properties"]["role"]["enum"].append("spatial")
     return {"version": "1.0.0", "units": units, "si": si, "dimensions": dims,
             "schemas": schemas, "hdf5": hdf, "operations": list(args), "entity_kinds": list(entities)}
 
@@ -201,7 +210,7 @@ def outputs():
           'namespace fcst { inline constexpr std::string_view contract_bundle_parts[] = {\n' +
           ',\n'.join('R"FCST(' + chunk + ')FCST"' for chunk in chunks) + '\n}; }\n')
     for name, schema in bundle["schemas"].items():
-        yield "spec/schemas/" + name + "-v1.schema.json", json.dumps(schema, indent=2) + "\n"
+        yield "spec/schemas/" + ("manifest-v2" if name == "manifest2" else name + ("-v2" if name == "spatial" else "-v1")) + ".schema.json", json.dumps(schema, indent=2) + "\n"
     yield "spec/contracts/hdf5-v1.json", json.dumps(bundle["hdf5"], indent=2) + "\n"
     groups = {"EntityKind": bundle["entity_kinds"], "Operation": bundle["operations"],
               "WorkerMessage": [s["properties"]["type"]["const"] for s in bundle["schemas"]["worker"]["oneOf"]]}

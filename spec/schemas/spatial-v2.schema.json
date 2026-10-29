@@ -1,0 +1,482 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fcst:contract:spatial:2.0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "contract_version": {
+      "const": "2.0.0"
+    },
+    "minimum_reader": {
+      "const": "2.0.0"
+    },
+    "capability": {
+      "const": "spatial-linear-vertex-v2"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "project_id": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+    },
+    "model_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "mesh_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "execution_mode": {
+      "enum": [
+        "fcst_native",
+        "reference_external"
+      ]
+    },
+    "vertex_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      },
+      "minItems": 1,
+      "maxItems": 4096,
+      "uniqueItems": true
+    },
+    "vertices": {
+      "type": "array",
+      "items": {
+        "type": "array",
+        "items": {
+          "type": "number"
+        },
+        "minItems": 3,
+        "maxItems": 3
+      },
+      "minItems": 3,
+      "maxItems": 4096
+    },
+    "cells": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "topology": {
+            "enum": [
+              "tet4",
+              "tri3"
+            ]
+          },
+          "order": {
+            "const": 1
+          },
+          "vertices": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 4095
+            },
+            "minItems": 3,
+            "maxItems": 4,
+            "uniqueItems": true
+          }
+        },
+        "required": [
+          "id",
+          "topology",
+          "order",
+          "vertices"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 4096
+    },
+    "frames": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "basis": {
+            "type": "array",
+            "items": {
+              "type": "array",
+              "items": {
+                "type": "number"
+              },
+              "minItems": 3,
+              "maxItems": 3
+            },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "required": [
+          "id",
+          "basis"
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 16
+    },
+    "material": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "conductivity": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "minItems": 3,
+            "maxItems": 3
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "conductivity_unit": {
+          "const": "W/(m*K)"
+        },
+        "frame_id": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+        },
+        "density": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "density_unit": {
+          "const": "kg/m3"
+        },
+        "specific_heat": {
+          "type": "number",
+          "exclusiveMinimum": 0
+        },
+        "specific_heat_unit": {
+          "const": "J/(kg*K)"
+        }
+      },
+      "required": [
+        "conductivity",
+        "conductivity_unit",
+        "frame_id",
+        "density",
+        "density_unit",
+        "specific_heat",
+        "specific_heat_unit"
+      ]
+    },
+    "times": {
+      "type": "array",
+      "items": {
+        "type": "number",
+        "minimum": 0
+      },
+      "minItems": 1,
+      "maxItems": 64
+    },
+    "fields": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "quantity": {
+                "const": "temperature"
+              },
+              "unit": {
+                "const": "K"
+              },
+              "components": {
+                "const": [
+                  "scalar"
+                ]
+              },
+              "location": {
+                "const": "mesh_vertex"
+              },
+              "entity_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "minItems": 1,
+                "maxItems": 4096,
+                "uniqueItems": true
+              },
+              "frame_id": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "projection": {
+                "const": "raw"
+              },
+              "provenance": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 1,
+                    "maxItems": 1
+                  },
+                  "minItems": 1,
+                  "maxItems": 4096
+                },
+                "minItems": 1,
+                "maxItems": 64
+              }
+            },
+            "required": [
+              "quantity",
+              "unit",
+              "components",
+              "location",
+              "entity_ids",
+              "frame_id",
+              "projection",
+              "provenance",
+              "values"
+            ]
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "quantity": {
+                "const": "heat_flux"
+              },
+              "unit": {
+                "const": "W/m2"
+              },
+              "components": {
+                "const": [
+                  "x",
+                  "y",
+                  "z"
+                ]
+              },
+              "location": {
+                "const": "mesh_vertex"
+              },
+              "entity_ids": {
+                "type": "array",
+                "items": {
+                  "type": "string",
+                  "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+                },
+                "minItems": 1,
+                "maxItems": 4096,
+                "uniqueItems": true
+              },
+              "frame_id": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+              },
+              "projection": {
+                "const": "raw"
+              },
+              "provenance": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "values": {
+                "type": "array",
+                "items": {
+                  "type": "array",
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "minItems": 3,
+                    "maxItems": 3
+                  },
+                  "minItems": 1,
+                  "maxItems": 4096
+                },
+                "minItems": 1,
+                "maxItems": 64
+              }
+            },
+            "required": [
+              "quantity",
+              "unit",
+              "components",
+              "location",
+              "entity_ids",
+              "frame_id",
+              "projection",
+              "provenance",
+              "values"
+            ]
+          }
+        ]
+      },
+      "minItems": 1,
+      "maxItems": 2
+    },
+    "mappings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "from_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "from_kind": {
+            "enum": [
+              "cad_face",
+              "facet",
+              "element",
+              "mesh_vertex"
+            ]
+          },
+          "to_id": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "to_kind": {
+            "enum": [
+              "facet",
+              "element",
+              "thermal_node"
+            ]
+          },
+          "weight": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "area_m2": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "provenance": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "required": [
+          "from_id",
+          "from_kind",
+          "to_id",
+          "to_kind",
+          "weight",
+          "area_m2",
+          "provenance"
+        ]
+      },
+      "maxItems": 4096
+    },
+    "cad_face_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      },
+      "maxItems": 4096,
+      "uniqueItems": true
+    },
+    "thermal_node_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+      },
+      "maxItems": 4096,
+      "uniqueItems": true
+    },
+    "source_license_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "boundary": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "none",
+            "surface_flux",
+            "total_power",
+            "prescribed_temperature"
+          ]
+        },
+        "value": {
+          "type": "number"
+        },
+        "unit": {
+          "enum": [
+            "1",
+            "W/m2",
+            "W",
+            "K"
+          ]
+        },
+        "cell_ids": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
+          },
+          "maxItems": 4096,
+          "uniqueItems": true
+        }
+      },
+      "required": [
+        "kind",
+        "value",
+        "unit",
+        "cell_ids"
+      ]
+    }
+  },
+  "required": [
+    "contract_version",
+    "minimum_reader",
+    "capability",
+    "id",
+    "project_id",
+    "model_hash",
+    "mesh_revision",
+    "execution_mode",
+    "vertex_ids",
+    "vertices",
+    "cells",
+    "frames",
+    "material",
+    "times",
+    "fields",
+    "mappings",
+    "cad_face_ids",
+    "thermal_node_ids",
+    "source_license_hash",
+    "boundary"
+  ]
+}

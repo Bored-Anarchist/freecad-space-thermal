@@ -248,7 +248,7 @@ The [WP-05 implementation contract](../docs/persistence.md) documents the portab
 
 ### Step 5.5 — WP-05.5: reconcile FEM reuse and the foundation handoff
 
-Implement the detailed [WP-5.5 work package](WP-05.5-Foundation-Reconciliation.md) and its [25-case acceptance register](WP-05.5-acceptance.csv). Status is planned; the package defines missing work rather than reopening completed baselines or claiming an implemented FEM integration. It depends on WP-01 through WP-05 and completes at P0 before dependent acceptance in WP-06, WP-07, WP-13 and WP-16.
+Implement the detailed [WP-5.5 work package](WP-05.5-Foundation-Reconciliation.md) and its [25-case acceptance register](WP-05.5-acceptance.csv). Implementation is complete on its declared foundation subset; [candidate-linked evidence](evidence/WP-05.5.json) records both Windows configurations and all 25 required cases. The package preserves completed baselines and leaves full production FEM qualification with its later owners. It depends on WP-01 through WP-05 and completes at P0 before dependent acceptance in WP-06, WP-07, WP-13 and WP-16.
 
 1. Inventory all six FEM candidate groups and synthetic examples with exact upstream source/API/license/dependency and reuse/adapt/replace/defer dispositions. Keep the acquired vendor inventory and publication holds separate.
 2. Run representative pinned Windows FEM object/mesh/selection/result and selected mesher/import probes, with independent native startup, offline deployment, host-thread ownership, failure diagnostics and watchdogs.

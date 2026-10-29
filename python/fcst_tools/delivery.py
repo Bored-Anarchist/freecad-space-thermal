@@ -19,7 +19,7 @@ def package_from_title(title):
     return match[1] if match and match[1] in COMMITTED_WORK_PACKAGES else None
 
 
-def validate_foundation_acceptance(rows, requirements, suites):
+def validate_foundation_acceptance(rows, requirements, suites, evidence=None):
     errors = []
     identifiers = [row.get("case_id") for row in rows]
     if set(identifiers) != FOUNDATION_CASES or len(identifiers) != len(set(identifiers)):
@@ -31,7 +31,14 @@ def validate_foundation_acceptance(rows, requirements, suites):
                 or len(reqs) != len(set(reqs)) or not set(selected) <= set(suites)
                 or len(selected) != len(set(selected))):
             errors.append("foundation_acceptance_unknown_or_duplicate_reference")
-        if (row.get("status") != "planned" or not row.get("owner_role")
+        substantiated = row.get("status") == "planned"
+        if row.get("status") == "passed" and evidence and evidence.get("status") == "complete":
+            collected = evidence.get("acceptance", [])
+            substantiated = (len(collected) == len(FOUNDATION_CASES)
+                and {c.get("id") for c in collected} == FOUNDATION_CASES
+                and all(c.get("status") == "passed" for c in collected)
+                and evidence.get("input_sha256") and evidence.get("tested_candidate"))
+        if (not substantiated or not row.get("owner_role")
                 or not row.get("automated_acceptance") or not row.get("evidence_contract")):
             errors.append("foundation_acceptance_unsubstantiated_or_incomplete")
     return sorted(set(errors))

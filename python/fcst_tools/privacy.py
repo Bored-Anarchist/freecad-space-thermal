@@ -153,7 +153,50 @@ class Scanner:
                 "payload_sha256": payload_hash, "items": items, "findings": self.findings}
 
 
+class BlobReader:
+    """One bounded Git batch process; cache bytes, never a path's clearance."""
+    def __init__(self, root, budget):
+        self.process = subprocess.Popen(["git", "-C", str(root), "cat-file", "--batch"], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.DEVNULL)
+        self.budget = budget
+        self.cache = {}
+        self.bytes = 0
+
+    def read(self, oid):
+        if not re.fullmatch(r"[0-9a-f]{40,64}", oid):
+            raise ValueError("invalid object identity")
+        if oid in self.cache:
+            return self.cache[oid]
+        self.process.stdin.write((oid+"\n").encode())
+        self.process.stdin.flush()
+        header = self.process.stdout.readline(200).split()
+        if len(header) != 3 or header[0].decode() != oid or header[1] != b"blob":
+            raise ValueError("invalid object response")
+        size = int(header[2])
+        if not 0 <= size <= self.budget:
+            raise ValueError("inspection budget exceeded")
+        data = self.process.stdout.read(size)
+        if len(data) != size or self.process.stdout.read(1) != b"\n":
+            raise ValueError("incomplete object response")
+        if self.bytes + size <= self.budget:
+            self.cache[oid] = data
+            self.bytes += size
+        return data
+
+    def close(self):
+        self.process.stdin.close()
+        self.process.stdout.close()
+        self.process.wait(timeout=15)
+
+
 def inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: bool) -> None:
+    reader = BlobReader(root, scanner.policy["max_item_bytes"])
+    try:
+        _inspect_git(scanner, root, revision, staged, reader)
+    finally:
+        reader.close()
+
+
+def _inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: bool, reader) -> None:
     if staged:
         entries = git(root, "ls-files", "--stage", "-z")
         for record in entries.split(b"\0"):
@@ -166,7 +209,7 @@ def inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: bool
                 scanner.finding("link_submodule_or_unmerged", name)
                 continue
             scanner.scan("index-mode/" + name + ".txt", mode.encode())
-            scanner.scan("index/" + name, git(root, "cat-file", "blob", blob))
+            scanner.scan("index/" + name, reader.read(blob))
     if revision:
         object_id = git(root, "rev-parse", "--verify", revision).decode().strip()
         for depth in range(scanner.policy["max_archive_depth"] + 1):
@@ -203,7 +246,7 @@ def inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: bool
                 if kind != "blob" or mode not in {"100644", "100755"}:
                     scanner.finding("link_or_submodule", commit + "/" + name)
                     continue
-                scanner.scan(commit + "/" + name, git(root, "cat-file", "blob", blob))
+                scanner.scan(commit + "/" + name, reader.read(blob))
 
 
 def main(argv: list[str] | None = None) -> int:

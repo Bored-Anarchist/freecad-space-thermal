@@ -1,0 +1,123 @@
+{
+  "retained_audit": [
+    {
+      "group": "restart",
+      "regressions": [
+        "test_numerical.NumericalTests.test_restart_rejects_truncation_wrong_time_controls_and_nonfinite_state"
+      ]
+    },
+    {
+      "group": "steady",
+      "regressions": [
+        "test_numerical.NumericalTests.test_steady_requires_finite_nonnegative_norm_and_independent_balance"
+      ]
+    },
+    {
+      "group": "authorization",
+      "regressions": [
+        "test_persistence.PersistenceTests.test_create_scope_cannot_delete_replace_or_batch_entities"
+      ]
+    },
+    {
+      "group": "originals_dependencies",
+      "regressions": [
+        "test_persistence.PersistenceTests.test_original_blob_and_metadata_corruption_fail_before_rehashing",
+        "test_persistence.PersistenceTests.test_package_graph_model_path_and_audit_identity_survive_reconstruction"
+      ]
+    },
+    {
+      "group": "result_binding",
+      "regressions": [
+        "test_persistence.PersistenceTests.test_result_array_dependency_must_close_in_package"
+      ]
+    },
+    {
+      "group": "save_race",
+      "regressions": [
+        "test_persistence.PersistenceTests.test_delayed_save_selects_snapshot_after_destination_lock"
+      ]
+    },
+    {
+      "group": "host_race_alias",
+      "regressions": [
+        "test_persistence.PersistenceTests.test_host_sync_overlap_and_target_aliases_cannot_lose_writes"
+      ]
+    },
+    {
+      "group": "growing_file",
+      "regressions": [
+        "test_persistence.PersistenceTests.test_directory_reads_remain_bounded_when_size_changes_after_stat"
+      ]
+    }
+  ],
+  "baseline_evidence": {
+    "plans/evidence/WP-01.json": "a8b78983760bbfcd9533ade9a26544defd63e34f3c782362cd259dce4d27c405",
+    "plans/evidence/WP-02.json": "63494796fba6469a337f91d58cc3a729c49a96f169425808e9413dcc6274d91d",
+    "plans/evidence/WP-03.json": "e5301942993d49c4cc32fe8c806d6af3b8b0d7e6bd55335a746a81bf9ded3f16",
+    "plans/evidence/WP-04.json": "406d586eac29482956e597a0a5c69e8815c5f82be3b28050ae2690d6647dee8c",
+    "plans/evidence/WP-05.json": "9ffd64b4459180dfc88c0a9865504544e8e24e3b6c0d55720d6169d76c33496e",
+    "plans/evidence/WP-04-WP-05-audit.json": "e2e2b6410cc9ad8e88d92df31ffaadad929805a45e246e77de226048e4b83caa"
+  },
+  "issues": [
+    {
+      "id": "F055-01",
+      "severity": "major",
+      "owner": "Architecture and API lead",
+      "gate": "P0; WP-16/Q1 for deferred production capability",
+      "requirement": "Explicit element/order and field semantics",
+      "reproducer": "tests/fixtures/spatial/higher-order.json",
+      "regression": "test_contract_conformance",
+      "disposition": "corrected"
+    },
+    {
+      "id": "F055-02",
+      "severity": "major",
+      "owner": "Architecture and API lead",
+      "gate": "P0; WP-16/Q1 for deferred production capability",
+      "requirement": "Version and capability rejection before mutation",
+      "reproducer": "tests/fixtures/spatial/minimum-reader.json",
+      "regression": "test_version_matrix",
+      "disposition": "corrected"
+    },
+    {
+      "id": "F055-03",
+      "severity": "major",
+      "owner": "Architecture and API lead",
+      "gate": "P0; WP-16/Q1 for deferred production capability",
+      "requirement": "Bind actual arrays to field and mesh identities",
+      "reproducer": "tools/check_spatial.py",
+      "regression": "test_corruption_identity_historical_invalidation",
+      "disposition": "corrected"
+    },
+    {
+      "id": "F055-04",
+      "severity": "major",
+      "owner": "Architecture and API lead",
+      "gate": "P0; WP-16/Q1 for deferred production capability",
+      "requirement": "Real host transaction and result synchronization evidence",
+      "reproducer": "tools/fem_probe_payload.py",
+      "regression": "WP055-HOST-003;WP055-HOST-004",
+      "disposition": "corrected"
+    },
+    {
+      "id": "F055-05",
+      "severity": "major",
+      "owner": "Architecture and API lead",
+      "gate": "P0; WP-16/Q1 for deferred production capability",
+      "requirement": "Operational limits measured against representative subset",
+      "reproducer": "ci/spatial-criteria-v1.json",
+      "regression": "test_resource_profile",
+      "disposition": "corrected"
+    },
+    {
+      "id": "F055-06",
+      "severity": "limitation",
+      "owner": "Architecture and API lead",
+      "gate": "P0; WP-16/Q1 for deferred production capability",
+      "requirement": "Gmsh/Netgen generation and higher-order production capability",
+      "reproducer": "ci/fem-reuse.json",
+      "regression": "test_contract_conformance",
+      "disposition": "unsupported"
+    }
+  ]
+}

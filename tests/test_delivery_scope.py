@@ -66,9 +66,11 @@ class DeliveryScopeTests(unittest.TestCase):
         cases = rows("plans/WP-05.5-acceptance.csv")
         requirements = {row["id"] for name in ("spec/requirements.csv", "plans/automated-test-requirements.csv") for row in rows(name)}
         suites = {row["id"] for row in rows("plans/test-suites.csv")}
-        self.assertEqual(validate_foundation_acceptance(cases, requirements, suites), [])
+        path=ROOT/"plans/evidence/WP-05.5.json"
+        evidence=json.loads(path.read_bytes()) if path.is_file() else None
+        self.assertEqual(validate_foundation_acceptance(cases, requirements, suites, evidence), [])
         for damaged in (cases[:-1], cases + [cases[0]]):
-            self.assertIn("foundation_acceptance_coverage_mismatch", validate_foundation_acceptance(damaged, requirements, suites))
+            self.assertIn("foundation_acceptance_coverage_mismatch", validate_foundation_acceptance(damaged, requirements, suites, evidence))
         changed = copy.deepcopy(cases)
         changed[0]["requirement_ids"] += ";TST-999"
         self.assertIn("foundation_acceptance_unknown_or_duplicate_reference", validate_foundation_acceptance(changed, requirements, suites))

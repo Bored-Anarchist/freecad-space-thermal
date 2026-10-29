@@ -1,5 +1,5 @@
 {
-  "version": 2,
+  "version": 3,
   "approved_identities": [
     {
       "name": "Bored-Anarchist",
@@ -17,6 +17,7 @@
     ".py",
     ".cpp",
     ".hpp",
+    ".inc",
     ".in",
     ".txt",
     ".toml",
