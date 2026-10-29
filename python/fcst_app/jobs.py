@@ -67,6 +67,9 @@ class JobStore:
           CREATE TABLE IF NOT EXISTS job_events (
             job TEXT NOT NULL REFERENCES jobs(id), sequence INTEGER NOT NULL, data BLOB NOT NULL,
             PRIMARY KEY(job,sequence));
+          CREATE TABLE IF NOT EXISTS job_requests (
+            actor TEXT NOT NULL, request_key TEXT NOT NULL, request_hash TEXT NOT NULL,
+            response BLOB NOT NULL, PRIMARY KEY(actor,request_key));
         """)
 
     def _get(self, job_id):
@@ -120,6 +123,7 @@ class JobStore:
         if len(encode(request)) > 65536:
             reject("request_limit")
         with self.project.transaction():
+            self._key_available(actor,key)
             prior = self.db.execute("SELECT request_hash,id FROM jobs WHERE actor=? AND request_key=?", (actor,key)).fetchone()
             if prior:
                 if prior[0] != request_hash:
@@ -167,6 +171,11 @@ class JobStore:
                 self.db.execute("INSERT INTO job_bytes VALUES(?,?,?)", (job_id, "resume/state", data))
             _fault(self.fault, "job_submitted")
         return record
+
+    def _key_available(self, actor, key):
+        if (any(r["actor"] == actor and r["key"] == key for r in self.project.state()["dedup"])
+                or self.db.execute("SELECT 1 FROM job_requests WHERE actor=? AND request_key=?",(actor,key)).fetchone()):
+            reject("idempotency_conflict")
 
     def bytes(self, job_id, path):
         row = self.db.execute("SELECT data FROM job_bytes WHERE job=? AND path=?", (job_id,path)).fetchone()
@@ -315,10 +324,14 @@ class JobStore:
         self._authority(actor, scopes, "result.query", record)
         if record["state"] != "succeeded":
             reject("result_unavailable")
+        raw = self.bytes(job_id,"result/manifest")
+        verify_artifact(record["result"]["manifest"],raw)
+        manifest = read("result",loads(raw))
+        verify_artifact(manifest["data"],self.bytes(job_id,"result/data"))
         model = self.project.snapshot()
         if not historical and (model["revision"] != record["revision"] or semantic_hash(model) != record["semantic_hash"]):
             reject("stale_result")
-        return {"job": record, "manifest": loads(self.bytes(job_id,"result/manifest")),
+        return {"job": record, "manifest": manifest,
                 "snapshot": loads(self.db.execute("SELECT snapshot FROM jobs WHERE id=?", (job_id,)).fetchone()[0])}
 
     def attach(self, actor, scopes, job_id):
@@ -362,6 +375,31 @@ class JobStore:
         self._authority(actor,scopes,operation)
         if request["project_id"] != self.project.snapshot()["project_id"]:
             reject("wrong_project")
+        request_hash = sha256(encode(request)).hexdigest()
+        if operation == "job.cancel":
+            # Cancellation and its key reservation share a transaction. A retry
+            # returns the original response even after service restart.
+            with self.project.transaction():
+                prior = self.db.execute("SELECT request_hash,response FROM job_requests WHERE actor=? AND request_key=?",
+                                        (actor,request["idempotency_key"])).fetchone()
+                if prior:
+                    if prior[0] != request_hash:
+                        reject("idempotency_conflict")
+                    return read("response",loads(prior[1]))
+                self._key_available(actor,request["idempotency_key"])
+                if self.db.execute("SELECT 1 FROM jobs WHERE actor=? AND request_key=?",(actor,request["idempotency_key"])).fetchone():
+                    reject("idempotency_conflict")
+                record = self._get(args["job_id"])
+                self._authority(actor,scopes,operation,record)
+                if record["state"] == "queued":
+                    record.update(state="cancelled",reason="cancelled_before_start")
+                elif record["state"] == "running":
+                    record.update(state="cancelling",cancel_requested=self.clock())
+                self._put(record)
+                response = read("response",{"contract_version":VERSION,"operation":operation,
+                                             "result":{"job_id":args["job_id"],"accepted":True}})
+                self.db.execute("INSERT INTO job_requests VALUES(?,?,?,?)",(actor,request["idempotency_key"],request_hash,encode(response)))
+                return response
         if operation == "job.submit":
             prior = self.db.execute("SELECT id,snapshot FROM jobs WHERE actor=? AND request_key=?",
                                     (actor,request["idempotency_key"])).fetchone()
@@ -371,9 +409,6 @@ class JobStore:
             job = self.submit(actor,scopes,request["idempotency_key"],args["case_id"],
                               expected_revision=request["expected_revision"],execution=execution)
             result = {"job_id":job["id"]}
-        elif operation == "job.cancel":
-            self.cancel(actor,scopes,args["job_id"])
-            result = {"job_id":args["job_id"],"accepted":True}
         elif operation == "result.query":
             candidates = [loads(row[0]) for row in self.db.execute("SELECT record FROM jobs WHERE actor=?",(actor,))]
             record = next((r for r in candidates if r["result"] and r["result"]["id"] == args["result_id"]),None)

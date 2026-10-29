@@ -367,6 +367,10 @@ class ProjectStore:
             state = self.state()
             if project_id != state["model"]["project_id"]:
                 reject("wrong_project")
+            if self.db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='jobs'").fetchone():
+                if (self.db.execute("SELECT 1 FROM jobs WHERE actor=? AND request_key=?",(actor,key)).fetchone()
+                        or self.db.execute("SELECT 1 FROM job_requests WHERE actor=? AND request_key=?",(actor,key)).fetchone()):
+                    reject("idempotency_conflict")
             duplicate = next((r for r in state["dedup"] if r["actor"] == actor and r["key"] == key), None)
             if duplicate:
                 if duplicate["payload_hash"] != request_hash:

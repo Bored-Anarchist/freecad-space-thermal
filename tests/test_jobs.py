@@ -172,8 +172,18 @@ class JobTests(unittest.TestCase):
         result = self.project.dispatch(ACTOR,SCOPES,envelope,jobs=self.jobs,execution=execution())
         self.assertEqual(result,self.project.dispatch(ACTOR,SCOPES,envelope,jobs=self.jobs,execution=execution()))
         cancel = json.loads((ROOT / "tests/fixtures/contracts/operation-job.cancel.json").read_bytes())
+        cancel["idempotency_key"] = "00000000-0000-4000-8000-000000000091"
         cancel["arguments"]["job_id"] = result["result"]["job_id"]
-        self.assertTrue(self.project.dispatch(ACTOR,SCOPES,cancel,jobs=self.jobs,execution=execution())["result"]["accepted"])
+        response = self.project.dispatch(ACTOR,SCOPES,cancel,jobs=self.jobs,execution=execution())
+        self.assertTrue(response["result"]["accepted"])
+        self.assertEqual(response,self.project.dispatch(ACTOR,SCOPES,cancel,jobs=self.jobs,execution=execution()))
+        other = self.submit(key="other")
+        cancel["arguments"]["job_id"] = other["id"]
+        with self.assertRaisesRegex(PersistenceError,"idempotency_conflict"):
+            self.project.dispatch(ACTOR,SCOPES,cancel,jobs=self.jobs,execution=execution())
+        entity = deepcopy(model()["entities"][2])
+        with self.assertRaisesRegex(PersistenceError,"idempotency_conflict"):
+            self.project.apply(ACTOR,{"changes.apply"},model()["project_id"],0,"other",{"upsert":[entity],"delete":[]})
 
     def submit_hash(self):
         from fcst_app.persistence import semantic_hash

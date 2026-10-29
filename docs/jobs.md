@@ -4,7 +4,10 @@
 execution profile/features, actual backend build hash, dependency provenance,
 settings, platform, budgets and seeds in the project's SQLite database before
 returning a job ID. Actor-scoped exact retries return the original job; conflicting
-payloads fail. Connections belong to their calling thread. Independent clients can
+payloads fail. Submission, cancellation and project edits share the actor/project
+mutation-key namespace; cancellation and its original response commit together.
+Stored result manifests and data are checksum-verified again on retrieval.
+Connections belong to their calling thread. Independent clients can
 query, cancel and edit the project while a worker runs. Client timeout or disconnect
 does not change job truth.
 
