@@ -12,6 +12,12 @@ Track the 22 work packages in the [FCST implementation project](https://github.c
 
 [WP-5.5 — FEM reuse and foundation reconciliation](plans/WP-05.5-Foundation-Reconciliation.md), canonical ID WP-05.5, collects the missing WP-01 through WP-05 handoff work and related issues. Its 25 implemented acceptance cases cover reuse/provenance, pinned probes, element/field/heat-flux contracts, compatibility, storage/recovery, independent spatial fixtures, representative host integration and privacy. [Completion evidence](plans/evidence/WP-05.5.json) records the completed P0 handoff before dependent feature acceptance in WP-06/WP-07/WP-13/WP-16; the completed baselines retain their original scope and evidence.
 
+WP-07 provides the [common source exchange SDK](docs/exchange.md): byte-preserving
+syntax, bounded includes, typed mapping, inert source logic, fidelity reports,
+guarded exports and SI result queries. Its executable `fcst-network/1` synthetic
+profile exercises shared infrastructure; vendor dialects and qualification remain
+WP-08/WP-09/WP-10. Both Windows CI configurations run its frozen unattended cases.
+
 [WP-03 contracts](spec/contracts/README.md) freeze native model, operation, result, HDF5 layout and worker protocol version 1.0.0. Independent C++ and Python readers validate typed entities, references, quantities, frames and expression types, and agree on normalized snapshots and semantic hashes. Both Windows configurations run the same positive/negative fixtures and bounded framing checks.
 
 [WP-04's numerical checkpoint](docs/decisions/0001-q0-numerical.md) adds a separate C++/SUNDIALS experiment with independent analytic/nonlinear oracles, energy/event/restart checks, dense/banded and BDF/Adams comparisons, scale probes and sealed evidence. Both Windows verification configurations execute it unattended. It retains C++ as the implementation baseline; production solving, GUI workflows and vendor compatibility remain later work.

@@ -32,6 +32,10 @@ def check(directory):
         numerical=load(path.parent/"numerical.json");persistence=load(path.parent/"persistence.json")
         jobs=load(path.parent/"jobs.json")
         if jobs["gate"]["status"]!="passed": raise ValueError("job_lifecycle_regression")
+        exchange=load(path.parent/"exchange.json")
+        if (exchange["candidate"]!=candidate or evaluate(load(ROOT/"ci/exchange-acceptance.json")["required_cases"],exchange["cases"])["status"]!="passed"
+                or exchange["gate"]["status"]!="passed"):
+            raise ValueError("exchange_regression")
         if numerical["gate"]["status"]!="passed" or persistence["gate"]["status"]!="passed": raise ValueError("baseline_regression")
         contracts=load(path.parent/"contracts.json")
         if contracts["status"]!="passed": raise ValueError("contract_regression")

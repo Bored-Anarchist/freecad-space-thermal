@@ -141,6 +141,16 @@ WP-04 adds an exact pre-upload scan of each `numerical.json` summary. Its inputs
 
 WP-05 adds the exact generated `persistence.json` summary to both Windows CI pre-upload scans. Synthetic package/migration fixtures, typed store/array sources, completion evidence and final PR prose are checked with the staged/outgoing-history/approved-identity preflight before publication. Generated `.fcst`, HDF5, SQLite/WAL and synthetic host files plus raw crash/array diagnostics stay local. Imported engineering originals remain unchanged in their authorized storage and are never uploaded by this workflow. TST-021 acceptance includes planted privacy regressions and exact report/prose scans; neither an inert-source role nor successful persistence validation grants publication clearance.
 
+WP-07 extends TST-021 to the exact `exchange.json` acceptance summary, SDK sources,
+fidelity schema, synthetic converter fixture and final publication prose. Both
+Windows workflows clear that report before upload; it contains only case IDs,
+verdicts, candidate and public input hashes. Original decks, dependency/result
+bytes, packages, per-source fidelity inventories, converter logs and local failure
+traces remain local until separately reviewed and cleared. `python -S
+tools/check_security.py`, staged/outgoing-history and approved-identity scans, plus
+exact generated-report/PR-prose preflight remain executable acceptance. Tool
+authorization is recorded by hash without exposing actor identity or installed paths.
+
 FEM reuse work applies TST-021 to exact outgoing decision/assessment text, upstream attribution/license manifests, synthetic fixtures, bounded host/mesh/comparison reports and final issue/PR prose. Run `python -S tools/check_security.py` and `python tools/publication_preflight.py --staged --revision HEAD` before commit/push; scan each final generated report or post with `--file` before upload. Generated FreeCAD documents, raw solver decks, screenshots, mesh/result containers and logs stay local unless separately sanitized and cleared. Use synthetic inputs for public tests, preserve authorized originals unchanged, and do not weaken privacy policy to admit upstream examples or generated diagnostics.
 
 The WP-04/WP-05 verification audit adds synthetic truncation, residual, authority, original-corruption, dependency/result-binding, save/host-race and growing-file regressions. Its [decision record](../docs/decisions/0002-wp04-wp05-verification.md) documents corrected behavior and executable acceptance. New sealed numerical attempts and bounded audit summaries supplement the retained original baseline. Exact source/evidence/prose and generated report scans precede upload; raw inputs, databases, binary containers and diagnostics remain local.
@@ -278,6 +288,15 @@ Implement the detailed [WP-5.5 work package](WP-05.5-Foundation-Reconciliation.m
 The [WP-06 implementation contract](../docs/jobs.md) defines the SQLite lifecycle, Windows process-tree containment, frozen v1 stream and bounded cancellation acknowledgement channel, opt-in compatible restart, atomic result publication/attachment and historical views. `python tools/check_jobs.py --worker PATH_TO_WORKER` exercises real process termination, exact restart state and synthetic successful HDF5 publication; both Windows drivers require this report. [Completion evidence](evidence/WP-06.json) records both configurations and the prerequisite handoff on the tested implementation candidate. The standalone C++ worker validates snapshots with external solver search paths absent and reports unsupported physics truthfully; production thermal engine qualification remains WP-11 and full host workflows remain WP-13. Synthetic lifecycle success is never numerical qualification.
 
 ### Step 7 — WP-07: implement common adapter infrastructure and safe logic handling
+
+The implementation lives in `python/fcst_exchange` with its [versioned grammar and
+supported limits](../docs/exchange.md), [frozen automated acceptance register](../ci/exchange-acceptance.json)
+and fidelity schema. The executable synthetic reference dialect validates the common
+SDK boundary; exact vendor dialects and paired source-tool qualification remain
+WP-08/WP-09/WP-10. Both Windows drivers run `tools/check_exchange.py`, including real
+bounded converters, pure-logic oracles, parser fuzzing, source-byte preservation,
+controlled-edit reopen and result-query comparisons. Native readiness never upgrades
+opaque content or grants vendor/solver qualification.
 
 1. Define adapter discovery/capabilities, runtime probing, import preview/staging, conversion plans, semantic mapping, diagnostics and export interfaces.
 2. Build a source dependency resolver that safely reads permitted data includes, reports missing files and never executes include commands or imported logic. Record include graphs and original source locations.

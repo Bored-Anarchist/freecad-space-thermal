@@ -1,0 +1,258 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "adapter",
+    "profile",
+    "source_revision",
+    "runnable",
+    "qualified",
+    "records",
+    "operations",
+    "diagnostics",
+    "dependencies"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "adapter": {
+      "type": "string"
+    },
+    "profile": {
+      "type": "string"
+    },
+    "source_revision": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "runnable": {
+      "type": "boolean"
+    },
+    "qualified": {
+      "const": false
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "source_id",
+          "target_id",
+          "category",
+          "operation",
+          "status",
+          "required",
+          "location",
+          "evidence",
+          "limitations"
+        ],
+        "properties": {
+          "source_id": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "category": {
+            "enum": [
+              "entity",
+              "case",
+              "procedure",
+              "dependency",
+              "result"
+            ]
+          },
+          "operation": {
+            "const": "import"
+          },
+          "status": {
+            "enum": [
+              "native-reconstructed",
+              "bridged-executable",
+              "retained-opaque",
+              "approximated",
+              "unsupported"
+            ]
+          },
+          "required": {
+            "type": "boolean"
+          },
+          "location": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "path",
+              "line",
+              "start",
+              "end"
+            ],
+            "properties": {
+              "path": {
+                "type": "string"
+              },
+              "line": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "start": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "end": {
+                "type": "integer",
+                "minimum": 0
+              }
+            }
+          },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "sha256",
+              "regressions"
+            ],
+            "properties": {
+              "sha256": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              },
+              "regressions": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "operation",
+          "status",
+          "supported",
+          "source_id",
+          "target_id",
+          "profile",
+          "evidence",
+          "limitations"
+        ],
+        "properties": {
+          "operation": {
+            "enum": [
+              "native-reconstruction",
+              "unchanged-export",
+              "controlled-edit",
+              "vendor-qualification"
+            ]
+          },
+          "status": {
+            "enum": [
+              "native-reconstructed",
+              "bridged-executable",
+              "retained-opaque",
+              "approximated",
+              "unsupported"
+            ]
+          },
+          "supported": {
+            "type": "boolean"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "target_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "profile": {
+            "type": "string"
+          },
+          "evidence": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "source_revision"
+            ],
+            "properties": {
+              "source_revision": {
+                "type": "string",
+                "pattern": "^[0-9a-f]{64}$"
+              }
+            }
+          },
+          "limitations": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "code",
+          "source_id"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "path",
+          "includes"
+        ],
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "includes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:fcst:exchange:fidelity:1.0.0"
+}

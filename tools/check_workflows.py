@@ -32,6 +32,9 @@ def validate():
     assert workflow["jobs"]["host"]["strategy"]["matrix"]["os"] == ["windows-2022"], "Windows-only host matrix required"
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
+    build_steps = workflow["jobs"]["build"]["steps"]
+    assert any("publication_preflight.py" in step.get("run", "") and "exchange.json" in step["run"] for step in build_steps), "WP-07 report lacks pre-upload clearance"
+    assert any("exchange.json" in step.get("with", {}).get("path", "") for step in build_steps if step.get("uses", "").startswith("actions/upload-artifact@")), "WP-07 report absent"
     assert "fem_probe.py" in str(workflow["jobs"]["host"]), "FEM probes absent"
     assert "check_foundation_handoff.py" in str(workflow["jobs"]["gate"]), "TST-022 aggregate absent"
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]
