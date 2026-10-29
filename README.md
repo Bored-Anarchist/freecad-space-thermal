@@ -17,6 +17,8 @@ syntax, bounded includes, typed mapping, inert source logic, fidelity reports,
 guarded exports and SI result queries. Its executable `fcst-network/1` synthetic
 profile exercises shared infrastructure; vendor dialects and qualification remain
 WP-08/WP-09/WP-10. Both Windows CI configurations run its frozen unattended cases.
+[Completion evidence](plans/evidence/WP-07.json) records the two 165-check Windows
+drivers, 33 exchange acceptance cases, security regressions and foundation handoff.
 
 [WP-03 contracts](spec/contracts/README.md) freeze native model, operation, result, HDF5 layout and worker protocol version 1.0.0. Independent C++ and Python readers validate typed entities, references, quantities, frames and expression types, and agree on normalized snapshots and semantic hashes. Both Windows configurations run the same positive/negative fixtures and bounded framing checks.
 

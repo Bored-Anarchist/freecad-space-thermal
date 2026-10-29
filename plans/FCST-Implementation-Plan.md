@@ -298,6 +298,13 @@ bounded converters, pure-logic oracles, parser fuzzing, source-byte preservation
 controlled-edit reopen and result-query comparisons. Native readiness never upgrades
 opaque content or grants vendor/solver qualification.
 
+[Completion evidence](evidence/WP-07.json) records the tested implementation
+candidate, both 165-check Windows configurations, all 33 exchange acceptance cases,
+147 standard-library regressions, the 25-case prerequisite handoff and exact
+report/prose publication clearance. WP-07 is complete on its declared common SDK
+and executable synthetic reference profile; the later vendor owners retain their
+full dialect and paired qualification obligations.
+
 1. Define adapter discovery/capabilities, runtime probing, import preview/staging, conversion plans, semantic mapping, diagnostics and export interfaces.
 2. Build a source dependency resolver that safely reads permitted data includes, reports missing files and never executes include commands or imported logic. Record include graphs and original source locations.
 3. Implement syntax-preserving parsed trees for declared network dialects, with original byte ranges/comments and opaque unknown regions. Unknown syntax is reported, not interpreted by filename extension.
