@@ -1,4 +1,4 @@
-# Owned thermal model preparation and assembly
+# Owned thermal preparation, assembly and steady solving
 
 WP-11.1 and WP-11.2 provide the C++20 preparation API in
 [`fcst/thermal.hpp`](../engine/include/fcst/thermal.hpp). `thermal::load` validates
@@ -108,7 +108,7 @@ Run unattended acceptance with:
 ```text
 python tools/verify.py --preset windows-debug
 python tools/verify.py --preset windows-release
-python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --assembly-tests ASSEMBLY_TEST_EXE --report .local/thermal.json
+python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --assembly-tests ASSEMBLY_TEST_EXE --steady-tests STEADY_TEST_EXE --report .local/thermal.json
 python -S tools/check_security.py
 ```
 
@@ -116,14 +116,14 @@ The [acceptance register](../ci/thermal-acceptance.json) requires native analyti
 constant/linear/step/clamp integrals, derivative and enthalpy checks, storage
 conservation, tensor heat-flux checks, immutable/source/case loading and hostile
 JSON/structure/table/binding cases, energy residuals, boundary accounting,
-algebraic constraints and independent Jacobian differences. Both native acceptance executables run in
+algebraic constraints, independent Jacobian differences and steady solves. All native acceptance executables run in
 CTest and the report driver; the installed worker runs with only its own directory
 on PATH and Python/host/vendor search variables removed. Both CI configurations
 require `thermal.json`, validate its exact case coverage, source hashes, native
 binary hashes and worker build revision in the
 aggregate, and privacy-clear its actual bytes before upload. Raw compiler output,
 input/output values, executable/debug files and restricted engineering models
-remain local. WP-11.6 through WP-11.10, production solves, solver job integration
+remain local. WP-11.7 through WP-11.10, transient/event solving, solver job integration
 and full WP-11 qualification remain open.
 
 ## Energy and algebraic residuals (WP-11.3/11.4)
@@ -226,15 +226,116 @@ recompute the infinity-norm residual independently of the backend's reported nor
 Convergence must satisfy `atol + rtol * reference`, with `reference = norm(rhs)` for
 linear systems and `norm(F(initial))` for nonlinear problems. Invalid convergence
 claims reject; failed outcomes remain failed outcomes. This is the interface
-contract, not the production scaling/stopping strategy required by WP-11.6.
+contract. The steady scaling/stopping strategy is defined below under WP-11.6.
 Backend exceptions are sanitized; a backend cannot swallow a malformed guarded
-problem evaluation and subsequently claim success.
+problem evaluation and subsequently claim success. `EvaluationDomainError`
+identifies a recoverable physical trial domain, allowing a native algorithm to
+backtrack. Shape, nonfinite protocol arguments and ordinary callback failures
+remain fatal. Assembly steady-problem factories classify physical range failures
+this way; they do not execute imported logic.
 
 Acceptance compares all temperature and rate Jacobian entries, the combined
 implicit Jacobian, and steady/enthalpy-step Jacobians against independently
 perturbed residual evaluations on smooth fixtures. Nonlinear radiation, cross-node
 load dependence, environment exchange and variable capacity are exercised together.
 Analytic-answer test adapters verify both backend interfaces and false-convergence
-rejection. Production linear/nonlinear steady algorithms, stiff time integration,
-event handling and solver job/result publication remain WP-11.6 through WP-11.10;
-`solver_available` stays false.
+rejection. Native steady algorithms are implemented under WP-11.6 below. Stiff
+time integration, events and solver job/result publication remain WP-11.7 through
+WP-11.10; the frozen job protocol's `solver_available` stays false.
+
+## Native steady solves (WP-11.6)
+
+[`fcst/thermal_steady.hpp`](../engine/include/fcst/thermal_steady.hpp) supplies
+`SparseLuBackend`, `DampedNewtonBackend` and `solve_steady`. This is an owned
+steady numerical implementation. The Q0 CVODE/BDF transient decision remains
+unchanged; no new external dependency or thermal application is required.
+
+Sparse LU uses row/column equilibration, deterministic partial row pivoting and
+sparse row/column indexes. It retains lower and upper factors for iterative
+refinement. It checks both the requested residual criterion and a row-wise
+backward error, protecting small equations from an unrelated large RHS. Defaults
+bound dimension at 100,000 and factor storage at 1,000,000 entries, with a scaled
+pivot threshold of `64 * machine_epsilon`, backward error tolerance `1e-12` and
+at most three refinement corrections. Fill exhaustion returns `unsupported` with
+`fill_limit`; a zero/numerically deficient pivot returns `singular`. No tiny
+pivot, capacity, anchor or dense fallback is inserted. These bounds describe the
+supported kernel, not a throughput or arbitrary-graph conditioning guarantee.
+
+Newton obtains an analytic sparse Jacobian and an independently checked LU
+direction at each accepted state. Backtracking requires sufficient decrease in
+the scaled infinity-norm residual (Armijo coefficient `1e-4`, factor `0.5`, at
+most 32 backtracks), or satisfaction of the residual tolerance. Bounds restrict
+every trial. A recoverable physical-domain failure rejects the trial and permits
+a smaller step. Ordinary model/callback errors stop the solve. A step that rounds
+to the unchanged temperature vector is diagnosed as stagnation, not convergence.
+
+`solve_steady` selects direct linear corrections for constant conductors and
+temperature-independent power bindings. Temperature-dependent power dependencies
+select damped Newton. The explicit direct-linear method rejects temperature
+dependencies whose affinity is not established; such models can use Newton.
+Both paths use the same residual, prescribed temperatures and zero-storage
+algebraic equations. Multiple independent anchored components are supported.
+An unanchored conductive component is diagnosed from its actual Jacobian, rather
+than the conductive graph alone: a nonlinear environment callback can supply a
+valid anchor. Even an initially zero residual must pass the Jacobian rank check.
+All-prescribed models legitimately have no unknowns.
+
+Per-equation power scales are frozen at the initial state. By default each is the
+maximum of the initial residual magnitude, its incoming contribution magnitudes,
+and `abs(J[i,j]) * temperature_scale[j]`. Temperature scales default to
+`max(1 K, abs(initial_temperature))`. Explicit positive per-equation power scales
+and per-variable temperature scales are supported. An identically zero row uses
+a placeholder scale only for arithmetic; it still fails the rank check.
+
+The physical row limit is `absolute_power_tolerance + relative_power_tolerance *
+power_scale[i]`, with defaults `0 W` and `1e-10`. These limits remain fixed during
+the solve. The scaled infinity residual must be at most one. The newly computed
+Newton correction must also be at most one when normalized by
+`absolute_temperature_tolerance + relative_temperature_tolerance *
+temperature_scale[i]`, defaulting to `1e-8 K` and `1e-10`. A small correction
+alone cannot indicate success. Default iteration limit is 50 accepted updates;
+iteration exhaustion and line-search/bounds/stagnation failures retain failed
+status and the last valid temperature state. Limits below representable numerical
+range fail explicitly. Initial values must satisfy physical/material bounds;
+additional user temperature bounds can narrow them.
+
+After numerical convergence, the engine independently recomputes residuals and
+the physical heat budget. Both global energy defect and internal exchange defect
+must satisfy `absolute_energy_tolerance + relative_energy_tolerance * reference`,
+default `0 W` and `1e-10`. The reference contains actual exchanged powers, not
+large Jacobian coefficients or `G*T`: a rounded-away temperature gradient cannot
+hide an unbalanced load. Each radiation callback's own net power is checked
+relative to its own absolute power, preventing opposite defects or large unrelated
+networks from hiding a nonconservative callback. No callback is normalized to
+force a pass. An energy failure changes the outcome to `nonconverged`.
+
+`SteadyResult` includes the selected method, temperatures, physical balance,
+frozen power scales/row limits, normalized residuals, iteration/evaluation/rejected
+trial counts, correction norm and bounded reason codes. Singular/fill failures
+carry available equation/entity/source-map context. `converged`, `singular`,
+`nonconverged` and `unsupported` are distinct outcomes. Invalid configuration is a
+bounded input error; a failed numerical run is never marked successful.
+
+The standalone worker accepts a thermal-input-v1 envelope on stdin with
+`--thermal-steady`. Its default settings solve supported constant networks and
+return full-node temperatures, boundary power, residuals, limits, provenance
+hashes and diagnostics as JSON. Exit status zero requires convergence and energy
+acceptance. The native API additionally supports registered native nonlinear
+callbacks and configurable solver options. Models needing callback physics or
+control/spatial execution cannot silently gain support through the CLI.
+
+Build information declares `steady_available: true`. The existing
+`solver_available: false` refers to the frozen durable-job protocol, whose steady
+result/checkpoint publication is still pending; `--solve`, transient/event work
+and full job/result integration are not enabled by this substep.
+
+Acceptance includes hand-authored analytic steady values, a nonlinear quartic
+radiation/environment network, later-stage row pivots, a manufactured 10,000-row
+tridiagonal solve checked at every entry, components spanning 200 orders of
+conductance, domain/merit backtracking, zero-residual singular systems,
+temperature bounds, fill/iteration limits, false small-step convergence, energy
+defect cancellation and unrepresentable temperature gradients. The standalone
+CLI runs with Python/host/vendor search paths absent. Existing Q0 dense/band
+comparisons still run as their own numerical checkpoint; this does not replace
+their evidence or assert a new performance ranking. Full WP-11 qualification,
+paired source comparisons and later transient/event/job features remain open.

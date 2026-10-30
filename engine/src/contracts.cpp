@@ -2,6 +2,7 @@
 #include "fcst/contracts.hpp"
 #include "fcst/contract_bundle.hpp"
 #include "fcst/thermal.hpp"
+#include "fcst/thermal_steady.hpp"
 #include "fcst/thermal_schema.hpp"
 #include <algorithm>
 #include <array>
@@ -473,9 +474,43 @@ std::string thermal::inspect(std::string_view input) {
     return dump(J(out));
   }
 }
+std::string thermal::inspect_steady(std::string_view input) {
+  try {
+    auto model=thermal::load(input); auto model_hash=model.data().model_hash, preparation_hash=model.data().preparation_hash;
+    thermal::Assembly assembly(std::move(model)); auto result=thermal::solve_steady(assembly);
+    J::A nodes,scales;
+    if (result.balance) for (std::size_t i=0;i<assembly.model().data().nodes.size();++i) {
+      const auto& node=assembly.model().data().nodes[i];
+      nodes.emplace_back(J::O{{"node_id",J(node.id)},{"temperature_K",J(result.balance->temperature[i])},
+        {"residual_W",node.equation?J(result.balance->residual[*node.equation]):J()},
+        {"boundary_power_W",J(result.balance->boundary_power[i])}});
+    }
+    for (double v:result.residual_limits) scales.emplace_back(v);
+    J::O out{{"status",J(result.solve.status==thermal::SolveStatus::converged?"passed":"failed")},
+      {"outcome",J(std::string(thermal::status_code(result.solve.status)))},
+      {"reason",J(std::string(thermal::reason_code(result.solve.diagnostics.reason)))},
+      {"model_hash",J(model_hash)},{"preparation_hash",J(preparation_hash)},
+      {"iterations",J(static_cast<double>(result.solve.iterations))},
+      {"evaluations",J(static_cast<double>(result.solve.diagnostics.evaluations))},
+      {"rejected_trials",J(static_cast<double>(result.solve.diagnostics.rejected_trials))},
+      {"scaled_residual_norm",result.solve.residual_norm?J(*result.solve.residual_norm):J()},
+      {"scaled_correction_norm",result.solve.diagnostics.correction_norm?J(*result.solve.diagnostics.correction_norm):J()},
+      {"energy_defect_W",result.balance?J(result.balance->energy_defect):J()},
+      {"internal_exchange_defect_W",result.balance?J(result.balance->internal_exchange_defect):J()},
+      {"residual_limits_W",J(scales)},{"nodes",J(nodes)}};
+    if (!result.entity_id.empty()) out.emplace("entity_id",J(result.entity_id));
+    if (!result.source_map_id.empty()) out.emplace("source_map_id",J(result.source_map_id));
+    return dump(J(out));
+  } catch (const thermal::Error& e) {
+    J::O out{{"status",J("failed")},{"code",J(e.code)}};
+    if (!e.entity_id.empty()) out.emplace("entity_id",J(e.entity_id));
+    if (!e.source_map_id.empty()) out.emplace("source_map_id",J(e.source_map_id));
+    return dump(J(out));
+  } catch (...) { return "{\"status\":\"failed\",\"code\":\"unavailable\"}"; }
+}
 int run_worker(const std::string& root, const std::string& job_id) {
-  // This boundary stays engine-only. Physics remains WP-11; unsupported work
-  // produces a truthful failed terminal rather than a fabricated thermal result.
+  // Durable steady result publication is not implemented in this protocol yet.
+  // The separate native steady API/CLI does not fabricate a job result artifact.
   try {
     if (!std::regex_match(job_id,std::regex("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"))) fail("schema");
     auto emit=[&](const J& message) {

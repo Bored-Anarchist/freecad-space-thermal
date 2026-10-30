@@ -3,7 +3,7 @@
 from hashlib import sha256
 from .gate import evaluate
 
-IMPLEMENTED_SUBSTEPS = [f'WP-11.{n}' for n in range(1,6)]
+IMPLEMENTED_SUBSTEPS = [f'WP-11.{n}' for n in range(1,7)]
 
 
 def input_hashes(root):
@@ -21,12 +21,14 @@ def input_hashes(root):
 def assess(report, policy, hashes, candidate):
     binaries = report.get('binary_sha256', {})
     build = report.get('worker_build', {})
-    if (report.get('schema_version') != 2 or report.get('candidate') != candidate
+    if (report.get('schema_version') != 3 or report.get('candidate') != candidate
             or report.get('input_sha256') != hashes or report.get('solver_available') is not False
+            or report.get('steady_available') is not True
             or report.get('work_packages') != IMPLEMENTED_SUBSTEPS or policy.get('work_packages') != IMPLEMENTED_SUBSTEPS
-            or set(binaries) != {'worker','preparation_acceptance','assembly_acceptance'}
+            or set(binaries) != {'worker','preparation_acceptance','assembly_acceptance','steady_acceptance'}
             or any(not isinstance(v,str) or len(v)!=64 or set(v)-set('0123456789abcdef') for v in binaries.values())
             or build.get('engine') != 'fcst_native' or build.get('solver_available') is not False
+            or build.get('steady_available') is not True
             or build.get('source_revision') != candidate
             or report.get('gate', {}).get('status') != 'passed'
             or evaluate(policy['required_cases'], report.get('cases', []))['status'] != 'passed'):

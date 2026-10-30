@@ -30,6 +30,8 @@ class PropertyLaw {
               double minimum_temperature, double maximum_temperature);
   Sample sample(double temperature) const;
   double integral(double from_temperature, double to_temperature) const;
+  double minimum_temperature() const { return minimum_; }
+  double maximum_temperature() const { return maximum_; }
  private:
   std::vector<double> x_, y_;
   std::vector<std::size_t> jumps_;

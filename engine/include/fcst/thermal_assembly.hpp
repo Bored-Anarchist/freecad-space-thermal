@@ -59,9 +59,11 @@ struct State {
   std::vector<double> rate; // Differential index order only, K/s. Algebraic rates do not exist.
 };
 struct Balance {
+  struct InternalTerm { std::string entity_id; double net_power, absolute_power; };
   std::vector<double> temperature, residual;
   std::vector<double> conductive_in, load_in, radiation_in, environment_in, storage_power, boundary_power;
   std::vector<double> conductor_power; // Positive from conductor.from to conductor.to.
+  std::vector<InternalTerm> internal_terms; // Each internal radiation callback, before global cancellation.
   double internal_exchange_defect = 0; // Net conductive plus internal radiation power; ideally zero.
   double energy_defect = 0; // Sum storage - sum external input, including prescribed reservoirs.
 };
@@ -78,12 +80,16 @@ struct NonlinearProblem {
   std::shared_ptr<const Sparsity> sparsity;
   std::function<NonlinearEvaluation(std::span<const double>, bool)> evaluate;
 };
+// A physical trial may be outside the model domain; an algorithm may backtrack.
+// Shape, nonfinite protocol values and ordinary callback failures remain fatal.
+struct EvaluationDomainError : Error { explicit EvaluationDomainError(const Error& error) : Error(error) {} };
 class Assembly {
  public:
   explicit Assembly(Model model, std::vector<PowerBinding> powers = {}, std::vector<BoundaryBinding> boundaries = {});
   const Model& model() const;
   const std::shared_ptr<const Sparsity>& sparsity() const;
   std::vector<double> initial_temperature() const;
+  bool has_temperature_dependent_power() const;
   Balance residual(const State& state) const;
   Linearization linearize(const State& state) const;
   Balance steady_residual(double time, std::span<const double> temperature) const;
@@ -105,6 +111,17 @@ class Assembly {
 };
 
 enum class SolveStatus { converged, singular, nonconverged, unsupported };
+enum class SolveReason {
+  none, singular_pivot, fill_limit, numerical_range, linear_residual,
+  iteration_limit, line_search_failed, stagnation, bounds, initial_domain,
+  model_error, energy_imbalance, unsupported_model
+};
+struct SolveDiagnostics {
+  SolveReason reason = SolveReason::none;
+  std::size_t evaluations = 0, rejected_trials = 0;
+  std::optional<std::size_t> failure_index;
+  std::optional<double> correction_norm;
+};
 struct SolveOptions {
   double absolute_tolerance = 1e-10, relative_tolerance = 1e-10;
   std::size_t maximum_iterations = 100;
@@ -114,6 +131,7 @@ struct SolveResult {
   std::vector<double> solution;
   std::size_t iterations = 0;
   std::optional<double> residual_norm;
+  SolveDiagnostics diagnostics{};
 };
 class LinearBackend {
  public:

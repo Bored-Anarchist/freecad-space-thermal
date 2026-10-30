@@ -3,6 +3,7 @@
 #include "fcst/diagnostic.hpp"
 #include "fcst/contracts.hpp"
 #include "fcst/thermal.hpp"
+#include "fcst/thermal_steady.hpp"
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -18,14 +19,14 @@ int main(int argc, char* argv[]) {
     return fcst::run_worker(argv[2], argv[3]);
   }
   if ((argc == 3 && std::string_view(argv[1]) == "--contract") ||
-      (argc == 2 && std::string_view(argv[1]) == "--thermal-prepare")) {
+      (argc == 2 && (std::string_view(argv[1]) == "--thermal-prepare" || std::string_view(argv[1]) == "--thermal-steady"))) {
 #ifdef _WIN32
     if (_setmode(_fileno(stdin), _O_BINARY) == -1) return 2;
 #endif
     std::string input;
     char c;
     while (input.size() <= 1048576 && std::cin.get(c)) input += c;
-    auto result = argc == 2 ? fcst::thermal::inspect(input) : fcst::inspect_contract(argv[2], input);
+    auto result = argc == 2 ? (std::string_view(argv[1]) == "--thermal-steady" ? fcst::thermal::inspect_steady(input) : fcst::thermal::inspect(input)) : fcst::inspect_contract(argv[2], input);
     std::cout << result << '\n';
     return result.find("\"status\":\"passed\"") != std::string::npos ? 0 : 1;
   }
@@ -34,13 +35,13 @@ int main(int argc, char* argv[]) {
               << "\",\"compiler\":\"" << FCST_COMPILER
               << "\",\"compiler_version\":\"" << FCST_COMPILER_VERSION
               << "\",\"source_revision\":\"" << FCST_SOURCE_REVISION
-              << "\",\"cxx_standard\":20,\"solver_available\":false,\"protocol_version\":1}\n";
+              << "\",\"cxx_standard\":20,\"solver_available\":false,\"steady_available\":true,\"protocol_version\":1}\n";
     return 0;
   }
   if (argc == 2 && std::string_view(argv[1]) == "--self-test") {
     return fcst::code_name(fcst::DiagnosticCode::invalid_argument) == "invalid_argument" ? 0 : 1;
   }
   // Never echo untrusted arguments or claim an unimplemented solve succeeded.
-  std::cerr << "{\"code\":\"not_implemented\",\"message\":\"Thermal solving is not implemented\"}\n";
+  std::cerr << "{\"code\":\"not_implemented\",\"message\":\"Requested solve operation is not implemented\"}\n";
   return 2;
 }

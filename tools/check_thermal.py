@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
-"""Unattended native WP-11.1/11.2 acceptance with no external thermal runtime."""
+"""Unattended native WP-11.1 through WP-11.6 acceptance, without a vendor runtime."""
 import argparse
 from copy import deepcopy
 from hashlib import sha256
@@ -21,7 +21,7 @@ def quantity(value, unit): return {'value': value, 'unit': unit}
 def entity(value, n): return next(e for e in value['model']['entities'] if e['id'] == uid(n))
 
 
-def check(worker, native_tests, assembly_tests):
+def check(worker, native_tests, assembly_tests, steady_tests):
     policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
     fixture = ROOT/'tests/fixtures/thermal/material-network.json'
     baseline = json.loads(fixture.read_bytes())
@@ -35,6 +35,7 @@ def check(worker, native_tests, assembly_tests):
         build_info.update(json.loads(result.stdout))
         assert result.returncode == 0 and not result.stderr
         assert build_info['engine'] == 'fcst_native' and build_info['solver_available'] is False
+        assert build_info['steady_available'] is True
         assert build_info['source_revision'] == subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     def run(value):
         raw = value if isinstance(value, bytes) else json.dumps(value, allow_nan=False).encode()
@@ -152,7 +153,32 @@ def check(worker, native_tests, assembly_tests):
         result = rejects(value,'schema'); assert 'opaque-marker' not in json.dumps(result)
         value = deepcopy(baseline); value['material_laws'][0]['specific_heat']['values'][0]['value'] = 1e309
         raw = json.dumps(value).encode(); rejects(raw,'invalid_json')
-    cli = {'build-identity': build_identity, 'native-preparation': preparation, 'canonical-identity': canonical_identity,
+    def steady(value):
+        raw = value if isinstance(value,bytes) else json.dumps(value,allow_nan=False).encode()
+        result = subprocess.run([str(worker),'--thermal-steady'],input=raw,capture_output=True,env=env,timeout=30)
+        output=json.loads(result.stdout)
+        assert not result.stderr and result.returncode==(0 if output['status']=='passed' else 1)
+        return output
+    def steady_linear():
+        result=steady(baseline)
+        assert result['status']=='passed' and result['outcome']=='converged'
+        assert abs(result['nodes'][0]['temperature_K']-305)<1e-7
+        assert abs(result['nodes'][1]['temperature_K']-302.5)<1e-7
+        assert abs(result['nodes'][2]['boundary_power_W']+5)<1e-7
+        assert result['scaled_residual_norm']<=1 and result['scaled_correction_norm']<=1
+        assert result['model_hash']==passes(baseline)['model_hash']
+    def steady_singular():
+        result=steady(json.loads((fixture.parent/'steady-singular-zero.json').read_bytes()))
+        assert result['status']=='failed' and result['outcome']=='singular' and result['reason']=='singular_pivot'
+    def steady_rejections():
+        result=steady(json.loads((fixture.parent/'steady-outside-domain.json').read_bytes()))
+        assert result['status']=='failed' and result['outcome']=='nonconverged' and result['reason']=='bounds'
+        result=steady(json.loads((fixture.parent/'control-network.json').read_bytes()))
+        assert result['status']=='failed' and result['code']=='controls_require_state'
+        for raw in (b'{',b'[]',b'\xff'):
+            assert steady(raw)['status']=='failed'
+    cli = {'steady-cli-linear':steady_linear,'steady-cli-singular':steady_singular,'steady-cli-rejections':steady_rejections,
+           'build-identity': build_identity, 'native-preparation': preparation, 'canonical-identity': canonical_identity,
            'disconnected-components': disconnected, 'zero-links': zero_links,
            'invalid-structure': invalid_structure, 'invalid-tables': invalid_tables,
            'storage-binding': storage_binding, 'tensor-validation': tensors,
@@ -161,7 +187,11 @@ def check(worker, native_tests, assembly_tests):
     records = []
     for case in policy['required_cases']:
         try:
-            if case.startswith('assembly-'):
+            if case.startswith('steady-') and not case.startswith('steady-cli-'):
+                result = subprocess.run([str(steady_tests),case.removeprefix('steady-'),str(fixture.parent)],
+                                        capture_output=True,timeout=30,env=env)
+                assert result.returncode == 0 and json.loads(result.stdout) == {'status':'passed'} and not result.stderr
+            elif case.startswith('assembly-'):
                 result = subprocess.run([str(assembly_tests),case.removeprefix('assembly-'),str(fixture.parent)],
                                         capture_output=True,timeout=30,env=env)
                 assert result.returncode == 0 and json.loads(result.stdout) == {'status':'passed'} and not result.stderr
@@ -182,14 +212,15 @@ def main():
     parser.add_argument('--worker', type=Path, required=True)
     parser.add_argument('--native-tests', type=Path, required=True)
     parser.add_argument('--assembly-tests', type=Path, required=True)
+    parser.add_argument('--steady-tests', type=Path, required=True)
     parser.add_argument('--report', type=Path, default=ROOT/'.local/thermal.json')
     args = parser.parse_args()
     policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
-    records, build_info = check(args.worker.resolve(), args.native_tests.resolve(), args.assembly_tests.resolve())
-    report = {'schema_version':2, 'work_packages':IMPLEMENTED_SUBSTEPS, 'solver_available':False,
+    records, build_info = check(args.worker.resolve(), args.native_tests.resolve(), args.assembly_tests.resolve(), args.steady_tests.resolve())
+    report = {'schema_version':3, 'work_packages':IMPLEMENTED_SUBSTEPS, 'solver_available':False,'steady_available':True,
               'worker_build':build_info,
               'binary_sha256':{key:sha256(path.read_bytes()).hexdigest() for key,path in
-                               [('worker',args.worker),('preparation_acceptance',args.native_tests),('assembly_acceptance',args.assembly_tests)]},
+                               [('worker',args.worker),('preparation_acceptance',args.native_tests),('assembly_acceptance',args.assembly_tests),('steady_acceptance',args.steady_tests)]},
               'candidate':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
               'input_sha256':input_hashes(ROOT), 'gate':evaluate(policy['required_cases'],records), 'cases':records}
     args.report.parent.mkdir(parents=True,exist_ok=True)

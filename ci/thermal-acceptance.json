@@ -5,9 +5,10 @@
     "WP-11.2",
     "WP-11.3",
     "WP-11.4",
-    "WP-11.5"
+    "WP-11.5",
+    "WP-11.6"
   ],
-  "scope": "Owned preparation, material/storage laws, energy and DAE residuals, sparse analytic Jacobians and backend interfaces; no production steady/transient/event solver qualification",
+  "scope": "Owned preparation, material/storage laws, energy/DAE residuals, sparse Jacobians and native linear/nonlinear steady solves; transient/event/job qualification remains open",
   "required_cases": [
     "native-constant-law",
     "native-linear-law",
@@ -41,6 +42,21 @@
     "assembly-backend-linear",
     "assembly-backend-nonlinear",
     "assembly-assembly-safety",
-    "assembly-physics-coverage"
+    "assembly-physics-coverage",
+    "steady-lu-analytic",
+    "steady-lu-sparse",
+    "steady-linear",
+    "steady-nonlinear",
+    "steady-line-search",
+    "steady-domain-backtracking",
+    "steady-scaling",
+    "steady-singular",
+    "steady-limits",
+    "steady-energy",
+    "steady-stopping",
+    "steady-options",
+    "steady-cli-linear",
+    "steady-cli-singular",
+    "steady-cli-rejections"
   ]
 }

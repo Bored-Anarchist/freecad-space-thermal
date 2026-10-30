@@ -46,6 +46,8 @@ void result_check(const SolveResult& result, std::size_t size, const SolveOption
       (result.status == SolveStatus::converged && result.solution.size() != size) ||
       (!result.solution.empty() && result.solution.size() != size)) throw Error("backend_result");
   for (double v : result.solution) if (!std::isfinite(v)) throw Error("backend_result");
+  if ((result.diagnostics.failure_index && *result.diagnostics.failure_index>=size) ||
+      (result.diagnostics.correction_norm && (!std::isfinite(*result.diagnostics.correction_norm) || *result.diagnostics.correction_norm<0))) throw Error("backend_result");
 }
 NonlinearEvaluation problem_evaluate(const NonlinearProblem& problem, std::span<const double> x, bool jacobian) {
   if (!problem.sparsity || !problem.evaluate) throw Error("dimension");
@@ -203,6 +205,9 @@ std::vector<double> Assembly::initial_temperature() const {
   for (const auto& node : model().data().nodes) if (node.equation) result[*node.equation] = node.temperature;
   return result;
 }
+bool Assembly::has_temperature_dependent_power() const {
+  return std::any_of(impl_->powers.begin(),impl_->powers.end(),[](const auto& p) { return !p.dependencies.empty(); });
+}
 Linearization Assembly::evaluate(Storage mode, double time, std::span<const double> x,
                                   std::span<const double> rate, std::span<const double> previous,
                                   double seconds, bool jacobian) const {
@@ -253,6 +258,11 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
       catch (...) { throw Error("callback_failure"); }
       vector_check(value.watts,p.affected_nodes.size());
       vector_check(value.d_temperature,jacobian ? p.dependencies.size() : 0);
+      if (p.kind==PowerKind::radiation) {
+        long double net=0,absolute=0;
+        for (double v:value.watts) { net+=v; absolute+=std::abs(v); }
+        b.internal_terms.push_back({p.entity_id,narrow(net),narrow(absolute)});
+      }
       auto& destination = p.kind == PowerKind::load ? b.load_in : p.kind == PowerKind::radiation ? b.radiation_in : b.environment_in;
       for (std::size_t k = 0; k < p.affected_nodes.size(); ++k) {
         auto i = p.affected_nodes[k]; destination[i] = checked(destination[i]+value.watts[k]);
@@ -315,9 +325,14 @@ Linearization Assembly::step_linearize(double t, std::span<const double> x, std:
 NonlinearProblem Assembly::steady_problem(double time) const {
   (void)checked(time);
   return {sparsity(),[owned = *this,time](std::span<const double> x, bool jacobian) {
-    if (!jacobian) return NonlinearEvaluation{owned.steady_residual(time,x).residual,{}};
-    auto result = owned.steady_linearize(time,x);
-    return NonlinearEvaluation{std::move(result.balance.residual),std::move(result.d_temperature)};
+    try {
+      if (!jacobian) return NonlinearEvaluation{owned.steady_residual(time,x).residual,{}};
+      auto result = owned.steady_linearize(time,x);
+      return NonlinearEvaluation{std::move(result.balance.residual),std::move(result.d_temperature)};
+    } catch (const Error& error) {
+      if (error.code == "range") throw EvaluationDomainError(error);
+      throw;
+    }
   }};
 }
 NonlinearProblem Assembly::step_problem(double time, std::vector<double> previous, double seconds) const {
@@ -352,6 +367,7 @@ SolveResult solve_nonlinear(const NonlinearBackend& backend, const NonlinearProb
   auto callback_error = std::make_shared<std::exception_ptr>();
   NonlinearProblem guarded{problem.sparsity,[problem,callback_error](std::span<const double> x, bool jacobian) {
     try { return problem_evaluate(problem,x,jacobian); }
+    catch (const EvaluationDomainError&) { throw; }
     catch (...) { *callback_error = std::current_exception(); throw; }
   }};
   SolveResult result;

@@ -94,6 +94,7 @@ def main():
         "thermal-preparation": [sys.executable, "tools/check_thermal.py", "--worker", str(install / "bin/fcst-worker.exe"),
                                 "--native-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-tests.exe"),
                                 "--assembly-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-assembly-tests.exe"),
+                                "--steady-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-steady-tests.exe"),
                                 "--report", str(output / "thermal.json")],
         "numerical-checkpoint": [sys.executable, "tools/check_numerical.py", "--configuration", config,
                                   "--report", str(output / "numerical.json")],
