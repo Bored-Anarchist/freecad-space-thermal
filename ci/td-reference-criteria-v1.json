@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "profile": "fcst-synthetic-reference/1",
+  "boundary_temperature_K": 300,
+  "initial_temperature_K": 293.15,
+  "capacity_J_per_K": 100,
+  "conductance_W_per_K": 2,
+  "load_W": 5,
+  "transient_end_s": 100,
+  "absolute_temperature_tolerance_K": 0.01,
+  "relative_temperature_tolerance": 0.00001,
+  "required_modes": ["steady", "transient"],
+  "policy": "Independent constant-network analytic reference criteria; freeze before vendor execution. A passing external reference does not qualify the owned engine or radiation/environment physics."
+}

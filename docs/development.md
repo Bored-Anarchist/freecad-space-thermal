@@ -41,6 +41,33 @@ The [FCST implementation project](https://github.com/users/Bored-Anarchist/proje
 
 ## Publication privacy (TST-021)
 
+WP-08 adds the [TD/SINDA implementation](td-sinda.md), owned binary codecs and
+source-free DWG writer, direct property readers, its source-only C# sidecar
+and runtime-independent `td.json` summary. Both Windows CI presets execute the
+frozen cases and scan that exact summary before upload. Property-law research
+data stay local. Orthotropic, variable-table/grid,
+two-band optical and composite-definition tests use owned synthetic inputs;
+law JSON and source exports containing engineering values are not CI assets.
+Fresh-process property import/edit/export checks deny vendor imports.
+Local installed-API receipts contain hashes and bounded status only. Q1 vendor/native/paired ESA
+qualification remains open. Policy v4 inspects `.cs` as text with the same
+privacy patterns, binary rejection and budgets; compiled sidecars, vendor DLLs,
+original DWG/decks/property/result files, private runner profiles and raw logs
+are not public artifacts. Staged bytes and outgoing history are both required
+preflight scopes and may be scanned separately to avoid counting the same tree
+twice against a combined invocation's inspection budget.
+
+WP-07 adds the [shared exchange SDK](exchange.md), versioned synthetic grammar,
+fidelity schema and `ci/exchange-acceptance.json`. Both Windows drivers execute
+`tools/check_exchange.py` and privacy-clear the exact `exchange.json` summary before
+upload. The report contains case verdicts and public implementation/input hashes;
+source decks, converter stdout/stderr, original artifacts, result tables, portable
+packages and failure traces stay local. Converter tools record reviewed tool and
+authorization hashes without installed paths or raw actor identity. Production
+source/fidelity/export reports still require independent exact-byte preflight.
+The Git index remains the sanitized publication copy; staged content, outgoing
+history, author metadata and actual PR/issue prose are scanned before publication.
+
 WP-05 adds the [persistence service and recovery tools](persistence.md). The standard-library cases exercise package validation, scoped transactions/previews/retries, undo/invalidation, migration and synthetic host synchronization. Both Windows drivers also run `python tools/check_persistence.py`, including real process termination at save boundaries, fresh-process portable reconstruction and strict HDF5 result/mesh checks. The locked tooling includes the optional standalone `arrays` extra. CI privacy-clears the exact `persistence.json` summary alongside the existing reports before upload; generated packages, HDF5/SQLite/host files and raw crash logs remain local. Frozen operation dispatch now creates conductors and validates/hashes models; worker/job execution remains WP-06. See `docs/persistence.md` for storage limits, audit retention and the explicitly supported migration/downgrade envelope.
 
 WP-04 adds the [numerical checkpoint and Q0 decision](decisions/0001-q0-numerical.md). Both standard Windows drivers build/install its separate C++ executable, execute independent analytic/nonlinear oracles, compare CVODE BDF/dense, BDF/band and Adams/band, exercise events/cancellation/restart and run bounded scale probes. `python tools/check_numerical.py --require-reference` also requires the frozen Release reference configuration. Every attempt has its own criteria, fixture, observations, assessment, provenance and hash seal under `.local/numerical/`; use `--replay <attempt-directory>` to verify stored evidence. Missing required cases or prerequisites fail the gate and identify missing case IDs. Full product/vendor gates remain separate.
@@ -64,6 +91,15 @@ python tools/publication_preflight.py --staged --revision HEAD --verify-clearanc
 ```
 
 Omit `--revision HEAD` only before the first commit. Pre-commit checks staged bytes; pre-push checks every reachable commit/tree and both author/committer identities. Clearance binds policy version/hash, exact bytes, locations and metadata. Recheck after any change. Native Git hooks cover ordinary pushes; direct API writes must call the same preflight explicitly. `tools/setup_github.py` scans its exact outgoing JSON payloads before posting.
+
+Within one history inspection, unchanged `(path, mode, blob)` versions share a
+content scan. Every commit's metadata/identities and every tree's entry modes are
+still checked. Reusing the same bytes under another path, file type or mode gets
+a separate scan. The cache is not reused across invocations or policies, and
+staged content is inspected separately. This keeps repeated historical snapshots
+within the existing byte/item budgets without skipping any distinct content or
+path context. Regression cases cover history metadata, deleted secrets, different
+path classifications, executable modes and budget enforcement.
 
 For prose or generated assets, select the actual outgoing files:
 

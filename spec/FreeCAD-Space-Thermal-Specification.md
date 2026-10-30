@@ -5,12 +5,12 @@
 | Field | Baseline |
 |---|---|
 | Document | FCST-SYS-SPEC-001 |
-| Revision | 0.7 — Windows delivery; optional platform stretch goals |
+| Revision | 0.9 — independent TD and ESATAN import and export |
 | Prepared | 2026-10-27 |
 | Product name | FreeCAD Space Thermal (FCST), working name |
 | User decisions | Open-source add-on and independently maintained C++ engine; Python integration; existing solvers may be starting points; local-first; equal priority for Thermal Desktop and ESATAN-TMS; NASA/ESA refers to existing-tool file compatibility |
 | Intended audience | Thermal analysts, implementation engineers, and software testers |
-| Current evidence | Research-backed design; no implemented file converters or solver results |
+| Current evidence | Design and implemented foundation/SINDA subset; independent DWG thermal codecs and production solver unimplemented |
 | Change owner | Product owner for scope; thermal and software leads for numerical and compatibility test criteria |
 
 **Decision:** implement an independently maintained **C++ numerical engine**, with **Python for FreeCAD integration, automation/MCP, tests, and reference prototypes**. A versioned application/model/job interface connects these components and permits other front ends. Rust remains an optional implementation experiment; it is not a required production dependency. The default implementation is C++ unless the Q0 comparison checkpoint produces evidence for an explicitly accepted change.
@@ -18,6 +18,8 @@
 **Solver ownership decision:** the production target is our own independently maintained thermal engine. PyCanha and other solvers may inform implementation, provide compatible reusable code/components, generate comparison cases, or run temporary prototypes. A permanent wrapper around another solver is not the target. The owned engine must execute the required supported physics after model import, without delegating the solve to PyCanha, SINDA, ESATAN, or another external thermal solver. Low-level numerical libraries, meshers, and documented property libraries remain permitted dependencies.
 
 **Native creation and file independence:** FCST must also create models from scratch, save them in its own versioned `.fcst` project format, reopen and edit them, solve them with the owned engine, and inspect results without an imported vendor model, proprietary thermal/CAD runtime, vendor license, or vendor service. Thermal Desktop and ESATAN backward compatibility is an additional required adapter capability. The legacy-model inventory defines compatibility coverage; it is not a prerequisite for native authoring or solving. This clarification applies to ARC-001, ARC-003, ARC-009 and the native persistence/installation acceptance workflows.
+
+**Legacy file independence:** TD/SINDA and ESATAN native-project, network and result import, edit, export and reopen must also work with Thermal Desktop, OpenTD, AutoCAD/CRTechCAD, SINDA/FLUINT, ESATAN-TMS/ESARAD, their APIs, licenses and conversion services absent. A prior source-tool conversion is not a prerequisite. Use independent file readers/writers and owned versioned thermal codecs. The [independent TD exchange decision](../docs/decisions/0004-independent-thermal-exchange.md) and [independent ESATAN decision](../docs/decisions/0005-independent-esatan-exchange.md) supersede mandatory vendor API/export migration paths. Existing OpenTD code is optional external reference tooling only; full direct DWG thermal conversion remains unimplemented.
 
 **Primary benchmark/starting-point references:** SINDA/FLUINT and Thermal Desktop shall guide required thermal/fluid model behavior, source-model semantics, analyst workflows, and comparative benchmark cases. Existing ESATAN-TMS compatibility remains equally required. For proprietary products, a starting point means documented methods and interfaces, modeling concepts, authorized model fixtures and reference runs; source-code reuse applies only where the code is actually available under suitable terms. PyCanha and other open implementations remain additional adoption/reference candidates.
 
@@ -29,7 +31,7 @@ The end-state requirement is backward compatibility with existing Thermal Deskto
 
 Revision 0.2 removes the agency-governance requirements introduced in revision 0.1. Retired requirement IDs GOV-001, GOV-004, GOV-005, GOV-007, and VNV-008 are not reused. File-format specifications remain technical implementation references, not agency process obligations.
 
-Revision 0.3 resolves native-versus-bridged execution in favor of the owned solver. Vendor APIs may remain necessary for proprietary file extraction, migration, re-export, and reference comparisons; these are separate from production thermal solving.
+Revision 0.3 resolved native-versus-bridged execution in favor of the owned solver. Its allowance for mandatory TD APIs during extraction/migration/re-export is superseded by revision 0.8; vendor tools may now supply optional external comparison evidence only for the TD path.
 
 Revision 0.4 explicitly adds SINDA/FLUINT and Thermal Desktop as required benchmark and behavioral starting-point references, alongside the owned Rust solver direction.
 
@@ -96,8 +98,8 @@ flowchart TB
     ENGINE --> RESULTS[Results / diagnostics / evidence]
     RESULTS --> GUI
     API --> ADAPTERS[Versioned import / export adapters]
-    ADAPTERS <--> TD[Windows OpenTD sidecar / installed TD]
-    ADAPTERS <--> ESA[ESATAN tools / STEP-TAS / ESA adapters]
+    ADAPTERS <--> TD[Independent DWG container and owned TD codecs]
+    ADAPTERS <--> ESA[Independent ESATAN project, deck and result codecs]
 ```
 
 Components and responsibilities:
@@ -262,6 +264,8 @@ Q1 is a qualified conduction/radiation/environment profile. Q2 closes every addi
 
 For Q1 and Q2 native acceptance, the thermal solve runs on the owned engine. The legacy inventory bounds the required advanced feature set; this is not an unbounded promise to duplicate every feature ever shipped in every source tool.
 
+Revision 0.9 extends vendor-free file conversion to original ESATAN projects, companions, decks and results. WP-09 remains planned; vendor APIs and pre-exported interchange files cannot substitute for direct source-format implementation.
+
 ## 7. Backward compatibility contract
 
 ### 7.1 Meaning and limits
@@ -286,19 +290,19 @@ Profile names `TD-NATIVE` and `ESA-NATIVE` refer to original source-project file
 
 | Profile | Source / proposed versions | Required path | Qualification boundary |
 |---|---|---|---|
-| TD-NATIVE | TD 6.3, 2025 R2, 2026 R1; extend from inventory | Version-matched Windows OpenTD sidecar; inventory DWG custom thermal entities and dependent files; extract/edit/export copies through supported APIs | Every required feature has read/represent/edit/execute/write coverage; exact runtime/compiler combinations frozen per profile |
+| TD-NATIVE | TD 6.3, 2025 R2, 2026 R1; extend from inventory | Independent DWG reader/writer plus owned versioned thermal-class and companion-file codecs; OpenTD is optional external reference tooling | Every required feature has read/represent/edit/execute/write coverage; exact runtime/compiler combinations frozen per profile |
 | TD-NETWORK | SINDA/FLUINT decks associated with TD-NATIVE | Reviewed parser/writer for declared `.inp`/`.sin` dialect; required includes/logic mapped to owned-engine semantics | Original content retained; source execution supplies comparisons, not native completion |
-| TD-RESULTS | Source solver versions matching corpus | OpenTD results facilities or documented file readers | Temperatures, heat flows, time grids, registers, IDs and units; proprietary result formats not guessed |
-| ESA-NATIVE | ESATAN-TMS 2021 and 2025; extend from inventory | Version-matched native export/import or scripting plus STEP-TAS and TMM adapters | Every required feature has read/represent/edit/execute/write coverage; STEP-TAS alone may omit campaign content |
+| TD-RESULTS | Source solver versions matching corpus | Independent documented result-file readers; OpenTD only for optional external reference retrieval | Temperatures, heat flows, time grids, registers, IDs and units; proprietary result formats not guessed |
+| ESA-NATIVE | ESATAN-TMS 2018 SP1, 2020, 2021 and 2025; exact profiles from inventory | Independent native geometry/environment/kinematics/project/deck/result readers and writers; owned versioned semantic codecs; STEP-TAS when supplied as a format, never a prior vendor-export prerequisite | Every required feature has read/represent/edit/execute/write coverage; STEP-TAS alone may omit campaign content |
 | ESA-NETWORK | ESATAN-TMS `.d` dialects from corpus | Reviewed parser/writer; required expressions, tables, includes and user logic mapped to owned-engine semantics | Owned-engine execution compared with declared source-language behavior |
-| ESA-RESULTS | ESATAN versions matching corpus | Documented/native export or API, with node/time/units mapping | No invented binary results grammar |
+| ESA-RESULTS | ESATAN versions matching corpus | Independent documented result-file and dataset-schema readers with node/case/time/units mapping; vendor retrieval is optional external reference work | No invented binary results grammar |
 | STEP-TAS | Relevant schema identified in S06, v6 ecosystem where applicable | Schema-backed reader, writer, validator and metadata | Actual file entities/datasets and required import/export directions tested per source profile |
 | THERMICA | SYSTEMA/THERMICA 4.9.1+ candidate profile | Product-native STEP-TAS path; companion mission/TMM artifacts inventoried | Q2 named-version qualification; current project format is not an old SYSBAS reader |
 | THERMISOL | 4.9 candidate `.dck` profile | Product-native converter/API or reviewed deck adapter; preserve GMM/TMM mesh correspondence | Q2 node properties, couplings, logic and results |
 | ESA-LEGACY | ESARAD 5.1 `.erg`; THERMICA3 `.SYSBAS`/`.VIF`; TRASYS 2007 `.inp` | Declared legacy adapter or approved TASverter invocation | Each direction independently qualified; read-only VIF does not imply a writer |
 | CUSTOMER-LEGACY | Every additional version/format in approved source inventory | Assigned adapter and fixtures | Mandatory if needed by the user's corpus; unresolved rows block Q2 |
 
-Verified source constraints: modern TD DWG, ESATAN geometry, and THERMICA4 files are not generically read by TASverter. ESA describes separate GMM and TMM workflows; geometry conversion does not create a full thermal network. TASverter is useful for defined legacy conversions and validation, while current vendor STEP-TAS paths are preferred. The TD converter and vendor bridges have their own version/runtime requirements. [S12, S17, S18]
+Verified source constraints: modern TD DWG, ESATAN geometry, and THERMICA4 files are not generically read by TASverter. ESA describes separate GMM and TMM workflows; geometry conversion does not create a full thermal network. TASverter is useful for defined legacy conversions and validation. Vendor STEP-TAS paths and TD bridges have their own version/runtime requirements and may supply optional reference evidence; product TD/ESATAN import/export requires independent direct codecs and cannot require prior vendor conversion. [S12, S17, S18]
 
 TD properties can live outside the DWG, including `.rco` and `.tdp` databases. Inventory all files actually referenced, not only those extensions. ESATAN 2025 adds API and STEP-TAS capabilities; older assumptions must therefore not be imposed on all versions. SYSTEMA/THERMICA/THERMISOL require separate GMM, campaign, and thermal-network handling. [S18, S19, S20]
 
@@ -316,8 +320,8 @@ There is no independent requirement to implement a fixed set of full STEP-TAS co
 | INT-002 | TD and ESATAN core profile qualification shall pass at the same Q1 gate; success in one shall not substitute for the other. | T/I: paired profile acceptance reports. | User | Q1 |
 | INT-003 | Every conversion shall produce a machine-readable feature inventory and fidelity report per entity/case, operation, and version profile with source and target IDs. | T: complete inventories for positive, partial, and malformed fixtures; execution does not imply edit/write support. | S06 P | Q1 |
 | INT-004 | Retained-opaque, approximated, and unsupported statuses shall remain distinct from executable compatibility. | T: opaque code cannot satisfy a solver/profile release check. | P | Q1 |
-| INT-005 | TD source-project import/export shall preserve thermal semantics through a declared API/adapter; generic DWG/DXF import shall be labeled geometry-only. | T: semantic inventory and source-tool reopen/run. | S17 P | Q1 |
-| INT-006 | ESATAN imports shall reconstruct required case, property, GMM/TMM mapping, and user-logic data, using source-access bridges only where needed for extraction/exchange. | T: core cases execute on the owned engine at Q1; remaining mandatory runtime semantics close at Q2 against source comparisons. | S12 S19 P | Q1 |
+| INT-005 | TD source-project import and export shall preserve thermal semantics through independent file codecs without TD, OpenTD, AutoCAD/CRTechCAD, SINDA/FLUINT, vendor licenses, prior vendor conversion or vendor services; generic geometry import shall be labeled geometry-only. | T: offline vendor-absent first import, controlled edit, source export and independent reopen; complete semantic/dependency inventory and round-trip comparisons. | S17 P | Q1 |
+| INT-006 | ESATAN native-project, network and result import/export shall reconstruct required case, property, GMM/TMM, environment, motion and reviewed user-logic semantics through independent file codecs without vendor software, APIs, licenses, prior vendor exports or conversion services. | T: offline vendor-absent first import, controlled edit, new-model export and independent reopen with complete dependency/semantic coverage; owned core cases pass Q1 and remaining mandatory runtime semantics pass Q2. | S12 S19 P | Q1 |
 | INT-007 | All source units, node classes/numbers, submodels, frames, normals, active sides, properties, tables, and expressions shall map explicitly. | T: semantic fixtures including collisions, offsets, and front/back surfaces. | P | Q1 |
 | INT-008 | Native parsers shall implement documented, versioned dialects and diagnose unknown syntax with source location. | T: grammar, malformed-input, and future-field tests. | P | Q1 |
 | INT-009 | Legacy user code shall be preserved without automatic execution; translation shall require specified semantics and regression evidence. | T/I: executable content inert on import; translated procedures match reference cases. | P | Q1 |
@@ -327,7 +331,7 @@ There is no independent requirement to implement a fixed set of full STEP-TAS co
 | INT-013 | STEP-TAS reader/writer shall correctly parse and emit required datasets against the pinned schema, preserving their thermal data and diagnosing unsupported content. | T: source-generated files import, exported files reopen in target tools, and malformed datasets report actionable errors. | S06 P | Q1 |
 | INT-014 | Published STEP-TAS support shall identify tested entities, dataset types, versions and directions without implying support for untested content. | I/T: capability matrix matches actual conversion fixtures and results. | P | Q1 |
 | INT-015 | Vendor runtime, compiler, API, and license prerequisites shall be discovered and reported before a bridge operation. | T: absent/mismatched runtimes fail before source mutation. | S17 P | Q1 |
-| INT-016 | Vendor bridges shall use open-source adapter code while proprietary binaries remain separately installed and user-provided. | I/D: ordinary native operation remains independent of vendor installations. | User P | Q1 |
+| INT-016 | TD/SINDA and ESATAN product import/export shall use independently deployable open-source adapters; proprietary runtime bridges shall be optional external reference tools and shall not satisfy product import/export acceptance. | I/T: isolated offline import/edit/export/reopen with vendor installations, assemblies, license services and conversion servers absent; attempted vendor calls fail the test. | User P | Q1 |
 | INT-017 | Required source results shall retain time grids, identity, quantity, units, sign convention, and interpolation provenance. | T: direct result-query and plotted-data comparisons. | P | Q1 |
 | INT-018 | All mandatory legacy-corpus features shall achieve owned-engine execution plus tested editing/re-export where required before the full backward-compatibility and solver-independence target is complete. | T/I: zero unresolved required entities/cases; required solves run without external thermal solvers and all required round trips pass. | User | Q2 |
 | INT-019 | Source-version changes and adapter upgrades shall trigger targeted requalification; previous compatibility evidence shall remain immutable. | T/I: release/profile dependency and regression audit. | P | Q1 |
@@ -507,7 +511,7 @@ These items do not prevent creation of this specification. They do prevent hones
 |---|---|---|
 | Legacy corpus | Obtain authorized TD and ESATAN projects, all dependent files/code, baseline results and exact versions; classify confidential/redistributable fixtures | Product owner + source analysts / affected Q1/Q2 compatibility gate |
 | Required compatibility semantics | Identify required read/edit/re-export/cross-tool operations and the physics/logic each imported model must execute on the owned engine | Product owner + source analysts / affected Q1/Q2 compatibility gate |
-| Proprietary bridge and benchmark access | Licensed TD/OpenTD/AutoCAD/SINDA/FLUINT and ESATAN installations, relevant RadCAD/FloCAD modules, API docs, compilers, and runnable reference environments; optional Fluent only for selected CFD comparisons | Adapter and numerical leads / affected Q1/Q2 compatibility gate |
+| Optional proprietary benchmark access | Separately installed licensed TD/OpenTD/AutoCAD/SINDA/FLUINT and ESATAN reference environments, relevant RadCAD/FloCAD modules and API docs; optional Fluent for selected CFD comparisons; never product import/export prerequisites | Numerical/reference leads / separately labeled comparison evidence |
 | ESA tools beyond ESATAN | Exact SYSTEMA/THERMICA/THERMISOL, ESARAD and historical formats/version priorities | ESA-side analyst / affected Q1/Q2 compatibility gate |
 | STEP-TAS distribution | Relevant EXPRESS/dictionary schema, license/access terms, required entity/dataset coverage, and usable validation tools | Exchange owner / affected Q1/Q2 compatibility gate |
 | Owned-engine implementation map | Assign every required source-physics/user-logic feature a native implementation or explicitly accepted native equivalent, tests, and migration plan; reference solver runs do not close the item | Numerical and adapter leads / affected Q1/Q2 compatibility gate |

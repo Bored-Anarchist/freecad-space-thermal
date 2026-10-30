@@ -28,10 +28,19 @@ def validate():
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
-    assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies"}, "Profile jobs absent from required gate"
+    assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies", "dwg"}, "Profile jobs absent from required gate"
+    native=workflow['jobs']['dwg']['steps']
+    assert any('build_independent_dwg.py' in step.get('run','') for step in native), 'Independent backend build absent'
+    assert any('publication_preflight.py' in step.get('run','') and 'dwg-backend.json' in step['run'] for step in native), 'Native report lacks clearance'
+    assert any(step.get('with',{}).get('name')=='foundation-dwg' for step in native), 'Native report absent from handoff'
     assert workflow["jobs"]["host"]["strategy"]["matrix"]["os"] == ["windows-2022"], "Windows-only host matrix required"
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
+    build_steps = workflow["jobs"]["build"]["steps"]
+    assert any("publication_preflight.py" in step.get("run", "") and "exchange.json" in step["run"] for step in build_steps), "WP-07 report lacks pre-upload clearance"
+    assert any("exchange.json" in step.get("with", {}).get("path", "") for step in build_steps if step.get("uses", "").startswith("actions/upload-artifact@")), "WP-07 report absent"
+    assert any("publication_preflight.py" in step.get("run", "") and "td.json" in step["run"] for step in build_steps), "WP-08 report lacks pre-upload clearance"
+    assert any("td.json" in step.get("with", {}).get("path", "") for step in build_steps if step.get("uses", "").startswith("actions/upload-artifact@")), "WP-08 report absent"
     assert "fem_probe.py" in str(workflow["jobs"]["host"]), "FEM probes absent"
     assert "check_foundation_handoff.py" in str(workflow["jobs"]["gate"]), "TST-022 aggregate absent"
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]

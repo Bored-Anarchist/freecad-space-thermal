@@ -1,0 +1,162 @@
+{
+  "schema_version": 1,
+  "source": {
+    "url": "https://github.com/LibreDWG/libredwg/releases/download/0.14/libredwg-0.14.tar.xz",
+    "filename": "libredwg-0.14.tar.xz",
+    "bytes": 11108920,
+    "sha256": "62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275"
+  },
+  "compiler": {
+    "url": "https://github.com/skeeto/w64devkit/releases/download/v2.11.0/w64devkit-x64-2.11.0.7z.exe",
+    "filename": "w64devkit-x64-2.11.0.7z.exe",
+    "bytes": 68801240,
+    "sha256": "54c2bb9962e8a30c8270e34c5efc3d5fee579f53087fa7d435b95fbba2af7b2b"
+  },
+  "runtime": {
+    "protocol": "fcst-dwg-native/2",
+    "backend": "LibreDWG",
+    "version": "0.14",
+    "source_sha256": "62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275",
+    "patch_sha256": "3a3f663e316734a6ac90df3fbd6404f6b9afb9eb674efe33b79c31b80eeba369",
+    "bridge_source_sha256": "e5ae84f54f74c462c97bfbb41ee097bfa98c099574424aa6393141e8fbeea8cf",
+    "configuration_sha256": "9fc697b346e90dd0410f5969bac5e25797133f4fde4c272b327f13a22a70b371",
+    "cmake_sha256": "9a496fbd09f134ab80ae140b6d9bb72dcc11f9ff4cc8a079231ca09a5ae54a0e",
+    "scope": "independent DWG container; closed canonical network import/export, orthotropic property libraries and variable property law exchange; complete rectangle/brick serialization; physical geometry bindings and full-model qualification pending"
+  },
+  "modified_files": {
+    "include/dwg.h": {
+      "before": "7ea181127d114fa32e2e0c512db54c3b36e83cda80e617792de4e10169b10955",
+      "after": "15e853188168f7bc85c6835bb828ec9ebde1f5bf719d91abcd4b737c8aa32119"
+    },
+    "src/spec.h": {
+      "before": "d5698e3b31a66141674d25aa7d6452959334b058b2db113fa47a0a2bac6d0ab2",
+      "after": "9261eb2bcc4bb2edbd22c31021c483c3ce412f1b0695e3fdf6173754e80c6ea6"
+    },
+    "src/out_json.c": {
+      "before": "0fbf436393485655a5b99c78efe0385ea6579ca88d8f390743d860549af08b1a",
+      "after": "43a2dc5d9fe4ec23ac1dbcdca16733ffe54c6f25b272549659073119fc5361ff"
+    },
+    "src/encode.c": {
+      "before": "c38cabf2be1d3daaeb50647e406d0d88bbb2691e7240aa6b0113429c79ecda84",
+      "after": "bdb1b95c978dbb62166e5a21f19a1a6fb4c6170f68ef23fa13aaaeb8a406793f"
+    },
+    "src/free.c": {
+      "before": "0e527bc532b1cb8929da7074728797baf2eea3ef6d9a4b11b5819f87e0117049",
+      "after": "3db526d01805ea84d71c4b17a52e7b78f40a7701fd3713036a068a41dcfd74a7"
+    },
+    "src/decode.c": {
+      "before": "02c00923c2089f01d78e369098cb9a1005ff18f50bf45da0539335dbcd127623",
+      "after": "868d555c4307c6a7072fae0c97ffbf4d555aeda8a0b2a4313804d417da05866c"
+    },
+    "src/dwg.spec": {
+      "before": "3309c218a54a06de741fafeeef9d5e2e45dce39c448e1cb9e9f1be13b595348c",
+      "after": "e390f6131f948c8bcabb3a1cf2362b180bb837182f8b93db260e01dc04495309"
+    }
+  },
+  "source_inputs": {
+    "adapters/libredwg/main.cpp": "e5ae84f54f74c462c97bfbb41ee097bfa98c099574424aa6393141e8fbeea8cf",
+    "adapters/libredwg/CMakeLists.txt": "9a496fbd09f134ab80ae140b6d9bb72dcc11f9ff4cc8a079231ca09a5ae54a0e",
+    "adapters/libredwg/config-windows.h": "9fc697b346e90dd0410f5969bac5e25797133f4fde4c272b327f13a22a70b371",
+    "adapters/libredwg/LICENSE": "8ceb4b9ee5adedde47b31e975c1d90c73ad27b6b165a1dcd80c7c545eb65b903",
+    "adapters/libredwg/README.md": "ec6739fb09a1a75b0e7b1a1119d1d98bbf4398477393f93b0ba672d988453b24",
+    "adapters/libredwg/preservation.patch": "3a3f663e316734a6ac90df3fbd6404f6b9afb9eb674efe33b79c31b80eeba369",
+    "tools/build_independent_dwg.py": "07227c1fd6d2bf4442219d9d8c6bb8b9fd5a68ad6be6122715b6b1b0fc922b54",
+    "tools/dwg_build_support.py": "2f7abe1e15feece16651f9542987f5c5e61be9dcbf37a6fff6e61a530278ca59",
+    "python/fcst_exchange/dwg-profile.json": "e24ba0e92fa526c927f6f159230c756842ff6fb8d5051faac32de7cabd9409ff",
+    "python/fcst_exchange/dwg_native.py": "6fadb10f6ae8a0e9fa36912c8029642640161d0613bdef69837e4a1b41399f11",
+    "python/fcst_exchange/dwg_container.py": "e31c2477d444b90a592d7b1d054789ffe66da6e35aaefdcd5e9a7a7e3789b231",
+    "python/fcst_exchange/tools.py": "f8161776a79504e411a49f7ef225124e854be29fe4addcdb6cba8223269334c0",
+    "python/fcst_exchange/core.py": "934f44ed58a9e74cb919eee2836b917f922bbe6415d1700e3f5540e98834dbfd",
+    "python/fcst_app/process_limits.py": "fbae3c77add596d49b2cd7e9c3fd0dab54012cd97bd42f293cacb07462e975f4",
+    "python/fcst_app/persistence.py": "ceca343f03e5f2b42c108475955c833f618c4f7c0cb0eb71c41f586b3dd57778",
+    "python/fcst_exchange/td_conductor.py": "1912d126c002ea24111089bbc642de2759fb6aaf412918f3e139910c130ba7c8",
+    "python/fcst_exchange/td_decode.py": "18513ead0cdb1d584f4f6a3f210bf699054c6192037220d7914067809dc1216e",
+    "python/fcst_exchange/td_filer.py": "37a5b7a0138e196d734067bea5933fcaf95b610cea99aeae0e980dd945404908",
+    "python/fcst_exchange/td_geometry.py": "e84bc6f342bf512cdd93193158d2af224142d5847d183ea25d324b6896120e86",
+    "python/fcst_exchange/td_load.py": "449a91679ca7dbdaaf6308b28368f7e032f43b87c4065494f236869f2cc08565",
+    "python/fcst_exchange/td_model.py": "bc90c718ca9e10a111da25f01d9bf582950a12aed4afc9a475dc65a4ffd63e1a",
+    "python/fcst_exchange/td_node.py": "68497dfcdd1115bbd07cf346859f8ab1d0f49681d60a16a82c1eca9313794f15",
+    "python/fcst_exchange/td_project.py": "c029d1d51aeefc054caac4d0d129af9c7efb22a2523b7bd94cbfc75780cf87bc",
+    "python/fcst_exchange/td_properties.py": "7943eb3c4992a72e93c363bb32db8e9cd380fd79ef61e5bf14ed77c71b0d3bd2",
+    "python/fcst_exchange/td_property_laws.py": "e07c9282bc45da2abc78182bdeb0d29e77a3d50c83a8242d2e84e337289637bc",
+    "python/fcst_exchange/td_property_model.py": "b30d63f1c4a1172741ef2148703d37a951bedb1f9ce9d3e606b5f8ead65a18e7",
+    "python/fcst_exchange/td_qualification.py": "0f842cae40fcd2050b25fa30427e490afe16a29c468bb0bef43b70119ed6b300",
+    "python/fcst_exchange/td_reference.py": "fc121100061252aea790f14a13ef80664e996260cd8353358bbb97dce19e391c",
+    "python/fcst_exchange/td_surface.py": "96a1b7fa97096ccfa5f0851b9a9e409d721b04fc75fddf22d422bb1254d44223",
+    "python/fcst_exchange/td_writer.py": "d8cf8fa63f74532ab9acd4ff48504e565dc75b1314008841a4330e30641f7327",
+    "python/fcst_exchange/dwg_bits.py": "47b0dd26e69250fbd18659e3f203f0af01ad35c067c1473f70df14615e6a8e4f",
+    "python/fcst_cli/td.py": "09fd71a2b6efca12a5520154ef489e29327cdb4adc1ca28ebbc09ff26e29471e",
+    "tests/td_fixture.py": "ba59a38d0f9940bc09fe51fca2c88d00855f4b7ddc360ad8d0dfe28c28f74095",
+    "tests/test_td_payloads.py": "6aae3d46f04567de78065c23056252b3e194e74869ab828c7a78f3a5c5b1d3b5",
+    "tests/test_td_properties.py": "c00f589cbfd04a3111026990654533608cc5d98f6b993ea6bc16ae34b5c9ebef",
+    "tests/fixtures/contracts/analytic-seed-native.json": "fdbdc75745c4ae3606e052f39ecb091585794ca147081e7b469d1dbe109861ac",
+    "python/fcst_exchange/sinda.py": "510fb4482cb56129ec1565b1118f74006abe86a9ab6f84300e9d5d78d10215d9",
+    "python/fcst_exchange/sinda_writer.py": "1897c5292932c8c22ec4365d79f58387c3c4eede261107fd814e754886c9abae",
+    "python/fcst_exchange/sinda_arrays.py": "866a1e77841c9a4a470023c5b56ce861435aa0b2ccb18063032592dffd95c0fd",
+    "python/fcst_exchange/source_package.py": "9845a56cdd5a5dfb180462ceaa34474887bca860e6a50278e8c312a49f9847fc",
+    "python/fcst_exchange/source_tree.py": "65aa3697532a04ebe2be3913a9d1108cea2792f60b5c2933b9cc0da013357749",
+    "tests/test_td_native_model.py": "22ed7036bb0acea625c59d70d891f6b16834de72c20b55c91d6157dd08d5d8b4",
+    "tests/test_td_property_model.py": "47d6251d8e0424f269525b796e9a4d650067525ac5ce83d22769702db2a935e3",
+    "tests/test_sinda_arrays.py": "160745d29dfa13e2a454fd6063eb2f67cb9075695704ea3bc31a78707f7d7e3d",
+    "tests/test_td_geometry.py": "bb9bae6a163961334819376f3cba8505337eb9c475b0252d41fe9fe800bf5ba4",
+    "tests/test_td_property_laws.py": "f042f6157e9cbc65e09909c7be49d5d7867401243aedeeae703b7eb1d2931685",
+    "tests/td_geometry_fixture.py": "cbf4bc5900ec9e12a1fd02825ceb2bf82976622d311ff350f5456e1a8388d424",
+    "python/fcst_exchange/__init__.py": "c0b8878319521c32bac18ae2f74eeb0b8fcaea6bddd0dca342913528fce548ed",
+    "python/fcst_exchange/export.py": "daacae0d4f3d9180c651c827487cd1016418aa0dcc74015d7be4ecfe4d51ff70",
+    "python/fcst_exchange/independent_td.py": "c3781bec9b1711f1ad41a61afeb60cd75ca8c62b92a31ee7ddb30ccad39c92c8",
+    "python/fcst_exchange/logic.py": "a94961ae77ecba9b93ea366164fcb8cb42c5250fcf8f64454cff100b94733b3f",
+    "python/fcst_exchange/opentd.py": "9c36251237f25bbfc3a51b977d704b24dbb7eb840aec6aea48f6214024ad2dfc",
+    "python/fcst_exchange/results.py": "ad3bb3a9c0a62020899b2620b532d9e4cf328102bc48c4cbd36733ea9e4c149a",
+    "python/fcst_exchange/sinda_results.py": "28b5bf1372708985a182fda3c8b63d2d8f7ef37a934fa2f40a2e9cd60cd238ff",
+    "python/fcst_exchange/syntax.py": "86ba72e58f39211f006fb00512251d615adf4f656194d88d09939c89c008be27",
+    "python/fcst_exchange/vendor_paths.py": "997d30a6ca5e2d5420231f4f3e673acb1b6b5b6731629b1b8636611a70351dc3",
+    "python/fcst_cli/__init__.py": "c77a7b2bffa4f4daa04cd06e0c60e3d9b9cf541199ea87a48d527f1c8675526e",
+    "python/fcst_cli/__main__.py": "71136750b17805b8f7e0d3afdfaf8c8ae23bc42a8378a9507c947d4e5d1346b0",
+    "python/fcst_cli/exchange.py": "ed9d49c5e71e3c50f0c34bae553642f49a03a4488349c9705e5a2e55b2a33fde",
+    "python/fcst_cli/jobs.py": "667a23eeafc935128f95310de7a6ba81164ddb6d862505571b1120655ab400dc",
+    "python/fcst_app/__init__.py": "d5fb80b0622163ad4bf6b9ad0e3a10147a13f6017315a49d4e946d6f1822579e",
+    "python/fcst_app/arrays.py": "1bbb1a369796ff4da422ed63edd898a5479aec4db782c20bb4b2a016556f14ab",
+    "python/fcst_app/fem_adapter.py": "24317fc44f06de3aba5d7ae6372b74639e401c44a52222e86dabe675abff40c6",
+    "python/fcst_app/jobs.py": "e261b47ff350eec2cad4dc7d7eded8db571f228c565b25f65661f269c8b8776c",
+    "python/fcst_app/spatial_arrays.py": "ec1793b9aee9d0c7b16fa415a6921469a941300dd1e985254057bb8aef2cb1f7",
+    "python/fcst_app/store.py": "7d05c90ee83a508d0358ddfdaf9334777079cd2f0ef4c612fa8b46c819ae0cd2",
+    "python/fcst_contracts/__init__.py": "7ce10d4ade7d2f111eca73a4ab136ab1d184e6368b16c2d91bbaf4ecf1ed48c5",
+    "python/fcst_contracts/spatial.py": "5019c4dce9233055e91b4cd63ba713324c252a12900de2d6bdde703238fb5e4a",
+    "python/fcst_contracts/types.py": "d399ea1521fbbb899bfa2a9194532ef1e7892e6719a6b3e9c54ca14cd43e9824",
+    "python/fcst_contracts/worker.py": "a8da22e6d4c3534ce73494312fd0641ed10bfb2866ab34ef87a196a9827fbadf",
+    "python/fcst_contracts/bundle.json": "785584588917e6d882f80247f25632cf1bd84c5ed9cb2c4116a96bc10365b932",
+    "python/fcst_tools/gate.py": "e3e9a6fd7acf36589713a722452f2b756258e169b7ec23b86a3e39c1514ca409"
+  },
+  "license": "GPL-3.0-or-later; separate executable and linked backend; not linked into the thermal engine",
+  "required_cases": [
+    "owned-fixture-read",
+    "fresh-native-reopen",
+    "class-identity-and-version-preservation",
+    "vendor-free-runtime",
+    "no-false-thermal-qualification",
+    "source-free-thermal-network-cli",
+    "new-network-all-fields-and-references",
+    "compressed-scalar-edit-fresh-reopen",
+    "edited-source-and-companion-preservation",
+    "native-import-cli-and-portable-source",
+    "native-edit-export-cli-roundtrip",
+    "canonical-label-and-identity-roundtrip",
+    "native-property-library-cli-roundtrip",
+    "unmapped-native-semantics-remain-held",
+    "original-property-document-cli-import",
+    "offset-unit-native-edit-roundtrip",
+    "native-property-source-cli-edit",
+    "variable-property-laws-cli-roundtrip",
+    "composite-property-source-preservation",
+    "orthotropic-property-library-cli-roundtrip",
+    "orthotropic-original-source-cli-edit",
+    "source-free-complete-surface-solid-roundtrip",
+    "surface-solid-compressed-parameter-edits",
+    "structural-geometry-keeps-native-semantics-held"
+  ],
+  "qualification_holds": [
+    "geometry/case/manager and dynamic TD semantics incomplete",
+    "source-version and dependency mapping",
+    "owned-engine and paired ESA comparisons"
+  ]
+}

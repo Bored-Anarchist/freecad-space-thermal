@@ -1,0 +1,137 @@
+{
+  "work_package": "WP-07",
+  "status": "complete",
+  "tested_candidate": "faf623d18c04c0601ce90d94220e9495d2bb4ab1",
+  "scope": "Shared SDK and synthetic reference dialect; vendor language/profile qualification remains WP-08/WP-09/WP-10",
+  "requirements": [
+    "DAT-007",
+    "INT-003",
+    "INT-004",
+    "INT-007",
+    "INT-008",
+    "INT-009",
+    "INT-010",
+    "INT-017",
+    "SEC-001",
+    "SEC-002",
+    "SEC-003",
+    "TST-010",
+    "TST-021",
+    "TST-022"
+  ],
+  "contract": "docs/exchange.md",
+  "acceptance_register": "ci/exchange-acceptance.json",
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "required_checks": 165,
+      "unit_cases": 147,
+      "exchange_acceptance_cases": 33,
+      "reports_sha256": {
+        "verification": "f9bf67e716abaa2627f51dcb58f758b15b400fd7bbe447a99a809a23f68d23c1",
+        "exchange": "d297d5beb052cd561fbeed95539215b7c9564b03c495525c188aeb2697a8bd90",
+        "jobs": "378badca6f75088926ba44c5e49ed4dcbde35d88d407bc2d4a7abb8bc8828206",
+        "contracts": "c3e8938c7747824d6637465fbc147648b385dcab484865c36a7c51cd4bc49a50",
+        "numerical": "57fc757e35c71619f378194a7cea0484bfca571dc2573d202ed73ccbf3c6f598",
+        "persistence": "a4d54531ec7a81017de40048aa5fd7a9629902075885581d0b05f3be59a38645",
+        "spatial": "9d00609e4ad3fac54df0df32f2f31dd962c438b9452b31b381d2e287af1bafc3",
+        "build-info": "dbac8b10999694e0ef80a2f95c7f9c45794432e74660c7a78ad94aff6d45b03c"
+      }
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "required_checks": 165,
+      "unit_cases": 147,
+      "exchange_acceptance_cases": 33,
+      "reports_sha256": {
+        "verification": "aebe411d0ceaf086315ce609e54be5665c02daa458e5d0408d719498d6ddc059",
+        "exchange": "d297d5beb052cd561fbeed95539215b7c9564b03c495525c188aeb2697a8bd90",
+        "jobs": "bf1fba741858d574babbc2fd750f4341c0b36c305fd45112604544b3cebdae8d",
+        "contracts": "c3e8938c7747824d6637465fbc147648b385dcab484865c36a7c51cd4bc49a50",
+        "numerical": "c3f75aaa117c494868852d4dabefae653d93848092eaf82762f99b572e5e6bf9",
+        "persistence": "a4d54531ec7a81017de40048aa5fd7a9629902075885581d0b05f3be59a38645",
+        "spatial": "9d00609e4ad3fac54df0df32f2f31dd962c438b9452b31b381d2e287af1bafc3",
+        "build-info": "dbac8b10999694e0ef80a2f95c7f9c45794432e74660c7a78ad94aff6d45b03c"
+      }
+    },
+    {
+      "id": "standard-library-security",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "required_checks": 147,
+      "report_sha256": "2c45ac6915cb50e7003ba38d4fc22858673030fca8e7a4b638b6eb152ed17519"
+    },
+    {
+      "id": "foundation-handoff",
+      "status": "passed",
+      "required_checks": 25,
+      "command": "python tools/check_foundation_handoff.py --reports .local/wp07-handoff --report .local/wp07-handoff.json",
+      "report_sha256": "606b5f301b6ac8c42d4d32e7287e68799dc3e845aa2017a5454dd8aea854378d"
+    },
+    {
+      "id": "exact-report-and-prose-privacy",
+      "status": "passed",
+      "command": "python tools/publication_preflight.py --file FINAL_REPORT --file FINAL_PROSE",
+      "payload_sha256": "8afa57853bf4f0ed97c76b6a517fcfca941b2e590719779bdd5cb62b294dd990",
+      "policy_sha256": "3d4b11a45604a142d9e725fc3372c683040443d8b4b830923ddd1894b9889946"
+    }
+  ],
+  "acceptance": [
+    "test_exchange.ExchangeTests.test_all_canonical_entities_frames_sides_tables_and_cases_map_explicitly",
+    "test_exchange.ExchangeTests.test_bounded_deterministic_parser_fuzz_preserves_all_bytes_and_verdicts",
+    "test_exchange.ExchangeTests.test_byte_file_record_and_depth_limits_are_enforced",
+    "test_exchange.ExchangeTests.test_cli_preview_export_package_and_result_query_are_unattended",
+    "test_exchange.ExchangeTests.test_controlled_edit_reopens_and_preserves_every_other_byte",
+    "test_exchange.ExchangeTests.test_data_hash_closure_mapping_attachment_and_new_package_are_explicit",
+    "test_exchange.ExchangeTests.test_dependency_graph_and_originals_persist_after_reopen",
+    "test_exchange.ExchangeTests.test_discovery_requires_explicit_profile_and_runtime",
+    "test_exchange.ExchangeTests.test_duplicate_source_handles_and_dangling_references_fail",
+    "test_exchange.ExchangeTests.test_export_never_silently_omits_undeclared_or_new_source_dependencies",
+    "test_exchange.ExchangeTests.test_foundation_v2_contracts_and_lossy_exports_are_rejected",
+    "test_exchange.ExchangeTests.test_hard_process_exit_before_export_commit_preserves_original_bytes",
+    "test_exchange.ExchangeTests.test_include_cycles_cached_depth_and_case_aliases_fail_closed",
+    "test_exchange.ExchangeTests.test_linked_files_and_junctions_are_rejected_without_reading",
+    "test_exchange.ExchangeTests.test_logic_cycles_units_undefined_symbols_and_domain_are_not_silently_accepted",
+    "test_exchange.ExchangeTests.test_missing_malicious_and_command_includes_stay_inert",
+    "test_exchange.ExchangeTests.test_positive_inventory_offsets_units_and_collision_free_identity",
+    "test_exchange.ExchangeTests.test_result_dependencies_are_inventoried_and_exported_as_exact_data",
+    "test_exchange.ExchangeTests.test_result_discontinuities_interpolation_and_extrapolation_are_explicit",
+    "test_exchange.ExchangeTests.test_result_future_fields_shapes_units_numbers_and_time_order_fail",
+    "test_exchange.ExchangeTests.test_result_reader_maps_time_temperature_sign_and_identity",
+    "test_exchange.ExchangeTests.test_reviewed_expression_procedure_translation_and_independent_oracles",
+    "test_exchange.ExchangeTests.test_stale_sources_original_targets_and_interrupted_export_leave_originals",
+    "test_exchange.ExchangeTests.test_structured_malformed_record_fuzz_never_escapes_as_host_exceptions",
+    "test_exchange.ExchangeTests.test_unchanged_export_preserves_opaque_bytes_without_claiming_execution",
+    "test_exchange.ExchangeTests.test_unknown_malformed_and_future_fields_have_complete_distinct_inventory",
+    "test_exchange.ExchangeTests.test_unreviewed_code_import_never_executes_or_grants_authority",
+    "test_exchange.ExchangeTests.test_unsafe_unknown_identity_and_overlapping_edits_are_rejected",
+    "test_exchange_tools.ExchangeToolTests.test_real_converter_is_bounded_and_records_tool_and_authorization_provenance",
+    "test_exchange_tools.ExchangeToolTests.test_real_timeout_log_disk_and_descendant_limits_terminate_tree",
+    "test_exchange_tools.ExchangeToolTests.test_tool_registration_hashes_and_authorization_fail_before_mutation",
+    "test_exchange_tools.ExchangeToolTests.test_undeclared_outputs_and_modified_inputs_never_become_results",
+    "exchange-report-schema"
+  ],
+  "publication": {
+    "policy_version": 3,
+    "approved_identity": "Bored-Anarchist",
+    "publication_copy": "Exact staged blobs plus outgoing history and approved author/committer identities",
+    "commands": [
+      "python -S tools/check_security.py",
+      "python tools/publication_preflight.py --staged --revision HEAD",
+      "python tools/publication_preflight.py --file FINAL_REPORT --file FINAL_PROSE"
+    ],
+    "withheld": "Original decks, dependency/result bytes, portable packages, per-source fidelity inventories, converter output, local traces and native binaries"
+  },
+  "supported_limits": "Versioned fcst-network/1 and fcst-results/1 reference grammars; native model v1, manifest v1/v2 and spatial v2; bounded Windows trusted converters; complete declared source trees",
+  "remaining_scope": [
+    "WP-08/WP-09 exact vendor dialects, runtime provisioning and paired source-tool reopen/run qualification",
+    "WP-10 STEP-TAS schema and dataset qualification",
+    "WP-11 production thermal evaluation, runtime domains and event semantics",
+    "No OS filesystem/network sandbox for untrusted converters; only application-reviewed installed tools are supported"
+  ],
+  "blockers": []
+}

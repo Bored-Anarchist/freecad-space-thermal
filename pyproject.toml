@@ -21,3 +21,4 @@ where = ["python"]
 
 [tool.setuptools.package-data]
 fcst_contracts = ["bundle.json"]
+fcst_exchange = ["dwg-profile.json"]

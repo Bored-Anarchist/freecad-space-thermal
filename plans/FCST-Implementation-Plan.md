@@ -1,6 +1,6 @@
 # FreeCAD Space Thermal: implementation and build plan
 
-Plan revision 1.5, 28 October 2026. Based on specification FCST-SYS-SPEC-001 revision 0.5 and the user's additional requirements for unattended testing, GitHub project delivery, removal of private/personal information before anything is put online, explicit independence of native model creation, files and solving, assessment of FreeCAD FEM reuse, and an inserted WP-05.5 foundation reconciliation package.
+Plan revision 1.7, 29 October 2026. Based on specification FCST-SYS-SPEC-001 revision 0.9 and the user's additional requirements for unattended testing, GitHub project delivery, removal of private/personal information before anything is put online, explicit independence of native model creation, files and solving, assessment of FreeCAD FEM reuse, and an inserted WP-05.5 foundation reconciliation package.
 
 This is an implementation plan, not evidence of implemented physics or file compatibility. The workspace contains the specification, 121 registered requirements, 12 proposed compatibility profiles, three draft JSON schemas and two schema examples. WP-02 now adds a native worker/application skeleton, local/CI verification and publication-privacy preflight; it implements no thermal solving or file compatibility. [WP-02 evidence](evidence/WP-02.json) records completed foundation acceptance and remaining Q0/product obligations. The specification remains the design baseline; the automated-test requirements below add delivery obligations without relaxing its acceptance criteria.
 
@@ -10,7 +10,7 @@ Read this plan alongside the [specification](../spec/FreeCAD-Space-Thermal-Speci
 
 ## Delivery approach
 
-Build the product around a host-independent C++20 thermal engine and a versioned Python application service. FreeCAD, the CLI, and MCP use the same operations. Vendor adapters extract and re-export source models and produce reference runs; production thermal solving belongs to FCST. Preserve the original files, stable identities, units, and model semantics from the first import implementation.
+Build the product around a host-independent C++20 thermal engine and a versioned Python application service. FreeCAD, the CLI, and MCP use the same operations. Independent file adapters extract and re-export TD/SINDA and ESATAN source models; optional vendor harnesses produce external comparison evidence only. Production thermal solving belongs to FCST. Preserve the original files, stable identities, units, and model semantics from the first import implementation.
 
 The native workflow is independently required: create a model from an empty project, assign nodes/properties/conductors/loads/cases, save an FCST `.fcst` file, reopen and edit it, run owned steady/transient solves, and inspect results without a vendor file, Thermal Desktop/SINDA/FLUINT, ESATAN, vendor licenses or vendor services. WP-01 scopes backward-compatibility coverage; native WP-02/WP-03/WP-04 slices start with public synthetic fixtures and analytic oracles while vendor access is acquired. Complete Q0 and compatibility claims still require their specified evidence; missing vendor access must not stop native core development.
 
@@ -26,6 +26,43 @@ Online publication must exclude private/personal information. This covers code a
 
 ## 1. Boundaries and decisions to establish first
 
+The 29 October independent TD exchange correction also extends TST-021.
+Execute `tests/test_independent_dwg.py` and `tools/check_td.py` in unattended
+Windows verification, plus `tests/test_native_dwg.py` and `tests/test_sinda_writer.py`.
+The corrected native bridge preserves ordered duplicate decoder fields and checks
+complete opaque bit payloads and every unrequested logical field without echoing
+private values. A separate required CI job builds the locked GPL component and
+rewrites/reopens an owned fixture; candidate/source-bound bounded evidence is
+required by the final handoff. Typed RcNode v22/RcConductor v22/RcHeatLoad v17 and property readers now
+support guarded source-field edits and source-free constant-network DWG export.
+Execute `tests/test_td_payloads.py` and `tests/test_td_properties.py`; the required
+native job independently reopens all generated fields/references and compressed
+scalar edits while preserving every unrequested source field. Closed canonical network import, portable source restoration and verified native
+scalar exports now run without other feature packages. Add
+`tests/test_td_native_model.py`, `tests/test_td_property_model.py`,
+`tests/test_sinda_arrays.py` and `tests/test_td_geometry.py`; the frozen native
+job exercises the real vendor-denied CLI for package import, native edits, fresh
+reopen, property-library round trips, original property-document import and native
+property-source edits. One-dimensional property tables are typed and guarded
+without enabling unimplemented variable-property physics. Full-model semantics
+remain incomplete. Scan the exact owned codecs/writers, synthetic filer fixtures,
+CLI sources, preservation patch and source-hash locks alongside probe/audit sources, synthetic
+tests, pinned dependency metadata, updated scope documents and bounded summaries
+before publication. Policy v5 scans native headers/patches as text, retains all
+sensitive patterns/budgets and rejects binary disguises. Preserve GPL attribution
+and scan exact build configuration, patch pre/post hashes and provenance alongside
+the source. WP-09 independent ESATAN plans/fixtures/evidence use the same TST-021
+rule; documentation does not qualify an unimplemented converter.
+Raw drawings, companion files, decoded JSON, runtime binaries
+and raw logs remain local; the original corpus remains unchanged. This adds no
+permission to redistribute third-party models or proprietary libraries.
+
+Publication history checks scan every commit's metadata and identities and every
+tree's entry modes. Identical historical `(path, mode, blob)` versions share one
+content scan within that invocation; new paths, modes and changed bytes are
+rechecked. The TST-021 history regressions prove metadata binding and path/mode
+reclassification while retaining all existing privacy patterns and budgets.
+
 | Area | Implementation direction | Decision or evidence required |
 |---|---|---|
 | Project development | GitHub repository, Issues/Projects, pull requests, GitHub Actions and Releases | Repository owner/URL, visibility, permissions, supported protection features and runner/evidence access established at Q0 |
@@ -36,7 +73,7 @@ Online publication must exclude private/personal information. This covers code a
 | Geometry | Obtain mesh/geometry through a FreeCAD adapter; keep engine network-only operation possible | Supported primitives/elements, pinned FreeCAD/OCCT combination and attachment rules |
 | FreeCAD FEM reuse | Prefer compatible mesh, selection/assignment and result APIs behind the host adapter; retain the owned engine | WP-13/WP-16 component assessment with pinned source/API/license evidence and automated acceptance before replacement or adoption |
 | Storage | Documented ZIP/directory `.fcst`, JSON metadata and versioned HDF5 arrays | Full model/results schemas, canonical hashing, atomic-save/recovery protocol |
-| Vendor access | Separate version-matched adapters; Windows OpenTD sidecar where required | Actual licenses, runtimes, APIs, fixture rights and unattended automation paths |
+| TD/SINDA and ESATAN exchange | Independent native-project, companion, network and result readers/writers with owned versioned semantic codecs; vendor APIs only for optional external reference work | Offline vendor-absent first import/edit/new-model export/reopen, complete semantic/dependency coverage, untouched-field preservation and deployment/license evidence |
 | Platform qualification | Windows 11 x64 and official pinned FreeCAD 1.1.4; macOS/Linux are uncommitted stretch goals outside work packages | Qualify actual combinations; do not infer support from version names |
 | MCP | Local stdio over the shared application API | Verify and pin a released protocol/SDK and named clients at Q0; separately test legacy profiles |
 | Optional work | In-process pybind11, GPU acceleration, Rust comparisons, network MCP, Fluent comparisons | Add only when justified; none is necessary for the initial worker architecture |
@@ -75,7 +112,7 @@ python/
 freecad/FCST/                    Init files, commands, objects, editors, view providers
 adapters/
   common/ sinda/ esatan/ step_tas/ legacy/
-sidecars/opentd/                 Separately built, version-profiled vendor bridge
+sidecars/opentd/                 Optional external reference harness only
 tests/
   fixtures/public/               Synthetic files and generated reference cases
   fixtures/restricted-manifests/ Hashes and metadata; no unlicensed model contents
@@ -140,6 +177,42 @@ WP-03 extends that executable publication boundary to the generated v1 schemas, 
 WP-04 adds an exact pre-upload scan of each `numerical.json` summary. Its inputs are synthetic SI fixtures and independently frozen criteria; public evidence contains bounded metrics, source/backend/artifact hashes and public hardware/toolchain attributes. Raw per-attempt observations, compiler logs, executable/DLL files and restricted originals remain local. Sealed attempt manifests preserve failed/interrupted/superseded results. TST-021 acceptance executes the planted regressions plus staged/outgoing-history/identity and final prose/evidence scans before push; CI scans the final generated numerical summary before upload. No scanner suppression or authorization to publish engineering originals is added.
 
 WP-05 adds the exact generated `persistence.json` summary to both Windows CI pre-upload scans. Synthetic package/migration fixtures, typed store/array sources, completion evidence and final PR prose are checked with the staged/outgoing-history/approved-identity preflight before publication. Generated `.fcst`, HDF5, SQLite/WAL and synthetic host files plus raw crash/array diagnostics stay local. Imported engineering originals remain unchanged in their authorized storage and are never uploaded by this workflow. TST-021 acceptance includes planted privacy regressions and exact report/prose scans; neither an inert-source role nor successful persistence validation grants publication clearance.
+
+WP-07 extends TST-021 to the exact `exchange.json` acceptance summary, SDK sources,
+fidelity schema, synthetic converter fixture and final publication prose. Both
+Windows workflows clear that report before upload; it contains only case IDs,
+verdicts, candidate and public input hashes. Original decks, dependency/result
+bytes, packages, per-source fidelity inventories, converter logs and local failure
+traces remain local until separately reviewed and cleared. `python -S
+tools/check_security.py`, staged/outgoing-history and approved-identity scans, plus
+exact generated-report/PR-prose preflight remain executable acceptance. Tool
+authorization is recorded by hash without exposing actor identity or installed paths.
+
+WP-08 extends TST-021 to the exact `td.json` public acceptance summary, managed
+sidecar sources, SINDA/TD fixtures, bounded offline API receipts and final GitHub
+prose. Policy v4 adds `.cs` to text inspection with the same sensitive patterns,
+binary rejection and budgets. Both Windows jobs clear `td.json` before upload;
+original projects/decks/property databases/results, private runner profiles,
+compiled sidecars/vendor DLLs and raw logs stay local. Required staged-byte and
+outgoing-history scans may run separately; neither scope may be skipped. Q1 holds
+are recorded explicitly and are not replaced with parser or external-run success.
+The independent property-law slice adds owned synthetic orthotropic, variable
+table/grid, two-band optical and composite-definition fixtures. TST-021 acceptance
+includes their unattended unit cases, fresh-process vendor-free CLI roundtrips,
+and exact `td.json`/`dwg-backend.json` report scans. Original property laws, decoded
+engineering JSON, frame companions, edited files and raw research logs stay local.
+Canonical variable/composite/spectral bindings and complete DWG thermal geometry
+remain WP-08 implementation work; WP-09/WP-11/WP-12 comparisons are later
+qualification obligations, not prerequisites for implementing those codecs.
+Complete RcRectangle v7/attribute-marker-54 and RcFdBrick v21 readers/writers now
+consume data, text and handles, including subdivision, mesh, face and advection
+records. TST-021 executes owned geometry mutation/stream/identity regressions and
+native source-free generation, compressed parameter edits and fresh reopen. Scan
+the exact codecs, bridge, synthetic fixtures and `td.json`/`dwg-backend.json`, plus
+staged bytes, outgoing history/identity and final publication text. Original
+geometry, decoded fields, source handles, generated containers and raw research/
+build/CLI diagnostics remain local. Structural decoding cannot qualify physical
+geometry or mesh regeneration; original dynamic geometry edits remain held.
 
 FEM reuse work applies TST-021 to exact outgoing decision/assessment text, upstream attribution/license manifests, synthetic fixtures, bounded host/mesh/comparison reports and final issue/PR prose. Run `python -S tools/check_security.py` and `python tools/publication_preflight.py --staged --revision HEAD` before commit/push; scan each final generated report or post with `--file` before upload. Generated FreeCAD documents, raw solver decks, screenshots, mesh/result containers and logs stay local unless separately sanitized and cleared. Use synthetic inputs for public tests, preserve authorized originals unchanged, and do not weaken privacy policy to admit upstream examples or generated diagnostics.
 
@@ -279,6 +352,22 @@ The [WP-06 implementation contract](../docs/jobs.md) defines the SQLite lifecycl
 
 ### Step 7 — WP-07: implement common adapter infrastructure and safe logic handling
 
+The implementation lives in `python/fcst_exchange` with its [versioned grammar and
+supported limits](../docs/exchange.md), [frozen automated acceptance register](../ci/exchange-acceptance.json)
+and fidelity schema. The executable synthetic reference dialect validates the common
+SDK boundary; exact vendor dialects and paired source-tool qualification remain
+WP-08/WP-09/WP-10. Both Windows drivers run `tools/check_exchange.py`, including real
+bounded converters, pure-logic oracles, parser fuzzing, source-byte preservation,
+controlled-edit reopen and result-query comparisons. Native readiness never upgrades
+opaque content or grants vendor/solver qualification.
+
+[Completion evidence](evidence/WP-07.json) records the tested implementation
+candidate, both 165-check Windows configurations, all 33 exchange acceptance cases,
+147 standard-library regressions, the 25-case prerequisite handoff and exact
+report/prose publication clearance. WP-07 is complete on its declared common SDK
+and executable synthetic reference profile; the later vendor owners retain their
+full dialect and paired qualification obligations.
+
 1. Define adapter discovery/capabilities, runtime probing, import preview/staging, conversion plans, semantic mapping, diagnostics and export interfaces.
 2. Build a source dependency resolver that safely reads permitted data includes, reports missing files and never executes include commands or imported logic. Record include graphs and original source locations.
 3. Implement syntax-preserving parsed trees for declared network dialects, with original byte ranges/comments and opaque unknown regions. Unknown syntax is reported, not interpreted by filename extension.
@@ -292,28 +381,109 @@ The [WP-06 implementation contract](../docs/jobs.md) defines the SQLite lifecycl
 
 ### Step 8 — WP-08: implement the Thermal Desktop/SINDA path
 
-1. Create a version-profiled Windows bridge with a discovery-only runtime probe. Select its .NET/compiler/runtime from the actual OpenTD release requirements; do not assume one binary covers every target.
-2. On a copied source project, inventory custom thermal entities, submodels, node IDs/classes, GMM/TMM assignments, properties, optics, conductors, cases, controls, references and dependencies. Include external property databases such as those actually referenced by the fixture.
-3. Extract required geometry and thermal data through the declared API into adapter IR, then canonical entities. Generic DWG/DXF geometry import remains labeled geometry-only.
-4. Implement declared SINDA deck dialect parsers/writers, includes, property tables, expressions and required reviewed source logic. Map each construct to owned-engine capability or an explicit unsupported status.
-5. Implement supported canonical-to-TD edits against the copied source tree and source identity map. Validate supported changes before calling the vendor API.
-6. Automate unchanged and controlled-edit reopen/run/result extraction on the licensed runner. Independently make equivalent source-native edits and compare their results with FCST-edited derivatives.
-7. Exercise loads, material tables, geometry/topology, properties and cases, plus unchanged opaque-content preservation. A parser-only test cannot qualify editing/export.
-8. Compare owned-engine thermal/radiation/environment runs with the matching SINDA and TD/RadCAD references, preserving separate execution-mode labels.
+The [independent exchange decision](../docs/decisions/0004-independent-thermal-exchange.md)
+requires TD/SINDA import and export without TD, OpenTD, AutoCAD/CRTechCAD,
+SINDA/FLUINT, vendor licenses, prior vendor conversion or conversion servers.
+The earlier OpenTD-first implementation is retained only as optional external
+reference tooling. The direct SINDA subset and independent typed TD
+node/conductor/heat-load/property profiles are implemented, with guarded source-field
+edits and source-free constant-network DWG export. Required geometry, case, manager,
+dynamic and dependency semantics and full-model reverse mapping remain incomplete.
+The declared closed constant-network profile now supports canonical import, portable
+`.fcst` storage and canonical scalar export/reopen. Constant original property
+documents and owned property libraries have independent conversion paths; static
+SINDA arrays/intrinsics have bounded readers. Complete rectangle/brick wire
+profiles have owned readers/writers and guarded constant-parameter source edits;
+physical geometry/mesh binding and regeneration remain unimplemented.
+Unrepresented modes and additional source versions need verified format evidence,
+while owned-engine and paired ESA comparisons remain later qualification dependencies. WP-08 stays in progress; historical evidence retains its scope.
 
-**Outputs:** TD/OpenTD profile implementations, SINDA adapters, reference runner and paired evidence. **Completion:** every required Q1 TD feature/operation passes semantic inventory, edited round trips and numerical comparisons on exact runtimes. Q1 TD status remains blocked until its paired ESA qualification also passes.
+1. Retain the corrected independent LibreDWG 0.14 native component, locked source,
+   compiler, preservation patch and GPL notices. Its implementation fixes observed
+   opaque bit-length, material/version-field and raw datastorage losses and retains
+   every ordered duplicate field occurrence. Require its owned fixture build and
+   fresh-process rewrite/reopen in CI. Container/source retention is implemented;
+   thermal class semantics and qualified edited/new-model DWG remain open.
+2. Implement owned versioned TD binary-class codecs and companion-file readers.
+   Inventory submodels, nodes, geometry, GMM/TMM assignments, properties, optics,
+   conductors, loads, cases, controls, expressions, handles and dependency closure.
+   Container version alone does not identify the TD serialization release.
+3. Map supported source fields into canonical FCST entities and implement reverse
+   serializers for edited and new-model exports. Preserve every untouched field
+   and required opaque bit range, reference, property database and source original;
+   refuse unsupported edits. Generic geometry remains labeled geometry-only.
+4. Complete required SINDA dialect parsers/writers, includes, property tables and
+   reviewed source logic using owned code. Never require SINDA execution for
+   import/export or execute imported Fortran as an implicit conversion step.
+5. Automate offline first import, controlled edits, export and fresh-process reopen
+   with all vendor software, assemblies, services and licenses absent. Attempted
+   vendor process/API/remote conversion calls fail acceptance. Missing vendor
+   installations cannot be a product prerequisite or a development blocker.
+6. Test load, material-table, geometry/topology, property and case edits, full
+   unchanged field preservation and new-model export through independent readers.
+   Retained bytes, matching JSON or geometry alone cannot pass thermal conversion.
+7. Compare owned-engine thermal/radiation/environment results with analytic and
+   independently obtained source baselines. Optional licensed reference runners
+   supply additional evidence only; never an installed-product dependency.
+8. Include the required paired ESA qualification and remaining source-version/
+   feature coverage in Q1/Q2 completion, with explicit unresolved fidelity holds.
 
-### Step 9 — WP-09: implement the ESATAN-TMS path
+**Outputs:** independent TD/SINDA codecs and writers, vendor-absent acceptance,
+optional external reference harnesses and paired evidence. **Completion:** every
+required Q1 TD operation passes complete semantic/dependency inventory, independent
+edited/new-model round trips, offline vendor-absence and owned numerical comparisons.
+Container probes and the former OpenTD delivery cannot satisfy this completion.
+Q1 TD status remains held until its paired ESA qualification also passes.
 
-1. Build version-specific prerequisite probes and unattended export/import/reopen/result drivers for the selected ESATAN versions.
-2. Inventory project/campaign files, cases, geometry, properties, GMM/TMM mappings, includes, expressions, user logic and results. Do not reconstruct campaigns from geometry alone.
-3. Implement the required `.d` dialects with preserved syntax, source locations, tables, units, submodels/node identities and reviewed expression semantics.
-4. Use native API/export and STEP-TAS paths where available, together with required companion files; map to the same canonical entities used by TD.
-5. Implement supported edits and export to a copied project tree. Preserve untouched content or fail explicitly when the adapter cannot safely write it.
-6. Automate unchanged and controlled-edit source reopen/run, equivalent source-native edits and source-result comparison using the same categories required for TD.
-7. Compare FCST native execution with ESATAN reference cases, and retain diagnostics for required semantics scheduled for Q2.
+### Step 9 — WP-09: implement the independent ESATAN-TMS path
 
-**Outputs:** ESATAN profile adapters, result readers and unattended reference runner. **Completion:** the paired Q1 ESA profile passes the same semantic, edit/re-export and numerical criteria as TD. Extra work in either ecosystem cannot compensate for missing coverage in the other.
+The [independent ESATAN exchange decision](../docs/decisions/0005-independent-esatan-exchange.md)
+requires original native-project, companion, network and result conversion without
+ESATAN-TMS/ESARAD, vendor APIs, licenses, conversion services or prior vendor exports.
+The earlier native-API/export prerequisite is superseded. WP-09 remains Planned;
+these are required implementation and unattended acceptance tasks, not completed
+converter capabilities. A D-deck or STEP-TAS subset cannot replace native-project
+and campaign semantics.
+
+1. Freeze exact native geometry/environment/kinematics/project, D-deck and result
+   dialect/schema profiles from authorized fixtures. Inventory all source files,
+   cases, materials/optics, GMM/TMM associations, expressions, source logic, results
+   and complete dependency closure without running a vendor tool.
+2. Implement bounded direct readers/writers for required native file families,
+   including the acquired ERG/ERE/ERK and project/campaign formats. Retain source
+   bytes, comments, syntax and every untouched field; reject unresolved required
+   content. Disable XML external entities and never evaluate source commands.
+3. Implement required D-deck syntax, nodes/submodels, arrays, property tables,
+   couplings, includes, cases and reviewed expression/procedure semantics in owned
+   code. Map to the same typed canonical entities used by TD and the owned engine;
+   retained procedures and a geometry-only model cannot establish native readiness.
+4. Implement independent result-file/dataset readers, including required TMD/HDF5
+   schemas, with exact model/campaign/case/node identity, units/sign/time and event
+   mapping. HDF5 container readability cannot qualify an undocumented schema.
+5. Implement reverse serialization for supported source edits and new native
+   projects/decks. Export to new complete trees and independently reopen in fresh
+   processes. Preserve all unrequested fields, opaque bits and companion data;
+   reject edits that cannot safely maintain full source correspondence.
+6. Run offline first import, load/material/geometry/property/environment/motion/
+   case edits, new-model export and reopen with all vendor installations, APIs,
+   services and licenses absent. Guard against attempted vendor process/import/
+   network calls. No prior ESATAN conversion or user-executed acceptance is allowed.
+7. Bind STEP-TAS input/output to an independently acquired schema/dictionary under
+   WP-10 when that format is actually supplied. Do not require vendor-generated
+   interchange to access original native files. Preserve native campaign content
+   absent from an interchange schema through declared companion formats.
+8. Compare owned-engine behavior with analytic and independent source baselines;
+   qualify both paired TD/ESA directions with separate semantic/loss reports.
+   Optional licensed reference runners produce additional comparison evidence
+   only. Missing evidence holds a compatibility claim, never mandates a vendor
+   dependency in the installed product. Keep remaining Q2 semantics explicit.
+
+**Outputs:** independent ESATAN native-project/deck/result codecs and writers,
+complete campaign/dependency mapping, vendor-absent acceptance and optional external
+reference harnesses. **Completion:** all required Q1 source features and directions
+pass full semantic/dependency coverage, independent changed/new-model round trips,
+offline vendor-absence and owned numerical comparisons. Paired ESA and TD coverage
+remain separate required gates; neither can compensate for the other.
 
 ### Step 10 — WP-10: implement STEP-TAS and bidirectional exchange
 
@@ -463,14 +633,14 @@ Plan and prototype this work from WP-01 findings; do not wait for Q1 to discover
 ### Step 21 — WP-21: close Q2 legacy profiles and full inventory qualification
 
 1. Implement exact required SYSTEMA/THERMICA, THERMISOL, ESARAD, SYSBAS/VIF, TRASYS and additional customer dialect/version paths identified by the inventory.
-2. Handle GMM, mesh, TMM, properties, campaign and results jointly where required. Choose native APIs/schema paths or approved converter invocations per actual profile.
+2. Handle GMM, mesh, TMM, properties, campaign and results jointly where required. Use owned direct schema codecs or independently deployable open-source converters per actual profile; vendor APIs supply optional external reference evidence only for TD/ESATAN paths.
 3. Qualify every required direction independently. A VIF reader does not imply a writer; current THERMICA projects are not qualified by an old SYSBAS reader.
 4. Apply the same safe parse/preserve/edit/new-tree export, unchanged/controlled-edit source round trips and native-solve comparisons used for Q1.
 5. Run every mandatory entity/procedure/case/operation through the coverage evaluator. Required retained-opaque, unsupported, unapproved approximation or external-only execution entries block Q2.
 6. Re-run affected Q1 profiles, platform installations, security, performance and automation suites after advanced modules/adapters are added.
 7. Publish the exact supported inventory, remaining non-required limitations and immutable evidence bundle. Close all five Q2 specification requirements and applicable delivery-test requirements.
 
-**Outputs:** full required legacy adapters, advanced/native support matrix and Q2 qualification bundle. **Completion:** zero unresolved required coverage entries and all mandatory round trips/owned-engine executions pass. Compatibility claims stay bounded by the published inventory; proprietary source conversion may still require declared vendor tools.
+**Outputs:** full required legacy adapters, advanced/native support matrix and Q2 qualification bundle. **Completion:** zero unresolved required coverage entries and all mandatory round trips/owned-engine executions pass. Compatibility claims stay bounded by the published inventory; TD/ESATAN conversion retains the independent product requirement at Q2.
 
 
 ## 4. Mandatory automated-test delivery requirements
@@ -533,9 +703,11 @@ For thermal cases, compare quantities with `abs(x - reference) <= atol + rtol * 
 
 ### 4.2 How unattended vendor and GUI tests work
 
-Create dedicated licensed self-hosted runners for each declared vendor configuration, accessed only by controlled GitHub Actions workflows in the private validation repository described in section 2.1. The runner has a preprovisioned licensed installation and a disposable project/work directory. A supervisor checks prerequisites, creates the fixture copy, invokes documented vendor automation, waits with deadlines, retrieves results, compares them and collects artifacts. Test credentials/licenses stay outside projects and logs. Untrusted public changes cannot directly execute on restricted runners; promote reviewed source/build artifacts by verified candidate hash through a controlled job.
+Independent product acceptance first runs import, edit, new-model export and fresh-process reopen on offline Windows with vendor installations, APIs, assemblies, licenses and conversion endpoints absent. Attempted vendor use fails acceptance. These drivers run automatically and cannot be replaced by licensed reference jobs.
 
-For each round trip, the driver runs this complete chain: verify original hashes → run source baseline → import and inspect fidelity → run FCST natively → export a new derivative → reopen/run derivative in the exact source tool → compare identities/topology/fields/results and unchanged content. Controlled-edit cases also create an equivalent source-native edit automatically. Cross-tool directions use separate manifests and target runners.
+Optional external comparisons use dedicated licensed self-hosted runners for each declared vendor configuration, accessed only by controlled GitHub Actions workflows in the private validation repository described in section 2.1. The runner has a preprovisioned licensed installation and a disposable project/work directory. A supervisor checks prerequisites, creates the fixture copy, invokes documented vendor automation, waits with deadlines, retrieves results, compares them and collects artifacts. Test credentials/licenses stay outside projects and logs. Untrusted public changes cannot directly execute on restricted runners; promote reviewed source/build artifacts by verified candidate hash through a controlled job.
+
+For each optional source-tool comparison, the reference driver verifies original hashes, runs the source baseline, independently imports and inspects fidelity, runs FCST natively, independently exports a new derivative, then reopens/runs it in the exact source tool and compares identities/topology/fields/results and unchanged content. Controlled-edit comparisons also create an equivalent source-native edit automatically. Cross-tool directions use separate manifests and target runners. Missing licensed runners hold that optional evidence, without creating a product dependency or blocking independent codec development.
 
 If a vendor interface needs an interactive desktop, use a dedicated signed-in automation session with a test supervisor, timeouts and stable selectors. Prefer supported vendor APIs/commands wherever possible. Automating a supported UI does not remove license constraints. If no reliable unattended route exists, record a blocked profile and build the missing driver/path; do not replace it with a request for the user to click through tests or accept a screenshot as numerical evidence.
 

@@ -231,6 +231,11 @@ def _inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: boo
         commits = git(root, "rev-list", revision, "--").decode().splitlines()
         if len(commits) > scanner.policy["max_items"]:
             raise ValueError("history inspection budget exceeded")
+        # Repeated unchanged trees do not add new content to inspect. The key
+        # includes the complete path and mode, so a blob reused as a binary,
+        # restricted path or executable is still checked in its new context.
+        # This cache is local to this history scan and this policy invocation.
+        seen_versions = set()
         for commit in commits:
             metadata = git(root, "show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%B", commit).decode("utf-8")
             author, email, committer, committer_email, message = metadata.split("\x00", 4)
@@ -246,7 +251,11 @@ def _inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: boo
                 if kind != "blob" or mode not in {"100644", "100755"}:
                     scanner.finding("link_or_submodule", commit + "/" + name)
                     continue
+                version = (name, mode, blob)
+                if version in seen_versions:
+                    continue
                 scanner.scan(commit + "/" + name, reader.read(blob))
+                seen_versions.add(version)
 
 
 def main(argv: list[str] | None = None) -> int:

@@ -10,6 +10,10 @@ def main() -> int:
     commands = parser.add_subparsers(dest="command")
     from .jobs import parsers as job_parsers
     job_parsers(commands)
+    from .exchange import parsers as exchange_parsers
+    exchange_parsers(commands)
+    from .td import parsers as td_parsers
+    td_parsers(commands)
     inspect = commands.add_parser("project-inspect")
     inspect.add_argument("path")
     inspect.add_argument("--previous", action="store_true")
@@ -27,10 +31,17 @@ def main() -> int:
         result = capabilities()
     elif args.command:
         from fcst_contracts import ContractError
+        from fcst_exchange import ExchangeError
         from pathlib import Path
         from fcst_app.persistence import PersistenceError, recover_package, migrate_project, semantic_hash, save_package
         try:
-            if args.command.startswith("job-"):
+            if args.command.startswith(('td-','sinda-')):
+                from .td import execute
+                result=execute(args)
+            elif args.command.startswith("exchange-"):
+                from .exchange import execute
+                result = execute(args)
+            elif args.command.startswith("job-"):
                 from .jobs import execute
                 result = execute(args)
             elif args.command == "project-inspect":
@@ -43,7 +54,7 @@ def main() -> int:
                 if Path(args.destination).exists() or Path(args.source).resolve() == Path(args.destination).resolve():
                     raise PersistenceError("recovery_requires_new_target")
                 result = save_package(recover_package(args.source, previous=args.previous), args.destination)
-        except (ContractError, PersistenceError) as error:
+        except (ContractError, PersistenceError, ExchangeError) as error:
             print(json.dumps({"code": str(error)}))
             return 2
         except OSError:

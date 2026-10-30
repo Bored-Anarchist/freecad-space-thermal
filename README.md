@@ -1,6 +1,6 @@
 # FreeCAD Space Thermal — specification package
 
-Design baseline **0.7**, amended **27 October 2026**.
+Design baseline **0.9**, amended **29 October 2026**.
 
 **Windows first:** develop and qualify the FreeCAD add-on/workbench and standalone engine for Windows. macOS and Linux configurations are optional [stretch goals](plans/stretch-goals.md), outside the work packages and committed delivery. No modified FreeCAD distribution is required.
 
@@ -11,6 +11,29 @@ Track the 22 work packages in the [FCST implementation project](https://github.c
 [FreeCAD FEM reuse](docs/decisions/0003-freecad-fem-reuse.md) is a required assessment before overlapping WP-13 host and WP-16 mesh work. Evaluate existing mesh, selection/material/load and result tools before replacing them; retain the standalone owned engine. FEM is currently a design reference, with no implemented FEM integration or adopted FEM source. Component selection, pinned API/license checks and unattended host/mesh acceptance remain planned.
 
 [WP-5.5 — FEM reuse and foundation reconciliation](plans/WP-05.5-Foundation-Reconciliation.md), canonical ID WP-05.5, collects the missing WP-01 through WP-05 handoff work and related issues. Its 25 implemented acceptance cases cover reuse/provenance, pinned probes, element/field/heat-flux contracts, compatibility, storage/recovery, independent spatial fixtures, representative host integration and privacy. [Completion evidence](plans/evidence/WP-05.5.json) records the completed P0 handoff before dependent feature acceptance in WP-06/WP-07/WP-13/WP-16; the completed baselines retain their original scope and evidence.
+
+WP-07 provides the [common source exchange SDK](docs/exchange.md): byte-preserving
+syntax, bounded includes, typed mapping, inert source logic, fidelity reports,
+guarded exports and SI result queries. Its executable `fcst-network/1` synthetic
+profile exercises shared infrastructure; vendor dialects and qualification remain
+WP-08/WP-09/WP-10. Both Windows CI configurations run its frozen unattended cases.
+[Completion evidence](plans/evidence/WP-07.json) records the two 165-check Windows
+drivers, 33 exchange acceptance cases, security regressions and foundation handoff.
+
+WP-08 requires [fully independent TD/SINDA import and export](docs/decisions/0004-independent-thermal-exchange.md).
+The direct SINDA subset imports, edits and writes new models without vendor installations.
+A corrected independent native DWG backend supports container inspection, exact
+source-tree retention, typed node/conductor/heat-load payloads, direct property
+databases, guarded scalar edits and source-free constant-network DWG generation.
+Closed constant networks now import into native FCST projects, retain portable
+originals and export canonical scalar edits. Constant property libraries and
+static SINDA arrays have independent paths; rectangle geometry has a partial
+envelope reader. Required complete geometry/case/manager/dynamic semantics,
+additional formats and full-model DWG qualification remain open. The existing OpenTD sidecar is an optional external reference
+harness. Q1 remains unqualified; public CI exercises
+runtime-independent contracts without proprietary software or data.
+
+WP-09 requires [independent ESATAN native-project, deck and result conversion](docs/decisions/0005-independent-esatan-exchange.md), with no vendor installation, API, license, prior export or conversion service. Its implementation remains Planned; the documentation change does not claim a working ESATAN converter.
 
 [WP-03 contracts](spec/contracts/README.md) freeze native model, operation, result, HDF5 layout and worker protocol version 1.0.0. Independent C++ and Python readers validate typed entities, references, quantities, frames and expression types, and agree on normalized snapshots and semantic hashes. Both Windows configurations run the same positive/negative fixtures and bounded framing checks.
 
@@ -28,7 +51,7 @@ This package specifies an open-source, local-first FreeCAD add-on and independen
 
 The accepted baseline is **C++20 with CMake**, with exact compiler and dependency builds frozen at Q0. Python owns the host-facing interfaces and test orchestration; the numerical engine remains usable without FreeCAD. WP-04 tests SUNDIALS in the separate numerical checkpoint. PETSc, Embree, Open CASCADE and pybind11 remain documented candidates; a production stack requires its own qualification. Their selection and supported combinations require implementation evidence. A Q0 prototype gate compares numerical correctness, sparse scaling, deployment, and engineering effort at equivalent accuracy; language comparisons use the same numerical backend where applicable. Rust is an optional comparison prototype, not a production dependency or a parallel implementation requirement. Changing the accepted C++ baseline requires an explicit decision supported by that evidence.
 
-**SINDA/FLUINT and Thermal Desktop are primary behavioral benchmarks and starting-point references** for thermal/fluid modeling, workflows, and interoperability. PyCanha and other open solvers may also supply licensed reusable components, comparison results, or temporary prototype backends, with provenance and dependency records. Ansys Fluent is a separate, optional CFD reference. Required production solves must ultimately run on the owned engine; wrapping another thermal solver alone does not meet that goal. Reusing suitable numerical libraries does not remove ownership of FCST's thermal assembly, physics, controls, and solve lifecycle. Source-format migration and source-tool comparison/re-export may still use vendor APIs where necessary.
+**SINDA/FLUINT and Thermal Desktop are primary behavioral benchmarks and starting-point references** for thermal/fluid modeling, workflows, and interoperability. PyCanha and other open solvers may also supply licensed reusable components, comparison results, or temporary prototype backends, with provenance and dependency records. Ansys Fluent is a separate, optional CFD reference. Required production solves must ultimately run on the owned engine; wrapping another thermal solver alone does not meet that goal. Reusing suitable numerical libraries does not remove ownership of FCST's thermal assembly, physics, controls, and solve lifecycle. Product source import/export must use independent codecs. Vendor APIs may supply optional external comparison evidence only.
 
 Start with [the specification](spec/FreeCAD-Space-Thermal-Specification.md). Supporting artifacts are:
 
