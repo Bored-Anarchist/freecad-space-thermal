@@ -259,7 +259,9 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
       }
       state=std::move(next); a=a.with_operating_state(state);
       if(changed || pass==0) c.temperature=engine.consistent(a,c.time,c.temperature);
-      if(!changed)break;
+      // A schedule alone can move an algebraic sensor across a threshold.
+      // Inspect the reinitialized state once even when the first batch was empty.
+      if(!changed && pass>0)break;
       if(pass==31)throw Failure{"chattering",{}};
     }
     c.operating=state; if(initial)c.initial_temperature=c.temperature;

@@ -1,0 +1,193 @@
+{
+  "contract_version": "1.0.0",
+  "model": {
+    "contract_version": "1.0.0",
+    "minimum_reader": "1.0.0",
+    "project_id": "00000000-0000-4000-8000-000000000001",
+    "revision": 0,
+    "entities": [
+      {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "kind": "submodel"
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "capacitive",
+        "temperature": {
+          "value": 294,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 1,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000006",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "prescribed",
+        "temperature": {
+          "value": 290,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000007",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000004",
+        "to_node_id": "00000000-0000-4000-8000-000000000006",
+        "conductance": {
+          "value": 1,
+          "unit": "W/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000010",
+        "kind": "frame",
+        "origin": [
+          {
+            "value": 0,
+            "unit": "m"
+          },
+          {
+            "value": 0,
+            "unit": "m"
+          },
+          {
+            "value": 0,
+            "unit": "m"
+          }
+        ],
+        "rotation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000012",
+        "kind": "load",
+        "node_id": "00000000-0000-4000-8000-000000000004",
+        "power": {
+          "value": 20,
+          "unit": "W"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000014",
+        "kind": "environment",
+        "frame_id": "00000000-0000-4000-8000-000000000010",
+        "background_temperature": {
+          "value": 250,
+          "unit": "K"
+        },
+        "solar_flux": {
+          "value": 0,
+          "unit": "W/m2"
+        },
+        "epoch": "2026-01-01T00:00:00",
+        "time_scale": "TAI",
+        "time_origin": {
+          "value": 0,
+          "unit": "s"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000013",
+        "kind": "case",
+        "mode": "transient",
+        "start": {
+          "value": 0,
+          "unit": "s"
+        },
+        "end": {
+          "value": 10,
+          "unit": "s"
+        },
+        "environment_id": "00000000-0000-4000-8000-000000000014",
+        "load_ids": [
+          "00000000-0000-4000-8000-000000000012",
+          "00000000-0000-4000-8000-000000000026"
+        ],
+        "control_ids": [
+          "00000000-0000-4000-8000-000000000024"
+        ],
+        "overlays": []
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000024",
+        "kind": "control",
+        "sensor_node_id": "00000000-0000-4000-8000-000000000005",
+        "load_id": "00000000-0000-4000-8000-000000000012",
+        "on_below": {
+          "value": 291,
+          "unit": "K"
+        },
+        "off_above": {
+          "value": 299,
+          "unit": "K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000005",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "algebraic",
+        "temperature": {
+          "value": 290,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000008",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000005",
+        "to_node_id": "00000000-0000-4000-8000-000000000006",
+        "conductance": {
+          "value": 2,
+          "unit": "W/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000026",
+        "kind": "load",
+        "node_id": "00000000-0000-4000-8000-000000000005",
+        "power": {
+          "value": 20,
+          "unit": "W"
+        }
+      }
+    ],
+    "source_maps": [],
+    "assumptions": [],
+    "limitations": [],
+    "mappings": [],
+    "attachments": []
+  },
+  "material_laws": [],
+  "node_storage": [],
+  "case_id": "00000000-0000-4000-8000-000000000013"
+}

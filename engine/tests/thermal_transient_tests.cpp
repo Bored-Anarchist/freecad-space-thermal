@@ -107,6 +107,11 @@ int main(int argc,char** argv) {
     auto o=options(4);o.schedules={{uid(12),{{0,0},{1,1},{2,0}}}};auto r=solve_transient(assembly(root,"enthalpy"),o);success(r);
     require(r.events.size()==3);near(r.events[1].time,1,0);near(r.events[2].time,2,0);
     near(r.samples.back().storage_change[0],5,1e-7);near(r.samples.back().balance.temperature[0],std::sqrt(90500.),1e-7);
+    auto switched=options(2);switched.absolute_temperature_tolerance=1e-5;
+    switched.schedules={{uid(26),{{0,0},{1,1}}}};
+    auto post=solve_transient(assembly(root,"schedule-sensor"),switched);success(post);
+    auto event=std::find_if(post.events.begin(),post.events.end(),[&](const auto& e){return e.kind=="heater" && e.after==0;});
+    require(event!=post.events.end());near(event->time,1,0);require(!post.checkpoint->operating.heaters.at(uid(24)));
   } else if(name=="simultaneous") {
     auto o=options(2);o.schedules={{uid(27),{{0,1},{1,2}}}};auto r=solve_transient(assembly(root,"simultaneous"),o);success(r);
     require(r.events.size()==5);near(r.events[2].time,1,o.event_time_tolerance);
