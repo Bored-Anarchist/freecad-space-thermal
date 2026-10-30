@@ -124,7 +124,7 @@ void create_network() {
     std::vector<NewObject> records;std::size_t total=0;
     for (std::size_t i=0;i<count;++i) {
         NewObject record{};record.kind=input.number(1);record.main_bits=input.number(4);record.text_bits=input.number(4);const auto refs=input.number(4);
-        require(record.kind>=1 && record.kind<=3 && refs<=10000 && record.text_bits<0x8000);
+        require(record.kind>=1 && record.kind<=5 && refs<=10000 && record.text_bits<0x8000);
         record.main=input.payload(record.main_bits);if(record.text_bits) record.text=input.payload(record.text_bits);
         total+=record.main.size()+record.text.size()+refs*4;require(total<=max_payload);
         for (std::size_t j=0;j<refs;++j) {const auto ref=input.number(4);require(ref<=count);record.references.push_back(ref);}
@@ -132,8 +132,8 @@ void create_network() {
     }
     require(input.cursor==input.bytes.size());stage="new-network-document";Document doc;doc.data.header.version=R_2018;doc.data.header.from_version=R_2018;
     require(dwg_add_Document(&doc.data,0)==0);
-    stage="new-network-classes";const char* dxf[]={"RCNODE","RCCONDUCTOR","RCHEATLOAD"};const char* cpp[]={"RcNode","RcConductor","RcHeatLoad"};unsigned classes[3];
-    for (unsigned i=0;i<3;++i) {const int id=dwg_add_class(&doc.data,dxf[i],cpp[i],"FCST independent exchange",true);require(id>=500);classes[i]=id;doc.data.dwg_class[id-500].dwg_version=21;}
+    stage="new-network-classes";const char* dxf[]={"RCNODE","RCCONDUCTOR","RCHEATLOAD","RCRECTANGLE","RCTD_FDBRICK"};const char* cpp[]={"RcNode","RcConductor","RcHeatLoad","RcRectangle","RcFdBrick"};unsigned classes[5];
+    for (unsigned i=0;i<5;++i) {const int id=dwg_add_class(&doc.data,dxf[i],cpp[i],"FCST independent exchange",true);require(id>=500);classes[i]=id;doc.data.dwg_class[id-500].dwg_version=21;}
     auto* space=dwg_model_space_object(&doc.data);require(space && space->tio.object && space->tio.object->tio.BLOCK_HEADER);
     auto* block=space->tio.object->tio.BLOCK_HEADER;std::vector<unsigned> indexes;
     stage="new-network-objects";for (const auto& record:records) {
@@ -183,7 +183,7 @@ void apply_edits(Document& doc) {
         require(seen.insert(handle).second && objects.count(handle));auto& object=*objects.at(handle);
         require(classes.count(object.type) && object.num_unknown_bits==before_bits);
         const auto* name=classes.at(object.type);
-        require(name && (std::strcmp(name,"RCNODE")==0 || std::strcmp(name,"RCCONDUCTOR")==0 || std::strcmp(name,"RCHEATLOAD")==0));
+        require(name && (std::strcmp(name,"RCNODE")==0 || std::strcmp(name,"RCCONDUCTOR")==0 || std::strcmp(name,"RCHEATLOAD")==0 || std::strcmp(name,"RCRECTANGLE")==0 || std::strcmp(name,"RCTD_FDBRICK")==0));
         require(after_bits>=before_bits && (after_bits-before_bits)%64==0 && after_bits-before_bits<=128);
         auto before=input.payload(before_bits);auto after=input.payload(after_bits);total+=before.size()+after.size();require(total<=2*max_payload);
         require(wire_bytes(object.unknown_bits,before_bits)==before);

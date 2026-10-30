@@ -165,10 +165,15 @@ Static SINDA arrays now retain storage/identity and support bounded continuation
 and allocation; reviewed intrinsics and explicit table-IR construction do not run
 source code. Active control/array consumers require separate reviewed mappings.
 
-RcRectangle v7 geometry has a tested prefix reader for six serialized parameters,
-origin and basis; all thermal attributes remain opaque. This adds no native thermal
-geometry or edited-geometry claim. Complete geometry, manager/case, material-derived,
-variable and additional-version semantics still require verified format evidence.
+RcRectangle v7/attribute-marker-54 and RcFdBrick v21 now have complete bounded
+readers and owned writers. They consume all data/text/handles, subdivision,
+attributes, expressions, face records, mesh controls and advection. All 18 local
+geometry objects structurally decode, bringing complete payload coverage to 996.
+Native tests create new geometry containers and verify guarded constant-parameter
+edits in fresh processes. The original geometry retains its source-expression edit
+holds. Physical parameter/selector mappings, regeneration, additional geometry
+classes, manager/case, material-derived, variable and additional-version semantics
+still require implementation; structural completion never grants native physics.
 WP-09/WP-11/WP-12 are needed for cross-tool/owned-engine qualification, and are not
 prerequisites for implementing the independent paths above.
 
@@ -234,3 +239,7 @@ Property-law JSON, source definitions, frame companions and edited engineering
 files also stay local. Publish only owned synthetic property/layer/grid fixtures,
 public source hashes and bounded verdicts. TST-021 scans staged bytes, outgoing
 history/identity and the exact final reports/GitHub prose before publication.
+Surface/solid acceptance uses owned synthetic fields and references. Original
+geometry payloads, decoded values, raw serialization research and generated
+containers remain local; bounded source/roundtrip verdicts require exact-byte
+privacy clearance before any upload.

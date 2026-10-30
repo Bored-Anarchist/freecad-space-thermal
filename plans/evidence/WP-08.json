@@ -171,5 +171,29 @@
     "vendor_runtime_required": false,
     "qualified": false,
     "publication": "Owned synthetic fixtures and bounded count/hash/verdict reports only; all original engineering data and raw research remain local"
+  },
+  "independent_geometry_profiles": {
+    "implementation_delivery": "implemented_structural_profiles_unqualified",
+    "profiles": [
+      "td-rcrectangle-v7-attributes54/1",
+      "td-rcfdbrick-v21/1"
+    ],
+    "scope": [
+      "Complete data/text/handle stream decoding and owned source-free record generation",
+      "Subdivision attributes ordered repeated-key maps expressions mesh controls face and advection records",
+      "Guarded up-to-two serialized parameter edits and exact unrequested-field preservation",
+      "Decimal-string uint64 source identities and safe numeric CLI handles"
+    ],
+    "acceptance_register": "ci/td-acceptance.json",
+    "vendor_runtime_required": false,
+    "qualified": false,
+    "native_ready": false,
+    "remaining": [
+      "Physical geometry parameter and selector mappings",
+      "Material optical and mesh assignments and regeneration",
+      "Additional geometry classes case manager environment dynamic constructs and source versions",
+      "Canonical variable/composite bindings and composite physics"
+    ],
+    "privacy": "Publish independently owned synthetic fixtures and bounded verdicts only; originals decoded structures identities containers and raw research logs remain local"
   }
 }

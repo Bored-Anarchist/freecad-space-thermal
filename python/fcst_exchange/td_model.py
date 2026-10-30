@@ -112,6 +112,7 @@ def convert_network(snapshot,units,source_revision,*,closure_holds=()):
     for p in payloads:
         f=p.fields;h=p.record['handle']
         try:
+            if p.report.get('thermal_semantics_decoded') is False:reject('td_native_geometry_semantics_unmapped')
             if any(v['target'] and v['target'] not in all_handles for values in f['common_handles'].values() for v in values):reject('td_native_common_reference_closure')
             if set(f['common_handles'])-{'layer','ownerhandle'}:reject('td_native_common_dependency_unmapped')
             if 'initial_temperature' in f:

@@ -29,7 +29,7 @@ unimplemented. An absent or mismatched profile fails before source mutation.
 ## Independent DWG profiles and exports
 
 `python tools/build_independent_dwg.py` builds the locked separate GPL backend
-and runs seventeen unattended native checks, including the actual vendor-free CLI,
+and runs the frozen unattended native checks, including the actual vendor-free CLI,
 new-model generation, compressed scalar edits and fresh-process reopen. Select
 its trusted installation receipt explicitly, outside imported project data.
 
@@ -230,14 +230,38 @@ references and modes remain fixed; all unselected source bytes are preserved.
 
 ## Geometry and remaining format evidence
 
-The RcRectangle v7 reader now extracts six serialized geometric parameters,
-origin and basis while preserving the remaining thermal attributes/text/handles
-as opaque source ranges. All 16 rectangles in the local example pass this prefix
-reader. This is a partial envelope, with units and parameter interpretations still
-unresolved; it cannot enable thermal geometry edits or native reconstruction.
+The complete RcRectangle v7/attribute-marker-54 and RcFdBrick v21 profiles now
+consume all object data, Unicode text and handles, including subdivision boundaries,
+attribute groups, expressions, ordered maps (including repeated keys), mesh
+controls, face records, advection records, references and entity flags. The marker
+is a serialization discriminator, not an inferred TD release. All 16 rectangles
+and two bricks in the local example pass the complete readers. Together with
+nodes/conductors/loads this covers 996 complete payloads. Unknown rectangle
+attribute revisions retain a partial envelope; unsupported solids retain opaque
+bytes. Neither status grants physical reconstruction.
+
+Owned `rectangle_payload`/`brick_payload` writers create those complete records
+without an imported drawing or vendor template. The native factory writes their
+actual class identities (`RCRECTANGLE`/`RcRectangle` and
+`RCTD_FDBRICK`/`RcFdBrick`). A fresh native process verifies all fields/references.
+`td-export-source --edits` can replace `serialized_parameters` with the same-size
+array, changing at most two values per object. Parameter expressions must satisfy
+the declared constant guard; every other bit/field and source file is checked.
+Zero/one compression can expand by up to 128 bits. JSON source handles accept
+safe integral numbers or decimal strings for uint64 identities; rounded numeric
+aliases, booleans and duplicate identities reject. This interface edits serialized
+parameters, not canonical dimensions, and performs no mesh regeneration.
+
+The original geometry objects currently fail the expression guard and remain
+ineligible for parameter edits. Their complete structures and exact bytes can be
+read and preserved. Parameter-unit/selector interpretation, material/optical and
+mesh assignments, expression evaluation and regeneration still need independent
+semantic mappings. Complete structural decoding explicitly reports
+`thermal_semantics_decoded=false` and cannot promote a drawing to a native
+constant network. No units or thermal physics are guessed from display geometry.
 
 Remaining independent implementation needs verified layouts/semantics for complete
-surface/solid/mesh, material-derived node modes, canonical variable/composite and
+additional surface/solid/mesh classes and physical bindings, material-derived node modes, canonical variable/composite and
 spectral bindings, composite effective physics, case/manager, orbit/environment
 and dynamic source constructs. Those
 fields cannot be reconstructed by guessing from display geometry or neutral
@@ -449,3 +473,8 @@ DWG/deck/result bytes, private profiles, compiled sidecars, vendor DLLs and raw 
 stay local. Scan staged bytes and outgoing history before upload; the scopes may
 be scanned separately, and neither may be omitted. No scanner finding is suppressed
 to publish a fixture or report.
+Complete geometry tests use independently owned parameter/attribute/mesh records;
+private originals, decoded structures, source-handle maps, generated DWG files and
+raw reference/build/CLI logs stay local. Public evidence includes profile counts,
+hashes and verdicts only. TST-021 executes `tests/test_td_geometry.py`, the frozen
+native fresh-process workflows and exact staged/history/report/prose preflight.

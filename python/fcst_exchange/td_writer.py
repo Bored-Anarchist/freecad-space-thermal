@@ -1,7 +1,8 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 """Owned new-model TD constant-network serialization, without source templates.
 
-Only the declared RcNode/Conductor v22 and HeatLoad v17 profiles are generated.
+Canonical generation uses RcNode/Conductor v22 and HeatLoad v17. The separate
+geometry module supplies complete rectangle/brick wire records to the same packet.
 Unknown model fields cannot be omitted to obtain an export. Target-product and
 full-physics qualification remain separate from independent codec round trips.
 """
@@ -140,7 +141,7 @@ def network_packet(records):
     if not isinstance(records,(list,tuple)) or not 1<=len(records)<=10000:reject('td_writer_network_limit')
     out=bytearray(b'FCSTNEW2'+struct.pack('<I',len(records)))
     for record in records:
-        if not isinstance(record,EncodedPayload) or record.kind not in {1,2,3}:reject('td_writer_record')
+        if not isinstance(record,EncodedPayload) or record.kind not in {1,2,3,4,5}:reject('td_writer_record')
         if (type(record.data_bits) is not int or not 0<record.data_bits<=8388608
                 or type(record.string_bits) is not int or not 0<=record.string_bits<32768
                 or not isinstance(record.data,bytes) or not isinstance(record.strings,bytes)
@@ -176,7 +177,8 @@ def template_fields(payload,reference_handles,*,handle=1):
     row={'handle':handle,'data':bytes(b.bytes).hex(),'bits':b.count,'object_bits':b.count,
          'data_bits':data_end,'string_bits':payload.string_bits,'handle_bits':b.count-data_end}
     standard=Fields([('entmode',2),('is_xdic_missing',1),('layer',[5,0,0])])
-    return {1:decode_node,2:decode_conductor,3:decode_load}[payload.kind](row,standard).fields
+    from .td_geometry import decode_rectangle_complete,decode_brick
+    return {1:decode_node,2:decode_conductor,3:decode_load,4:decode_rectangle_complete,5:decode_brick}[payload.kind](row,standard).fields
 
 
 def verify_network(snapshot,records):
@@ -184,7 +186,7 @@ def verify_network(snapshot,records):
     from .td_decode import decode_drawing
     inventory=decode_drawing(snapshot)
     if len(inventory.payloads)!=len(records) or len(inventory.records)!=len(records):reject('td_writer_reopen_inventory')
-    expected_classes={'RcNode':'RCNODE','RcConductor':'RCCONDUCTOR','RcHeatLoad':'RCHEATLOAD'}
+    expected_classes={'RcNode':'RCNODE','RcConductor':'RCCONDUCTOR','RcHeatLoad':'RCHEATLOAD','RcRectangle':'RCRECTANGLE','RcFdBrick':'RCTD_FDBRICK'}
     for row in snapshot.native['classes']:
         if row['cppname'] in expected_classes and (row['dxfname']!=expected_classes[row['cppname']] or row['dwg_version']!=21):reject('td_writer_reopen_class')
     payloads=sorted(inventory.payloads,key=lambda p:p.record['handle']);handles=[p.record['handle'] for p in payloads]

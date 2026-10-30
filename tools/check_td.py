@@ -56,14 +56,14 @@ def main():
            'adapters/opentd63/Program.cs','tests/test_sinda.py','tests/test_opentd.py',
            'tests/test_independent_dwg.py','tests/test_native_dwg.py','tests/test_sinda_writer.py',
            'tests/test_td_payloads.py','tests/test_td_properties.py','tests/td_fixture.py','python/fcst_cli/td.py',
-           'tests/test_td_native_model.py','tests/test_td_property_model.py','tests/test_td_property_laws.py','tests/test_sinda_arrays.py','tests/test_td_geometry.py',
+           'tests/test_td_native_model.py','tests/test_td_property_model.py','tests/test_td_property_laws.py','tests/test_sinda_arrays.py','tests/test_td_geometry.py','tests/td_geometry_fixture.py',
            'tools/probe_independent_dwg.py','ci/dwg-backend.json','python/fcst_exchange/dwg-profile.json',
            'tools/build_independent_dwg.py','tools/dwg_build_support.py']
     paths += [p.relative_to(ROOT).as_posix() for p in sorted((ROOT/'adapters/libredwg').iterdir()) if p.is_file()]
     paths += [p.relative_to(ROOT).as_posix() for p in sorted((ROOT/'python/fcst_exchange').glob('*.py'))]
     report={'schema_version':1,'work_package':'WP-08','candidate':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
             'gate':evaluate(expected,records),'cases':records,'input_sha256':{p:sha256((ROOT/p).read_bytes()).hexdigest() for p in paths},
-            'scope':'Independent closed TD canonical-network import, portable persistence, scalar export, orthotropic property libraries and basic variable-property law exchange; static SINDA arrays/intrinsics; partial rectangle geometry; full-model qualification pending',
+            'scope':'Independent closed TD canonical-network import, portable persistence, scalar export, orthotropic/property-law exchange and complete rectangle/brick serialization; geometry physical bindings and full-model qualification pending',
             'qualified':False,'qualification_holds':manifest['qualification_holds']}
     args.report.parent.mkdir(parents=True,exist_ok=True);args.report.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report['gate']));return 0 if report['gate']['status']=='passed' else 1

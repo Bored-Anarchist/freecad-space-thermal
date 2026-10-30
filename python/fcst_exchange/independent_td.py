@@ -17,6 +17,19 @@ from .td_properties import parse_properties
 from .core import ExchangeError
 
 
+def source_edit_handle(value):
+    """Preserve uint64 source identities across the canonical JSON number parser."""
+    import re
+    if isinstance(value,str):
+        if not re.fullmatch(r'[1-9][0-9]{0,19}',value):reject('td_source_edit_handle')
+        value=int(value)
+    elif type(value) is float:
+        if not value.is_integer() or not 1<=value<=9007199254740991:reject('td_source_edit_handle')
+        value=int(value)
+    if type(value) is not int or not 1<=value<=18446744073709551615:reject('td_source_edit_handle')
+    return value
+
+
 @dataclass(frozen=True)
 class DwgPreview:
     original:ProjectCopy
@@ -166,13 +179,14 @@ class IndependentTdAdapter:
                 or any(is_link(p) for p in (work,*work.parents))):reject('td_source_edit_new_tree')
         staged.original.check_current(limits)
         payloads={p.record['handle']:p for p in decode_drawing(staged.snapshot).payloads}
-        replacements={};pairs=[];reports=[];seen=set();property_changes={}
+        replacements={};pairs=[];reports=[];seen=set();property_changes={};object_changes={}
         for edit in edits:
             if not isinstance(edit,dict):reject('td_source_edit_shape')
             if set(edit)=={'handle','changes'}:
-                handle=edit['handle']
-                if type(handle) is not int or handle not in payloads or handle in seen:reject('td_source_edit_handle')
+                handle=source_edit_handle(edit['handle'])
+                if handle not in payloads or handle in seen:reject('td_source_edit_handle')
                 seen.add(handle);payload=payloads[handle]
+                object_changes[handle]=edit['changes']
                 options={'temperature_unit':staged.units.temperature} if staged.units is not None and 'initial_temperature' in payload.fields else {}
                 row,report=payload.edited_record(edit['changes'],**options)
                 pairs.append((payload.record,row));reports.append(report)
@@ -196,7 +210,8 @@ class IndependentTdAdapter:
             for original,row in pairs:
                 expected=payloads[original['handle']]
                 if original['handle'] not in actual:reject('td_source_edit_reopen_profile')
-                requested=next(e['changes'] for e in edits if e.get('handle')==original['handle'])
+                requested=object_changes[original['handle']]
+                if 'serialized_parameters' in requested:requested={**requested,'serialized_parameters':tuple(requested['serialized_parameters'])}
                 if actual[original['handle']].fields!={**expected.fields,**requested}:reject('td_source_edit_reopen_values')
             replacements[staged.original.entry]=derived
         staged.original.check_current(limits)

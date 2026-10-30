@@ -136,9 +136,13 @@ raise SystemExit(main())
     edited=adapter.export_source(staged,attempt/'edited-model',edits,work=attempt/'edit-work')
     original_unchanged=all((attempt/'new-model'/name).read_bytes()==raw for name,raw in staged.original.files)
     companions_preserved=all((attempt/'edited-model'/name).read_bytes()==raw for name,raw in staged.original.files if name!='network.dwg')
+    cli_sequence=0
     def invoke(arguments):
+        nonlocal cli_sequence
         process=subprocess.run([sys.executable,'-S','-c',script,*map(str,arguments)],stdin=subprocess.DEVNULL,
             stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=cli_env,timeout=240,creationflags=subprocess.CREATE_NO_WINDOW)
+        cli_sequence+=1
+        (attempt/('cli-'+str(cli_sequence)+'.log')).write_bytes(process.stdout+b'\n'+process.stderr)
         return process.returncode==0
     import_cli=invoke(['td-package',attempt/'new-model','network.dwg',attempt/'imported.fcst',
         '--backend',receipt_path,'--work',attempt/'import-cli','--temperature-unit','K','--capacity-unit','J/K',
@@ -273,6 +277,40 @@ raise SystemExit(main())
         if entity['kind']=='load':entity['power']['value']=3
     offset_export=offset_adapter.export_native(offset_staged,offset_model,attempt/'offset-export',attempt/'offset-edit')
     offset_reopen=offset_adapter.preview(attempt/'offset-export','network.dwg',attempt/'offset-reopen')
+    # Complete owned surface/solid streams are exercised in a real new container
+    # and edited through the vendor-denied CLI, not just a Python envelope.
+    sys.path.insert(0,str(ROOT/'tests'))
+    from td_geometry_fixture import rectangle_fields,brick_fields
+    from fcst_exchange.td_geometry import rectangle_payload,brick_payload
+    rectangle=rectangle_fields();rectangle['attributes']['references_a']=((1,),(0,))
+    brick=brick_fields();brick['attributes']['references_a']=((1,),(0,))
+    geometry_records=[node_payload('MAIN',1,300,10,'capacitive'),rectangle_payload(rectangle),brick_payload(brick)]
+    geometry_created,_=runtime.run('create-network',network_packet(geometry_records),attempt/'geometry-create')
+    geometry_source=attempt/'geometry-source';geometry_source.mkdir();geometry_raw=geometry_created['derived.dwg']
+    (geometry_source/'network.dwg').write_bytes(geometry_raw)
+    geometry_staged=native_adapter.preview(geometry_source,'network.dwg',attempt/'geometry-preview')
+    geometry_handles=verify_network(geometry_staged.snapshot,geometry_records)
+    geometry_inventory=decode_drawing(geometry_staged.snapshot);geometry_edits=[]
+    for payload in geometry_inventory.payloads:
+        if 'serialized_parameters' not in payload.fields:continue
+        values=list(payload.fields['serialized_parameters']);values[:2]=[1.25,2.5]
+        handle=str(payload.record['handle']) if payload.report['profile'].startswith('td-rcfdbrick') else payload.record['handle']
+        geometry_edits.append({'handle':handle,'changes':{'serialized_parameters':values}})
+    (attempt/'geometry-edits.json').write_bytes(encode(geometry_edits))
+    geometry_cli=invoke(['td-export-source',geometry_source,'network.dwg',attempt/'geometry-edited',
+        '--backend',receipt_path,'--work',attempt/'geometry-cli','--edits',attempt/'geometry-edits.json'])
+    if not geometry_cli:raise ValueError('backend_geometry_source_edit_failed')
+    geometry_reopened=native_adapter.preview(attempt/'geometry-edited','network.dwg',attempt/'geometry-reopened')
+    before_geometry={p.record['handle']:p for p in geometry_inventory.payloads}
+    after_geometry={p.record['handle']:p for p in decode_drawing(geometry_reopened.snapshot).payloads}
+    geometry_equal=set(before_geometry)==set(after_geometry)
+    for handle,payload in before_geometry.items():
+        expected=dict(payload.fields)
+        if 'serialized_parameters' in expected:
+            expected['serialized_parameters']=(1.25,2.5,*expected['serialized_parameters'][2:])
+            geometry_equal=geometry_equal and after_geometry[handle].record['bits']-payload.record['bits']==128
+        geometry_equal=geometry_equal and after_geometry[handle].fields==expected
+    geometry_equal=geometry_equal and (geometry_source/'network.dwg').read_bytes()==geometry_raw
     checks={'owned-fixture-read':first.report['objects']>0 and first.report['read_warning_bits']==0,
             'fresh-native-reopen':verdict['structural_roundtrip_verified'],
             'class-identity-and-version-preservation':first.native['classes']==second.native['classes'],
@@ -294,6 +332,10 @@ raise SystemExit(main())
             'composite-property-source-preservation':composite_equal,
             'orthotropic-property-library-cli-roundtrip':ortho_cli,
             'orthotropic-original-source-cli-edit':ortho_source}
+    checks.update({'source-free-complete-surface-solid-roundtrip':len(geometry_handles)==3,
+                   'surface-solid-compressed-parameter-edits':geometry_cli and geometry_equal,
+                   'structural-geometry-keeps-native-semantics-held':not geometry_staged.conversion.report['native_ready']
+                       and not geometry_reopened.conversion.report['native_ready']})
     records=[{'id':key,'status':'passed' if value else 'failed'} for key,value in checks.items()]
     report={'schema_version':1,'candidate':revision(),'profile':profile['runtime'],
             'gate':evaluate(profile['required_cases'],records),'cases':records,

@@ -4,7 +4,8 @@ import json
 from fcst_exchange.dwg_native import snapshot
 
 PATCH='a'*64
-NAMES={1:('RCNODE','RcNode'),2:('RCCONDUCTOR','RcConductor'),3:('RCHEATLOAD','RcHeatLoad')}
+NAMES={1:('RCNODE','RcNode'),2:('RCCONDUCTOR','RcConductor'),3:('RCHEATLOAD','RcHeatLoad'),
+       4:('RCRECTANGLE','RcRectangle'),5:('RCTD_FDBRICK','RcFdBrick')}
 
 
 def envelope(payload,handle=101,targets=(101,102,103,104)):

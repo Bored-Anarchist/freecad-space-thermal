@@ -29,15 +29,23 @@ replacements tied to exact original bytes. Application codecs guard permitted
 scalar fields; independent reopen checks all unrequested logical fields.
 
 `create-network` consumes an owned bounded binary packet and creates new node,
-conductor and heat-load objects in a new container, including separate text and
+conductor, heat-load, rectangle and brick objects in a new container, including separate text and
 reference streams. It uses no source model template. The preservation patch
 removes upstream dummy/point substitution; missing thermal objects or changed
 fields fail the required fresh-process decoder comparison. Neither a structural
 round trip nor a synthetic fixture grants target-product/full-model qualification.
 
-The required Windows self-test now exercises seventeen cases, including actual
+The required Windows self-test exercises the frozen cases, including actual
 vendor-denied CLI import to a portable native project, canonical scalar editing,
 source export and fresh semantic reopen; constant property library/document
 conversion and source-preserving native property edits; Celsius offsets/scaled
 power; and refusal to promote unsupported modes. Source locks bind the Python
 conversion/contract/CLI sources as well as the native bridge and patch.
+Complete rectangle/brick wire generation and two-parameter compressed source edits
+are also reopened through fresh native processes. Actual solid class spelling is
+retained independently of its C++ name. The bridge accepts only the five declared
+classes for edits, exact original bytes and bounded 0/64/128-bit expansion. The
+application guards parameter expressions and verifies every unrequested field;
+full geometric/thermal interpretation and mesh regeneration remain unimplemented.
+CLI diagnostics stay local; the published self-test artifact contains verdicts,
+source hashes and nonqualification flags only.

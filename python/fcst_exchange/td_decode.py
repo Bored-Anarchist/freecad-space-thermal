@@ -7,9 +7,10 @@ from .dwg_native import _one
 from .td_node import decode_node
 from .td_conductor import decode_conductor
 from .td_load import decode_load
-from .td_geometry import decode_rectangle
+from .td_geometry import decode_rectangle,decode_brick
 
-DECODERS={'RcNode':decode_node,'RcConductor':decode_conductor,'RcHeatLoad':decode_load,'RcRectangle':decode_rectangle}
+DECODERS={'RcNode':decode_node,'RcConductor':decode_conductor,'RcHeatLoad':decode_load,'RcRectangle':decode_rectangle,'RcFdBrick':decode_brick}
+GEOMETRY_CLASSES={'RcRectangle':'RCRECTANGLE','RcFdBrick':'RCTD_FDBRICK'}
 
 
 @dataclass(frozen=True)
@@ -28,12 +29,14 @@ class ThermalInventory:
 
 
 def decode_drawing(snapshot):
-    names={c['number']:c['cppname'] for c in snapshot.native['classes']}
+    classes={c['number']:c for c in snapshot.native['classes']};names={k:c['cppname'] for k,c in classes.items()}
     standards={_one(row,'handle')[2]:row for row in _one(snapshot.standard,'OBJECTS')}
     payloads=[];records=[]
     for row in snapshot.native['objects']:
         if row['type']<500:continue
         decoder=DECODERS.get(names[row['type']]);code='td_class_profile_unmapped'
+        if names[row['type']] in GEOMETRY_CLASSES and classes[row['type']]['dxfname']!=GEOMETRY_CLASSES[names[row['type']]]:
+            decoder=None;code='td_geometry_class_identity_unmapped'
         if decoder is None and row['kind'] not in {'UNKNOWN_ENT','UNKNOWN_OBJ'}:continue
         if decoder:
             try:

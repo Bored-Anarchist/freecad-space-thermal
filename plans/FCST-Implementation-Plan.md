@@ -40,7 +40,7 @@ native job independently reopens all generated fields/references and compressed
 scalar edits while preserving every unrequested source field. Closed canonical network import, portable source restoration and verified native
 scalar exports now run without other feature packages. Add
 `tests/test_td_native_model.py`, `tests/test_td_property_model.py`,
-`tests/test_sinda_arrays.py` and `tests/test_td_geometry.py`; the seventeen-case native
+`tests/test_sinda_arrays.py` and `tests/test_td_geometry.py`; the frozen native
 job exercises the real vendor-denied CLI for package import, native edits, fresh
 reopen, property-library round trips, original property-document import and native
 property-source edits. One-dimensional property tables are typed and guarded
@@ -204,6 +204,15 @@ engineering JSON, frame companions, edited files and raw research logs stay loca
 Canonical variable/composite/spectral bindings and complete DWG thermal geometry
 remain WP-08 implementation work; WP-09/WP-11/WP-12 comparisons are later
 qualification obligations, not prerequisites for implementing those codecs.
+Complete RcRectangle v7/attribute-marker-54 and RcFdBrick v21 readers/writers now
+consume data, text and handles, including subdivision, mesh, face and advection
+records. TST-021 executes owned geometry mutation/stream/identity regressions and
+native source-free generation, compressed parameter edits and fresh reopen. Scan
+the exact codecs, bridge, synthetic fixtures and `td.json`/`dwg-backend.json`, plus
+staged bytes, outgoing history/identity and final publication text. Original
+geometry, decoded fields, source handles, generated containers and raw research/
+build/CLI diagnostics remain local. Structural decoding cannot qualify physical
+geometry or mesh regeneration; original dynamic geometry edits remain held.
 
 FEM reuse work applies TST-021 to exact outgoing decision/assessment text, upstream attribution/license manifests, synthetic fixtures, bounded host/mesh/comparison reports and final issue/PR prose. Run `python -S tools/check_security.py` and `python tools/publication_preflight.py --staged --revision HEAD` before commit/push; scan each final generated report or post with `--file` before upload. Generated FreeCAD documents, raw solver decks, screenshots, mesh/result containers and logs stay local unless separately sanitized and cleared. Use synthetic inputs for public tests, preserve authorized originals unchanged, and do not weaken privacy policy to admit upstream examples or generated diagnostics.
 
@@ -383,7 +392,9 @@ dynamic and dependency semantics and full-model reverse mapping remain incomplet
 The declared closed constant-network profile now supports canonical import, portable
 `.fcst` storage and canonical scalar export/reopen. Constant original property
 documents and owned property libraries have independent conversion paths; static
-SINDA arrays/intrinsics and partial rectangle geometry have bounded readers.
+SINDA arrays/intrinsics have bounded readers. Complete rectangle/brick wire
+profiles have owned readers/writers and guarded constant-parameter source edits;
+physical geometry/mesh binding and regeneration remain unimplemented.
 Unrepresented modes and additional source versions need verified format evidence,
 while owned-engine and paired ESA comparisons remain later qualification dependencies. WP-08 stays in progress; historical evidence retains its scope.
 

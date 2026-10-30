@@ -4,8 +4,8 @@
   "version": "0.14",
   "source_sha256": "62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275",
   "patch_sha256": "3a3f663e316734a6ac90df3fbd6404f6b9afb9eb674efe33b79c31b80eeba369",
-  "bridge_source_sha256": "76dd954ae7fa9a16b8a3578303accf1ffb344d30635eeeca54ee9c2a648d878d",
+  "bridge_source_sha256": "e5ae84f54f74c462c97bfbb41ee097bfa98c099574424aa6393141e8fbeea8cf",
   "configuration_sha256": "9fc697b346e90dd0410f5969bac5e25797133f4fde4c272b327f13a22a70b371",
   "cmake_sha256": "9a496fbd09f134ab80ae140b6d9bb72dcc11f9ff4cc8a079231ca09a5ae54a0e",
-  "scope": "independent DWG container; closed canonical network import/export, orthotropic property libraries and variable property law exchange; rectangle envelopes; full-model qualification pending"
+  "scope": "independent DWG container; closed canonical network import/export, orthotropic property libraries and variable property law exchange; complete rectangle/brick serialization; physical geometry bindings and full-model qualification pending"
 }
