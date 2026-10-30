@@ -13,16 +13,39 @@
       "id": "native-preparation-and-material-acceptance",
       "status": "passed",
       "configuration": "Debug",
-      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --report .local/thermal-debug.json",
+      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --report .local/windows-debug/thermal.json",
       "cases": 20,
-      "report_sha256": "b0109ee884cfc7793bca2c91a7d0464ca04dfd8659ca84ca858b4c060a3b3335",
-      "identity": "Exact implementation inputs are bound by input_sha256; candidate in the local precommit report identifies the base revision."
+      "report_sha256": "7221c6c1ca7df994f883c377eb928987becf4031bb8d3fae3e34a12829ca2fcf",
+      "identity": "Candidate and exact input_sha256 bind the tested implementation.",
+      "candidate": "1ac659ca07365a532cc111a0855097415ec74d88"
     },
     {
       "id": "standard-library-security-and-regressions",
       "status": "passed",
       "command": "python -S tools/check_security.py",
       "cases": 316
+    },
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "candidate": "1ac659ca07365a532cc111a0855097415ec74d88",
+      "cases": 337,
+      "thermal_acceptance_cases": 20,
+      "native_ctest_cases": 11,
+      "report_sha256": "d9495251ebc257d2f11f8f61388627c7814ee34527301c3ab46764fb79cb2199",
+      "thermal_report_sha256": "7221c6c1ca7df994f883c377eb928987becf4031bb8d3fae3e34a12829ca2fcf"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "candidate": "1ac659ca07365a532cc111a0855097415ec74d88",
+      "cases": 337,
+      "thermal_acceptance_cases": 20,
+      "native_ctest_cases": 11,
+      "report_sha256": "6a1451c377065db8914c8e260a8a265bf36cc33d570983160953b8b6675ad162",
+      "thermal_report_sha256": "7221c6c1ca7df994f883c377eb928987becf4031bb8d3fae3e34a12829ca2fcf"
     }
   ],
   "remaining_substeps": [
@@ -54,5 +77,6 @@
     "tools/check_thermal.py": "bfc7c769a3dfb2ccdab13cb787099af5af48bf05b71cd543f0127465086cdb08",
     "tools/generate_contracts.py": "eb9a07618d3e200c751d04a5a579240d0ec439b856fd8088cc1cd9fefd1577e7",
     "tools/thermal_schema.py": "ba97f2ce6afb23b0a05e7002cf9920fef5da055cf31b11f13c6bc0615bfbaa96"
-  }
+  },
+  "tested_candidate": "1ac659ca07365a532cc111a0855097415ec74d88"
 }
