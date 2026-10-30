@@ -61,15 +61,20 @@ class NodePayload:
                 'association_references':len(f['associations']),'qualified':False,
                 'native_ready':False,'scope':'Complete node payload structure; full-model semantics and closure require separate assessment'}
 
-    def edited_record(self,changes):
+    def edited_record(self,changes,*,temperature_unit='K'):
         if not isinstance(changes,dict) or not changes or set(changes)-{'initial_temperature','mass_value'}:reject('td_node_edit_fields')
         f=self.fields
         if (not logic_is_empty(f['logic']) or not expression_is_constant(f['temperature_expression'])
                 or not expression_is_constant(f['mass_expression']) or not expression_is_constant(f['selector_expression'])
                 or f['temperature_mode']!=0 or f['time_table']):reject('td_node_dynamic_edit')
         for name,value in changes.items():
-            if type(value) not in (int,float) or not math.isfinite(value) or value<0:reject('td_node_edit_range')
-            if name=='initial_temperature' and value==0:reject('td_node_edit_range')
+            if type(value) not in (int,float) or not math.isfinite(value):reject('td_node_edit_range')
+            if name=='mass_value' and value<0:reject('td_node_edit_range')
+            if name=='initial_temperature':
+                from fcst_contracts import BUNDLE
+                if not isinstance(temperature_unit,str) or temperature_unit not in BUNDLE['units'] or BUNDLE['units'][temperature_unit][0]!='temperature':reject('td_node_temperature_unit')
+                _,scale,offset=BUNDLE['units'][temperature_unit]
+                if value*scale+offset<=0:reject('td_node_edit_range')
         row=scalar_record(self.record,self.spans,changes);raw=bytes.fromhex(row['data']);after=decode_node(row,self.standard)
         expected={**f,**changes}
         if after.fields!=expected:reject('td_node_edit_reopen_mismatch')

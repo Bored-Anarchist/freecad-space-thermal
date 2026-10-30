@@ -25,8 +25,11 @@ The direct SINDA subset imports, edits and writes new models without vendor inst
 A corrected independent native DWG backend supports container inspection, exact
 source-tree retention, typed node/conductor/heat-load payloads, direct property
 databases, guarded scalar edits and source-free constant-network DWG generation.
-Required geometry/case/manager/dynamic semantics, complete canonical mapping and
-full-model DWG qualification remain open. The existing OpenTD sidecar is an optional external reference
+Closed constant networks now import into native FCST projects, retain portable
+originals and export canonical scalar edits. Constant property libraries and
+static SINDA arrays have independent paths; rectangle geometry has a partial
+envelope reader. Required complete geometry/case/manager/dynamic semantics,
+additional formats and full-model DWG qualification remain open. The existing OpenTD sidecar is an optional external reference
 harness. Q1 remains unqualified; public CI exercises
 runtime-independent contracts without proprietary software or data.
 

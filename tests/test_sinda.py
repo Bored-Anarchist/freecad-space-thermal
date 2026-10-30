@@ -62,7 +62,7 @@ class SindaTests(unittest.TestCase):
 
     def test_unknown_logic_radiation_tables_and_controls_block_native_readiness(self):
         for extra in (b'HEADER OPERATIONS\n      CALL FWDBCK\n',
-                      b'HEADER ARRAY DATA, MAIN\n  1=0,1,2,3\n',
+                      b'HEADER ARRAY DATA, MAIN\n  1=0.0,1,2,3\n',
                       b'HEADER CONTROL DATA, GLOBAL\n TIMEND=100\n',
                       b'HEADER CONDUCTOR DATA, MAIN\n -3,1,2,1e-8\n'):
             (self.source/'network.inp').write_bytes(extend(extra))

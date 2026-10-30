@@ -47,25 +47,37 @@ class ProjectCopy:
         current=capture_project(self.root,self.entry,limits=limits)
         if current.files!=self.files or current.directories!=self.directories:reject('stale_td_project')
 
-    def copy_to(self,destination,limits=ProjectLimits(),*,replacements=None):
+    def copy_to(self,destination,limits=ProjectLimits(),*,replacements=None,additions=None):
         destination=Path(destination).absolute()
         if destination.exists() or destination.resolve().is_relative_to(self.root.resolve()) or self.root.resolve().is_relative_to(destination.resolve()):reject('td_requires_new_tree')
         self.check_current(limits)
         replacements={} if replacements is None else replacements
         if (not isinstance(replacements,dict) or set(replacements)-set(dict(self.files))
                 or any(not isinstance(v,bytes) or len(v)>limits.file_bytes for v in replacements.values())):reject('td_invalid_replacements')
-        expected=tuple((name,replacements.get(name,raw)) for name,raw in self.files)
+        additions={} if additions is None else additions
+        if not isinstance(additions,dict):reject('td_invalid_additions')
+        seen={name.casefold() for name,_ in self.files}|{name.casefold() for name in self.directories}
+        for name,raw in additions.items():
+            path_name(name)
+            if name.casefold() in seen or not isinstance(raw,bytes) or len(raw)>limits.file_bytes:reject('td_invalid_additions')
+            seen.add(name.casefold())
+        expected=tuple(sorted([(name,replacements.get(name,raw)) for name,raw in self.files]+list(additions.items())))
+        if len(expected)>limits.files:reject('td_file_limit')
+        directories=set(self.directories)
+        for name in additions:
+            directories.update(p.as_posix() for p in Path(name).parents if p.as_posix()!='.')
+        directories=tuple(sorted(directories))
         if sum(len(raw) for _,raw in expected)>limits.total_bytes:reject('td_byte_limit')
         if not destination.parent.is_dir():reject('td_destination_parent')
         checked_path(destination.parent,destination.name)
         temporary=Path(tempfile.mkdtemp(prefix='.fcst-td-',dir=destination.parent))
         try:
-            for name in self.directories:(temporary/path_name(name)).mkdir(parents=True,exist_ok=True)
+            for name in directories:(temporary/path_name(name)).mkdir(parents=True,exist_ok=True)
             for name,raw in expected:
                 path=temporary/path_name(name);path.parent.mkdir(parents=True,exist_ok=True)
                 with path.open('xb') as stream:stream.write(raw);stream.flush();os.fsync(stream.fileno())
             current=capture_project(temporary,self.entry,limits=limits)
-            if current.files!=expected or current.directories!=self.directories:reject('td_copy_verification')
+            if current.files!=expected or current.directories!=directories:reject('td_copy_verification')
             self.check_current(limits)
             rename_new(temporary,destination)
         finally:

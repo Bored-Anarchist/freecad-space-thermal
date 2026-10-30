@@ -26,10 +26,11 @@ def envelope(payload,handle=101,targets=(101,102,103,104)):
     return row,common
 
 
-def drawing(records):
+def drawing(records,handles=None):
+    handles=list(range(101,101+len(records))) if handles is None else handles
     rows=[];standards=[]
     for index,record in enumerate(records):
-        row,standard=envelope(record,101+index);rows.append(row);standards.append(standard)
+        row,standard=envelope(record,handles[index],handles);rows.append(row);standards.append(standard)
     classes=[dict(number=499+kind,proxyflag=0,appname='FCST owned fixture',cppname=cpp,dxfname=dxf,is_zombie=0,
                   item_class_id=498,num_instances=sum(p.kind==kind for p in records),dwg_version=21,
                   maint_version=0,unknown_1=0,unknown_2=0) for kind,(dxf,cpp) in NAMES.items()]

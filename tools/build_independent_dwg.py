@@ -20,7 +20,7 @@ from fcst_exchange.dwg_native import NativeRuntime,compare
 from fcst_exchange.td_writer import model_records,verify_network
 from fcst_exchange.td_decode import decode_drawing
 from fcst_exchange.independent_td import IndependentTdAdapter
-from fcst_app.persistence import Package,encode,save_package
+from fcst_app.persistence import Package,encode,save_package,recover_package
 from fcst_exchange.core import target_id
 from fcst_tools.gate import evaluate
 
@@ -136,6 +136,74 @@ raise SystemExit(main())
     edited=adapter.export_source(staged,attempt/'edited-model',edits,work=attempt/'edit-work')
     original_unchanged=all((attempt/'new-model'/name).read_bytes()==raw for name,raw in staged.original.files)
     companions_preserved=all((attempt/'edited-model'/name).read_bytes()==raw for name,raw in staged.original.files if name!='network.dwg')
+    def invoke(arguments):
+        process=subprocess.run([sys.executable,'-S','-c',script,*map(str,arguments)],stdin=subprocess.DEVNULL,
+            stdout=subprocess.PIPE,stderr=subprocess.PIPE,env=cli_env,timeout=240,creationflags=subprocess.CREATE_NO_WINDOW)
+        return process.returncode==0
+    import_cli=invoke(['td-package',attempt/'new-model','network.dwg',attempt/'imported.fcst',
+        '--backend',receipt_path,'--work',attempt/'import-cli','--temperature-unit','K','--capacity-unit','J/K',
+        '--conductance-unit','W/K','--power-unit','W','--time-unit','s'])
+    if not import_cli:raise ValueError('backend_native_import_cli_failed')
+    imported=recover_package(attempt/'imported.fcst');changed=imported.model
+    for entity in changed['entities']:
+        if entity['kind']=='node' and entity['classification']=='algebraic':entity['temperature']['value']=305
+        if entity['kind']=='conductor':entity['conductance']['value']=.75
+        if entity['kind']=='load':entity['power']['value']=2.5
+    canonical_bytes=encode(changed);manifest=imported.manifest
+    model_record=next(r for r in manifest['artifacts'] if r['id']==manifest['model_artifact_id'])
+    model_record['artifact'].update(sha256=sha256(canonical_bytes).hexdigest(),byte_length=len(canonical_bytes))
+    package_files=dict(imported.files);package_files[model_record['artifact']['path']]=canonical_bytes
+    save_package(Package(manifest,package_files),attempt/'changed.fcst')
+    native_export=invoke(['td-export-native',attempt/'changed.fcst',attempt/'native-export','--backend',receipt_path,'--work',attempt/'native-export-work'])
+    if not native_export:raise ValueError('backend_native_export_cli_failed')
+    from fcst_exchange.sinda import SindaUnits
+    native_adapter=IndependentTdAdapter(runtime,SindaUnits('K','J/K','W/K','W','s'))
+    native_reopened=native_adapter.preview(attempt/'native-export','network.dwg',attempt/'native-roundtrip')
+    canonical_equal=native_reopened.require_native()['entities']==changed['entities']
+    properties=dict(model);properties['entities']=[
+        {'id':target_id(('dwg-selftest','material')),'kind':'material','label':'owned material',
+         'density':{'value':1000,'unit':'kg/m3'},'specific_heat':{'value':800,'unit':'J/(kg*K)'},
+         'conductivity':{'value':10,'unit':'W/(m*K)'},'valid_temperature':[{'value':150,'unit':'K'},{'value':450,'unit':'K'}]},
+        {'id':target_id(('dwg-selftest','optics')),'kind':'optics','label':'owned optics',
+         'solar_absorptivity':.2,'ir_emissivity':.8,'specular_fraction':0,'transmissivity':0}]
+    properties['source_maps']=[];pbytes=encode(properties);pid=target_id(('dwg-selftest','properties'))
+    pm={'contract_version':'2.0.0','minimum_reader':'2.0.0','project_id':properties['project_id'],'revision':0,'model_artifact_id':pid,
+        'artifacts':[{'id':pid,'role':'model','artifact':{'path':'model.json','sha256':sha256(pbytes).hexdigest(),'byte_length':len(pbytes)},'dependencies':[]}]}
+    save_package(Package(pm,{'model.json':pbytes}),attempt/'properties.fcst')
+    property_cli=invoke(['td-write-properties',attempt/'properties.fcst',attempt/'property-library']) and invoke(['td-read-properties',attempt/'property-library',attempt/'properties-reopened.fcst'])
+    properties_equal=property_cli and recover_package(attempt/'properties-reopened.fcst').model['entities']==recover_package(attempt/'properties.fcst').model['entities']
+    original_property_cli=invoke(['td-import-properties',attempt/'property-library','materials.tdp',attempt/'original-materials.fcst',
+        '--kind','tdp','--temperature-min','150','--temperature-max','450']) and invoke(['td-import-properties',attempt/'property-library','optics.rco',attempt/'original-optics.fcst','--kind','rco'])
+    if original_property_cli:
+        original_materials=recover_package(attempt/'original-materials.fcst');original_optics=recover_package(attempt/'original-optics.fcst')
+        original_property_cli=(original_materials.model['entities'][0]['density']['value']==1000
+            and original_optics.model['entities'][0]['solar_absorptivity']==.2
+            and (attempt/'property-library/materials.tdp').read_bytes() in original_materials.files.values())
+    if not original_property_cli:raise ValueError('backend_original_property_import_failed')
+    changed_properties=original_materials.model;changed_properties['entities'][0]['specific_heat']['value']=850
+    changed_bytes=encode(changed_properties);changed_manifest=original_materials.manifest
+    changed_record=next(r for r in changed_manifest['artifacts'] if r['id']==changed_manifest['model_artifact_id'])
+    changed_record['artifact'].update(sha256=sha256(changed_bytes).hexdigest(),byte_length=len(changed_bytes))
+    changed_files=dict(original_materials.files);changed_files[changed_record['artifact']['path']]=changed_bytes
+    save_package(Package(changed_manifest,changed_files),attempt/'changed-materials.fcst')
+    property_source_edit=invoke(['td-export-property-source',attempt/'changed-materials.fcst',attempt/'property-source-edit'])
+    if property_source_edit:
+        from fcst_exchange.td_property_model import import_document
+        reimported,_=import_document((attempt/'property-source-edit/materials.tdp').read_bytes(),'tdp',[150,450])
+        property_source_edit=reimported['entities']==changed_properties['entities']
+    held=native_adapter.preview(attempt/'edited-model','network.dwg',attempt/'held-preview')
+    from fcst_exchange.td_writer import node_payload,conductor_payload,load_payload,network_packet
+    offset_records=[node_payload('MAIN',1,-20,10,'capacitive'),node_payload('MAIN',2,20,0,'prescribed'),
+                    conductor_payload('MAIN',1,2,1,2),load_payload(2500,1)]
+    offset_created,_=runtime.run('create-network',network_packet(offset_records),attempt/'offset-create')
+    (attempt/'offset-source').mkdir();(attempt/'offset-source/network.dwg').write_bytes(offset_created['derived.dwg'])
+    offset_adapter=IndependentTdAdapter(runtime,SindaUnits('degC','J/K','W/K','mW','s'))
+    offset_staged=offset_adapter.preview(attempt/'offset-source','network.dwg',attempt/'offset-preview');offset_model=offset_staged.require_native()
+    for entity in offset_model['entities']:
+        if entity['kind']=='node' and entity['classification']=='capacitive':entity['temperature']['value']=258.15
+        if entity['kind']=='load':entity['power']['value']=3
+    offset_export=offset_adapter.export_native(offset_staged,offset_model,attempt/'offset-export',attempt/'offset-edit')
+    offset_reopen=offset_adapter.preview(attempt/'offset-export','network.dwg',attempt/'offset-reopen')
     checks={'owned-fixture-read':first.report['objects']>0 and first.report['read_warning_bits']==0,
             'fresh-native-reopen':verdict['structural_roundtrip_verified'],
             'class-identity-and-version-preservation':first.native['classes']==second.native['classes'],
@@ -144,13 +212,21 @@ raise SystemExit(main())
             'source-free-thermal-network-cli':new_cli.returncode==0,
             'new-network-all-fields-and-references':len(handles)==4,
             'compressed-scalar-edit-fresh-reopen':edited['edited_roundtrip_verified'] and len(edited['edits'])==3 and all(not e['bit_length_preserved'] for e in edited['edits']),
-            'edited-source-and-companion-preservation':original_unchanged and companions_preserved}
+            'edited-source-and-companion-preservation':original_unchanged and companions_preserved,
+            'native-import-cli-and-portable-source':import_cli,
+            'native-edit-export-cli-roundtrip':native_export,
+            'canonical-label-and-identity-roundtrip':canonical_equal,
+            'native-property-library-cli-roundtrip':properties_equal,
+            'unmapped-native-semantics-remain-held':held.report['native_ready'] is False,
+            'original-property-document-cli-import':original_property_cli,
+            'offset-unit-native-edit-roundtrip':offset_export['canonical_roundtrip_verified'] and offset_reopen.require_native()['entities']==offset_model['entities'],
+            'native-property-source-cli-edit':property_source_edit}
     records=[{'id':key,'status':'passed' if value else 'failed'} for key,value in checks.items()]
     report={'schema_version':1,'candidate':revision(),'profile':profile['runtime'],
             'gate':evaluate(profile['required_cases'],records),'cases':records,
             'input_sha256':profile['source_inputs'],'executable_sha256':receipt['executable_sha256'],
             'source_tree_sha256':source_tree_sha,'vendor_runtime_required':False,'qualified':False,
-            'scope':'Independent container, owned node/conductor/load profiles, source-free network writer and guarded scalar edits; complete TD model and target-product qualification pending'}
+            'scope':'Independent container and closed canonical-network import/portable/edit/export workflow; constant property libraries; complete TD model and target-product qualification pending'}
     args.report.parent.mkdir(parents=True,exist_ok=True)
     args.report.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report['gate']));return 0 if report['gate']['status']=='passed' else 1

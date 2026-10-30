@@ -34,3 +34,10 @@ reference streams. It uses no source model template. The preservation patch
 removes upstream dummy/point substitution; missing thermal objects or changed
 fields fail the required fresh-process decoder comparison. Neither a structural
 round trip nor a synthetic fixture grants target-product/full-model qualification.
+
+The required Windows self-test now exercises seventeen cases, including actual
+vendor-denied CLI import to a portable native project, canonical scalar editing,
+source export and fresh semantic reopen; constant property library/document
+conversion and source-preserving native property edits; Celsius offsets/scaled
+power; and refusal to promote unsupported modes. Source locks bind the Python
+conversion/contract/CLI sources as well as the native bridge and patch.

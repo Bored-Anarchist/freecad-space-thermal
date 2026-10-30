@@ -50,30 +50,63 @@ class SindaUnits:
 def scalar(text,registers):
     """Static scalar register arithmetic with SINDA D exponents, never eval()."""
     if not isinstance(text,str) or len(text)>2048:reject("sinda_expression_limit")
-    text=re.sub(r'(?<=\d)[dD]([+-]?\d+)',r'e\1',text.strip()).upper()
+    text=re.sub(r'(?<![A-Za-z0-9_])((?:\d+(?:\.\d*)?|\.\d+))[dD]([+-]?\d+)',r'\1e\2',text.strip()).upper()
     try:tree=ast.parse(text,mode='eval')
     except (ValueError,SyntaxError,RecursionError):reject("sinda_expression")
     if sum(1 for _ in ast.walk(tree))>128:reject("sinda_expression_limit")
     def visit(node,depth=0):
         if depth>12:reject("sinda_expression_limit")
         if isinstance(node,ast.Constant) and type(node.value) in (int,float):
+            token=ast.get_source_segment(text,node) or ''
+            if not NUMBER.fullmatch(token):reject('sinda_expression_number_syntax')
             try:value=float(node.value)
             except OverflowError:reject("sinda_expression_range")
-        elif isinstance(node,ast.Name) and node.id in registers:value=registers[node.id]
+            if value==0 and any(c in '123456789' for c in token.split('E')[0]):reject('sinda_expression_underflow')
+        elif isinstance(node,ast.Name) and node.id in registers:
+            if type(registers[node.id]) not in (int,float):reject('sinda_expression_register_type')
+            try:value=float(registers[node.id])
+            except OverflowError:reject('sinda_expression_range')
         elif isinstance(node,ast.UnaryOp) and isinstance(node.op,(ast.UAdd,ast.USub)):
             value=visit(node.operand,depth+1)*(-1 if isinstance(node.op,ast.USub) else 1)
-        elif isinstance(node,ast.BinOp) and isinstance(node.op,(ast.Add,ast.Sub,ast.Mult,ast.Div)):
+        elif isinstance(node,ast.BinOp) and isinstance(node.op,(ast.Add,ast.Sub,ast.Mult,ast.Div,ast.Pow)):
             a,b=visit(node.left,depth+1),visit(node.right,depth+1)
             if isinstance(node.op,ast.Add):value=a+b
             elif isinstance(node.op,ast.Sub):value=a-b
             elif isinstance(node.op,ast.Mult):value=a*b
-            else:
+            elif isinstance(node.op,ast.Div):
                 if b==0:reject("sinda_expression_domain")
                 value=a/b
+            else:
+                if not b.is_integer() or abs(b)>16 or abs(a)>1e100 or a==0 and b<0:reject('sinda_expression_power_limit')
+                try:value=a**int(b)
+                except (OverflowError,ValueError):reject('sinda_expression_range')
+        elif isinstance(node,ast.Call) and isinstance(node.func,ast.Name) and not node.keywords:
+            functions={'ABS':(abs,1),'SQRT':(math.sqrt,1),'EXP':(math.exp,1),'LOG':(math.log,1),
+                       'SIN':(math.sin,1),'COS':(math.cos,1),'MIN':(min,2),'MAX':(max,2)}
+            if node.func.id not in functions or node.func.id in registers:reject('sinda_dynamic_or_unknown_expression')
+            function,arity=functions[node.func.id]
+            if len(node.args)!=arity:reject('sinda_expression_arity')
+            try:value=function(*(visit(x,depth+1) for x in node.args))
+            except (OverflowError,ValueError):reject('sinda_expression_domain')
         else:reject("sinda_dynamic_or_unknown_expression")
         if not math.isfinite(value):reject("sinda_expression_range")
         return value
     return visit(tree.body)
+
+
+def split_fields(text,*,limit=10000):
+    """Separate data commas while retaining reviewed intrinsic arguments."""
+    if not isinstance(text,str) or len(text)>1048576:reject('sinda_field_limit')
+    fields=[];depth=0;start=0
+    for index,char in enumerate(text):
+        if char=='(':depth+=1
+        elif char==')':depth-=1
+        elif char==',' and depth==0:
+            fields.append(text[start:index].strip());start=index+1
+            if len(fields)>=limit:reject('sinda_field_limit')
+        if not 0<=depth<=12:reject('sinda_field_delimiters')
+    if depth:reject('sinda_field_delimiters')
+    fields.append(text[start:].strip());return fields
 
 
 def parse(path,raw,limits=Limits(),initial=("","MAIN")):
@@ -163,7 +196,7 @@ def _resolve(root,entry,limits):
 
 
 def expanded_fields(kind,text,registers,limit):
-    fields=[x.strip() for x in text.split(',')]
+    fields=split_fields(text)
     if not fields[0].upper().startswith('GEN '):return [fields]
     fields[0]=fields[0][4:].strip()
     length=5 if kind=='NODE' else 8 if kind=='CONDUCTOR' else 0
@@ -206,6 +239,8 @@ def _convert(sources,graph,errors,units,limits):
             except ExchangeError:continue
             del unresolved[name];changed=True
         if not changed:break
+    from .sinda_arrays import parse_arrays
+    arrays,array_records,array_errors=parse_arrays(sources,registers,limits=limits)
     staged=[]
     for record in records:
         value=record.value or {}; target=None; status='native-reconstructed';code=record.code
@@ -248,7 +283,8 @@ def _convert(sources,graph,errors,units,limits):
             elif record.kind=='CONTROL':
                 # Retain case/control semantics until a reviewed runtime translator owns them.
                 reject("sinda_case_control_requires_runtime_mapping")
-            elif record.kind=='ARRAY':reject("sinda_array_requires_declared_dimensions_and_interpolation")
+            elif record.kind=='ARRAY':
+                if record.source_id not in array_records:reject(array_errors.get(record.source_id,'sinda_array_declaration'))
             else:reject("sinda_untranslated_section_or_logic")
         except ExchangeError as error:
             status='retained-opaque' if record.kind in {'OPAQUE','ARRAY','CONTROL'} else 'unsupported';code=error.code
@@ -289,7 +325,9 @@ def _convert(sources,graph,errors,units,limits):
                            'supported':supported,'source_id':'project','target_id':model['project_id'] if model else None,'profile':PROFILE,
                            'evidence':{'source_revision':revision},'limitations':[] if supported else ['operation_not_supported']})
     return {'schema_version':'1.0.0','adapter':PROFILE,'profile':PROFILE,'source_revision':revision,'runnable':runnable,'qualified':False,
-            'records':rows,'operations':operations,'diagnostics':errors,'dependencies':[{'path':k,'includes':sorted(v)} for k,v in sorted(graph.items())]},model
+            'records':rows,'operations':operations,'diagnostics':errors,
+            'static_arrays':[a.report for _,a in sorted(arrays.items())],
+            'dependencies':[{'path':k,'includes':sorted(v)} for k,v in sorted(graph.items())]},model
 
 
 class SindaAdapter:
@@ -316,17 +354,24 @@ class SindaAdapter:
         return Preview(Path(root).absolute(),entry,self.profile,sources,encode(report),encode(model) if model is not None else None)
 
     def validate_patch(self,record,replacement,limits):
-        if record.kind not in {'NODE','CONDUCTOR','LOAD','REGISTER'}:reject("unsupported_sinda_patch")
+        if record.kind not in {'NODE','CONDUCTOR','LOAD','REGISTER','ARRAY'}:reject("unsupported_sinda_patch")
         value=record.value
         parsed=parse(record.path,replacement,limits,(value['section'],value['submodel']))
         if len(parsed)!=1 or parsed[0].kind!=record.kind or parsed[0].code:reject("unsupported_sinda_patch")
         before,after=value['text'],parsed[0].value['text']
+        if record.kind=='ARRAY':
+            from .sinda_arrays import array_values
+            a,b=(re.fullmatch(r'(\d{1,8})\s*=\s*(.*)',text) for text in (before,after))
+            if not a or not b or int(a[1])!=int(b[1]):reject('identity_edit')
+            av,ak=array_values([a[2]],{},limits.records);bv,bk=array_values([b[2]],{},limits.records)
+            if len(av)!=len(bv) or ak!=bk:reject('sinda_array_shape_or_storage_edit')
+            return
         if before.upper().startswith('GEN '):
             count=3 if record.kind=='NODE' else 7
-            if [x.strip() for x in before.split(',')[:count]]!=[x.strip() for x in after.split(',')[:count]]:reject('identity_edit')
+            if split_fields(before)[:count]!=split_fields(after)[:count]:reject('identity_edit')
         if record.kind=='REGISTER':
             if before.split('=',1)[0].strip().upper()!=after.split('=',1)[0].strip().upper():reject("identity_edit")
-        elif before.split(',',1)[0].strip()!=after.split(',',1)[0].strip():reject("identity_edit")
+        elif split_fields(before)[0]!=split_fields(after)[0]:reject("identity_edit")
 
     def export(self,staged,destination,patches=(),*,limits=Limits()):
         from .export import export_tree

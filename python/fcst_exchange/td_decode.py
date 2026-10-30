@@ -7,8 +7,9 @@ from .dwg_native import _one
 from .td_node import decode_node
 from .td_conductor import decode_conductor
 from .td_load import decode_load
+from .td_geometry import decode_rectangle
 
-DECODERS={'RcNode':decode_node,'RcConductor':decode_conductor,'RcHeatLoad':decode_load}
+DECODERS={'RcNode':decode_node,'RcConductor':decode_conductor,'RcHeatLoad':decode_load,'RcRectangle':decode_rectangle}
 
 
 @dataclass(frozen=True)
@@ -19,8 +20,9 @@ class ThermalInventory:
     @property
     def report(self):
         counts=Counter(row['status'] for row in self.records)
-        return {'profile':'td-typed-payloads/1','decoded_objects':len(self.payloads),
-                'retained_objects':counts['retained-opaque'],'records':list(self.records),
+        return {'profile':'td-typed-payloads/1','decoded_objects':counts['payload-decoded'],
+                'partial_objects':counts['partial-payload'],
+                'retained_objects':counts['retained-opaque']+counts['partial-payload'],'records':list(self.records),
                 'native_ready':False,'qualified':False,
                 'limitations':['full_model_dependency_and_semantic_closure_unqualified']}
 
@@ -36,7 +38,7 @@ def decode_drawing(snapshot):
         if decoder:
             try:
                 payload=decoder(row,standards[row['handle']]);payloads.append(payload)
-                records.append({'handle':row['handle'],'status':'payload-decoded',**payload.report});continue
+                records.append({'handle':row['handle'],'status':'payload-decoded' if payload.report['payload_decoded'] else 'partial-payload',**payload.report});continue
             except ExchangeError as error:code=error.code
         records.append({'handle':row['handle'],'status':'retained-opaque','limitation':code,
                         'native_ready':False,'qualified':False})

@@ -69,3 +69,22 @@ class TdPropertyTests(unittest.TestCase):
             self.assertEqual((root/'new/owned.tdp').read_bytes(),TDP.replace(b'800',b'900'))
             self.assertEqual((root/'new/main.dwg').read_bytes(),b'AC1032-owned');self.assertEqual((source/'owned.tdp').read_bytes(),TDP)
             self.assertFalse(receipt['native_ready']);self.assertTrue(receipt['unrequested_source_files_preserved'])
+
+    def test_one_dimensional_tables_parse_with_explicit_ir_binding_and_bounded_shapes(self):
+        raw=TDP.replace(b'[END]\r\n',b'[USEVARSPECHEAT]\r\n1\r\n[VARSPECHEAT]\r\n2\r\n100\r\n700\r\n500\r\n900\r\n[END]\r\n')
+        doc=parse_properties(raw,'tdp');table=doc.entries[0].get('VARSPECHEAT').table()
+        self.assertEqual(table.points,((100,700),(500,900)));self.assertEqual(doc.report['unknown_root_fields'],0)
+        ast=table.as_ast({'op':'literal','quantity':{'value':300,'unit':'K'}},x_unit='K',y_unit='J/(kg*K)',interpolation='linear',extrapolation='error')
+        self.assertEqual(ast['y'][1],{'value':900,'unit':'J/(kg*K)'})
+        for body in (b'10001\r\n',b'2\r\n100\r\n700\r\n',b'1\r\n100\r\n1E-999\r\n'):
+            field=doc.entries[0].get('VARSPECHEAT')
+            from dataclasses import replace
+            with self.assertRaises(ExchangeError):replace(field,value=body).table()
+
+    def test_table_source_edits_preserve_other_bytes_and_refuse_mode_shape_or_axis_changes(self):
+        body=b'2\r\n100\r\n700\r\n500\r\n900\r\n';raw=TDP.replace(b'[END]\r\n',b'[USEVARSPECHEAT]\r\n1\r\n[VARSPECHEAT]\r\n'+body+b'[END]\r\n')
+        doc=parse_properties(raw,'tdp');changed,report=doc.edited([{'entry':'OWNED MATERIAL','field':'VARSPECHEAT','points':[[100,750],[500,950]]}])
+        self.assertEqual(changed,raw.replace(body,b'2\r\n100\r\n750\r\n500\r\n950\r\n'));self.assertTrue(report['reopen_verified'])
+        with self.assertRaises(ExchangeError):doc.edited([{'entry':'OWNED MATERIAL','field':'SPECHEAT','value':900}])
+        for points in ([[100,750]],[[500,750],[100,950]],[[100,-1],[500,900]],[[100,float('nan')],[500,900]]):
+            with self.assertRaises(ExchangeError):doc.edited([{'entry':'OWNED MATERIAL','field':'VARSPECHEAT','points':points}])

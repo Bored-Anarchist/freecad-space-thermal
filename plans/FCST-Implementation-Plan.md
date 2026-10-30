@@ -37,7 +37,14 @@ required by the final handoff. Typed RcNode v22/RcConductor v22/RcHeatLoad v17 a
 support guarded source-field edits and source-free constant-network DWG export.
 Execute `tests/test_td_payloads.py` and `tests/test_td_properties.py`; the required
 native job independently reopens all generated fields/references and compressed
-scalar edits while preserving every unrequested source field. Full-model semantics
+scalar edits while preserving every unrequested source field. Closed canonical network import, portable source restoration and verified native
+scalar exports now run without other feature packages. Add
+`tests/test_td_native_model.py`, `tests/test_td_property_model.py`,
+`tests/test_sinda_arrays.py` and `tests/test_td_geometry.py`; the seventeen-case native
+job exercises the real vendor-denied CLI for package import, native edits, fresh
+reopen, property-library round trips, original property-document import and native
+property-source edits. One-dimensional property tables are typed and guarded
+without enabling unimplemented variable-property physics. Full-model semantics
 remain incomplete. Scan the exact owned codecs/writers, synthetic filer fixtures,
 CLI sources, preservation patch and source-hash locks alongside probe/audit sources, synthetic
 tests, pinned dependency metadata, updated scope documents and bounded summaries
@@ -364,8 +371,13 @@ The earlier OpenTD-first implementation is retained only as optional external
 reference tooling. The direct SINDA subset and independent typed TD
 node/conductor/heat-load/property profiles are implemented, with guarded source-field
 edits and source-free constant-network DWG export. Required geometry, case, manager,
-dynamic and dependency semantics, canonical import and full-model reverse mapping
-remain incomplete. WP-08 stays in progress; historical evidence retains its scope.
+dynamic and dependency semantics and full-model reverse mapping remain incomplete.
+The declared closed constant-network profile now supports canonical import, portable
+`.fcst` storage and canonical scalar export/reopen. Constant original property
+documents and owned property libraries have independent conversion paths; static
+SINDA arrays/intrinsics and partial rectangle geometry have bounded readers.
+Unrepresented modes and additional source versions need verified format evidence,
+while owned-engine and paired ESA comparisons remain later qualification dependencies. WP-08 stays in progress; historical evidence retains its scope.
 
 1. Retain the corrected independent LibreDWG 0.14 native component, locked source,
    compiler, preservation patch and GPL notices. Its implementation fixes observed

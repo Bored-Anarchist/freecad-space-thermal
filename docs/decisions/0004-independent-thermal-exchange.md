@@ -92,9 +92,10 @@ below extend the implementation without qualifying complete thermal models.
 The independently usable product slice exposes `td-preview` and
 `td-export-source`: inspect native container records and retain the entire
 immutable source tree exactly, including opaque companions and empty directories.
-These operations never construct a runnable thermal model. Guarded source-field
-edits are now supported for the declared constant profiles; native-ready requests
-still reject while complete semantic closure remains unresolved. `td-audit-rewrite` is a private preservation experiment and is
+Without explicit units these remain structural operations. Native reconstruction
+is now available for the declared closed constant-network profile; required
+unresolved fields or dependencies still hold the whole import. Guarded source-field
+edits remain separately available for declared constant fields. `td-audit-rewrite` is a private preservation experiment and is
 never promoted to a user export. No operation imports or falls back to OpenTD.
 
 Owned `RcNode` v22, `RcConductor` v22 and `RcHeatLoad` v17 codecs now consume
@@ -139,6 +140,30 @@ generated deck to compare every mapped identity, connection and quantity.
 Unsupported semantics, ambiguous load aggregation and precision loss reject
 before atomic publication. This does not qualify full SINDA language execution.
 
+
+The independent product now also maps complete closed constant networks into the
+canonical model, with explicit source units, identity/reference checks and native
+contract validation. Portable packages retain exact originals and empty directories
+under private alias maps. Canonical scalar export restores that closure, applies
+only supported values and verifies fresh decoded semantics before atomic source
+publication. Owned annotation companions are hash-bound and checked against source
+quantities/references; large native handles use string identities.
+
+Original property documents can be imported with explicit entry selection and
+material validity bounds. Constant isotropic materials and equivalent-band optics
+also have an owned source-free library writer and independent reader, preserving
+canonical validity/annotations separately. Unrepresented active modes reject.
+Static SINDA arrays now retain storage/identity and support bounded continuations
+and allocation; reviewed intrinsics and explicit table-IR construction do not run
+source code. Active control/array consumers require separate reviewed mappings.
+
+RcRectangle v7 geometry has a tested prefix reader for six serialized parameters,
+origin and basis; all thermal attributes remain opaque. This adds no native thermal
+geometry or edited-geometry claim. Complete geometry, manager/case, material-derived,
+variable and additional-version semantics still require verified format evidence.
+WP-09/WP-11/WP-12 are needed for cross-tool/owned-engine qualification, and are not
+prerequisites for implementing the independent paths above.
+
 ## Implementation and unattended acceptance
 
 WP-08 remains in progress. Deliver these slices in order:
@@ -170,7 +195,7 @@ WP-08 remains in progress. Deliver these slices in order:
 Build and self-test with `python tools/build_independent_dwg.py`. This downloads
 only locked public source/toolchain assets, keeps build artifacts local and
 produces a bounded `dwg-backend.json` report. Foundation CI requires that job and
-checks its candidate, source hashes, nine cases and nonqualification flags in
+checks its candidate, source hashes, seventeen cases and nonqualification flags in
 the final handoff. It publishes only the privacy-cleared summary.
 
 For private corpus research use

@@ -5,8 +5,10 @@ TD, OpenTD, AutoCAD and SINDA installations. The
 [independent exchange decision](decisions/0004-independent-thermal-exchange.md)
 supersedes the OpenTD-first migration design. The direct SINDA subset already
 works without those tools. Direct DWG node, conductor and heat-load profiles,
-property readers, guarded source-field edits and source-free constant-network
-DWG export are implemented. Complete-model thermal compatibility remains open.
+property readers, native constant-network import, portable storage, canonical
+scalar edits and source-free constant-network DWG export are implemented.
+Constant property libraries and static SINDA arrays have independent readers and
+writers. Complete-model thermal compatibility remains open.
 The OpenTD implementation below is retained only for optional external reference
 work and cannot satisfy the product's import/export requirement.
 
@@ -27,7 +29,7 @@ unimplemented. An absent or mismatched profile fails before source mutation.
 ## Independent DWG profiles and exports
 
 `python tools/build_independent_dwg.py` builds the locked separate GPL backend
-and runs nine unattended native checks, including the actual vendor-free CLI,
+and runs seventeen unattended native checks, including the actual vendor-free CLI,
 new-model generation, compressed scalar edits and fresh-process reopen. Select
 its trusted installation receipt explicitly, outside imported project data.
 
@@ -50,7 +52,9 @@ unsupported versions remain opaque with an explicit diagnostic. They inventory
 source expressions, tables, logic and unresolved selectors without executing or
 guessing their meaning. Preview reports contain counts, handles and bounded
 status codes, never source names, material values, source logic or decoded bytes.
-Native thermal readiness and Q1 qualification remain false.
+Without explicit units or with unresolved required fields/dependencies, native
+readiness remains false. Closed constant networks can now be reconstructed into
+the native model. Q1 compatibility and production-solver qualification remain open.
 
 `edits.json` is a bounded array of closed edit records. For example, using handles
 from the local preview:
@@ -75,7 +79,12 @@ checked and retained. `td-audit-rewrite` remains a separate private preservation
 audit; it does not grant full-model readiness.
 
 The direct UTF-8 `[UNICODE]` `.tdp`/`.rco` readers retain original bytes, comments,
-unknown tags and nested composite blocks. Allowlisted constant numeric edits
+unknown tags and nested composite blocks. Documented optional scalar defaults are
+handled explicitly. Counted one-dimensional conductivity/specific-heat and optical
+property tables have bounded typed readers. Table IR requires explicit units and
+interpolation/extrapolation choices; active table physics is not silently reduced
+to constants. Existing table values can be edited with the same point count and
+increasing axis, preserving all unselected bytes and source modes. Allowlisted constant numeric edits
 preserve every unselected byte and independently reparse. Stored thermophysical
 scalars use SI; switching property modes, active variable optics, composites and
 nonconstant fields is unsupported. These readers do not yet reconstruct all
@@ -98,12 +107,94 @@ without unrequested changes. All original bytes were preserved. These counts do
 not establish coverage for geometry, cases, managers, dynamic laws or other
 serialization/source versions.
 
-Remaining implementation: required surface/solid/mesh, material/optical, case,
-manager, orbit/environment and dynamic-expression semantics; complete dependency
-closure and canonical import/reverse mapping; full-model edited/new-model export;
-remaining SINDA constructs and source versions. Owned-engine and paired ESATAN
-Q1 comparisons remain separate holds. The unattended suite retains these holds;
-no acceptance-test execution is assigned to the user.
+## Native import, portable editing and export
+
+```text
+fcst td-package source main.dwg native.fcst --backend .local/dwg-backend/install/backend.json --work .local/import-job --temperature-unit K --capacity-unit J/K --conductance-unit W/K --power-unit W --time-unit s
+fcst td-export-native edited.fcst derived-source --backend .local/dwg-backend/install/backend.json --work .local/export-job
+```
+
+The same five unit options can be supplied to `td-preview`. All five are required
+together; no unit system or TD product release is inferred from AC1032. The
+`td-independent-network/1` converter accepts the declared complete constant node,
+conductor and load profiles only. It verifies every serialized field, node class,
+submodel/number, connection and required common reference against that profile.
+Clones, material-derived capacitance, unknown switches, active expressions/laws,
+selection sets, required geometry/cases/managers, extended data and unparsed
+storage prevent promotion. Unknown companions also hold native reconstruction.
+Known property databases are catalogued, and material references are classified
+as resolved, missing or ambiguous; resolving a name does not qualify its physics.
+
+`native_ready=true` means a validated canonical network exists. It does not claim
+an available production solver or complete TD compatibility. The source drawing
+remains authoritative for thermal values. Owned canonical/identity companions
+must bind the drawing hash and independently match all decoded quantities and
+references before their IDs, labels and other annotations are restored.
+
+`package_td` retains every source byte and empty directory in a portable `.fcst`
+project. Vendor filenames map to safe aliases with an inert private source map.
+No local source path or installed backend path is embedded. `restore_td` validates
+that map, paths, roles, budgets and source revision before atomic restoration.
+Changing a portable package's native scalar values can then drive
+`td-export-native`; it revalidates the package, restores the original tree,
+rewrites only supported fields and independently reopens every requested value
+and unrequested logical field. Celsius/Fahrenheit offsets and power scaling are
+explicit. Loss of precision, topology/classification/label changes, existing
+targets and unresolved semantics reject before publication. Canonical companions
+are regenerated after successful verification. 64-bit handles are stored as
+strings in new identity receipts so JSON number precision cannot alter them.
+
+## Independent property conversion
+
+```text
+fcst td-import-properties source materials.tdp material.fcst --kind tdp --temperature-min 150 --temperature-max 450 --name "OWNED MATERIAL"
+fcst td-import-properties source optics.rco optical.fcst --kind rco
+fcst td-export-property-source edited-material.fcst derived-property-source
+fcst td-write-properties property-project.fcst new-property-library
+fcst td-read-properties new-property-library reopened-properties.fcst
+```
+
+Original `.tdp` and `.rco` documents can be imported directly without a prior
+conversion or companion. Material validity limits must be supplied in kelvin;
+they are not fabricated from constant property values. Optional explicit entry
+selection preserves the entire original document, including unselected records,
+in the native package. Without selection every entry must be representable.
+
+`td-export-property-source` applies native constant-property edits to the retained
+original document. It preserves comments, names, unselected entries and inactive
+data, inserts documented optional scalar headers when necessary, and verifies
+physical values after reparsing. Identity/mode changes reject. Canonical companions
+retain explicit validity and annotations in the new export tree.
+
+The material profile covers constant isotropic conductivity, density, specific
+heat and their supported multipliers. The optical profile covers constant
+absorptivity, emissivity, equivalent solar/IR specular fractions and transmission.
+Variable, anisotropic/composite, spectral/refraction or unrepresented fields
+remain holds. Separate source-free property-library export accepts a native
+property-only project, writes deterministic `.tdp`/`.rco` definitions and retains
+validity/annotations in canonical companions. The reader reconstructs each source
+property and compares all values/identities before accepting those companions.
+Changed hashes alone cannot bless changed physical values. These are property
+library operations; drawing assignments and complete thermal geometry are separate.
+
+## Geometry and remaining format evidence
+
+The RcRectangle v7 reader now extracts six serialized geometric parameters,
+origin and basis while preserving the remaining thermal attributes/text/handles
+as opaque source ranges. All 16 rectangles in the local example pass this prefix
+reader. This is a partial envelope, with units and parameter interpretations still
+unresolved; it cannot enable thermal geometry edits or native reconstruction.
+
+Remaining independent implementation needs verified layouts/semantics for complete
+surface/solid/mesh, material-derived node modes, variable/composite/spectral
+properties, case/manager, orbit/environment and dynamic source constructs. Those
+fields cannot be reconstructed by guessing from display geometry or neutral
+selector numbers. Additional serialization versions, including the planned
+2025 R2/2026 R1 coverage, need suitable format/fixture evidence. Required unknown
+objects still prevent importing the entire available example as a native model.
+The closed-network, property, array and preservation work above does not depend
+on WP-09/WP-11/WP-12. Their paired ESATAN and owned-engine comparisons remain
+separate Q1 completion dependencies. No user-executed acceptance is required.
 
 See the decision and `adapters/libredwg/README.md` for pinned provenance and
 component license obligations. Raw inventories and source data remain local.
@@ -138,6 +229,23 @@ Supported declarations:
   signs cannot hide invalid include paths. Dollar suffixes outside quotes are
   comments; fixed-form column-one `C`, `*` and `!` comments retain original bytes.
 
+The static numeric profile also supports bounded integer powers and the explicit
+intrinsics `ABS`, `SQRT`, `EXP`, `LOG`, `SIN`, `COS`, `MIN` and `MAX`. Arguments are
+parsed as owned syntax trees; imported functions, function-shadowing registers,
+Python numeric extensions, malformed delimiters, overflow and literal underflow
+reject. Commas inside intrinsic arguments remain part of that expression.
+
+`ARRAY DATA` supports numbered `id = values` declarations, line continuations,
+static register expressions and bounded `SPACE`/`ALLSAME` allocation. Integer/real
+storage kinds and submodel identity are retained. Mixed storage without a mapped
+source option, ambiguous legacy syntax, dynamic allocation, malformed/duplicate
+IDs and budgets fail. Unreferenced constant arrays can accompany a native network;
+active consumers still need reviewed translation. Single-line literal-array
+preservation edits retain identity, length and storage kind. `sinda_arrays.table_ast`
+requires explicit axis/value units, input binding, interpolation, extrapolation
+and discontinuities; array shape alone never selects these semantics. It produces
+IR for the normal canonical type/reference validator, not an implicit source solve.
+
 `END OF DATA`, header spelling, whitespace, comments and line endings survive
 unchanged export. Repeated/ambiguous inserts, section leakage, cycles, missing
 files, traversal, absolute/network/device paths, links/hard links, case aliases
@@ -146,7 +254,7 @@ and size/depth/entity budget overruns fail closed. Default limits reuse WP-07's
 Noncomment data after `END OF DATA`, ambiguous terminators inside INSERT files
 and data headers without an explicit submodel also reject native reconstruction.
 
-Property arrays, runtime controls/cases, dynamic registers, unreviewed procedures,
+Active property-array consumers, runtime controls/cases, dynamic registers, unreviewed procedures,
 advanced radiation/fluid constructs and unknown syntax remain inert, with explicit
 source locations and fidelity limits. This profile does not claim complete SINDA
 language execution. Unsupported required semantics block native readiness and
