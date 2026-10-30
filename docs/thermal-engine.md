@@ -506,7 +506,7 @@ input text. Exit zero requires completed native acceptance of the trajectory.
 remains false until that transport's result integration is implemented.
 
 `tools/check_thermal.py` requires all five compiled binary hashes and native
-execution/build identity in report schema four. Both Windows presets run the
+execution/build identity in report schema five. Both Windows presets run the
 same required cases and privacy-clear the exact summary before upload. Cases
 cover analytic single/two-node cooling and conservation, a 10 ns fast mode,
 nonlinear specific heat/enthalpy, consistent DAE/boundary power, tolerance
@@ -525,3 +525,99 @@ The consistency and sign-change event assumptions were cross-checked against
 and [LLNL usage notes on discontinuities and reinitialization](https://computing.llnl.gov/projects/sundials/usage-notes).
 These references are background, not executable dependencies or acceptance substitutes;
 the owned method and its thresholds are specified above.
+
+
+## Requirement qualification and captured references
+
+[The qualification/oracle register](../ci/thermal-qualification-v1.json) maps
+ARC-009/015, PHY-001/005/006/007 and TST-004 to mandatory native case IDs.
+Report schema five derives each native requirement verdict from those actual
+case records. Missing, duplicate, failed or substituted required cases fail the
+owned gate. Event metrics must demonstrate error reduction under fixed step-cap
+halving; network metrics must come from 256 equations/766 CSR entries. Source
+comparison receipts bind the exact fixture/source bytes and report numerical
+errors across capacitive, algebraic and prescribed nodes. The assessor rejects
+stale fixture hashes, wrong execution modes, missing coverage and inflated
+vendor/Q1 claims. This is actual coverage evidence alongside the planning CSV,
+whose `planned` statuses intentionally do not serve as test results.
+
+The event-refinement fixture uses the independent analytic heater times
+`log(16/5) + k*log(3)` after its initial switch. Temperature tolerances are loose
+so caps 0.2, 0.1 and 0.05 s actually govern accepted steps. The maximum event-time
+error must shrink by at least a factor of 0.65 on each halving, reach below
+0.07 s at the finest cap, and the finest duty error must be below 0.02.
+The tighter existing adaptive heater checks remain required separately; the
+root-localization tolerance is not a continuous-solution error guarantee.
+The workload profile manufactures `T=300+t` on a strongly coupled 256-node
+capacitive chain plus a prescribed ramp, with one watt per capacitive node.
+Every final temperature and total storage has an independent exact value.
+Profiling includes all sparse Jacobian and LU work; timings imply no hardware
+qualification or throughput guarantee.
+
+Owned source-literal fixtures describe the same three-node network in constant
+SINDA 6.3 and ESATAN 2018-SP1 syntax, using K and degC respectively. Independent
+file adapters reconstruct the models; the C++ CLI solves each with all three
+node classes. Frozen constants give `Tcap=304+6*exp(-t/2)`,
+`Talg=(Tcap+300)/2`, `Tboundary=300`, reservoir power `-(Tcap-300)` W and
+storage `2*(Tcap-310)` J. Steady values, transient samples, physical constants,
+identities and energy are checked; changed loads/temperatures/powers/storage,
+missing times, NaN and reference-mode substitution reject. These tests do not
+execute SINDA, AutoCAD/TD or ESATAN and do not count as licensed comparisons.
+
+`python tools/compare_thermal_reference.py --manifest LOCAL_MANIFEST --worker
+WORKER_EXE --report LOCAL_REPORT` supplies the offline captured-result path.
+Without a manifest it writes a bounded `blocked` report and exits two. A manifest
+has version `fcst-thermal-captured-reference/1`, execution mode
+`reference_external`, ecosystem `sinda` or `esatan`, explicit source version and
+five units (temperature, capacity, conductance, power, time). `model`, `results`
+and `receipt` are relative path/SHA-256/byte-length artifact references.
+The model must be one fully supported constant source deck; includes/unsupported
+physics cannot be dropped. Originals are read unchanged and parsing occurs in
+an isolated temporary copy. Traversal, links, changed lengths/hashes and
+unresolved source semantics reject before comparison.
+
+The receipt binds execution mode/ecosystem/source version, source-model and
+result hashes, and SHA-256 identities for executable, settings, run and review
+decision. SINDA results use the bounded assigned-value print reader; ESATAN
+results require the exact `TmdBinding` object in `tmd_binding`, including matching
+result/canonical-model hashes, case, producer/schema and model namespace map.
+The existing safe HDF5 reader checks the TMD payload. The tool executes only the
+explicit owned worker, with host/Python/vendor search paths absent from its
+native process, and matches every node and source time without interpolation.
+Frozen temperature limits are 0.01 K plus 1e-6 relative. Unknown modes, malformed
+receipts, missing/ambiguous identities, truncated times, nonfinite values and
+numerical mismatches fail. Reports contain hashes, bounded counts/errors and
+fixed verdicts; raw decks, result arrays and receipts remain local.
+
+A passing captured comparison **does not authenticate a receipt or verify a
+license**. It always retains `vendor_qualified: false` and `q1_qualified: false`;
+reviewed licensed-profile admission belongs to the separate Q1 gate. The public
+contract test uses explicitly synthetic printed samples and receipts and proves
+that a successful replay cannot promote its qualification. With no approved
+runner/reference pair available, `native_qualification.licensed_paired_status`
+stays `blocked`. Full qualification also retains the host/MCP and coupled
+radiation/environment obligations assigned to their owning packages. No missing
+licensed gate is skipped, relabeled passed, or assigned as a manual user test.
+
+
+The workload suite also runs a localized one-watt load into the first node of
+that 256-node conductive chain with a fixed 300 K reservoir. It checks maximum
+principles, total enthalpy, energy defects and actual repeated compiled work.
+This case exposed spurious LU `linear_residual` failures in subnormal diffusion
+correction tails. The componentwise check now subtracts a conservative arithmetic
+allowance before forming its relative error: `(4*nz+2)*eta` for rounded row
+operations plus `2*abs(Aij)*eta` for each subnormal solution component, where
+`eta` is `double::denorm_min()`. The propagated term accounts for quantization of
+an unrepresentably small correction before multiplication by a large coefficient.
+Normal-component backward error, pivots, matrix equations, nonlinear/temperature
+criteria and independently recomputed global residual/physical energy checks
+retain their existing limits. There is no new capacity, diagonal regularization
+or user-tolerance relaxation. An analytic tridiagonal geometric-tail regression
+checks representable entries and subnormal absolute errors; an `eta/3` problem
+must still fail relative-only global residual acceptance.
+
+The arithmetic rationale is the gradual-underflow absolute-error property in
+[Oracle's numerical computation guide](https://docs.oracle.com/cd/E77782_01/html/E77791/z4000ac020351.html).
+The safeguard and its regression are owned code, not a copied numerical library
+implementation. Profiles remain measured workloads rather than performance
+qualification on a reference hardware profile.

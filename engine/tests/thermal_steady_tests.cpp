@@ -84,6 +84,21 @@ int main(int argc,char** argv) {
       auto r=solve_linear(SparseLuBackend(),a,rhs);
       require(r.status==SolveStatus::converged && a.sparsity()->nonzeros()==3*n-2);
       for (std::size_t i=0;i<n;++i) near(r.solution[i],1+static_cast<double>(i)/n,1e-7);
+    } else if (name=="lu-subnormal-tail") {
+      constexpr std::size_t n=256;std::vector<Entry> entries;
+      for(std::size_t i=0;i<n;++i) {entries.push_back({i,i});if(i)entries.push_back({i,i-1});if(i+1<n)entries.push_back({i,i+1});}
+      SparseMatrix a(std::make_shared<Sparsity>(n,entries));std::vector<double> rhs(n,0);rhs[0]=1;
+      for(std::size_t i=0;i<n;++i) {a.add({i,i},32);if(i)a.add({i,i-1},-1);if(i+1<n)a.add({i,i+1},-1);}
+      auto result=solve_linear(SparseLuBackend(),a,rhs,{0,1e-12,4});require(result.status==SolveStatus::converged);
+      const double r=2/(32+std::sqrt(32.*32-4)),eta=std::numeric_limits<double>::denorm_min();
+      for(std::size_t i=0;i<n;++i) {
+        double expected=(std::pow(r,static_cast<double>(i+1))-std::pow(r,static_cast<double>(2*n+1-i)))/(1-std::pow(r,static_cast<double>(2*n+2)));
+        require(std::abs(result.solution[i]-expected)<=1e-11*std::abs(expected)+16*eta);
+      }
+      // Quantization allowance cannot authorize a failed relative-only global
+      // residual: eta/3 has no representable exact solution in this format.
+      auto impossible=solve_linear(SparseLuBackend(),matrix(1,{{0,0,3}}),std::vector<double>{eta},{0,1e-12,4});
+      require(impossible.status==SolveStatus::nonconverged && impossible.diagnostics.reason==SolveReason::linear_residual);
     } else if (name=="linear") {
       Assembly a(fixture(root)); auto r=solve_steady(a); successful(r);
       require(r.method==SteadyMethod::direct_linear && r.solve.iterations==1);

@@ -6,6 +6,9 @@ sparse Jacobians, linear/nonlinear steady solving, adaptive stiff transients,
 hysteresis and schedule events, restart checkpoints, energy/provenance results
 and compiled-kernel profiling. Both Windows presets run native acceptance and
 require the source/build/five-binary-bound, privacy-cleared `thermal.json`.
+The [qualification register](../plans/WP-11-qualification.md) adds fixed-step
+event refinement, representative network profiling, owned source-literal
+comparisons and requirement receipts; licensed paired/Q1 gates remain explicit.
 Standalone native steady and transient API/CLI execution is available. The
 frozen durable-job transport still reports `solver_available: false`; its thermal
 HDF5 publication/host integration and paired vendor qualification remain separate.

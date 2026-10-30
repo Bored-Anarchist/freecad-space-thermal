@@ -6,6 +6,8 @@
 #include <fstream>
 #include <iostream>
 #include <iterator>
+#include <iomanip>
+#include <sstream>
 using namespace fcst::thermal;
 namespace {
 void require(bool ok) {if(!ok)throw std::runtime_error("acceptance_failed");}
@@ -103,6 +105,62 @@ int main(int argc,char** argv) {
     require(r.profile.event_probes>0);for(const auto& s:r.samples)require(s.balance.temperature[0]>=294 && s.balance.temperature[0]<=305.001);
     double on=0,last=0;bool enabled=false;for(const auto& e:r.events) {if(enabled)on+=e.time-last;last=e.time;enabled=e.after==1;}if(enabled)on+=5-last;
     near(r.samples.back().duty_cycles.at(uid(24)),on/5,1e-10);
+  } else if(name=="event-refinement") {
+    // Step caps, not adaptive temperature tolerances, drive this experiment.
+    // Each accepted interval uses two BE half steps; analytic switch times are
+    // independent of the assembly and root-localization implementation.
+    const double first=std::log(16./5),period=std::log(3.);
+    const std::vector<double> expected{0,first,first+period,first+2*period,first+3*period};
+    const double exact_duty=(first+period+5-expected.back())/5;
+    std::vector<double> errors,duty_errors;std::vector<std::size_t> steps;
+    for(double cap:{.2,.1,.05}) {
+      auto o=options(5);o.initial_step=cap;o.maximum_step=cap;o.absolute_temperature_tolerance=1000;o.event_time_tolerance=1e-9;
+      auto r=solve_transient(assembly(root,"heater"),o);success(r);require(r.events.size()==expected.size());
+      double error=0,longest=0;
+      for(std::size_t i=0;i<expected.size();++i) {
+        require(r.events[i].entity_id==uid(24) && r.events[i].kind=="heater" && r.events[i].after==(i%2==0?1.:0.));
+        error=std::max(error,std::abs(r.events[i].time-expected[i]));
+      }
+      for(const auto& step:r.steps)if(step.accepted)longest=std::max(longest,step.end-step.start);
+      require(longest>=.99*cap && longest<=cap+1e-12);
+      errors.push_back(error);duty_errors.push_back(std::abs(r.samples.back().duty_cycles.at(uid(24))-exact_duty));
+      steps.push_back(r.checkpoint->accepted_steps);
+    }
+    require(errors[0]>.001 && errors[1]<.65*errors[0] && errors[2]<.65*errors[1] && errors[2]<.07);
+    require(duty_errors[1]<.7*duty_errors[0] && duty_errors[2]<.7*duty_errors[1] && duty_errors[2]<.02);
+    require(steps[0]<steps[1] && steps[1]<steps[2]);
+    std::cout<<std::setprecision(17)<<"{\"status\":\"passed\",\"metrics\":{\"coarse_error_s\":"<<errors[0]
+      <<",\"medium_error_s\":"<<errors[1]<<",\"fine_error_s\":"<<errors[2]<<",\"fine_duty_error\":"<<duty_errors[2]
+      <<",\"coarse_steps\":"<<steps[0]<<",\"medium_steps\":"<<steps[1]<<",\"fine_steps\":"<<steps[2]<<"}}\n";return 0;
+  } else if(name=="network-profile" || name=="network-localized") {
+    // An owned many-node network exercises repeated assembly and factorization.
+    constexpr unsigned n=256;std::ostringstream json;
+    json<<R"({"contract_version":"1.0.0","model":{"contract_version":"1.0.0","minimum_reader":"1.0.0","project_id":")"<<uid(1)
+      <<R"(","revision":0,"entities":[{"id":")"<<uid(2)<<R"(","kind":"submodel"})";
+    for(unsigned i=0;i<=n;++i)json<<R"(,{"id":")"<<uid(1000+i)<<R"(","kind":"node","submodel_id":")"<<uid(2)
+      <<R"(","classification":")"<<(i==n?"prescribed":"capacitive")<<R"(","temperature":{"value":300,"unit":"K"},"capacity":{"value":)"
+      <<(i==n?0:1)<<R"(,"unit":"J/K"}})";
+    for(unsigned i=0;i<n;++i)json<<R"(,{"id":")"<<uid(2000+i)<<R"(","kind":"conductor","from_node_id":")"<<uid(1000+i)
+      <<R"(","to_node_id":")"<<uid(1001+i)<<R"(","conductance":{"value":100,"unit":"W/K"}})";
+    const bool localized=name=="network-localized";
+    for(unsigned i=0;i<(localized?1:n);++i)json<<R"(,{"id":")"<<uid(3000+i)<<R"(","kind":"load","node_id":")"<<uid(1000+i)<<R"(","power":{"value":1,"unit":"W"}})";
+    json<<R"(],"source_maps":[],"assumptions":[],"limitations":[],"mappings":[],"attachments":[]},"material_laws":[],"node_storage":[]})";
+    // Manufactured uniform ramp T=300+t gives an independent exact solution
+    // at every node while retaining all conductive Jacobian couplings.
+    std::vector<BoundaryBinding> boundaries;if(!localized)boundaries.push_back({n,[](double t){return 300+t;}});
+    Assembly a(load(json.str()),{},boundaries);auto o=options(.1);o.initial_step=.02;o.maximum_step=.02;o.absolute_temperature_tolerance=1e-5;
+    auto r=solve_transient(a,o);success(r);require(a.sparsity()->dimension()==n && a.sparsity()->nonzeros()==3*n-2);
+    const auto& p=r.profile;require(p.linear_solves>0 && p.jacobian_evaluations>0 && p.total_seconds>0);
+    double storage=0;for(double v:r.samples.back().storage_change)storage+=v;
+    for(double temperature:r.samples.back().balance.temperature) {
+      if(localized)require(temperature>=300-1e-9 && temperature<=300.1+1e-9);else near(temperature,300.1,1e-7);
+    }
+    near(storage,localized?.1:n*.1,1e-6);near(r.samples.back().run_energy.defect,0,1e-6);
+    std::cout<<std::setprecision(17)<<"{\"status\":\"passed\",\"metrics\":{\"equations\":"<<n<<",\"nonzeros\":"<<a.sparsity()->nonzeros()
+      <<",\"accepted_steps\":"<<r.checkpoint->accepted_steps<<",\"residual_evaluations\":"<<p.residual_evaluations
+      <<",\"jacobian_evaluations\":"<<p.jacobian_evaluations<<",\"linear_solves\":"<<p.linear_solves
+      <<",\"assembly_seconds\":"<<p.assembly_seconds<<",\"linear_seconds\":"<<p.linear_seconds<<",\"total_seconds\":"<<p.total_seconds
+      <<",\"energy_defect_J\":"<<r.samples.back().run_energy.defect<<"}}\n";return 0;
   } else if(name=="schedule") {
     auto o=options(4);o.schedules={{uid(12),{{0,0},{1,1},{2,0}}}};auto r=solve_transient(assembly(root,"enthalpy"),o);success(r);
     require(r.events.size()==3);near(r.events[1].time,1,0);near(r.events[2].time,2,0);

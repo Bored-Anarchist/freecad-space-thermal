@@ -12,7 +12,7 @@
     "WP-11.9",
     "WP-11.10"
   ],
-  "scope": "Owned network preparation, assembly, steady and adaptive enthalpy transient solves, index-one DAE initialization, hysteresis/schedule events, checkpoints, energy results and compiled profiling; durable jobs and paired vendor qualification remain separate",
+  "scope": "Owned network preparation, assembly, steady and adaptive enthalpy transient solves, index-one DAE initialization, hysteresis/schedule events, checkpoints, energy results and compiled profiling; durable jobs and paired vendor qualification remain separate; requirement-bound native qualification, fixed-step event refinement and owned SINDA/ESATAN source-literal comparisons",
   "required_cases": [
     "native-constant-law",
     "native-linear-law",
@@ -85,6 +85,14 @@
     "transient-cli-checkpoint",
     "transient-cli-events",
     "transient-cli-failures",
-    "transient-cli-capabilities"
+    "transient-cli-capabilities",
+    "transient-event-refinement",
+    "transient-network-profile",
+    "source-sinda-network",
+    "source-esatan-network",
+    "source-oracle-rejections",
+    "captured-reference-contract",
+    "steady-lu-subnormal-tail",
+    "transient-network-localized"
   ]
 }

@@ -146,9 +146,20 @@ SolveResult SparseLuBackend::solve(const SparseMatrix& a,std::span<const double>
       result.iterations=attempt+1; auto residual=a.multiply(x); double backward=0;
       for (std::size_t i=0;i<rhs.size();++i) {
         residual[i]=number(residual[i]-rhs[i]); double denominator=std::abs(rhs[i]);
-        for (std::size_t k=p.offsets()[i];k<p.offsets()[i+1];++k)
-          denominator=number(denominator+std::abs(number(a.values()[k]*x[p.columns()[k]])));
-        const double error=denominator==0 ? std::abs(residual[i]) : std::abs(residual[i])/denominator;
+        // A componentwise relative check alone is unattainable when solution
+        // tails are subnormal. Bound their quantization propagated through A,
+        // plus rounded dot products, in units of the smallest subnormal. This
+        // changes no equations/pivots and never replaces the global residual test.
+        const double eta=std::numeric_limits<double>::denorm_min();
+        double underflow=static_cast<double>(4*(p.offsets()[i+1]-p.offsets()[i])+2)*eta;
+        for (std::size_t k=p.offsets()[i];k<p.offsets()[i+1];++k) {
+          const double value=x[p.columns()[k]],coefficient=std::abs(a.values()[k]);
+          denominator=number(denominator+std::abs(number(a.values()[k]*value)));
+          if (std::abs(value)<std::numeric_limits<double>::min())
+            underflow=number(underflow+2*(coefficient*eta));
+        }
+        const double excess=std::max(0.0,std::abs(residual[i])-underflow);
+        const double error=denominator==0 ? (excess==0?0.:1.) : excess/denominator;
         backward=std::max(backward,error);
       }
       result.residual_norm=norm(residual); result.solution=x;

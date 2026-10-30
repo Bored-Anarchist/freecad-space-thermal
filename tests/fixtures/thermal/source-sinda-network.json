@@ -1,0 +1,13 @@
+{
+  "ecosystem": "sinda",
+  "source_version": "6.3",
+  "filename": "network.inp",
+  "units": [
+    "K",
+    "J/K",
+    "W/K",
+    "W",
+    "s"
+  ],
+  "source_ascii": "C Owned WP-11 source-comparison network\nHEADER NODE DATA, MAIN\n1,310,2\n2,350,0\n-3,300,0\nHEADER CONDUCTOR DATA, MAIN\n1,1,2,2\n2,2,3,2\nHEADER SOURCE DATA, MAIN\n1,4\nEND OF DATA\n"
+}

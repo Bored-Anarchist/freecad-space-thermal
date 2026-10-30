@@ -8,12 +8,14 @@ import os
 from pathlib import Path
 import subprocess
 import sys
+import tempfile
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'python'))
 from fcst_contracts import inspect
 from fcst_tools.gate import evaluate
 from fcst_tools.thermal import input_hashes, assess, IMPLEMENTED_SUBSTEPS
+from fcst_tools.thermal_qualification import source_model,source_results,oracle_model,qualification
 
 
 def uid(n): return f'00000000-0000-4000-8000-{n:012d}'
@@ -23,6 +25,7 @@ def entity(value, n): return next(e for e in value['model']['entities'] if e['id
 
 def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
     policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
+    qualification_policy=json.loads((ROOT/'ci/thermal-qualification-v1.json').read_bytes())
     fixture = ROOT/'tests/fixtures/thermal/material-network.json'
     baseline = json.loads(fixture.read_bytes())
     # Prove installed engine execution with Python, host and vendor search paths absent.
@@ -31,6 +34,7 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
     env['PATH'] = str(worker.parent)
     build_info = {}
     backend_capabilities, native_profile = {}, {}
+    qualification_metrics, source_comparisons, source_cache = {}, {}, {}
     def build_identity():
         result = subprocess.run([str(worker),'--build-info'],capture_output=True,env=env,timeout=30)
         build_info.update(json.loads(result.stdout))
@@ -248,9 +252,75 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
         assert c['external_reference'] is False and c['durable_job_solver'] is False
         assert c['transient']=='fcst_enthalpy_backward_euler_step_doubling'
         backend_capabilities.update(c)
+    def source_comparison(ecosystem):
+        path=fixture.parent/f'source-{ecosystem}-network.json'
+        definition=json.loads(path.read_bytes());model=source_model(definition)
+        criteria=qualification_policy['source_oracle'];oracle_model(model,criteria)
+        envelope={'contract_version':'1.0.0','model':model,'material_laws':[],'node_storage':[]}
+        steady_output=steady(envelope)
+        transient_output=transient({'thermal_input':envelope,'transient':{'start':0,'end':criteria['output_times_s'][-1],
+            'output_times':criteria['output_times_s'],'absolute_temperature_tolerance':1e-7,'relative_temperature_tolerance':0}})
+        metrics=source_results(model,steady_output,transient_output,criteria)
+        assert steady_output['model_hash']==transient_output['model_hash']==inspect('model',json.dumps(model).encode())['semantic_hash']
+        source_comparisons[ecosystem]={'fixture_sha256':sha256(path.read_bytes()).hexdigest(),
+            'source_sha256':sha256(definition['source_ascii'].encode('ascii')).hexdigest(),
+            'model_hash':steady_output['model_hash'],**metrics}
+        source_cache[ecosystem]=(model,steady_output,transient_output)
+    def source_oracle_rejections():
+        assert set(source_cache)=={'sinda','esatan'}
+        for model,steady_output,transient_output in source_cache.values():
+            for change in ('model-load','temperature','boundary-power','storage','missing-time','native-mode','nan'):
+                m,s,t=deepcopy((model,steady_output,transient_output))
+                if change=='model-load':next(e for e in m['entities'] if e['kind']=='load')['power']['value']+=1
+                if change=='temperature':t['samples'][-1]['temperature_K'][0]+=1
+                if change=='boundary-power':t['samples'][-1]['boundary_power_W']=[v+1 for v in t['samples'][-1]['boundary_power_W']]
+                if change=='storage':t['samples'][-1]['storage_change_J']=[v+1 for v in t['samples'][-1]['storage_change_J']]
+                if change=='missing-time':t['samples'].pop()
+                if change=='native-mode':t['backend']['execution_mode']='reference_external'
+                if change=='nan':t['samples'][-1]['temperature_K'][0]=float('nan')
+                try:source_results(m,s,t,qualification_policy['source_oracle'])
+                except ValueError:continue
+                raise AssertionError('source_oracle_accepted_perturbation')
+    def captured_reference_contract():
+        import math
+        definition=json.loads((fixture.parent/'source-sinda-network.json').read_bytes())
+        criteria=qualification_policy['source_oracle'];text=[]
+        for time in criteria['output_times_s']:
+            temperature=304+6*math.exp(-time/2)
+            text += [f'TIMEN = {time}', 'SUBMODEL NAME = MAIN',f'T1={temperature:.17g} T2={(temperature+300)/2:.17g} T3=300']
+        with tempfile.TemporaryDirectory() as folder:
+            root=Path(folder)
+            def artifact(name,raw):
+                (root/name).write_bytes(raw);return {'path':name,'byte_length':len(raw),'sha256':sha256(raw).hexdigest()}
+            source=artifact('network.inp',definition['source_ascii'].encode('ascii'))
+            results=artifact('printed.txt',('\n'.join(text)+'\n').encode('ascii'))
+            receipt={'execution_mode':'reference_external','ecosystem':'sinda','source_version':'6.3',
+                     'model_sha256':source['sha256'],'results_sha256':results['sha256'],
+                     **{key:sha256(b'owned-synthetic-receipt-contract-only').hexdigest() for key in
+                        ('executable_sha256','settings_sha256','run_id_sha256','review_decision_sha256')}}
+            manifest={'version':'fcst-thermal-captured-reference/1','execution_mode':'reference_external','ecosystem':'sinda',
+                      'source_version':'6.3','units':definition['units'],'model':source,'results':results,
+                      'receipt':artifact('receipt.json',json.dumps(receipt).encode())}
+            artifact('manifest.json',json.dumps(manifest).encode())
+            command=[sys.executable,str(ROOT/'tools/compare_thermal_reference.py'),'--manifest',str(root/'manifest.json'),
+                     '--worker',str(worker),'--report',str(root/'comparison.json')]
+            result=subprocess.run(command,capture_output=True,timeout=120)
+            report=json.loads((root/'comparison.json').read_bytes())
+            assert result.returncode==0 and not result.stderr and report['status']=='passed'
+            assert report['vendor_qualified'] is False and report['q1_qualified'] is False
+            assert report['comparison']['maximum_temperature_error_K']<.005
+            (root/'printed.txt').write_bytes(b'changed')
+            result=subprocess.run(command,capture_output=True,timeout=30)
+            assert result.returncode==1 and not result.stderr and json.loads(result.stdout)['status']=='failed'
+            result=subprocess.run([sys.executable,str(ROOT/'tools/compare_thermal_reference.py'),'--report',str(root/'blocked.json')],
+                                  capture_output=True,timeout=30)
+            assert result.returncode==2 and not result.stderr and json.loads(result.stdout)['status']=='blocked'
     cli = {'steady-cli-linear':steady_linear,'steady-cli-singular':steady_singular,'steady-cli-rejections':steady_rejections,
            'transient-cli-analytic':transient_analytic,'transient-cli-checkpoint':transient_checkpoint,
            'transient-cli-events':transient_events,'transient-cli-failures':transient_failures,'transient-cli-capabilities':transient_capabilities,
+           'source-sinda-network':lambda:source_comparison('sinda'),'source-esatan-network':lambda:source_comparison('esatan'),
+           'source-oracle-rejections':source_oracle_rejections,
+           'captured-reference-contract':captured_reference_contract,
            'build-identity': build_identity, 'native-preparation': preparation, 'canonical-identity': canonical_identity,
            'disconnected-components': disconnected, 'zero-links': zero_links,
            'invalid-structure': invalid_structure, 'invalid-tables': invalid_tables,
@@ -263,7 +333,12 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
             if case.startswith('transient-') and not case.startswith('transient-cli-'):
                 result = subprocess.run([str(transient_tests),case.removeprefix('transient-'),str(fixture.parent)],
                                         capture_output=True,timeout=180,env=env)
-                assert result.returncode == 0 and json.loads(result.stdout) == {'status':'passed'} and not result.stderr
+                output=json.loads(result.stdout)
+                assert result.returncode == 0 and not result.stderr and output['status']=='passed'
+                if case in {'transient-event-refinement','transient-network-profile','transient-network-localized'}:
+                    assert set(output)=={'status','metrics'}
+                    qualification_metrics[case]=output['metrics']
+                else:assert output=={'status':'passed'}
             elif case.startswith('steady-') and not case.startswith('steady-cli-'):
                 result = subprocess.run([str(steady_tests),case.removeprefix('steady-'),str(fixture.parent)],
                                         capture_output=True,timeout=30,env=env)
@@ -281,7 +356,7 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
         except (AssertionError, KeyError, ValueError, OSError, subprocess.SubprocessError):
             status = 'failed'
         records.append({'id': case, 'status': status})
-    return records, build_info, backend_capabilities, native_profile
+    return records, build_info, backend_capabilities, native_profile, qualification_metrics, source_comparisons, qualification(qualification_policy,records)
 
 
 def main():
@@ -294,10 +369,11 @@ def main():
     parser.add_argument('--report', type=Path, default=ROOT/'.local/thermal.json')
     args = parser.parse_args()
     policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
-    records, build_info, capabilities, profile = check(args.worker.resolve(), args.native_tests.resolve(), args.assembly_tests.resolve(), args.steady_tests.resolve(), args.transient_tests.resolve())
-    report = {'schema_version':4, 'work_packages':IMPLEMENTED_SUBSTEPS, 'solver_available':False,'steady_available':True,'transient_available':True,
+    records, build_info, capabilities, profile, qualification_metrics, comparisons, native_qualification = check(args.worker.resolve(), args.native_tests.resolve(), args.assembly_tests.resolve(), args.steady_tests.resolve(), args.transient_tests.resolve())
+    report = {'schema_version':5, 'work_packages':IMPLEMENTED_SUBSTEPS, 'solver_available':False,'steady_available':True,'transient_available':True,
               'worker_build':build_info,
               'backend_capabilities':capabilities,'native_profile':profile,
+              'qualification_metrics':qualification_metrics,'source_comparisons':comparisons,'native_qualification':native_qualification,
               'binary_sha256':{key:sha256(path.read_bytes()).hexdigest() for key,path in
                                [('worker',args.worker),('preparation_acceptance',args.native_tests),('assembly_acceptance',args.assembly_tests),('steady_acceptance',args.steady_tests),('transient_acceptance',args.transient_tests)]},
               'candidate':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
