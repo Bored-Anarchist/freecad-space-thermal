@@ -16,10 +16,39 @@
       "id": "native-preparation-material-and-assembly-acceptance",
       "status": "passed",
       "configuration": "Debug",
-      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --assembly-tests ASSEMBLY_TEST_EXE --report .local/wp11-assembly-debug.json",
+      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --assembly-tests ASSEMBLY_TEST_EXE --report .local/windows-debug/thermal.json",
       "cases": 33,
-      "report_sha256": "ccaf5f6e8dd7c69bbd5cc867cbfd3ded4c6c5f700d560384425cd7507b747284",
-      "identity": "Exact input_sha256 and native binary hashes bind the tested implementation; candidate in this precommit report identifies the base revision."
+      "report_sha256": "d3e9cca566cb9dbbd8e9293b8bdccb8dbad01810e1dfc38485f6d2463a1068fc",
+      "identity": "Candidate, exact input_sha256, native binary hashes and worker build identity bind the tested implementation.",
+      "candidate": "0b26b124eb451926b345b9776fccc9124ce30e0c"
+    },
+    {
+      "id": "standard-library-security-and-regressions",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "cases": 316
+    },
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "candidate": "0b26b124eb451926b345b9776fccc9124ce30e0c",
+      "cases": 337,
+      "thermal_acceptance_cases": 33,
+      "native_ctest_cases": 23,
+      "report_sha256": "e7126691673badf98d91f81c454fdcfc1535340dea686a5c00a7dd4515fc9561",
+      "thermal_report_sha256": "d3e9cca566cb9dbbd8e9293b8bdccb8dbad01810e1dfc38485f6d2463a1068fc"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "candidate": "0b26b124eb451926b345b9776fccc9124ce30e0c",
+      "cases": 337,
+      "thermal_acceptance_cases": 33,
+      "native_ctest_cases": 23,
+      "report_sha256": "24a59305ef09d1914ece2bd8da7938da39027d5554dd81322150c3a2fe3e46d1",
+      "thermal_report_sha256": "ad1b5fb816b941d7667be42d84cb80ad144d5cabd36636b2cb8f6eb48e528228"
     }
   ],
   "remaining_substeps": [
@@ -70,5 +99,6 @@
     "candidate": "dc63605aa0ab1f4026b89829b25e4fa9ec6c6a3a",
     "path": "plans/evidence/WP-11.json",
     "scope": "WP-11.1 and WP-11.2 verification retained in Git history"
-  }
+  },
+  "tested_candidate": "0b26b124eb451926b345b9776fccc9124ce30e0c"
 }
