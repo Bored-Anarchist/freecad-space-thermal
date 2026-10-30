@@ -111,7 +111,7 @@
     "python/fcst_exchange/syntax.py": "86ba72e58f39211f006fb00512251d615adf4f656194d88d09939c89c008be27",
     "python/fcst_exchange/vendor_paths.py": "997d30a6ca5e2d5420231f4f3e673acb1b6b5b6731629b1b8636611a70351dc3",
     "python/fcst_cli/__init__.py": "c77a7b2bffa4f4daa04cd06e0c60e3d9b9cf541199ea87a48d527f1c8675526e",
-    "python/fcst_cli/__main__.py": "71136750b17805b8f7e0d3afdfaf8c8ae23bc42a8378a9507c947d4e5d1346b0",
+    "python/fcst_cli/__main__.py": "5a7d31d922d626a9eaa1a1f7ab7941ad925af2abc68dcd8161cfa5db1a8b4b2a",
     "python/fcst_cli/exchange.py": "ed9d49c5e71e3c50f0c34bae553642f49a03a4488349c9705e5a2e55b2a33fde",
     "python/fcst_cli/jobs.py": "667a23eeafc935128f95310de7a6ba81164ddb6d862505571b1120655ab400dc",
     "python/fcst_app/__init__.py": "d5fb80b0622163ad4bf6b9ad0e3a10147a13f6017315a49d4e946d6f1822579e",
@@ -125,7 +125,10 @@
     "python/fcst_contracts/types.py": "d399ea1521fbbb899bfa2a9194532ef1e7892e6719a6b3e9c54ca14cd43e9824",
     "python/fcst_contracts/worker.py": "a8da22e6d4c3534ce73494312fd0641ed10bfb2866ab34ef87a196a9827fbadf",
     "python/fcst_contracts/bundle.json": "785584588917e6d882f80247f25632cf1bd84c5ed9cb2c4116a96bc10365b932",
-    "python/fcst_tools/gate.py": "e3e9a6fd7acf36589713a722452f2b756258e169b7ec23b86a3e39c1514ca409"
+    "python/fcst_tools/gate.py": "e3e9a6fd7acf36589713a722452f2b756258e169b7ec23b86a3e39c1514ca409",
+    "python/fcst_cli/esatan.py": "57bddd9a44a5462ac7498ce5278aa60e6429417289e457fb9be2956594cfd1ca",
+    "python/fcst_exchange/esatan.py": "5a4eeb077d03235c4c2457af06942589f0e1af83726a6ddf16b193d523823330",
+    "python/fcst_exchange/esatan_syntax.py": "f388989c5677405285838a6ba2ddaafeaa27c0dde50e29c94eb0eb23a5f62b93"
   },
   "license": "GPL-3.0-or-later; separate executable and linked backend; not linked into the thermal engine",
   "required_cases": [

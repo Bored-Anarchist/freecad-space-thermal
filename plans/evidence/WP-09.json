@@ -1,0 +1,138 @@
+{
+  "work_package": "WP-09",
+  "status": "in_progress",
+  "scope": "Independent constant D-deck codec, native syntax inventories, bound TMD queries and streaming postprocessing XML inspection; full plan completion remains open.",
+  "contract": "docs/esatan.md",
+  "acceptance_register": "ci/esatan-acceptance.json",
+  "source_profiles": "ci/esatan-profiles.json",
+  "checks": [
+    {
+      "id": "implementation-acceptance",
+      "status": "passed",
+      "command": "python tools/check_esatan.py",
+      "cases": 44,
+      "report_sha256": "56703f90bf03e9bdc9aaea12f310f01d2faa30b5fdc87195bc87898e5e2bab10",
+      "candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50"
+    },
+    {
+      "id": "standard-library-security-and-regressions",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "cases": 314,
+      "report_sha256": "10f896a543c69187f50ff9e7d62d02a275289781306f0b6086a17cde8ecf193d"
+    },
+    {
+      "id": "preserved-original-inspection",
+      "status": "passed",
+      "command": "python tools/probe_esatan.py --resolved-xml .local/wp09/lfs/project.xml",
+      "cases": 35,
+      "scope": "Inert syntax/container inspection; no full native qualification"
+    },
+    {
+      "id": "resolved-xml-streaming-inspection",
+      "status": "passed",
+      "elements": 2444480,
+      "series": 838,
+      "points": 2432973,
+      "provenance": "ci/esatan-acquisition.json"
+    },
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50",
+      "cases": 334,
+      "report_sha256": "fe761cc63f01cbdb712c9d14b578d8bcbd72a57c970d788e425865615dd67f43"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50",
+      "cases": 334,
+      "report_sha256": "4f089f62acb20f11a406ba1c07f3a504d7be812dbb2c8b5658e4cd4941827afc"
+    },
+    {
+      "id": "xml-mirror-acquisition-end-to-end",
+      "status": "passed",
+      "command": "python tools/acquire_esatan_xml.py <new-local-target>",
+      "provenance": "ci/esatan-acquisition.json",
+      "bytes": 211760264,
+      "scope": "Hash-bound local acquisition and complete bounded streaming inspection; no redistribution"
+    }
+  ],
+  "blockers": [
+    "complete_native_project_schema_and_dependency_closure",
+    "canonical_geometry_environment_motion_campaign_semantics",
+    "complete_d_deck_attributes_arrays_procedures_and_radiation",
+    "additional_required_result_schemas_and_source_pairing",
+    "owned_engine_numerical_comparisons_WP11_WP12",
+    "separate_TD_to_ESA_and_ESA_to_TD_qualification"
+  ],
+  "resolved_prerequisites": [
+    {
+      "id": "acquired-xml-lfs-payload",
+      "status": "resolved",
+      "provenance": "ci/esatan-acquisition.json",
+      "content_role": "postprocessing XML; not a native project descriptor"
+    }
+  ],
+  "publication": "TST-021 requires exact outgoing source staged/history/identity reports and prose preflight; original and resolved payloads remain local.",
+  "tested_source_inputs": {
+    "ci/esatan-acceptance.json": "3b48207e3063a0f593f9fa71eef9b7c8cc16764ad2899a6728390fcabd305cc4",
+    "ci/esatan-profiles.json": "e02b816613fb2f4a8242fd90057fe615dd236b5bc0b4f089f0dbad4659fd63ee",
+    "ci/esatan-acquisition.json": "855cae7eb3627ebe8bc94695d8269c8d4d940ee2ab5430187677a46725a3540a",
+    "tests/esatan_fixture.py": "aa3995988cd8f8521a73470e74a3ff095cbd4b36a7555154328e644162f8e2e0",
+    "tests/esatan_offline_peer.py": "4fec4fedad3bd9ffffad4a64b325455ae96186463829c3953130f80d447574e5",
+    "tests/esatan_result_acceptance.py": "6af4562ddfd4c960fa20e80ea4f990c90987620d218a17d475bc3026de03e312",
+    "tests/test_esatan.py": "097cd0b02ff9d6c7588f98b85870f34c99b027a6f5ad1422818d406cf3a8c6d0",
+    "python/fcst_cli/esatan.py": "57bddd9a44a5462ac7498ce5278aa60e6429417289e457fb9be2956594cfd1ca",
+    "python/fcst_cli/__main__.py": "5a7d31d922d626a9eaa1a1f7ab7941ad925af2abc68dcd8161cfa5db1a8b4b2a",
+    "tests/test_esatan_xml.py": "416cc4d14cba7659137da35f00df04c316dd20c21b72477cc0507a176bbb40eb",
+    "tools/check_esatan.py": "2015935ed359e153d60d7dea2ccbdcfaa87de851cf4ded593fc5cd40ff4c4812",
+    "tools/acquire_esatan_xml.py": "3a26adbd86d4cf8c8293e623335492fa795fe89a1edf6332bbcbb8cc00cb1b3c",
+    "tools/probe_esatan.py": "e56fa619c62c5062b188845d336bfb5f999faefa74454a0bd45bbd985fe92528",
+    "spec/schemas/exchange-fidelity-v1.schema.json": "f2425db252673ba3cb29917fdef56a523f7f05f6adaaf66a75ac51f68f029677",
+    "python/fcst_exchange/__init__.py": "c0b8878319521c32bac18ae2f74eeb0b8fcaea6bddd0dca342913528fce548ed",
+    "python/fcst_exchange/core.py": "934f44ed58a9e74cb919eee2836b917f922bbe6415d1700e3f5540e98834dbfd",
+    "python/fcst_exchange/dwg_bits.py": "47b0dd26e69250fbd18659e3f203f0af01ad35c067c1473f70df14615e6a8e4f",
+    "python/fcst_exchange/dwg_container.py": "e31c2477d444b90a592d7b1d054789ffe66da6e35aaefdcd5e9a7a7e3789b231",
+    "python/fcst_exchange/dwg_native.py": "6fadb10f6ae8a0e9fa36912c8029642640161d0613bdef69837e4a1b41399f11",
+    "python/fcst_exchange/esatan.py": "5a4eeb077d03235c4c2457af06942589f0e1af83726a6ddf16b193d523823330",
+    "python/fcst_exchange/esatan_native.py": "ebf9e52c281701e52f4f3b5cbc1b23b2a0d33b3ad686a6b8b60d2de5921ce3e5",
+    "python/fcst_exchange/esatan_results.py": "2f6d7a28df52b16bc13b428110221495989f0ad6da55d408ee0ca1aad3b042dd",
+    "python/fcst_exchange/esatan_syntax.py": "f388989c5677405285838a6ba2ddaafeaa27c0dde50e29c94eb0eb23a5f62b93",
+    "python/fcst_exchange/esatan_writer.py": "f298fbe1fc1e13718425c6dcd418bd68b902441e833e505fa23ad46d594ffada",
+    "python/fcst_exchange/esatan_xml.py": "8b13d60686a7d37d3e17b105a2817f1c74145da6a0965dd87844a4f7cf09cd5f",
+    "python/fcst_exchange/export.py": "daacae0d4f3d9180c651c827487cd1016418aa0dcc74015d7be4ecfe4d51ff70",
+    "python/fcst_exchange/independent_td.py": "c3781bec9b1711f1ad41a61afeb60cd75ca8c62b92a31ee7ddb30ccad39c92c8",
+    "python/fcst_exchange/logic.py": "a94961ae77ecba9b93ea366164fcb8cb42c5250fcf8f64454cff100b94733b3f",
+    "python/fcst_exchange/opentd.py": "9c36251237f25bbfc3a51b977d704b24dbb7eb840aec6aea48f6214024ad2dfc",
+    "python/fcst_exchange/results.py": "ad3bb3a9c0a62020899b2620b532d9e4cf328102bc48c4cbd36733ea9e4c149a",
+    "python/fcst_exchange/sinda.py": "510fb4482cb56129ec1565b1118f74006abe86a9ab6f84300e9d5d78d10215d9",
+    "python/fcst_exchange/sinda_arrays.py": "866a1e77841c9a4a470023c5b56ce861435aa0b2ccb18063032592dffd95c0fd",
+    "python/fcst_exchange/sinda_results.py": "28b5bf1372708985a182fda3c8b63d2d8f7ef37a934fa2f40a2e9cd60cd238ff",
+    "python/fcst_exchange/sinda_writer.py": "1897c5292932c8c22ec4365d79f58387c3c4eede261107fd814e754886c9abae",
+    "python/fcst_exchange/source_package.py": "9845a56cdd5a5dfb180462ceaa34474887bca860e6a50278e8c312a49f9847fc",
+    "python/fcst_exchange/source_tree.py": "65aa3697532a04ebe2be3913a9d1108cea2792f60b5c2933b9cc0da013357749",
+    "python/fcst_exchange/syntax.py": "86ba72e58f39211f006fb00512251d615adf4f656194d88d09939c89c008be27",
+    "python/fcst_exchange/td_conductor.py": "1912d126c002ea24111089bbc642de2759fb6aaf412918f3e139910c130ba7c8",
+    "python/fcst_exchange/td_decode.py": "18513ead0cdb1d584f4f6a3f210bf699054c6192037220d7914067809dc1216e",
+    "python/fcst_exchange/td_filer.py": "37a5b7a0138e196d734067bea5933fcaf95b610cea99aeae0e980dd945404908",
+    "python/fcst_exchange/td_geometry.py": "e84bc6f342bf512cdd93193158d2af224142d5847d183ea25d324b6896120e86",
+    "python/fcst_exchange/td_load.py": "449a91679ca7dbdaaf6308b28368f7e032f43b87c4065494f236869f2cc08565",
+    "python/fcst_exchange/td_model.py": "bc90c718ca9e10a111da25f01d9bf582950a12aed4afc9a475dc65a4ffd63e1a",
+    "python/fcst_exchange/td_node.py": "68497dfcdd1115bbd07cf346859f8ab1d0f49681d60a16a82c1eca9313794f15",
+    "python/fcst_exchange/td_project.py": "c029d1d51aeefc054caac4d0d129af9c7efb22a2523b7bd94cbfc75780cf87bc",
+    "python/fcst_exchange/td_properties.py": "7943eb3c4992a72e93c363bb32db8e9cd380fd79ef61e5bf14ed77c71b0d3bd2",
+    "python/fcst_exchange/td_property_laws.py": "e07c9282bc45da2abc78182bdeb0d29e77a3d50c83a8242d2e84e337289637bc",
+    "python/fcst_exchange/td_property_model.py": "b30d63f1c4a1172741ef2148703d37a951bedb1f9ce9d3e606b5f8ead65a18e7",
+    "python/fcst_exchange/td_qualification.py": "0f842cae40fcd2050b25fa30427e490afe16a29c468bb0bef43b70119ed6b300",
+    "python/fcst_exchange/td_reference.py": "fc121100061252aea790f14a13ef80664e996260cd8353358bbb97dce19e391c",
+    "python/fcst_exchange/td_surface.py": "96a1b7fa97096ccfa5f0851b9a9e409d721b04fc75fddf22d422bb1254d44223",
+    "python/fcst_exchange/td_writer.py": "d8cf8fa63f74532ab9acd4ff48504e565dc75b1314008841a4330e30641f7327",
+    "python/fcst_exchange/tools.py": "f8161776a79504e411a49f7ef225124e854be29fe4addcdb6cba8223269334c0",
+    "python/fcst_exchange/vendor_paths.py": "997d30a6ca5e2d5420231f4f3e673acb1b6b5b6731629b1b8636611a70351dc3"
+  },
+  "tested_candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50"
+}
