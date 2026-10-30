@@ -11,13 +11,15 @@
       "status": "passed",
       "command": "python tools/check_esatan.py",
       "cases": 44,
-      "report_sha256": "0befca873913a75500edd30163638a1856e48c39ceaff0a8b3d7b20b72c59552"
+      "report_sha256": "56703f90bf03e9bdc9aaea12f310f01d2faa30b5fdc87195bc87898e5e2bab10",
+      "candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50"
     },
     {
       "id": "standard-library-security-and-regressions",
       "status": "passed",
       "command": "python -S tools/check_security.py",
-      "cases": 314
+      "cases": 314,
+      "report_sha256": "10f896a543c69187f50ff9e7d62d02a275289781306f0b6086a17cde8ecf193d"
     },
     {
       "id": "preserved-original-inspection",
@@ -33,6 +35,30 @@
       "series": 838,
       "points": 2432973,
       "provenance": "ci/esatan-acquisition.json"
+    },
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50",
+      "cases": 334,
+      "report_sha256": "fe761cc63f01cbdb712c9d14b578d8bcbd72a57c970d788e425865615dd67f43"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50",
+      "cases": 334,
+      "report_sha256": "4f089f62acb20f11a406ba1c07f3a504d7be812dbb2c8b5658e4cd4941827afc"
+    },
+    {
+      "id": "xml-mirror-acquisition-end-to-end",
+      "status": "passed",
+      "command": "python tools/acquire_esatan_xml.py <new-local-target>",
+      "provenance": "ci/esatan-acquisition.json",
+      "bytes": 211760264,
+      "scope": "Hash-bound local acquisition and complete bounded streaming inspection; no redistribution"
     }
   ],
   "blockers": [
@@ -53,9 +79,9 @@
   ],
   "publication": "TST-021 requires exact outgoing source staged/history/identity reports and prose preflight; original and resolved payloads remain local.",
   "tested_source_inputs": {
-    "ci/esatan-acceptance.json": "53ecbd5656efd953175e7817a3e4f6cd417727b0a4d986e643cfc0d15a27a297",
-    "ci/esatan-profiles.json": "2129f74a51b354290e928c1b3e8e2af35767746a615fcaf5fb4299e66824a716",
-    "ci/esatan-acquisition.json": "a857e508dd2261023bcf89e84b8d65bd02b43f97461dbcb332f4c9e3e0e34473",
+    "ci/esatan-acceptance.json": "3b48207e3063a0f593f9fa71eef9b7c8cc16764ad2899a6728390fcabd305cc4",
+    "ci/esatan-profiles.json": "e02b816613fb2f4a8242fd90057fe615dd236b5bc0b4f089f0dbad4659fd63ee",
+    "ci/esatan-acquisition.json": "855cae7eb3627ebe8bc94695d8269c8d4d940ee2ab5430187677a46725a3540a",
     "tests/esatan_fixture.py": "aa3995988cd8f8521a73470e74a3ff095cbd4b36a7555154328e644162f8e2e0",
     "tests/esatan_offline_peer.py": "4fec4fedad3bd9ffffad4a64b325455ae96186463829c3953130f80d447574e5",
     "tests/esatan_result_acceptance.py": "6af4562ddfd4c960fa20e80ea4f990c90987620d218a17d475bc3026de03e312",
@@ -107,5 +133,6 @@
     "python/fcst_exchange/td_writer.py": "d8cf8fa63f74532ab9acd4ff48504e565dc75b1314008841a4330e30641f7327",
     "python/fcst_exchange/tools.py": "f8161776a79504e411a49f7ef225124e854be29fe4addcdb6cba8223269334c0",
     "python/fcst_exchange/vendor_paths.py": "997d30a6ca5e2d5420231f4f3e673acb1b6b5b6731629b1b8636611a70351dc3"
-  }
+  },
+  "tested_candidate": "cfff412a5104469debd043a8fe4f50ee910f2b50"
 }
