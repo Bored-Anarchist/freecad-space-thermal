@@ -93,6 +93,7 @@ def main():
                                  "--report", str(output / "contracts.json")],
         "thermal-preparation": [sys.executable, "tools/check_thermal.py", "--worker", str(install / "bin/fcst-worker.exe"),
                                 "--native-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-tests.exe"),
+                                "--assembly-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-assembly-tests.exe"),
                                 "--report", str(output / "thermal.json")],
         "numerical-checkpoint": [sys.executable, "tools/check_numerical.py", "--configuration", config,
                                   "--report", str(output / "numerical.json")],

@@ -2,6 +2,7 @@
 """Unattended native WP-11.1/11.2 acceptance with no external thermal runtime."""
 import argparse
 from copy import deepcopy
+from hashlib import sha256
 import json
 import os
 from pathlib import Path
@@ -12,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'python'))
 from fcst_contracts import inspect
 from fcst_tools.gate import evaluate
-from fcst_tools.thermal import input_hashes, assess
+from fcst_tools.thermal import input_hashes, assess, IMPLEMENTED_SUBSTEPS
 
 
 def uid(n): return f'00000000-0000-4000-8000-{n:012d}'
@@ -20,7 +21,7 @@ def quantity(value, unit): return {'value': value, 'unit': unit}
 def entity(value, n): return next(e for e in value['model']['entities'] if e['id'] == uid(n))
 
 
-def check(worker, native_tests):
+def check(worker, native_tests, assembly_tests):
     policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
     fixture = ROOT/'tests/fixtures/thermal/material-network.json'
     baseline = json.loads(fixture.read_bytes())
@@ -28,6 +29,13 @@ def check(worker, native_tests):
     env = {k: v for k, v in os.environ.items() if k.upper() not in
            {'PYTHONPATH', 'PYTHONHOME', 'FREECAD_LIB', 'FREECAD_USER_HOME', 'SINDAPATH', 'ESATAN'} }
     env['PATH'] = str(worker.parent)
+    build_info = {}
+    def build_identity():
+        result = subprocess.run([str(worker),'--build-info'],capture_output=True,env=env,timeout=30)
+        build_info.update(json.loads(result.stdout))
+        assert result.returncode == 0 and not result.stderr
+        assert build_info['engine'] == 'fcst_native' and build_info['solver_available'] is False
+        assert build_info['source_revision'] == subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip()
     def run(value):
         raw = value if isinstance(value, bytes) else json.dumps(value, allow_nan=False).encode()
         result = subprocess.run([str(worker), '--thermal-prepare'], input=raw, capture_output=True, env=env, timeout=30)
@@ -144,7 +152,7 @@ def check(worker, native_tests):
         result = rejects(value,'schema'); assert 'opaque-marker' not in json.dumps(result)
         value = deepcopy(baseline); value['material_laws'][0]['specific_heat']['values'][0]['value'] = 1e309
         raw = json.dumps(value).encode(); rejects(raw,'invalid_json')
-    cli = {'native-preparation': preparation, 'canonical-identity': canonical_identity,
+    cli = {'build-identity': build_identity, 'native-preparation': preparation, 'canonical-identity': canonical_identity,
            'disconnected-components': disconnected, 'zero-links': zero_links,
            'invalid-structure': invalid_structure, 'invalid-tables': invalid_tables,
            'storage-binding': storage_binding, 'tensor-validation': tensors,
@@ -153,7 +161,11 @@ def check(worker, native_tests):
     records = []
     for case in policy['required_cases']:
         try:
-            if case.startswith('native-') and case != 'native-preparation':
+            if case.startswith('assembly-'):
+                result = subprocess.run([str(assembly_tests),case.removeprefix('assembly-'),str(fixture.parent)],
+                                        capture_output=True,timeout=30,env=env)
+                assert result.returncode == 0 and json.loads(result.stdout) == {'status':'passed'} and not result.stderr
+            elif case.startswith('native-') and case != 'native-preparation':
                 result = subprocess.run([str(native_tests), case.removeprefix('native-'), str(fixture)],
                                         capture_output=True, timeout=30, env=env)
                 assert result.returncode == 0 and json.loads(result.stdout) == {'status':'passed'} and not result.stderr
@@ -162,22 +174,26 @@ def check(worker, native_tests):
         except (AssertionError, KeyError, ValueError, OSError, subprocess.SubprocessError):
             status = 'failed'
         records.append({'id': case, 'status': status})
-    return records
+    return records, build_info
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--worker', type=Path, required=True)
     parser.add_argument('--native-tests', type=Path, required=True)
+    parser.add_argument('--assembly-tests', type=Path, required=True)
     parser.add_argument('--report', type=Path, default=ROOT/'.local/thermal.json')
     args = parser.parse_args()
     policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
-    records = check(args.worker.resolve(), args.native_tests.resolve())
-    report = {'schema_version':1, 'work_packages':['WP-11.1','WP-11.2'], 'solver_available':False,
+    records, build_info = check(args.worker.resolve(), args.native_tests.resolve(), args.assembly_tests.resolve())
+    report = {'schema_version':2, 'work_packages':IMPLEMENTED_SUBSTEPS, 'solver_available':False,
+              'worker_build':build_info,
+              'binary_sha256':{key:sha256(path.read_bytes()).hexdigest() for key,path in
+                               [('worker',args.worker),('preparation_acceptance',args.native_tests),('assembly_acceptance',args.assembly_tests)]},
               'candidate':subprocess.check_output(['git','rev-parse','HEAD'],cwd=ROOT,text=True).strip(),
               'input_sha256':input_hashes(ROOT), 'gate':evaluate(policy['required_cases'],records), 'cases':records}
     args.report.parent.mkdir(parents=True,exist_ok=True)
-    args.report.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
+    args.report.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8',newline='\n')
     print(json.dumps({'gate':report['gate'],'failures':[c['id'] for c in records if c['status']!='passed']}))
     try: assess(report,policy,input_hashes(ROOT),report['candidate'])
     except ValueError: return 1

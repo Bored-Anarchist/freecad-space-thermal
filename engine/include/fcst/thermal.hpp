@@ -60,6 +60,14 @@ struct Node {
 };
 struct Conductor { std::string id; std::size_t from, to; double conductance; };
 struct Load { std::string id; std::size_t node; double power; std::optional<std::string> expression_id; bool active; };
+struct Environment {
+  std::string id, frame_id, epoch, time_scale;
+  double background_temperature, solar_flux, time_origin;
+};
+struct Radiation {
+  std::string id, environment_id, method;
+  std::vector<std::string> facet_ids, excluded_facet_ids;
+};
 struct SourceIdentity {
   std::string source_map_id, source_revision, source_tool, source_version;
   std::string name_space, handle, entity_id;
@@ -81,6 +89,9 @@ struct Data {
   std::vector<Material> materials;
   std::vector<Conductor> conductors;
   std::vector<Load> loads;
+  std::vector<Environment> environments;
+  std::vector<Radiation> radiation;
+  std::vector<std::string> active_environment_ids, active_control_ids, spatial_element_ids;
   std::vector<SourceIdentity> source_identities;
   std::map<std::string, std::vector<std::size_t>> sources_by_entity;
   std::map<std::tuple<std::string, std::string, std::string>, std::size_t> source_index;
@@ -92,6 +103,7 @@ class Model {
  public:
   const Data& data() const { return data_; }
   double storage_capacity(std::size_t node, double temperature) const;
+  Sample storage_capacity_sample(std::size_t node, double temperature) const;
   double storage_change(std::size_t node, double from, double to) const;
  private:
   explicit Model(Data data);

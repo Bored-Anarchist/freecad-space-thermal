@@ -1,57 +1,28 @@
 {
   "work_package": "WP-11",
   "status": "in_progress",
-  "scope": "WP-11.1 immutable typed preparation and WP-11.2 material tables, enthalpy and storage; full engine qualification remains open.",
+  "scope": "WP-11.1 through WP-11.5: immutable preparation, material/storage laws, differential/algebraic energy residuals, boundary power, sparse Jacobians and guarded backend interfaces; full engine qualification remains open.",
   "contract": "docs/thermal-engine.md",
   "acceptance_register": "ci/thermal-acceptance.json",
   "implemented_substeps": [
     "WP-11.1",
-    "WP-11.2"
+    "WP-11.2",
+    "WP-11.3",
+    "WP-11.4",
+    "WP-11.5"
   ],
   "checks": [
     {
-      "id": "native-preparation-and-material-acceptance",
+      "id": "native-preparation-material-and-assembly-acceptance",
       "status": "passed",
       "configuration": "Debug",
-      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --report .local/windows-debug/thermal.json",
-      "cases": 20,
-      "report_sha256": "7221c6c1ca7df994f883c377eb928987becf4031bb8d3fae3e34a12829ca2fcf",
-      "identity": "Candidate and exact input_sha256 bind the tested implementation.",
-      "candidate": "1ac659ca07365a532cc111a0855097415ec74d88"
-    },
-    {
-      "id": "standard-library-security-and-regressions",
-      "status": "passed",
-      "command": "python -S tools/check_security.py",
-      "cases": 316
-    },
-    {
-      "id": "windows-debug",
-      "status": "passed",
-      "command": "python tools/verify.py --preset windows-debug",
-      "candidate": "1ac659ca07365a532cc111a0855097415ec74d88",
-      "cases": 337,
-      "thermal_acceptance_cases": 20,
-      "native_ctest_cases": 11,
-      "report_sha256": "d9495251ebc257d2f11f8f61388627c7814ee34527301c3ab46764fb79cb2199",
-      "thermal_report_sha256": "7221c6c1ca7df994f883c377eb928987becf4031bb8d3fae3e34a12829ca2fcf"
-    },
-    {
-      "id": "windows-release",
-      "status": "passed",
-      "command": "python tools/verify.py --preset windows-release",
-      "candidate": "1ac659ca07365a532cc111a0855097415ec74d88",
-      "cases": 337,
-      "thermal_acceptance_cases": 20,
-      "native_ctest_cases": 11,
-      "report_sha256": "6a1451c377065db8914c8e260a8a265bf36cc33d570983160953b8b6675ad162",
-      "thermal_report_sha256": "7221c6c1ca7df994f883c377eb928987becf4031bb8d3fae3e34a12829ca2fcf"
+      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --assembly-tests ASSEMBLY_TEST_EXE --report .local/wp11-assembly-debug.json",
+      "cases": 33,
+      "report_sha256": "1e9b010e594796b6fef1bc8d739f68bd11abfa6ae3066dce5be9b8d8729d648e",
+      "identity": "Exact input_sha256 and native binary hashes bind the tested implementation; candidate in this precommit report identifies the base revision."
     }
   ],
   "remaining_substeps": [
-    "WP-11.3",
-    "WP-11.4",
-    "WP-11.5",
     "WP-11.6",
     "WP-11.7",
     "WP-11.8",
@@ -59,24 +30,45 @@
     "WP-11.10"
   ],
   "input_sha256": {
-    "CMakeLists.txt": "260fd6eed1eed3c9dff6950fa35b0bb31c9d2616c2bdec1c68cdd1d722cb9b3e",
+    "CMakeLists.txt": "18c68f7fc2d30d010fe35c1924270bf8a7e63c1a80de4a675650fe91d04e67c0",
     "CMakePresets.json": "68a5d94ecb715b8ed4ca4157fef64fd10c8f9b645f343184390faf3cd4649dbf",
-    "ci/thermal-acceptance.json": "ec0c4dda23377c6197af0b2ce6ab2fc3071bc7a2873e7827b8fc9a3cda926334",
+    "ci/thermal-acceptance.json": "612d159f913670a48d238b4f7780986875d490a22d4632d684e708cee0c4831a",
+    "engine/include/fcst/build_info.hpp.in": "a39b9c567abd186e960a5a4110df72507b40b0dbe6f1eb800cdfb9d076cc28cf",
     "engine/include/fcst/contract_bundle.hpp": "cc2e286bbe453ebdaf20ed21d34b724a58d9089090818fcbc378704ddacc6730",
-    "engine/include/fcst/thermal.hpp": "971b79652f71809f4e3a64477345312370312cbb52e79514f7d659bd4e488b92",
+    "engine/include/fcst/contract_types.hpp": "7c7af3a36204f732c3fc5fc610d12639e1c51240de2cdd4be7e7a099f55ea4f5",
+    "engine/include/fcst/contracts.hpp": "6a712aa169bc237a0420ba2fa098b3101ac925c86f3b258b4d7007064e7fa116",
+    "engine/include/fcst/diagnostic.hpp": "2196622a956afcf89d59bac4bcf1c7787717e646948a1f8383960e2960b2c6b2",
+    "engine/include/fcst/thermal.hpp": "3cbf2c1d745f6bf71fdc5283610be40d30eb5b2561ac23807910a9fe2c85a330",
+    "engine/include/fcst/thermal_assembly.hpp": "6de7d07099b53ceca0d4f3da361b50bb5ecac7d298e8507d2875d868b838e09e",
     "engine/include/fcst/thermal_schema.hpp": "50b574eceea4a5aaf5186985df69b92208cfe8155547d9b65b8178705b6fbe7c",
     "engine/src/contracts.cpp": "3e73c942175c3264ad1a5a0fa3372b2bf0f0a9d0acf329e0e6437a804d706d9e",
-    "engine/src/thermal.cpp": "eb4b779303df91e7857a67d2348178fe217e468ca0ba530ac9b5c353cb694f80",
-    "engine/src/thermal_loading.inc": "4e83d5d645348100a52fca1187a8cee71c2dc8e3e90babe93f5ff4b9f108907d",
+    "engine/src/diagnostic.cpp": "549e09fd222cc75c9d662fe115f90602a527c3a0ff3447b35c83210bb2ec997f",
+    "engine/src/spatial.inc": "102745857cdc2a4c9e43752ac84c8059e1824974cc77f4ce16b69cee875ba9c6",
+    "engine/src/thermal.cpp": "06293286afab72f1dbe6693b9f11a5a5db7edc412026f424ffe4e1a428a2ede9",
+    "engine/src/thermal_assembly.cpp": "f74a5447f535937cf541035a1478a7f79ff7ed062444c3a8ea2a69b5ad5d9df2",
+    "engine/src/thermal_loading.inc": "8fb0cf1f66bce682c95c22351a7753a9439abff68ec27af5a88ad86c37ed4b3b",
+    "engine/tests/thermal_assembly_tests.cpp": "e56eff2b8c6539b331cf3e61a6fe267812237ae1b862f7e659e113b55b319208",
     "engine/tests/thermal_tests.cpp": "e4261787958fb17cd1e0daf8ea4b0fecb20def4328dc9e9affeda436e59ec9bf",
     "engine/worker/main.cpp": "cc65798f2fc890a5f206c7f95dca86e6445272c51f8d0ff6b24f3578778c800e",
-    "python/fcst_tools/thermal.py": "c64c56bac819b2192de9d524056413cc7393e1b4ebadf8bdee6b50e6c4b56584",
+    "python/fcst_tools/thermal.py": "eb3852cdfaf8600437493ef662a35d3871ca9e302d8947ce6ab13c908c01a7ba",
     "spec/schemas/thermal-input-v1.schema.json": "3f31dbd12e15adef26ba4eaa3363bed003ad55f47bfe718191213aca31d63975",
+    "tests/fixtures/thermal/algebraic-network.json": "af8f3c145913ca47e198eb4b0e2f9ed0728fcbe10cb43dbcfa83debc900d3e95",
     "tests/fixtures/thermal/case-network.json": "48a0b92e45849c149fefc914dd3015eea7d9e118d35415d17658313486db45d8",
+    "tests/fixtures/thermal/control-network.json": "6c97ec7c9943ba478acea82af060adfb2d852f9e0fd918ca16f4cf32d766844b",
+    "tests/fixtures/thermal/element-network.json": "a2782091476aebb637c2f82d0e12f6373daed7135b9b042293f7b97b447f546f",
+    "tests/fixtures/thermal/expression-network.json": "3f2b5671bc3ec01ef8090b2b872b8e8dca509e43a8037ee52299ee2edb468966",
+    "tests/fixtures/thermal/isolated-network.json": "9293e2f485cf2721d61d1b69bbe5b22dc22cf2adf0c7dcd51c0f1e3bed212606",
     "tests/fixtures/thermal/material-network.json": "7087b931019c251e6ad1ca5ecc1eae348b22e4b6d105658d36487f3e631f9f4e",
-    "tools/check_thermal.py": "bfc7c769a3dfb2ccdab13cb787099af5af48bf05b71cd543f0127465086cdb08",
+    "tests/fixtures/thermal/power-network.json": "4bf3c2a32ae93f550ba8fd007a3e5576b11ecdf24ccfcba6f5a5f327098ba833",
+    "tests/fixtures/thermal/prescribed-network.json": "3530dfe2a78819c9e01e06e48d75e07489df1927fa67bbeb91b19cec44809107",
+    "tests/fixtures/thermal/step-network.json": "992ee0ad642cc0c554a9f4acb42f7cbc5716482943525f6e0317066aed869b3a",
+    "tools/check_thermal.py": "ab3c8c809dd2d69670f3c544cc0c66ab1848dcd50895d429d66c832330c99f44",
     "tools/generate_contracts.py": "eb9a07618d3e200c751d04a5a579240d0ec439b856fd8088cc1cd9fefd1577e7",
     "tools/thermal_schema.py": "ba97f2ce6afb23b0a05e7002cf9920fef5da055cf31b11f13c6bc0615bfbaa96"
   },
-  "tested_candidate": "1ac659ca07365a532cc111a0855097415ec74d88"
+  "previous_evidence": {
+    "candidate": "dc63605aa0ab1f4026b89829b25e4fa9ec6c6a3a",
+    "path": "plans/evidence/WP-11.json",
+    "scope": "WP-11.1 and WP-11.2 verification retained in Git history"
+  }
 }

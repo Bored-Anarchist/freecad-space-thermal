@@ -2,9 +2,12 @@
   "schema_version": 1,
   "work_packages": [
     "WP-11.1",
-    "WP-11.2"
+    "WP-11.2",
+    "WP-11.3",
+    "WP-11.4",
+    "WP-11.5"
   ],
-  "scope": "Owned model preparation and material/storage laws; no thermal solve qualification",
+  "scope": "Owned preparation, material/storage laws, energy and DAE residuals, sparse analytic Jacobians and backend interfaces; no production steady/transient/event solver qualification",
   "required_cases": [
     "native-constant-law",
     "native-linear-law",
@@ -25,6 +28,19 @@
     "tensor-validation",
     "source-diagnostics",
     "case-selection",
-    "safe-failures"
+    "safe-failures",
+    "build-identity",
+    "assembly-balance",
+    "assembly-algebraic-boundary",
+    "assembly-enthalpy-step",
+    "assembly-jacobian-differences",
+    "assembly-callback-contracts",
+    "assembly-boundary-callback",
+    "assembly-singular-components",
+    "assembly-sparsity",
+    "assembly-backend-linear",
+    "assembly-backend-nonlinear",
+    "assembly-assembly-safety",
+    "assembly-physics-coverage"
   ]
 }

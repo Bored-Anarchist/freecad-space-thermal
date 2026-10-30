@@ -114,11 +114,17 @@ Tensor Material::tensor(double t) const {
 }
 Model::Model(Data data) : data_(std::move(data)) {}
 double Model::storage_capacity(std::size_t index, double t) const {
+  return storage_capacity_sample(index, t).value;
+}
+Sample Model::storage_capacity_sample(std::size_t index, double t) const {
   const auto& node = data_.nodes.at(index);
   if (!std::isfinite(t) || t < 0) throw Error("range", node.id);
-  if (node.classification != NodeClass::capacitive) return 0;
-  if (!node.material_index) return node.capacity;
-  try { return finite(node.mass * data_.materials.at(*node.material_index).specific_heat.sample(t).value); }
+  if (node.classification != NodeClass::capacitive) return {0, 0, false};
+  if (!node.material_index) return {node.capacity, 0, false};
+  try {
+    auto sample = data_.materials.at(*node.material_index).specific_heat.sample(t);
+    return {finite(node.mass * sample.value), finite(node.mass * sample.derivative), sample.discontinuous};
+  }
   catch (Error& e) { e.entity_id = node.id; throw; }
 }
 double Model::storage_change(std::size_t index, double from, double to) const {

@@ -1,8 +1,9 @@
 # Development and automated verification
 
-WP-11.1/11.2 add [owned thermal model preparation](thermal-engine.md), immutable
+WP-11.1 through WP-11.5 add [owned thermal preparation and assembly](thermal-engine.md), immutable
 typed node/equation/source indexes, conductive component diagnoses and material
-table/enthalpy/storage APIs. Both Windows drivers run native acceptance and require
+table/enthalpy/storage APIs, differential/algebraic residuals, prescribed boundary
+power, sparse analytic Jacobians and backend interfaces. Both Windows drivers run native acceptance and require
 the privacy-cleared `thermal.json` report. Thermal solving remains unavailable.
 
 WP-02 supplies a C++20 worker skeleton and standalone Python application/CLI/MCP package boundaries. The worker reports build information and rejects solve requests as unimplemented. No thermal physics or legacy-file compatibility is claimed.

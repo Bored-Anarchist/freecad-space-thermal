@@ -133,8 +133,10 @@ thermal::Data thermal_data(std::string_view input) {
     }
     std::set<std::string> active_loads;
     if (out.case_id) {
+      out.active_environment_ids.push_back(entities.at(*out.case_id).at("environment_id").str());
       for (const auto& id : entities.at(*out.case_id).at("load_ids").arr()) active_loads.insert(id.str());
       for (const auto& id : entities.at(*out.case_id).at("control_ids").arr()) {
+        out.active_control_ids.push_back(id.str());
         const auto& control = entities.at(id.str());
         if (!active_loads.contains(control.at("load_id").str())) throw thermal::Error("reference", id.str());
       }
@@ -156,8 +158,22 @@ thermal::Data thermal_data(std::string_view input) {
           !out.case_id || active_loads.contains(id)};
         if (e.has("expression_id")) l.expression_id = e.at("expression_id").str();
         out.loads.push_back(std::move(l));
+      } else if (e.at("kind").str() == "environment") {
+        out.environments.push_back({id, e.at("frame_id").str(), e.at("epoch").str(), e.at("time_scale").str(),
+          e.at("background_temperature").at("value").num(), e.at("solar_flux").at("value").num(),
+          e.at("time_origin").at("value").num()});
+      } else if (e.at("kind").str() == "radiation") {
+        thermal::Radiation r{id, e.at("environment_id").str(), e.at("method").str(), {}, {}};
+        for (const auto& f : e.at("facet_ids").arr()) r.facet_ids.push_back(f.str());
+        for (const auto& f : e.at("excluded_facet_ids").arr()) r.excluded_facet_ids.push_back(f.str());
+        out.active_environment_ids.push_back(r.environment_id);
+        out.radiation.push_back(std::move(r));
+      } else if (e.at("kind").str() == "element") {
+        out.spatial_element_ids.push_back(id);
       }
     }
+    std::sort(out.active_environment_ids.begin(), out.active_environment_ids.end());
+    out.active_environment_ids.erase(std::unique(out.active_environment_ids.begin(), out.active_environment_ids.end()), out.active_environment_ids.end());
     std::map<std::size_t, std::size_t> components;
     for (std::size_t i = 0; i < out.nodes.size(); ++i) {
       auto key = root(i);

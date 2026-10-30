@@ -9,7 +9,7 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'python'))
 from fcst_tools.gate import evaluate
-from fcst_tools.thermal import assess, input_hashes
+from fcst_tools.thermal import assess, input_hashes, IMPLEMENTED_SUBSTEPS
 
 
 class ThermalEvidenceTests(unittest.TestCase):
@@ -17,11 +17,13 @@ class ThermalEvidenceTests(unittest.TestCase):
         policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
         hashes = input_hashes(ROOT)
         cases = [{'id':c,'status':'passed'} for c in policy['required_cases']]
-        report = {'schema_version':1,'candidate':'synthetic','input_sha256':hashes,
-                  'work_packages':['WP-11.1','WP-11.2'],'solver_available':False,
+        report = {'schema_version':2,'candidate':'synthetic','input_sha256':hashes,
+                  'work_packages':IMPLEMENTED_SUBSTEPS,'solver_available':False,
+                  'worker_build':{'engine':'fcst_native','solver_available':False,'source_revision':'synthetic'},
+                  'binary_sha256':{key:'1'*64 for key in ('worker','preparation_acceptance','assembly_acceptance')},
                   'gate':evaluate(policy['required_cases'],cases),'cases':cases}
         self.assertTrue(assess(report,policy,hashes,'synthetic'))
-        for change in ('missing','duplicate','failed','skipped','extra','solver','candidate','hash','scope'):
+        for change in ('missing','duplicate','failed','skipped','extra','solver','candidate','hash','scope','binary','stale-build','old-schema'):
             value = deepcopy(report)
             if change == 'missing': value['cases'].pop()
             if change == 'duplicate': value['cases'].append(deepcopy(value['cases'][0]))
@@ -31,6 +33,9 @@ class ThermalEvidenceTests(unittest.TestCase):
             if change == 'candidate': value['candidate'] = 'stale'
             if change == 'hash': value['input_sha256']['engine/src/thermal.cpp'] = '0'*64
             if change == 'scope': value['work_packages'] = ['WP-11']
+            if change == 'binary': del value['binary_sha256']['assembly_acceptance']
+            if change == 'stale-build': value['worker_build']['source_revision'] = 'stale'
+            if change == 'old-schema': value['schema_version'] = 1
             with self.subTest(change=change), self.assertRaises(ValueError):
                 assess(value,policy,hashes,'synthetic')
 
