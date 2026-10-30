@@ -269,7 +269,7 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
     try { b.load_in[load.node] = checked(b.load_in[load.node]+load.power); }
     catch (const Error& error) { impl_->context(error,load.id); }
   }
-  long double storage_total = 0, external_total = 0;
+  long double storage_total = 0, external_total = 0, internal_total = 0;
   for (std::size_t i = 0; i < d.nodes.size(); ++i) {
     const auto& node = d.nodes[i];
     try {
@@ -294,10 +294,12 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
       if (node.classification == NodeClass::prescribed) b.boundary_power[i] = -incoming;
       else b.residual[*node.equation] = checked(b.storage_power[i]-incoming);
       storage_total += b.storage_power[i];
-      external_total += static_cast<long double>(external)+b.boundary_power[i];
+      external_total += static_cast<long double>(b.load_in[i])+b.environment_in[i]+b.boundary_power[i];
+      internal_total += static_cast<long double>(b.conductive_in[i])+b.radiation_in[i];
     } catch (const Error& error) { impl_->context(error,node.id); }
   }
   b.energy_defect = narrow(storage_total-external_total);
+  b.internal_exchange_defect = narrow(internal_total);
   return out;
 }
 Balance Assembly::residual(const State& s) const { return evaluate(Storage::rate,s.time,s.temperature,s.rate,{},0,false).balance; }

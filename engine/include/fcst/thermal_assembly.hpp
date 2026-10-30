@@ -62,6 +62,7 @@ struct Balance {
   std::vector<double> temperature, residual;
   std::vector<double> conductive_in, load_in, radiation_in, environment_in, storage_power, boundary_power;
   std::vector<double> conductor_power; // Positive from conductor.from to conductor.to.
+  double internal_exchange_defect = 0; // Net conductive plus internal radiation power; ideally zero.
   double energy_defect = 0; // Sum storage - sum external input, including prescribed reservoirs.
 };
 struct Linearization {

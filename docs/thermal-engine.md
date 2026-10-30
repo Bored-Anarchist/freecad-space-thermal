@@ -148,9 +148,13 @@ and negative power removes heat to maintain its prescribed temperature.
 `Balance` returns effective full-node temperatures, equation-order residuals,
 per-node incoming contributions by category, storage and boundary powers, and
 oriented per-conductor powers. `energy_defect` is total storage power minus total
-external contributions, including prescribed reservoirs. It equals the sum of
-the unknown residuals, subject to floating-point summation. Internal conductive
-exchange cancels; radiation and environment channels remain separately visible.
+external load/environment contributions, including prescribed reservoirs.
+`internal_exchange_defect` records net conductive and internal radiation power,
+which should be zero. Energy defect equals the sum of unknown residuals plus
+this internal defect, subject to floating-point summation. A nonconservative
+radiation callback remains visible as an energy defect; it is never reclassified
+as an external source or silently normalized. Radiation and environment channels
+remain separately visible.
 
 For the synthetic `material-network.json`, `State{0, {320,310}, {1}}` gives residuals
 `{21.4,0}` W and prescribed boundary power `-20` W. This is an evaluation of a trial

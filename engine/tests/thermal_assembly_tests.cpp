@@ -52,8 +52,9 @@ void conservation(const Balance& b) {
   auto sum = [](const auto& values) { return std::accumulate(values.begin(),values.end(),0.0); };
   near(sum(b.conductive_in),0);
   near(sum(b.radiation_in),0); // The synthetic fixture's radiation term is closed internal exchange.
-  near(b.energy_defect,sum(b.residual));
-  near(sum(b.storage_power)-sum(b.load_in)-sum(b.radiation_in)-sum(b.environment_in)-sum(b.boundary_power),b.energy_defect);
+  near(b.internal_exchange_defect,0);
+  near(b.energy_defect,sum(b.residual)+b.internal_exchange_defect);
+  near(sum(b.storage_power)-sum(b.load_in)-sum(b.environment_in)-sum(b.boundary_power),b.energy_defect);
 }
 struct ExactLinear final : LinearBackend {
   SolveResult result{SolveStatus::converged,{5,2.5},1,999};
@@ -282,6 +283,13 @@ int main(int argc,char** argv) {
       auto a = one.linearize({1,{320,310},{0}}), b = two.linearize({1,{320,310},{0}});
       require(a.balance.residual == b.balance.residual && *one.sparsity() == *two.sparsity());
       near(a.balance.radiation_in[0]+a.balance.radiation_in[1],0); conservation(a.balance);
+      auto nonconservative = powers();
+      nonconservative[1].evaluate = [](double,std::span<const double>,bool jacobian) {
+        return PowerEvaluation{{1,1},jacobian ? std::vector<double>(4,0) : std::vector<double>{}};
+      };
+      auto defect = Assembly(fixture(folder,"power-network.json"),nonconservative).residual({0,{300,300},{0}});
+      near(defect.internal_exchange_defect,2); near(defect.energy_defect,5);
+      near(defect.energy_defect-std::accumulate(defect.residual.begin(),defect.residual.end(),0.0),2);
       const auto& environment = one.model().data().environments.front();
       near(environment.background_temperature,250); require(environment.id == uid(14));
     } else throw std::runtime_error("unknown_case");
