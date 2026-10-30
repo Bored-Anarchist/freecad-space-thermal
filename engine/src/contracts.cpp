@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 #include "fcst/contracts.hpp"
 #include "fcst/contract_bundle.hpp"
+#include "fcst/thermal.hpp"
+#include "fcst/thermal_schema.hpp"
 #include <algorithm>
 #include <array>
 #include <bit>
@@ -430,7 +432,47 @@ std::string sha256(const std::string& bytes) {
   auto status=BCryptHash(BCRYPT_SHA256_ALG_HANDLE,nullptr,0,reinterpret_cast<PUCHAR>(const_cast<char*>(bytes.data())),static_cast<ULONG>(bytes.size()),digest.data(),static_cast<ULONG>(digest.size()));
   if(status<0) fail("artifact"); return hex(std::string_view(reinterpret_cast<const char*>(digest.data()),digest.size()));
 }
+#include "thermal_loading.inc"
 } // namespace
+thermal::Model thermal::load(std::string_view input) {
+  try { return Model(thermal_data(input)); }
+  catch (const fcst::Error& e) { throw thermal::Error(e.code, e.entity, e.source); }
+  catch (const thermal::Error&) { throw; }
+  catch (const std::exception&) { throw thermal::Error("schema"); }
+}
+std::string thermal::inspect(std::string_view input) {
+  try {
+    auto model = thermal::load(input);
+    const auto& data = model.data();
+    J::A nodes, components;
+    for (const auto& node : data.nodes) {
+      auto index = [](const std::optional<std::size_t>& i) { return i ? J(static_cast<double>(*i)) : J(); };
+      nodes.emplace_back(J::O{{"id", J(node.id)}, {"equation", index(node.equation)},
+        {"differential_index", index(node.differential_index)}, {"algebraic_index", index(node.algebraic_index)},
+        {"classification", J(node.classification == thermal::NodeClass::capacitive ? "capacitive" :
+          node.classification == thermal::NodeClass::algebraic ? "algebraic" : "prescribed")}});
+    }
+    for (const auto& component : data.components) {
+      J::A ids;
+      for (auto i : component.nodes) ids.emplace_back(data.nodes.at(i).id);
+      components.emplace_back(J::O{{"node_ids", J(ids)}, {"prescribed_anchor", J(component.prescribed_anchor)},
+        {"storage_anchor", J(component.storage_anchor)},
+        {"steady_conduction_singular", J(component.steady_conduction_singular)},
+        {"transient_algebraic_singular", J(component.transient_algebraic_singular)}});
+    }
+    return dump(J(J::O{{"status", J("passed")}, {"solver_available", J(false)},
+      {"model_hash", J(data.model_hash)}, {"preparation_hash", J(data.preparation_hash)},
+      {"nodes", J(nodes)}, {"components", J(components)},
+      {"material_count", J(static_cast<double>(data.materials.size()))},
+      {"source_identity_count", J(static_cast<double>(data.source_identities.size()))},
+      {"deferred_entity_count", J(static_cast<double>(data.deferred_entity_ids.size()))}}));
+  } catch (const thermal::Error& e) {
+    J::O out{{"status", J("failed")}, {"code", J(e.code)}};
+    if (!e.entity_id.empty()) out.emplace("entity_id", J(e.entity_id));
+    if (!e.source_map_id.empty()) out.emplace("source_map_id", J(e.source_map_id));
+    return dump(J(out));
+  }
+}
 int run_worker(const std::string& root, const std::string& job_id) {
   // This boundary stays engine-only. Physics remains WP-11; unsupported work
   // produces a truthful failed terminal rather than a fabricated thermal result.

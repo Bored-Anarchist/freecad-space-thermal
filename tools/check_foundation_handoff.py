@@ -52,6 +52,8 @@ def check(directory):
             raise ValueError('esatan_regression_stale_inputs_or_false_qualification')
         contracts=load(path.parent/"contracts.json")
         if contracts["status"]!="passed": raise ValueError("contract_regression")
+        from fcst_tools.thermal import assess as assess_thermal, input_hashes as thermal_hashes
+        assess_thermal(load(path.parent/'thermal.json'), load(ROOT/'ci/thermal-acceptance.json'), thermal_hashes(ROOT), candidate)
     hosts=list(directory.rglob("fem-probe.json"))
     if len(hosts)!=1: raise ValueError("missing_or_duplicate_host_report")
     host=load(hosts[0]);inputs=input_hashes(ROOT)

@@ -2,6 +2,7 @@
 #include "fcst/build_info.hpp"
 #include "fcst/diagnostic.hpp"
 #include "fcst/contracts.hpp"
+#include "fcst/thermal.hpp"
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -16,14 +17,15 @@ int main(int argc, char* argv[]) {
 #endif
     return fcst::run_worker(argv[2], argv[3]);
   }
-  if (argc == 3 && std::string_view(argv[1]) == "--contract") {
+  if ((argc == 3 && std::string_view(argv[1]) == "--contract") ||
+      (argc == 2 && std::string_view(argv[1]) == "--thermal-prepare")) {
 #ifdef _WIN32
     if (_setmode(_fileno(stdin), _O_BINARY) == -1) return 2;
 #endif
     std::string input;
     char c;
     while (input.size() <= 1048576 && std::cin.get(c)) input += c;
-    auto result = fcst::inspect_contract(argv[2], input);
+    auto result = argc == 2 ? fcst::thermal::inspect(input) : fcst::inspect_contract(argv[2], input);
     std::cout << result << '\n';
     return result.find("\"status\":\"passed\"") != std::string::npos ? 0 : 1;
   }

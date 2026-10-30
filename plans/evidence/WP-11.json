@@ -1,0 +1,58 @@
+{
+  "work_package": "WP-11",
+  "status": "in_progress",
+  "scope": "WP-11.1 immutable typed preparation and WP-11.2 material tables, enthalpy and storage; full engine qualification remains open.",
+  "contract": "docs/thermal-engine.md",
+  "acceptance_register": "ci/thermal-acceptance.json",
+  "implemented_substeps": [
+    "WP-11.1",
+    "WP-11.2"
+  ],
+  "checks": [
+    {
+      "id": "native-preparation-and-material-acceptance",
+      "status": "passed",
+      "configuration": "Debug",
+      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --report .local/thermal-debug.json",
+      "cases": 20,
+      "report_sha256": "b0109ee884cfc7793bca2c91a7d0464ca04dfd8659ca84ca858b4c060a3b3335",
+      "identity": "Exact implementation inputs are bound by input_sha256; candidate in the local precommit report identifies the base revision."
+    },
+    {
+      "id": "standard-library-security-and-regressions",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "cases": 316
+    }
+  ],
+  "remaining_substeps": [
+    "WP-11.3",
+    "WP-11.4",
+    "WP-11.5",
+    "WP-11.6",
+    "WP-11.7",
+    "WP-11.8",
+    "WP-11.9",
+    "WP-11.10"
+  ],
+  "input_sha256": {
+    "CMakeLists.txt": "260fd6eed1eed3c9dff6950fa35b0bb31c9d2616c2bdec1c68cdd1d722cb9b3e",
+    "CMakePresets.json": "68a5d94ecb715b8ed4ca4157fef64fd10c8f9b645f343184390faf3cd4649dbf",
+    "ci/thermal-acceptance.json": "ec0c4dda23377c6197af0b2ce6ab2fc3071bc7a2873e7827b8fc9a3cda926334",
+    "engine/include/fcst/contract_bundle.hpp": "cc2e286bbe453ebdaf20ed21d34b724a58d9089090818fcbc378704ddacc6730",
+    "engine/include/fcst/thermal.hpp": "971b79652f71809f4e3a64477345312370312cbb52e79514f7d659bd4e488b92",
+    "engine/include/fcst/thermal_schema.hpp": "50b574eceea4a5aaf5186985df69b92208cfe8155547d9b65b8178705b6fbe7c",
+    "engine/src/contracts.cpp": "3e73c942175c3264ad1a5a0fa3372b2bf0f0a9d0acf329e0e6437a804d706d9e",
+    "engine/src/thermal.cpp": "eb4b779303df91e7857a67d2348178fe217e468ca0ba530ac9b5c353cb694f80",
+    "engine/src/thermal_loading.inc": "4e83d5d645348100a52fca1187a8cee71c2dc8e3e90babe93f5ff4b9f108907d",
+    "engine/tests/thermal_tests.cpp": "e4261787958fb17cd1e0daf8ea4b0fecb20def4328dc9e9affeda436e59ec9bf",
+    "engine/worker/main.cpp": "cc65798f2fc890a5f206c7f95dca86e6445272c51f8d0ff6b24f3578778c800e",
+    "python/fcst_tools/thermal.py": "c64c56bac819b2192de9d524056413cc7393e1b4ebadf8bdee6b50e6c4b56584",
+    "spec/schemas/thermal-input-v1.schema.json": "3f31dbd12e15adef26ba4eaa3363bed003ad55f47bfe718191213aca31d63975",
+    "tests/fixtures/thermal/case-network.json": "48a0b92e45849c149fefc914dd3015eea7d9e118d35415d17658313486db45d8",
+    "tests/fixtures/thermal/material-network.json": "7087b931019c251e6ad1ca5ecc1eae348b22e4b6d105658d36487f3e631f9f4e",
+    "tools/check_thermal.py": "bfc7c769a3dfb2ccdab13cb787099af5af48bf05b71cd543f0127465086cdb08",
+    "tools/generate_contracts.py": "eb9a07618d3e200c751d04a5a579240d0ec439b856fd8088cc1cd9fefd1577e7",
+    "tools/thermal_schema.py": "ba97f2ce6afb23b0a05e7002cf9920fef5da055cf31b11f13c6bc0615bfbaa96"
+  }
+}

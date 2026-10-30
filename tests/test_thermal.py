@@ -1,0 +1,45 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+"""Prevent missing, stale or inflated native preparation evidence passing CI."""
+from copy import deepcopy
+import json
+from pathlib import Path
+import sys
+import unittest
+
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT/'python'))
+from fcst_tools.gate import evaluate
+from fcst_tools.thermal import assess, input_hashes
+
+
+class ThermalEvidenceTests(unittest.TestCase):
+    def test_missing_duplicate_failed_and_false_solver_claims_are_rejected(self):
+        policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
+        hashes = input_hashes(ROOT)
+        cases = [{'id':c,'status':'passed'} for c in policy['required_cases']]
+        report = {'schema_version':1,'candidate':'synthetic','input_sha256':hashes,
+                  'work_packages':['WP-11.1','WP-11.2'],'solver_available':False,
+                  'gate':evaluate(policy['required_cases'],cases),'cases':cases}
+        self.assertTrue(assess(report,policy,hashes,'synthetic'))
+        for change in ('missing','duplicate','failed','skipped','extra','solver','candidate','hash','scope'):
+            value = deepcopy(report)
+            if change == 'missing': value['cases'].pop()
+            if change == 'duplicate': value['cases'].append(deepcopy(value['cases'][0]))
+            if change in ('failed','skipped'): value['cases'][0]['status'] = change
+            if change == 'extra': value['cases'].append({'id':'unreviewed','status':'passed'})
+            if change == 'solver': value['solver_available'] = True
+            if change == 'candidate': value['candidate'] = 'stale'
+            if change == 'hash': value['input_sha256']['engine/src/thermal.cpp'] = '0'*64
+            if change == 'scope': value['work_packages'] = ['WP-11']
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                assess(value,policy,hashes,'synthetic')
+
+    def test_ci_requires_native_preparation_and_clears_exact_report(self):
+        sys.path.insert(0,str(ROOT/'tools'))
+        import verify
+        self.assertIn('thermal-preparation',verify.STEPS)
+        workflow = (ROOT/'.github/workflows/ci.yml').read_text()
+        self.assertIn('--file .local/${{ matrix.preset }}/thermal.json',workflow)
+        self.assertIn('            .local/${{ matrix.preset }}/thermal.json\n',workflow)
+        handoff = (ROOT/'tools/check_foundation_handoff.py').read_text()
+        self.assertIn("assess_thermal(load(path.parent/'thermal.json')",handoff)

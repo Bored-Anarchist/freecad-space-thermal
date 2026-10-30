@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "work_packages": [
+    "WP-11.1",
+    "WP-11.2"
+  ],
+  "scope": "Owned model preparation and material/storage laws; no thermal solve qualification",
+  "required_cases": [
+    "native-constant-law",
+    "native-linear-law",
+    "native-previous-law",
+    "native-clamped-law",
+    "native-invalid-laws",
+    "native-storage",
+    "native-tensor",
+    "native-immutable-loading",
+    "native-case-loading",
+    "native-preparation",
+    "canonical-identity",
+    "disconnected-components",
+    "zero-links",
+    "invalid-structure",
+    "invalid-tables",
+    "storage-binding",
+    "tensor-validation",
+    "source-diagnostics",
+    "case-selection",
+    "safe-failures"
+  ]
+}
