@@ -154,6 +154,7 @@
     "test_privacy.PrivacyTests.test_nested_archive",
     "test_privacy.PrivacyTests.test_planted_categories_and_reports_never_echo_values",
     "test_privacy.PrivacyTests.test_private_identifier_hash",
+    "test_privacy.PrivacyTests.test_public_github_identity_is_committer_only_and_exact_in_history",
     "test_privacy.PrivacyTests.test_public_project_url_is_distinct_from_real_home_paths",
     "test_privacy.PrivacyTests.test_safe_synthetic_document",
     "test_privacy.PrivacyTests.test_sensitive_filename_redacted",

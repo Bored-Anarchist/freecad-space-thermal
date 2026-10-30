@@ -56,8 +56,8 @@ class Scanner:
                 break
         for category, pattern in PATTERNS.items():
             for match in re.finditer(pattern, value):
-                if category == "contact" and any(match.group() == identity["email"]
-                                                 for identity in self.policy["approved_identities"]):
+                public_contacts = self.policy["approved_identities"] + self.policy.get("public_service_committers", [])
+                if category == "contact" and any(match.group() == identity["email"] for identity in public_contacts):
                     continue
                 # Exceptions bind one complete content hash and one category.
                 if any(item.get("sha256") == sha(value.encode()) and item.get("category") == category
@@ -140,8 +140,11 @@ class Scanner:
             return
         self.text(text, name)
 
-    def identity(self, name: str, email: str, location: str) -> None:
-        if {"name": name, "email": email} not in self.policy["approved_identities"]:
+    def identity(self, name: str, email: str, location: str, *, committer: bool = False) -> None:
+        permitted = self.policy["approved_identities"]
+        if committer:
+            permitted = permitted + self.policy.get("public_service_committers", [])
+        if {"name": name, "email": email} not in permitted:
             self.finding("unapproved_identity", location)
 
     def report(self) -> dict:
@@ -240,7 +243,7 @@ def _inspect_git(scanner: Scanner, root: Path, revision: str | None, staged: boo
             metadata = git(root, "show", "-s", "--format=%an%x00%ae%x00%cn%x00%ce%x00%B", commit).decode("utf-8")
             author, email, committer, committer_email, message = metadata.split("\x00", 4)
             scanner.identity(author, email, commit + "/author")
-            scanner.identity(committer, committer_email, commit + "/committer")
+            scanner.identity(committer, committer_email, commit + "/committer", committer=True)
             scanner.scan(commit + "/commit.txt", git(root, "cat-file", "commit", commit))
             for record in git(root, "ls-tree", "-rz", commit).split(b"\0"):
                 if not record:

@@ -30,6 +30,35 @@ class PrivacyTests(unittest.TestCase):
         self.scanner.scan("fixtures/model.json", b'{"nodes":[{"id":"n1","temperature_K":300}]}')
         self.assertEqual(self.scanner.report()["status"], "passed")
 
+    def test_public_github_identity_is_committer_only_and_exact_in_history(self):
+        import os
+        service={"name":"GitHub","email":"noreply@github.com"}
+        self.assertEqual(self.policy['public_service_committers'],[service])
+        self.assertNotIn(service,self.policy['approved_identities'])
+        for name,email,committer,accepted in (
+            (service['name'],service['email'],True,True),
+            (service['name'],service['email'],False,False),
+            ('github',service['email'],True,False),
+            (service['name'],'other'+'@'+'example.invalid',True,False)):
+            scanner=Scanner(self.policy);scanner.identity(name,email,'synthetic/identity',committer=committer)
+            self.assertEqual(not scanner.findings,accepted)
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as temporary:
+            root=Path(temporary);maintainer=self.policy['approved_identities'][0]
+            env=dict(os.environ,GIT_AUTHOR_NAME=maintainer['name'],GIT_AUTHOR_EMAIL=maintainer['email'],
+                     GIT_COMMITTER_NAME=service['name'],GIT_COMMITTER_EMAIL=service['email'])
+            def command(*args):return subprocess.run(['git','-C',str(root),*args],env=env,check=True,capture_output=True).stdout
+            command('init','-q');(root/'safe.txt').write_text('Owned synthetic source',encoding='utf-8')
+            command('add','safe.txt');command('-c','core.hooksPath=','commit','-qm','Synthetic service commit')
+            scanner=Scanner(self.policy);inspect_git(scanner,root,'HEAD',False)
+            self.assertEqual(scanner.report()['status'],'passed')
+            command('tag','-a','service-tag','-m','Unapproved service tagger')
+            scanner=Scanner(self.policy);inspect_git(scanner,root,'service-tag',False)
+            self.assertIn('unapproved_identity',{row['category'] for row in scanner.findings})
+            env['GIT_AUTHOR_NAME']=service['name'];env['GIT_AUTHOR_EMAIL']=service['email']
+            command('-c','core.hooksPath=','commit','--allow-empty','-qm','Unapproved service author')
+            scanner=Scanner(self.policy);inspect_git(scanner,root,'HEAD',False)
+            self.assertIn('unapproved_identity',{row['category'] for row in scanner.findings})
+
     def test_native_header_and_patch_are_scanned_as_text_without_binary_exemptions(self):
         for name in ('config.h','preservation.patch'):
             scanner=Scanner(self.policy);scanner.scan(name,b'/* owned synthetic source */\n')

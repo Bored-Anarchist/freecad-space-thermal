@@ -41,6 +41,16 @@ The [FCST implementation project](https://github.com/users/Bored-Anarchist/proje
 
 ## Publication privacy (TST-021)
 
+Policy v6 recognizes GitHub's exact public service identity only as a committer.
+Maintainer author and annotated-tagger identities still require the existing
+approved maintainer list. Other names/emails and case variants reject. The public
+service address is permitted as contact text so raw commit metadata can be
+inspected; it grants no author/tagger approval. Git parsing supplies the role,
+independently of content and path names. Policy hashing invalidates earlier
+clearances. The real-history regression
+`test_public_github_identity_is_committer_only_and_exact_in_history` covers this
+boundary. No merged history needs rewriting and no private identity is permitted.
+
 WP-08 adds the [TD/SINDA implementation](td-sinda.md), owned binary codecs and
 source-free DWG writer, direct property readers, its source-only C# sidecar
 and runtime-independent `td.json` summary. Both Windows CI presets execute the

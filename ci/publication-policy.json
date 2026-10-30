@@ -1,9 +1,15 @@
 {
-  "version": 5,
+  "version": 6,
   "approved_identities": [
     {
       "name": "Bored-Anarchist",
       "email": "109712444+Bored-Anarchist@users.noreply.github.com"
+    }
+  ],
+  "public_service_committers": [
+    {
+      "name": "GitHub",
+      "email": "noreply@github.com"
     }
   ],
   "private_term_hashes": [
