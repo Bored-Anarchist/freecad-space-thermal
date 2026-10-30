@@ -267,7 +267,8 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
     c.operating=state; if(initial)c.initial_temperature=c.temperature;
   };
   auto sample=[&] {
-    reserve_values(a.model().data().nodes.size()*20+c.operating.heaters.size()*4);
+    reserve_values(a.model().data().nodes.size()*20+a.model().data().conductors.size()+
+      a.model().data().radiation.size()*2+c.operating.heaters.size()*4+c.operating.load_factors.size()*2);
     TransientSample s; s.time=c.time; s.balance=engine.instantaneous(a,c.time,c.temperature,s.rate); s.operating=c.operating;
     s.storage_change.resize(a.model().data().nodes.size());
     for(std::size_t i=0;i<s.storage_change.size();++i) {
@@ -325,7 +326,7 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
         h=first; trial=engine.trial(a,c.time,c.temperature,h);
         if(trial.error>1) {reserve_values(4);out.steps.push_back({c.time,c.time+h,trial.error,false,"event_tolerance",{}});++c.rejected_steps;c.next_step=h/2;continue;}
       }
-      reserve_values(4+a.model().data().nodes.size()*4);
+      reserve_values(8+a.model().data().nodes.size()*4);
       auto committed=c;
       const double old_time=c.time; c.time=old_time+h; if(located.empty() && std::abs(c.time-stop)<=4*std::numeric_limits<double>::epsilon()*std::max(1.,std::abs(stop)))c.time=stop;
       for(const auto& [id,on]:c.operating.heaters)if(on)c.on_seconds[id]=finite(c.on_seconds[id]+h);

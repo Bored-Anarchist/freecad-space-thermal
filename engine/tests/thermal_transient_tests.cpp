@@ -153,6 +153,8 @@ int main(int argc,char** argv) {
     auto a=assembly(root,"single");auto o=options();o.maximum_attempts=1;auto r=solve_transient(a,o);require(!r.valid && r.reason=="attempt_limit" && r.checkpoint);
     o=options();o.minimum_step=.1;r=solve_transient(a,o);require(!r.valid && r.reason=="step_underflow");
     o=options();o.maximum_result_values=1;r=solve_transient(a,o);require(!r.valid && r.reason=="result_limit");
+    o=options(.0001);o.output_times={0,.0001};o.initial_step=.0001;o.absolute_temperature_tolerance=1;o.maximum_result_values=100;
+    r=solve_transient(assembly(root,"parallel"),o);require(!r.valid && r.reason=="result_limit");
     o=options();o.output_times={0,1,1,4};rejects([&]{solve_transient(a,o);},"range");
     o=options();o.schedules={{uid(12),{{0,1}}}};rejects([&]{solve_transient(a,o);},"reference");
     o=options();o.callback_revision.clear();rejects([&]{solve_transient(assembly(root,"heater"),o);},"callback_revision");
