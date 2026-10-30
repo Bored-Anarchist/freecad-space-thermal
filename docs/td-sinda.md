@@ -86,8 +86,9 @@ interpolation/extrapolation choices; active table physics is not silently reduce
 to constants. Existing table values can be edited with the same point count and
 increasing axis, preserving all unselected bytes and source modes. Allowlisted constant numeric edits
 preserve every unselected byte and independently reparse. Stored thermophysical
-scalars use SI; switching property modes, active variable optics, composites and
-nonconstant fields is unsupported. These readers do not yet reconstruct all
+scalars use SI; scalar edits cannot switch property modes. Temperature/pressure
+vectors and selected existing composite component numbers also have guarded
+source edits. These readers do not yet reconstruct all
 material/optical models or their complete drawing dependencies.
 
 `td-write-model` accepts a native `.fcst` model containing only explicit submodels,
@@ -152,6 +153,9 @@ fcst td-import-properties source optics.rco optical.fcst --kind rco
 fcst td-export-property-source edited-material.fcst derived-property-source
 fcst td-write-properties property-project.fcst new-property-library
 fcst td-read-properties new-property-library reopened-properties.fcst
+fcst td-import-properties source materials.tdp orthotropic.fcst --kind tdp --temperature-min 150 --temperature-max 450 --material-frame material-axes.json
+fcst td-read-property-laws source materials.tdp property-laws --kind tdp
+fcst td-write-property-laws property-laws property-laws.json new-law-source
 ```
 
 Original `.tdp` and `.rco` documents can be imported directly without a prior
@@ -166,16 +170,60 @@ data, inserts documented optional scalar headers when necessary, and verifies
 physical values after reparsing. Identity/mode changes reject. Canonical companions
 retain explicit validity and annotations in the new export tree.
 
-The material profile covers constant isotropic conductivity, density, specific
-heat and their supported multipliers. The optical profile covers constant
+The canonical material profile covers constant isotropic and orthotropic
+conductivity, density, specific heat and their supported multipliers. Orthotropic
+import requires an explicit canonical frame entity in `--material-frame`; a
+property database defines local axes but cannot establish their placement in a
+drawing. All three scaled conductivities map to a diagonal tensor in that frame.
+Source-free libraries preserve the declared frame and validity in their canonical
+companion and independently check all three axes against the original-format
+properties. Native source export preserves the original multipliers and refuses
+frame/mode changes. General tensors with off-diagonal terms require a separate
+axis mapping and reject this writer. The optical canonical profile covers constant
 absorptivity, emissivity, equivalent solar/IR specular fractions and transmission.
-Variable, anisotropic/composite, spectral/refraction or unrepresented fields
+Variable/composite and separate-band/refraction bindings into the canonical model
 remain holds. Separate source-free property-library export accepts a native
 property-only project, writes deterministic `.tdp`/`.rco` definitions and retains
 validity/annotations in canonical companions. The reader reconstructs each source
 property and compares all values/identities before accepting those companions.
 Changed hashes alone cannot bless changed physical values. These are property
 library operations; drawing assignments and complete thermal geometry are separate.
+
+The separate `td-property-laws/1` interchange reads and writes the original
+bracketed documents without a vendor installation, prior conversion or template.
+Each entry retains its name, scalar switches, counted 1D tables and counted grid
+vectors. Basic material laws cover conductivity along each property axis,
+specific heat versus temperature, density/scales, effective emissivity, and
+conductivity versus temperature and pressure. Grid storage varies temperature
+first. The evaluator requires explicit `linear` or `previous` interpolation and
+`error` or `clamp` extrapolation; these are declared owned policies, not a claim
+that a vendor solver uses them. Temperatures are kelvin, pressures pascals and
+thermophysical quantities SI. Angle tables use the serialized source coordinate;
+the caller must establish the angle convention before physical evaluation.
+
+Optical laws retain separate solar and infrared constants, reflected and
+transmitted specularity, refractive-index ratios, angle tables, temperature
+tables and the wavelength-dependent-radks switch. Temperature-dependent
+absorptivity/emissivity takes precedence over all angle tables in that band.
+Energy bounds are checked at the table knots. This two-band representation does
+not claim arbitrary wavelength-spectrum or radiation-solver support.
+
+Laminate/aggregate definitions retain ordered component references, thickness,
+orientation, weights, conductivity scaling and override settings. Every component
+must resolve to a basic property in the document. The interchange rejects missing,
+composite-to-composite and cyclic references. It does not calculate effective
+mixture properties or silently replace a composite with a constant. Unknown
+fields, fusion, recession, thermoelectric and stress modes remain unsupported
+by this semantic profile and retained by the byte-preserving document reader.
+
+The new CLI commands write a new output directory and independently reparse it.
+Law JSON contains engineering data and stays local; console/CI reports contain
+counts and verdicts. They always report `native_ready=false` and `qualified=false`.
+They are a separate format interchange, not a variable-law binding into `.fcst`
+native execution. Existing `td-export-source --edits` can change a grid vector
+using `{entry, field, values}`, or an existing component number using
+`{entry, component, field, value}` with a zero-based component index. Counts,
+references and modes remain fixed; all unselected source bytes are preserved.
 
 ## Geometry and remaining format evidence
 
@@ -186,8 +234,9 @@ reader. This is a partial envelope, with units and parameter interpretations sti
 unresolved; it cannot enable thermal geometry edits or native reconstruction.
 
 Remaining independent implementation needs verified layouts/semantics for complete
-surface/solid/mesh, material-derived node modes, variable/composite/spectral
-properties, case/manager, orbit/environment and dynamic source constructs. Those
+surface/solid/mesh, material-derived node modes, canonical variable/composite and
+spectral bindings, composite effective physics, case/manager, orbit/environment
+and dynamic source constructs. Those
 fields cannot be reconstructed by guessing from display geometry or neutral
 selector numbers. Additional serialization versions, including the planned
 2025 R2/2026 R1 coverage, need suitable format/fixture evidence. Required unknown

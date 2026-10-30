@@ -27,26 +27,37 @@ def _values(entry,kind):
     return values
 
 
-def material_entity(entry,temperature_range,*,identifier=None):
+def material_entity(entry,temperature_range,*,identifier=None,frame_id=None):
     """The source has no validity interval: callers must declare one in kelvin."""
     v=_values(entry,'tdp')
     if (not isinstance(temperature_range,(tuple,list)) or len(temperature_range)!=2
             or any(type(x) not in (int,float) or not math.isfinite(x) for x in temperature_range)
             or not 0<temperature_range[0]<temperature_range[1]):reject('td_property_temperature_interval_required')
-    if v.get('TYPE',0)!=0 or v.get('USEANISO',0)!=0 or v.get('EFFECTIVEEMISS',0)!=0 or any(v.get(k,0)!=0 for k in MATERIAL_FLAGS):reject('td_property_material_mode_unmapped')
+    if v.get('TYPE',0)!=0 or v.get('USEANISO',0) not in (0,1) or v.get('EFFECTIVEEMISS',0)!=0 or any(v.get(k,0)!=0 for k in MATERIAL_FLAGS):reject('td_property_material_mode_unmapped')
+    if v.get('USEANISO',0)==1:
+        from uuid import UUID
+        try:
+            if not isinstance(frame_id,str) or str(UUID(frame_id))!=frame_id or UUID(frame_id).version not in (1,2,3,4,5):reject('td_property_material_frame_required')
+        except (ValueError,AttributeError):reject('td_property_material_frame_required')
     color=v.get('COLOR',1)
     if not 1<=color<=255 or int(color)!=color:reject('td_property_color_range')
-    if any(v.get(k,1)<=0 for k in ('DENSITY','SPECHEAT','CONDUCT','DENSITYMULT','KUMULT')):reject('td_property_material_range')
+    keys=['DENSITY','SPECHEAT','CONDUCT','DENSITYMULT','KUMULT']
+    if v.get('USEANISO',0)==1:keys+=['CONDUCTY','CONDUCTZ','KVMULT','KWMULT']
+    if any(v.get(k,1)<=0 for k in keys):reject('td_property_material_range')
     result={'id':identifier or target_id(('td-property','material',entry.name.casefold())),'kind':'material','label':entry.name,
             'density':{'value':v.get('DENSITY',1)*v.get('DENSITYMULT',1),'unit':'kg/m3'},
             'specific_heat':{'value':v.get('SPECHEAT',1),'unit':'J/(kg*K)'},
             'conductivity':{'value':v.get('CONDUCT',1)*v.get('KUMULT',1),'unit':'W/(m*K)'},
             'valid_temperature':[{'value':x,'unit':'K'} for x in temperature_range]}
-    if any(not math.isfinite(result[k]['value']) for k in ('density','specific_heat','conductivity')):reject('td_property_material_range')
+    if any(not math.isfinite(result[k]['value']) or result[k]['value']<=0 for k in ('density','specific_heat','conductivity')):reject('td_property_material_range')
+    if v.get('USEANISO',0)==1:
+        axes=[v.get(k,1)*v.get(m,1) for k,m in (('CONDUCT','KUMULT'),('CONDUCTY','KVMULT'),('CONDUCTZ','KWMULT'))]
+        if any(not math.isfinite(x) or x<=0 for x in axes):reject('td_property_material_range')
+        result.update(frame_id=frame_id,conductivity_tensor=[[axes[i] if i==j else 0 for j in range(3)] for i in range(3)])
     return result
 
 
-def import_document(raw,kind,temperature_range=None,*,names=None):
+def import_document(raw,kind,temperature_range=None,*,names=None,material_frame=None):
     """Import original property text; selection and material validity are explicit."""
     document=parse_properties(raw,kind);selected=list(document.entries)
     if names is not None:
@@ -54,14 +65,18 @@ def import_document(raw,kind,temperature_range=None,*,names=None):
                 or len({n.casefold() for n in names})!=len(names)):reject('td_property_selection')
         requested={n.casefold() for n in names};selected=[e for e in selected if e.name.casefold() in requested]
         if len(selected)!=len(requested):reject('td_property_selection')
-    entities=[material_entity(e,temperature_range) if kind=='tdp' else optics_entity(e) for e in selected]
+    if material_frame is not None and (kind!='tdp' or not isinstance(material_frame,dict) or material_frame.get('kind')!='frame'):reject('td_property_material_frame_required')
+    entities=[material_entity(e,temperature_range,frame_id=material_frame.get('id') if material_frame else None) if kind=='tdp' else optics_entity(e) for e in selected]
     revision=sha256(raw).hexdigest();entries=[{'namespace':'TD.PROPERTIES','handle':kind+'.'+sha256(e.name.casefold().encode()).hexdigest()[:32],
                                             'entity_id':native['id']} for e,native in zip(selected,entities)]
+    if material_frame:
+        if not any('frame_id' in e for e in entities):reject('td_property_unused_material_frame')
+        entities.append(deepcopy(material_frame))
     model={'contract_version':'1.0.0','minimum_reader':'1.0.0','project_id':target_id(('td-property-document',kind,revision)),
            'revision':0,'entities':entities,'source_maps':[{'id':target_id(('td-property-map',kind,revision)),
            'version':'1.0.0','source_revision':revision,'source_tool':'Thermal Desktop property text','source_version':'UNICODE bracket-tagged profile 1',
            'entries':entries}],'mappings':[],'attachments':[],
-           'assumptions':['Stored SI thermophysical values; caller-declared material validity; explicitly selected constant entries' if names else 'Stored SI thermophysical values; caller-declared material validity; all entries reconstructed'],
+           'assumptions':['Stored SI thermophysical values; caller-declared material validity and orthotropic frame; explicitly selected constant entries' if names else 'Stored SI thermophysical values; caller-declared material validity and orthotropic frame; all entries reconstructed'],
            'limitations':['Variable/composite or spectral semantics and full TD qualification are outside this profile'],
            'audit':{'timestamp':'source-import'},'gui':{'selection':[]}}
     try:model=read('model',loads(encode(model)))
@@ -110,7 +125,17 @@ def _property_model(model):
     if model['mappings'] or model['attachments'] or not model['entities']:reject('td_property_model_scope')
     for entity in model['entities']:
         kind=entity['kind']
-        if kind not in {'material','optics'} or set(entity)-set(BUNDLE['schemas']['model']['$defs'][kind]['required'])-{'label'}:reject('td_property_model_scope')
+        extra={'label'}|({'conductivity_tensor','frame_id'} if kind=='material' else {'parent_id'} if kind=='frame' else set())
+        if kind not in {'material','optics','frame'} or set(entity)-set(BUNDLE['schemas']['model']['$defs'][kind]['required'])-extra:reject('td_property_model_scope')
+        if kind=='material' and 'conductivity_tensor' in entity:
+            tensor=entity['conductivity_tensor']
+            if any(tensor[i][j]!=0 for i in range(3) for j in range(3) if i!=j) or tensor[0][0]!=entity['conductivity']['value']:reject('td_property_tensor_not_source_axes')
+    frames={e['id']:e for e in model['entities'] if e['kind']=='frame'};used={e['frame_id'] for e in model['entities'] if e['kind']=='material' and 'frame_id' in e}
+    pending=list(used)
+    while pending:
+        parent=frames[pending.pop()].get('parent_id')
+        if parent and parent not in used:used.add(parent);pending.append(parent)
+    if set(frames)!=used:reject('td_property_unused_material_frame')
     model['entities'].sort(key=lambda e:e['id']);return model
 
 
@@ -120,12 +145,14 @@ def render_library(model):
         if not math.isfinite(value):reject('td_property_writer_number')
         return format(value,'.17g')
     for e in model['entities']:
+        if e['kind']=='frame':continue
         name='F'+e['id'].replace('-','');kind='tdp' if e['kind']=='material' else 'rco'
         fields=[('NAME',name)]
         if kind=='tdp':
-            fields += [('TYPE',0),('CONDUCT',e['conductivity']['value']),('CONDUCTY',e['conductivity']['value']),
-                       ('CONDUCTZ',e['conductivity']['value']),('DENSITY',e['density']['value']),('SPECHEAT',e['specific_heat']['value']),
-                       ('DENSITYMULT',1),('KUMULT',1),('KVMULT',1),('KWMULT',1),('USEANISO',0),('EFFECTIVEEMISS',0)]
+            axes=[e['conductivity_tensor'][i][i] for i in range(3)] if 'conductivity_tensor' in e else [e['conductivity']['value']]*3
+            fields += [('TYPE',0),('CONDUCT',axes[0]),('CONDUCTY',axes[1]),
+                       ('CONDUCTZ',axes[2]),('DENSITY',e['density']['value']),('SPECHEAT',e['specific_heat']['value']),
+                       ('DENSITYMULT',1),('KUMULT',1),('KVMULT',1),('KWMULT',1),('USEANISO',int('conductivity_tensor' in e)),('EFFECTIVEEMISS',0)]
         else:
             fields += [('ALPHA',e['solar_absorptivity']),('EMISS',e['ir_emissivity']),('SOLSPEC',e['specular_fraction']),
                        ('IRSPEC',e['specular_fraction']),('SOLTRANS',e['transmissivity']),('IRTRANS',e['transmissivity']),
@@ -149,14 +176,14 @@ def read_library_files(files):
         for name,digest in meta['files'].items():
             if sha256(files[name]).hexdigest()!=digest:reject('td_property_library_binding')
             docs[Path(name).suffix[1:]]=parse_properties(files[name],Path(name).suffix[1:])
-        native={e['id']:e for e in canonical['entities']};seen=set();source_seen=set()
+        native={e['id']:e for e in canonical['entities'] if e['kind']!='frame'};seen=set();source_seen=set()
         if len(meta['identities'])!=len(native):reject('td_property_library_inventory')
         for row in meta['identities']:
             if set(row)!={'entity_id','kind','name'} or row['entity_id'] in seen:reject('td_property_library_identity')
             expected=native[row['entity_id']];kind='tdp' if expected['kind']=='material' else 'rco'
             if row['kind']!=expected['kind'] or (kind,row['name']) in source_seen:reject('td_property_library_identity')
             source_seen.add((kind,row['name']));entry=next(e for e in docs[kind].entries if e.name==row['name'])
-            actual=material_entity(entry,[q['value'] for q in expected['valid_temperature']],identifier=expected['id']) if kind=='tdp' else optics_entity(entry,identifier=expected['id'])
+            actual=material_entity(entry,[q['value'] for q in expected['valid_temperature']],identifier=expected['id'],frame_id=expected.get('frame_id')) if kind=='tdp' else optics_entity(entry,identifier=expected['id'])
             actual.pop('label');wanted={k:v for k,v in expected.items() if k!='label'}
             if actual!=wanted:reject('td_property_library_semantic_mismatch')
             seen.add(row['entity_id'])
@@ -182,7 +209,7 @@ def export_library(model,destination):
             if temporary.parent.resolve()!=destination.parent.resolve() or not temporary.name.startswith('.fcst-properties-'):reject('td_property_library_cleanup')
             shutil.rmtree(temporary)
     return {'operation':'td-write-properties','entities':len(identities),'independent_reopen_verified':True,
-            'vendor_runtime_required':False,'qualified':False,'scope':'Constant isotropic material/equivalent-band optics; validity/annotations in verified canonical companion'}
+            'vendor_runtime_required':False,'qualified':False,'scope':'Constant isotropic/orthotropic material and equivalent-band optics; validity and declared property-axis frames in canonical companion'}
 
 
 def export_document_package(package,destination):
@@ -202,16 +229,21 @@ def export_document_package(package,destination):
         entries=[entry for entry in document.entries if entry.name in selected]
         if len(entries)!=len(selected):reject('td_property_selection')
         expected_ids={target_id(('td-property','material' if kind=='tdp' else 'optics',e.name.casefold())) for e in entries}
-        entities={e['id']:e for e in target['entities']}
+        frames=[e for e in target['entities'] if e['kind']=='frame']
+        if frames!=sorted(meta.get('material_frames',[]),key=lambda e:e['id']):reject('td_property_document_frame_changed')
+        entities={e['id']:e for e in target['entities'] if e['kind']!='frame'}
         if expected_ids!=set(entities):reject('td_property_document_identity')
         changes=[]
         for entry in entries:
             identifier=target_id(('td-property','material' if kind=='tdp' else 'optics',entry.name.casefold()));entity=entities[identifier]
             if entity['kind']!=('material' if kind=='tdp' else 'optics') or entity.get('label')!=entry.name:reject('td_property_document_identity')
             if kind=='tdp':
-                v=_values(entry,kind);material_entity(entry,[q['value'] for q in entity['valid_temperature']])
+                v=_values(entry,kind);before=material_entity(entry,[q['value'] for q in entity['valid_temperature']],frame_id=entity.get('frame_id'))
+                if ('conductivity_tensor' in before)!=('conductivity_tensor' in entity):reject('td_property_edit_mode')
                 fields={'DENSITY':entity['density']['value']/v.get('DENSITYMULT',1),'SPECHEAT':entity['specific_heat']['value'],
                         'CONDUCT':entity['conductivity']['value']/v.get('KUMULT',1)}
+                if 'conductivity_tensor' in entity:
+                    fields.update(CONDUCTY=entity['conductivity_tensor'][1][1]/v.get('KVMULT',1),CONDUCTZ=entity['conductivity_tensor'][2][2]/v.get('KWMULT',1))
                 defaults={'DENSITY':1,'SPECHEAT':1,'CONDUCT':1}
             else:
                 v=_values(entry,kind);optics_entity(entry)
@@ -225,7 +257,7 @@ def export_document_package(package,destination):
         for entry in reopened.entries:
             if entry.name not in selected:continue
             identifier=target_id(('td-property','material' if kind=='tdp' else 'optics',entry.name.casefold()));expected=entities[identifier]
-            actual=material_entity(entry,[q['value'] for q in expected['valid_temperature']],identifier=identifier) if kind=='tdp' else optics_entity(entry,identifier=identifier)
+            actual=material_entity(entry,[q['value'] for q in expected['valid_temperature']],identifier=identifier,frame_id=expected.get('frame_id')) if kind=='tdp' else optics_entity(entry,identifier=identifier)
             if actual!=expected:reject('td_property_document_reopen_mismatch')
     except (KeyError,TypeError,AttributeError,ZeroDivisionError):reject('td_property_document_package')
     destination=Path(destination).absolute()

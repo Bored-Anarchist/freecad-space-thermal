@@ -141,5 +141,35 @@
     ],
     "withheld": "Original DWG, SINDA decks, property and result bytes, private host profiles, vendor DLLs, compiled sidecars and raw logs"
   },
-  "github": "Update existing PR #28; retain issue #8 and project status In progress until full Q1 qualification"
+  "github": "Update existing PR #28; retain issue #8 and project status In progress until full Q1 qualification",
+  "independent_property_laws": {
+    "profile": "td-property-laws/1",
+    "implementation_delivery": "implemented_unqualified",
+    "verification_base_revision": "d2dd9358a22caaa1a143343cc48a3aa46d628594",
+    "scope": [
+      "Constant isotropic/orthotropic canonical material import, owned library export and guarded original source export",
+      "Basic material temperature tables and temperature-pressure grids with explicit owned evaluation policies",
+      "Independent separate-band optical definitions and ordered laminate/aggregate definitions with closed basic-material references",
+      "Guarded grid-vector and composite-component edits; every unselected source byte retained"
+    ],
+    "acceptance_register": "ci/td-acceptance.json",
+    "new_unit_cases": 13,
+    "required_commands": [
+      "python tools/check_td.py",
+      "python tools/build_independent_dwg.py",
+      "python tools/verify.py --preset windows-debug",
+      "python tools/verify.py --preset windows-release",
+      "python -S tools/check_security.py"
+    ],
+    "remaining_implementation": [
+      "Complete DWG surface/solid/mesh thermal attributes and reverse mapping",
+      "Material-derived node and dynamic source modes",
+      "Canonical variable/composite/spectral bindings and effective composite physics",
+      "Case/manager/orbit/environment formats",
+      "Remaining SINDA control/radiation constructs and additional source versions"
+    ],
+    "vendor_runtime_required": false,
+    "qualified": false,
+    "publication": "Owned synthetic fixtures and bounded count/hash/verdict reports only; all original engineering data and raw research remain local"
+  }
 }

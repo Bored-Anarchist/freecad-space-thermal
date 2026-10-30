@@ -29,6 +29,7 @@ MATERIAL_TABLES={'VARCONDUCT','VARCONDUCTY','VARCONDUCTZ','VARSPECHEAT'}
 OPTICAL_FLAGS={'USETEMPSOLABS','USETEMPIREMIS','USEWAVELENGTHDEPPROPS'}
 OPTICAL_TABLES={x for x in OPTICS if x.startswith('VAR')}|{'TEMPALPHA','TEMPEMIS'}
 TABLE_FIELDS=MATERIAL_TABLES|OPTICAL_TABLES
+GRID_FIELDS={prefix+suffix for prefix in ('BIVARTEMPERATURE','BIVARPRESSURE','BIVARCONDUCTIVITY') for suffix in ('','Y','Z')}
 
 
 @dataclass(frozen=True)
@@ -68,12 +69,29 @@ class PropertyField:
         values=[PropertyField(self.tag,0,0,len(token),token).scalar() for token in tokens[1:]]
         return PropertyTable(tuple(zip(values[::2],values[1::2])))
 
+    def vector(self,*,limit=10000):
+        if self.tag not in GRID_FIELDS:reject('td_property_grid_profile')
+        tokens=self.value.split()
+        if not tokens or not re.fullmatch(rb'\d{1,8}',tokens[0]):reject('td_property_grid_count')
+        count=int(tokens[0])
+        if count>limit or len(tokens)!=1+count:reject('td_property_grid_shape')
+        return tuple(PropertyField(self.tag,0,0,len(token),token).scalar() for token in tokens[1:])
+
+
+@dataclass(frozen=True)
+class PropertyBlock:
+    tag:str
+    depth:int
+    start:int
+    end:int
+
 
 @dataclass(frozen=True)
 class PropertyEntry:
     name:str=field(repr=False)
     fields:tuple=field(repr=False)
     insert_position:int=field(default=0,repr=False)
+    blocks:tuple=field(default=(),repr=False)
 
     def get(self,tag):
         values=[f for f in self.fields if f.tag==tag and f.depth==0]
@@ -89,7 +107,7 @@ class PropertyDocument:
 
     @property
     def report(self):
-        known=MATERIAL|MATERIAL_FLAGS|MATERIAL_TABLES|{'TYPE','NAME','COLOR','COMMENT_MULTILINE'} if self.kind=='tdp' else OPTICS|OPTICAL_FLAGS|OPTICAL_TABLES|{'NAME','COMMENT_MULTILINE'}
+        known=MATERIAL|MATERIAL_FLAGS|MATERIAL_TABLES|GRID_FIELDS|{'TYPE','NAME','COLOR','COMMENT_MULTILINE'} if self.kind=='tdp' else OPTICS|OPTICAL_FLAGS|OPTICAL_TABLES|{'NAME','COMMENT_MULTILINE'}
         unknown=sum(f.depth==0 and f.tag not in known for e in self.entries for f in e.fields)
         variable=0
         for entry in self.entries:
@@ -104,17 +122,30 @@ class PropertyDocument:
 
     def edited(self,changes):
         if not isinstance(changes,(list,tuple)) or not changes:reject('td_property_edits')
+        if any(isinstance(c,dict) and 'component' in c for c in changes):
+            from .td_property_laws import edit_composite
+            return edit_composite(self,changes)
         pending=[];seen=set();allowed=MATERIAL if self.kind=='tdp' else OPTICS-OPTICAL_TABLES
         for change in changes:
             is_table=isinstance(change,dict) and set(change)=={'entry','field','points'}
-            if not isinstance(change,dict) or not is_table and set(change)!={'entry','field','value'}:reject('td_property_edit_shape')
+            is_vector=isinstance(change,dict) and set(change)=={'entry','field','values'}
+            if not isinstance(change,dict) or not is_table and not is_vector and set(change)!={'entry','field','value'}:reject('td_property_edit_shape')
             name,tag=(change[k] for k in ('entry','field'));value=change.get('value')
             table_allowed=MATERIAL_TABLES if self.kind=='tdp' else OPTICAL_TABLES
-            if not isinstance(name,str) or not isinstance(tag,str) or tag not in (table_allowed if is_table else allowed) or (name,tag) in seen:reject('td_property_edit_field')
+            if not isinstance(name,str) or not isinstance(tag,str) or tag not in (GRID_FIELDS if is_vector and self.kind=='tdp' else set() if is_vector else table_allowed if is_table else allowed) or (name,tag) in seen:reject('td_property_edit_field')
             seen.add((name,tag));entry=next((e for e in self.entries if e.name==name),None)
             if entry is None:reject('td_property_edit_entry')
             types=[f for f in entry.fields if f.depth==0 and f.tag=='TYPE']
             if self.kind=='tdp' and types and types[0].scalar()!=0:reject('td_property_composite_or_variable_edit')
+            if is_vector:
+                f=entry.get(tag);old=f.vector();values=change['values']
+                if (not isinstance(values,(tuple,list)) or len(values)!=len(old) or not old
+                        or any(type(v) not in (int,float) or not math.isfinite(v) for v in values)):reject('td_property_grid_edit_shape')
+                if any(v<0 if tag.startswith('BIVARPRESSURE') else v<=0 for v in values):reject('td_property_grid_range')
+                if not tag.startswith('BIVARCONDUCTIVITY') and any(b<=a for a,b in zip(values,values[1:])):reject('td_property_grid_axis')
+                ending=b'\r\n' if b'\r\n' in f.value else b'\r' if b'\r' in f.value else b'\n'
+                replacement=ending.join([str(len(values)).encode(),*(format(v,'.17g').encode() for v in values)])+ending
+                pending.append((f.start,f.end,replacement));continue
             if is_table:
                 f=entry.get(tag);old=f.table().points;points=change['points']
                 if (not isinstance(points,(tuple,list)) or len(points)!=len(old) or not old
@@ -124,8 +155,8 @@ class PropertyDocument:
                 ending=b'\r\n' if b'\r\n' in f.value else b'\r' if b'\r' in f.value else b'\n'
                 raw=ending.join([str(len(points)).encode(),*(format(v,'.17g').encode() for p in points for v in p)])+ending
                 pending.append((f.start,f.end,raw));continue
-            active={'ALPHA':'USEVSA','SOLTRANS':'USEVST','SOLSPEC':'USEVSS','SOLREFRAC':'USEVSZ',
-                    'EMISS':'USEVIE','IRTRANS':'USEVIT','IRSPEC':'USEVIS','IRREFRAC':'USEVIZ'}
+            active={'ALPHA':'USEVSA','SOLTRANS':'USEVST','SOLSPEC':'USEVSS','SOLTSPEC':'USEVSZ',
+                    'EMISS':'USEVIE','IRTRANS':'USEVIT','IRSPEC':'USEVIS','IRTSPEC':'USEVIZ'}
             flags=[active[tag]] if self.kind=='rco' and tag in active else []
             if self.kind=='rco' and tag in {'ALPHA','EMISS'}:flags.append('USETEMPSOLABS' if tag=='ALPHA' else 'USETEMPIREMIS')
             if self.kind=='tdp':flags.extend({'CONDUCT':['USEVARCONDUCT','USEVARCONDTEMPPRES'],
@@ -154,6 +185,8 @@ class PropertyDocument:
             f=next(e for e in reopened.entries if e.name==change['entry']).get(change['field'])
             if 'points' in change:
                 if f.table().points!=tuple(tuple(p) for p in change['points']):reject('td_property_edit_precision')
+            elif 'values' in change:
+                if f.vector()!=tuple(change['values']):reject('td_property_edit_precision')
             elif f.scalar()!=float(change['value']):reject('td_property_edit_precision')
         # All bytes outside the selected numeric spans are retained by construction.
         return raw,{'profile':PROFILE,'edited_fields':len(pending),'reopen_verified':True,
@@ -180,7 +213,7 @@ def parse_properties(raw,kind,*,limits=Limits()):
         offset+=len(line)
     if comment:reject('td_property_unterminated_comment')
     if not tokens or tokens[0][0]!='UNICODE':reject('td_property_header')
-    entries=[];current=None;fields=[];stack=[];names=set()
+    entries=[];current=None;fields=[];stack=[];blocks=[];names=set()
     opens={'AGGREGATE':'ENDAGGREGATE','COMPONENT':'ENDCOMPONENT'}
     for index,(tag,start,end) in enumerate(tokens):
         next_start=tokens[index+1][1] if index+1<len(tokens) else len(raw)
@@ -189,7 +222,7 @@ def parse_properties(raw,kind,*,limits=Limits()):
             if index or value.strip():reject('td_property_header')
         elif tag=='START':
             if current is not None or value.strip():reject('td_property_record_structure')
-            current=start;fields=[];stack=[]
+            current=start;fields=[];stack=[];blocks=[]
         elif current is None:
             if tag=='ENDCOMMENT':reject('td_property_comment_structure')
             reject('td_property_outside_record')
@@ -199,12 +232,13 @@ def parse_properties(raw,kind,*,limits=Limits()):
             if len(namefields)!=1:reject('td_property_name')
             name=namefields[0].value.decode('utf-8').strip()
             if not name or len(name)>256 or any(ord(c)<32 for c in name) or name.casefold() in names:reject('td_property_name')
-            names.add(name.casefold());entries.append(PropertyEntry(name,tuple(fields),start));current=None
+            names.add(name.casefold());entries.append(PropertyEntry(name,tuple(fields),start,tuple(blocks)));current=None
         elif tag in opens:
             if value.strip() or len(stack)>=limits.include_depth:reject('td_property_nested_structure')
-            stack.append(opens[tag])
+            stack.append((tag,start))
         elif tag in opens.values():
-            if not stack or stack.pop()!=tag or value.strip():reject('td_property_nested_structure')
+            if not stack or opens[stack[-1][0]]!=tag or value.strip():reject('td_property_nested_structure')
+            opened,position=stack.pop();blocks.append(PropertyBlock(opened,len(stack),position,end))
         elif tag=='ENDCOMMENT':
             if value.strip():reject('td_property_comment_structure')
         else:

@@ -196,6 +196,14 @@ original projects/decks/property databases/results, private runner profiles,
 compiled sidecars/vendor DLLs and raw logs stay local. Required staged-byte and
 outgoing-history scans may run separately; neither scope may be skipped. Q1 holds
 are recorded explicitly and are not replaced with parser or external-run success.
+The independent property-law slice adds owned synthetic orthotropic, variable
+table/grid, two-band optical and composite-definition fixtures. TST-021 acceptance
+includes their unattended unit cases, fresh-process vendor-free CLI roundtrips,
+and exact `td.json`/`dwg-backend.json` report scans. Original property laws, decoded
+engineering JSON, frame companions, edited files and raw research logs stay local.
+Canonical variable/composite/spectral bindings and complete DWG thermal geometry
+remain WP-08 implementation work; WP-09/WP-11/WP-12 comparisons are later
+qualification obligations, not prerequisites for implementing those codecs.
 
 FEM reuse work applies TST-021 to exact outgoing decision/assessment text, upstream attribution/license manifests, synthetic fixtures, bounded host/mesh/comparison reports and final issue/PR prose. Run `python -S tools/check_security.py` and `python tools/publication_preflight.py --staged --revision HEAD` before commit/push; scan each final generated report or post with `--file` before upload. Generated FreeCAD documents, raw solver decks, screenshots, mesh/result containers and logs stay local unless separately sanitized and cleared. Use synthetic inputs for public tests, preserve authorized originals unchanged, and do not weaken privacy policy to admit upstream examples or generated diagnostics.
 

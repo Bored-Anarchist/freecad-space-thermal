@@ -7,5 +7,5 @@
   "bridge_source_sha256": "76dd954ae7fa9a16b8a3578303accf1ffb344d30635eeeca54ee9c2a648d878d",
   "configuration_sha256": "9fc697b346e90dd0410f5969bac5e25797133f4fde4c272b327f13a22a70b371",
   "cmake_sha256": "9a496fbd09f134ab80ae140b6d9bb72dcc11f9ff4cc8a079231ca09a5ae54a0e",
-  "scope": "independent DWG container; closed canonical network import/export and property libraries; rectangle envelopes; full-model qualification pending"
+  "scope": "independent DWG container; closed canonical network import/export, orthotropic property libraries and variable property law exchange; rectangle envelopes; full-model qualification pending"
 }

@@ -12,6 +12,10 @@ def parsers(commands):
     properties_import.add_argument('root');properties_import.add_argument('entry');properties_import.add_argument('destination')
     properties_import.add_argument('--kind',required=True,choices=['tdp','rco']);properties_import.add_argument('--temperature-min',type=float)
     properties_import.add_argument('--temperature-max',type=float);properties_import.add_argument('--name',action='append')
+    properties_import.add_argument('--material-frame',help='JSON canonical frame declaring the material property axes')
+    for command in ('td-read-property-laws','td-write-property-laws'):
+        laws=commands.add_parser(command);laws.add_argument('root');laws.add_argument('entry');laws.add_argument('destination')
+        if command=='td-read-property-laws':laws.add_argument('--kind',required=True,choices=['tdp','rco'])
     property_export=commands.add_parser('td-export-property-source');property_export.add_argument('project');property_export.add_argument('destination')
     td_writer=commands.add_parser('td-write-model')
     td_writer.add_argument('project');td_writer.add_argument('destination')
@@ -42,6 +46,20 @@ def execute(args):
     if args.command=='td-probe':
         from fcst_exchange.opentd import discover_runtime
         return discover_runtime().probe()
+    if args.command in {'td-read-property-laws','td-write-property-laws'}:
+        from fcst_exchange.td_property_laws import read_laws,export_laws
+        from fcst_exchange.vendor_paths import checked_path
+        from fcst_exchange.core import reject
+        from fcst_contracts import loads
+        with checked_path(Path(args.root),args.entry).open('rb') as stream:raw=stream.read(1048577)
+        if len(raw)>1048576:reject('td_property_library_limit')
+        if args.command=='td-read-property-laws':
+            library=read_laws(raw,args.kind)
+        else:
+            library=loads(raw)
+        # The result contains local engineering data. Console reports are counts
+        # only, following the same separation as native DWG/property workflows.
+        return {'operation':args.command,**export_laws(library,args.destination,json_output=args.command=='td-read-property-laws')}
     if args.command=='td-write-properties':
         from fcst_app.persistence import recover_package
         from fcst_exchange.td_property_model import export_library
@@ -61,10 +79,15 @@ def execute(args):
         if len(raw)>1048576:reject('td_property_library_limit')
         if args.kind=='rco' and (args.temperature_min is not None or args.temperature_max is not None):reject('td_property_optics_temperature_interval_unmapped')
         bounds=[args.temperature_min,args.temperature_max] if args.kind=='tdp' else None
-        model,report=import_document(raw,args.kind,bounds,names=args.name)
+        from fcst_contracts import loads
+        frame=None
+        if args.material_frame:
+            with Path(args.material_frame).open('rb') as stream:frame=loads(stream.read(1048577))
+        model,report=import_document(raw,args.kind,bounds,names=args.name,material_frame=frame)
         source='source/'+sha256(args.entry.encode()).hexdigest()+'.original';files={'model.json':encode(model),source:raw,
             'exchange/property-source-map.json':encode({'profile':'td-property-document/1','source_paths':{args.entry:source},'report':report,
-                'entries':[e['label'] for e in model['entities']]})}
+                'entries':[e['label'] for e in model['entities'] if e['kind']!='frame'],
+                'material_frames':[e for e in model['entities'] if e['kind']=='frame']})}
         model_id=target_id(('property-document-model',model['project_id']));source_id=target_id(('property-document-original',args.entry));records=[]
         for name,data in files.items():
             records.append({'id':model_id if name=='model.json' else source_id if name==source else target_id(('property-document-evidence',name)),

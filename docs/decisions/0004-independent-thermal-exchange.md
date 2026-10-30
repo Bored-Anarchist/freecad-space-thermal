@@ -150,9 +150,17 @@ publication. Owned annotation companions are hash-bound and checked against sour
 quantities/references; large native handles use string identities.
 
 Original property documents can be imported with explicit entry selection and
-material validity bounds. Constant isotropic materials and equivalent-band optics
+material validity bounds. Constant isotropic/orthotropic materials and equivalent-band optics
 also have an owned source-free library writer and independent reader, preserving
 canonical validity/annotations separately. Unrepresented active modes reject.
+Orthotropic conversion requires a caller-declared property-axis frame, preserves
+all three scaled conductivities and rejects general off-diagonal tensors. The
+independent property-law interchange now reads/writes temperature/pressure grids,
+active 1D basic material laws, separate optical bands and ordered laminate/aggregate
+definitions. Evaluator policies are explicit. Component references must close on
+basic properties; effective composite physics and canonical variable/spectral
+bindings remain implementation work. Guarded grid/component edits retain every
+unselected source byte, and a fresh reader verifies exports without vendor tools.
 Static SINDA arrays now retain storage/identity and support bounded continuations
 and allocation; reviewed intrinsics and explicit table-IR construction do not run
 source code. Active control/array consumers require separate reviewed mappings.
@@ -195,7 +203,7 @@ WP-08 remains in progress. Deliver these slices in order:
 Build and self-test with `python tools/build_independent_dwg.py`. This downloads
 only locked public source/toolchain assets, keeps build artifacts local and
 produces a bounded `dwg-backend.json` report. Foundation CI requires that job and
-checks its candidate, source hashes, seventeen cases and nonqualification flags in
+checks its candidate, source hashes, required cases and nonqualification flags in
 the final handoff. It publishes only the privacy-cleared summary.
 
 For private corpus research use
@@ -205,7 +213,8 @@ drawings remain local. Success always retains `native_ready=false` and
 `qualified=false` because complete thermal semantics remain incomplete.
 
 `tests/test_native_dwg.py`, `tests/test_sinda_writer.py`,
-`tests/test_td_payloads.py`, `tests/test_td_properties.py` and the existing SINDA,
+`tests/test_td_payloads.py`, `tests/test_td_properties.py`,
+`tests/test_td_property_laws.py` and the existing SINDA,
 container and optional-reference tests run in both Windows configurations and
 the standard-library security job. They cover retained duplicate occurrences,
 partial payload bytes, Unicode/stream bounds, fixed-width and compressed scalar
@@ -221,3 +230,7 @@ bounded probe summaries before any publication. Raw DWG/dependencies, proprietar
 class payloads, decoded JSON, metadata, private paths, binaries and raw logs remain
 local. Preserve the original corpus and its hashes. No source fixture is altered
 to manufacture a public example; no proprietary binary is redistributed.
+Property-law JSON, source definitions, frame companions and edited engineering
+files also stay local. Publish only owned synthetic property/layer/grid fixtures,
+public source hashes and bounded verdicts. TST-021 scans staged bytes, outgoing
+history/identity and the exact final reports/GitHub prose before publication.

@@ -44,8 +44,12 @@ The [FCST implementation project](https://github.com/users/Bored-Anarchist/proje
 WP-08 adds the [TD/SINDA implementation](td-sinda.md), owned binary codecs and
 source-free DWG writer, direct property readers, its source-only C# sidecar
 and runtime-independent `td.json` summary. Both Windows CI presets execute the
-frozen cases and scan that exact summary before upload. Local installed-API
-receipts contain hashes and bounded status only. Q1 vendor/native/paired ESA
+frozen cases and scan that exact summary before upload. Property-law research
+data stay local. Orthotropic, variable-table/grid,
+two-band optical and composite-definition tests use owned synthetic inputs;
+law JSON and source exports containing engineering values are not CI assets.
+Fresh-process property import/edit/export checks deny vendor imports.
+Local installed-API receipts contain hashes and bounded status only. Q1 vendor/native/paired ESA
 qualification remains open. Policy v4 inspects `.cs` as text with the same
 privacy patterns, binary rejection and budgets; compiled sidecars, vendor DLLs,
 original DWG/decks/property/result files, private runner profiles and raw logs

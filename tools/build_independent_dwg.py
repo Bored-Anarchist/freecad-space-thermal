@@ -191,6 +191,75 @@ raise SystemExit(main())
         from fcst_exchange.td_property_model import import_document
         reimported,_=import_document((attempt/'property-source-edit/materials.tdp').read_bytes(),'tdp',[150,450])
         property_source_edit=reimported['entities']==changed_properties['entities']
+    # Property codecs run in fresh processes behind the same vendor-import
+    # prohibition as native network conversion. Inputs are independently owned.
+    from copy import deepcopy
+    from fcst_exchange.td_property_laws import write_laws,read_laws,material_laws,optical_laws
+    law_inputs=attempt/'law-inputs';law_inputs.mkdir()
+    thermal_laws={'profile':'td-property-laws/1','kind':'tdp','entries':[{'name':'owned variable material',
+        'scalars':{'USEANISO':1,'USEVARCONDTEMPPRES':1,'USEVARSPECHEAT':1,'CONDUCTY':30,'CONDUCTZ':40},
+        'tables':{'VARSPECHEAT':[[100,500],[300,900]]},'vectors':{'BIVARTEMPERATURE':[100,300],
+        'BIVARPRESSURE':[0,100],'BIVARCONDUCTIVITY':[10,20,30,40]}}]}
+    thermal_laws['entries'].append({'name':'owned laminate','scalars':{'TYPE':1},'tables':{},'vectors':{},
+        'aggregate':{'scalars':{},'components':[{'material':'owned variable material','scalars':{'THICKNESS':.001,'ORIENTATIONANGLE':30}},
+                                              {'material':'owned variable material','scalars':{'THICKNESS':.002,'ORIENTATIONANGLE':-45}}]}})
+    optical_law_data={'profile':'td-property-laws/1','kind':'rco','entries':[{'name':'owned optical bands',
+        'scalars':{'ALPHA':.2,'EMISS':.6,'SOLTRANS':.1,'IRTRANS':.3,'SOLTSPEC':.7,'IRTSPEC':.8,
+                   'SOLREFRAC':1.2,'IRREFRAC':1.5,'USETEMPSOLABS':1},
+        'tables':{'TEMPALPHA':[[100,.2],[300,.5]]},'vectors':{}}]}
+    law_cli=True
+    for kind,library in (('tdp',thermal_laws),('rco',optical_law_data)):
+        raw=write_laws(library);(law_inputs/('owned.'+kind)).write_bytes(raw)
+        law_cli=invoke(['td-read-property-laws',law_inputs,'owned.'+kind,attempt/('laws-'+kind),'--kind',kind]) and law_cli
+        if not law_cli:raise ValueError('backend_property_laws_import_failed')
+        recovered=json.loads((attempt/('laws-'+kind)/'property-laws.json').read_bytes())
+        if recovered!=library:raise ValueError('backend_property_laws_decode_failed')
+        if kind=='tdp':
+            recovered['entries'][0]['vectors']['BIVARCONDUCTIVITY']=[12,24,36,48]
+            recovered['entries'][1]['aggregate']['components'][1]['scalars']['THICKNESS']=.004
+        else:recovered['entries'][0]['scalars']['IRTSPEC']=.9
+        (attempt/('laws-'+kind)/'edited.json').write_bytes(encode(recovered))
+        law_cli=invoke(['td-write-property-laws',attempt/('laws-'+kind),'edited.json',attempt/('laws-export-'+kind)]) and law_cli
+        if not law_cli:raise ValueError('backend_property_laws_export_failed')
+        filename='materials.tdp' if kind=='tdp' else 'optics.rco'
+        actual=read_laws((attempt/('laws-export-'+kind)/filename).read_bytes(),kind)
+        if actual!=recovered or (law_inputs/('owned.'+kind)).read_bytes()!=raw:raise ValueError('backend_property_laws_roundtrip_failed')
+        if kind=='tdp':
+            law=material_laws(actual['entries'][0])
+            if law['conductivity'][0].evaluate(temperature=200,pressure=50,interpolation='linear',extrapolation='error')!=30:raise ValueError('backend_property_grid_order_failed')
+        elif optical_laws(actual['entries'][0])['infrared']['transmissive_specular_fraction'].values!=(.9,):raise ValueError('backend_property_bands_failed')
+    composite_source=attempt/'composite-source';composite_source.mkdir()
+    (composite_source/'network.dwg').write_bytes((attempt/'new-model/network.dwg').read_bytes())
+    (composite_source/'layers.tdp').write_bytes(write_laws(thermal_laws))
+    composite_staged=adapter.preview(composite_source,'network.dwg',attempt/'composite-preview')
+    composite_export=adapter.export_source(composite_staged,attempt/'composite-edited',
+        [{'path':'layers.tdp','changes':[{'entry':'owned laminate','component':1,'field':'THICKNESS','value':.004}]}],work=attempt/'composite-edit-work')
+    composite_actual=read_laws((attempt/'composite-edited/layers.tdp').read_bytes(),'tdp')
+    composite_equal=(composite_actual['entries'][1]['aggregate']['components'][1]['scalars']['THICKNESS']==.004
+        and (attempt/'composite-edited/network.dwg').read_bytes()==(composite_source/'network.dwg').read_bytes()
+        and (composite_source/'layers.tdp').read_bytes()==write_laws(thermal_laws) and composite_export['unrequested_source_files_preserved'])
+    orthotropic=deepcopy(properties);material_frame={'id':target_id(('dwg-selftest','property-frame')),'kind':'frame',
+        'origin':[{'value':0,'unit':'m'}]*3,'rotation':[[0,-1,0],[1,0,0],[0,0,1]]}
+    orthotropic['entities'][0].update(frame_id=material_frame['id'],conductivity_tensor=[[10,0,0],[0,20,0],[0,0,30]])
+    orthotropic['entities'].append(material_frame);ortho_bytes=encode(orthotropic);ortho_manifest=deepcopy(pm)
+    ortho_manifest['artifacts'][0]['artifact'].update(sha256=sha256(ortho_bytes).hexdigest(),byte_length=len(ortho_bytes))
+    save_package(Package(ortho_manifest,{'model.json':ortho_bytes}),attempt/'orthotropic.fcst')
+    ortho_cli=invoke(['td-write-properties',attempt/'orthotropic.fcst',attempt/'orthotropic-library']) and invoke(['td-read-properties',attempt/'orthotropic-library',attempt/'orthotropic-reopened.fcst'])
+    if not ortho_cli or recover_package(attempt/'orthotropic-reopened.fcst').model['entities']!=sorted(orthotropic['entities'],key=lambda e:e['id']):raise ValueError('backend_orthotropic_library_failed')
+    (attempt/'property-frame.json').write_bytes(encode(material_frame))
+    ortho_source=invoke(['td-import-properties',attempt/'orthotropic-library','materials.tdp',attempt/'orthotropic-original.fcst',
+        '--kind','tdp','--temperature-min','150','--temperature-max','450','--material-frame',attempt/'property-frame.json'])
+    if not ortho_source:raise ValueError('backend_orthotropic_source_import_failed')
+    ortho_package=recover_package(attempt/'orthotropic-original.fcst');ortho_changed=ortho_package.model
+    ortho_material=next(e for e in ortho_changed['entities'] if e['kind']=='material');ortho_material['conductivity_tensor'][1][1]=25
+    ortho_bytes=encode(ortho_changed);ortho_manifest=ortho_package.manifest;ortho_files=dict(ortho_package.files)
+    ortho_record=next(r for r in ortho_manifest['artifacts'] if r['id']==ortho_manifest['model_artifact_id'])
+    ortho_record['artifact'].update(sha256=sha256(ortho_bytes).hexdigest(),byte_length=len(ortho_bytes));ortho_files[ortho_record['artifact']['path']]=ortho_bytes
+    save_package(Package(ortho_manifest,ortho_files),attempt/'orthotropic-changed.fcst')
+    ortho_source=invoke(['td-export-property-source',attempt/'orthotropic-changed.fcst',attempt/'orthotropic-source-edit']) and ortho_source
+    if not ortho_source:raise ValueError('backend_orthotropic_source_export_failed')
+    ortho_reimported,_=import_document((attempt/'orthotropic-source-edit/materials.tdp').read_bytes(),'tdp',[150,450],material_frame=material_frame)
+    ortho_source=sorted(ortho_reimported['entities'],key=lambda e:e['id'])==sorted(ortho_changed['entities'],key=lambda e:e['id'])
     held=native_adapter.preview(attempt/'edited-model','network.dwg',attempt/'held-preview')
     from fcst_exchange.td_writer import node_payload,conductor_payload,load_payload,network_packet
     offset_records=[node_payload('MAIN',1,-20,10,'capacitive'),node_payload('MAIN',2,20,0,'prescribed'),
@@ -220,7 +289,11 @@ raise SystemExit(main())
             'unmapped-native-semantics-remain-held':held.report['native_ready'] is False,
             'original-property-document-cli-import':original_property_cli,
             'offset-unit-native-edit-roundtrip':offset_export['canonical_roundtrip_verified'] and offset_reopen.require_native()['entities']==offset_model['entities'],
-            'native-property-source-cli-edit':property_source_edit}
+            'native-property-source-cli-edit':property_source_edit,
+            'variable-property-laws-cli-roundtrip':law_cli,
+            'composite-property-source-preservation':composite_equal,
+            'orthotropic-property-library-cli-roundtrip':ortho_cli,
+            'orthotropic-original-source-cli-edit':ortho_source}
     records=[{'id':key,'status':'passed' if value else 'failed'} for key,value in checks.items()]
     report={'schema_version':1,'candidate':revision(),'profile':profile['runtime'],
             'gate':evaluate(profile['required_cases'],records),'cases':records,
