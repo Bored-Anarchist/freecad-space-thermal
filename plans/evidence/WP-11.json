@@ -1,8 +1,116 @@
 {
   "work_package": "WP-11",
   "status": "in_progress",
-  "scope": "WP-11.1 through WP-11.10 implementation: immutable preparation, material/enthalpy laws, owned assembly/Jacobians, steady and adaptive stiff transient solves, index-one DAE initialization, schedule/heater events, native checkpoints, energy results/provenance and compiled profiling/capabilities.",
+  "scope": "WP-11.1 through WP-11.10 plus native qualification closure: source-literal analytic comparisons, event-time/duty refinement, representative network profiles, captured-result contract guards and subnormal LU representability acceptance.",
   "contract": "docs/thermal-engine.md",
+  "qualification_register": "ci/thermal-qualification-v1.json",
+  "qualification_detail": "plans/WP-11-qualification.md",
+  "native_qualification": {
+    "schema_version": 1,
+    "execution_mode": "fcst_native",
+    "requirements": [
+      {
+        "requirement_id": "ARC-009",
+        "native_status": "passed",
+        "required_cases": [
+          "native-preparation",
+          "steady-cli-linear",
+          "transient-cli-analytic",
+          "build-identity"
+        ],
+        "remaining_q1_gates": []
+      },
+      {
+        "requirement_id": "ARC-015",
+        "native_status": "passed",
+        "required_cases": [
+          "transient-network-profile",
+          "transient-cli-capabilities",
+          "source-sinda-network",
+          "source-esatan-network",
+          "transient-network-localized"
+        ],
+        "remaining_q1_gates": [
+          "WP-13 host parity",
+          "WP-14 MCP parity"
+        ]
+      },
+      {
+        "requirement_id": "PHY-001",
+        "native_status": "passed",
+        "required_cases": [
+          "steady-nonlinear",
+          "transient-independent-reference",
+          "transient-initialization",
+          "source-sinda-network",
+          "source-esatan-network",
+          "steady-lu-subnormal-tail"
+        ],
+        "remaining_q1_gates": [
+          "GAP-LICENSES",
+          "GAP-RESULTS"
+        ]
+      },
+      {
+        "requirement_id": "PHY-005",
+        "native_status": "passed",
+        "required_cases": [
+          "transient-event-refinement",
+          "transient-schedule",
+          "transient-simultaneous",
+          "transient-checkpoint",
+          "transient-chattering"
+        ],
+        "remaining_q1_gates": []
+      },
+      {
+        "requirement_id": "PHY-006",
+        "native_status": "passed",
+        "required_cases": [
+          "steady-singular",
+          "steady-limits",
+          "transient-rejection",
+          "transient-failures",
+          "transient-cli-failures"
+        ],
+        "remaining_q1_gates": []
+      },
+      {
+        "requirement_id": "PHY-007",
+        "native_status": "passed",
+        "required_cases": [
+          "assembly-balance",
+          "steady-energy",
+          "transient-energy",
+          "transient-two-node"
+        ],
+        "remaining_q1_gates": [
+          "WP-12 radiation coupling",
+          "WP-17 environments"
+        ]
+      },
+      {
+        "requirement_id": "TST-004",
+        "native_status": "passed",
+        "required_cases": [
+          "assembly-callback-contracts",
+          "assembly-physics-coverage",
+          "source-oracle-rejections",
+          "transient-cli-failures",
+          "captured-reference-contract"
+        ],
+        "remaining_q1_gates": [
+          "WP-12 radiation suite",
+          "WP-17 environment suite"
+        ]
+      }
+    ],
+    "native_status": "passed",
+    "licensed_paired_status": "blocked",
+    "licensed_paired_reason": "approved_reference_pair_unavailable",
+    "q1_qualified": false
+  },
+  "remaining_native_qualification": [],
   "acceptance_register": "ci/thermal-acceptance.json",
   "implemented_substeps": [
     "WP-11.1",
@@ -17,19 +125,19 @@
     "WP-11.10"
   ],
   "remaining_substeps": [],
-  "qualification": "All ten native implementation substeps pass owned acceptance. Full licensed paired-source/vendor qualification and durable-job HDF5/host result integration remain separate; no full vendor or production qualification is asserted.",
-  "tested_candidate": "e16f4b6400c5f544327ef16206aa8eb6b15fc381",
+  "qualification": "Native implementation and all registered native qualification cases pass. Licensed paired-reference qualification remains blocked by GAP-LICENSES/GAP-RESULTS; host/MCP and coupled-physics gates remain with their owning packages. No full Q1 qualification is asserted.",
+  "tested_candidate": "acf91db0943e3d6ad4a4ee58d8f1dadc61904f5c",
   "checks": [
     {
       "id": "windows-debug",
       "status": "passed",
-      "candidate": "e16f4b6400c5f544327ef16206aa8eb6b15fc381",
+      "candidate": "acf91db0943e3d6ad4a4ee58d8f1dadc61904f5c",
       "command": "python tools/verify.py --preset windows-debug",
-      "cases": 337,
-      "native_ctest_cases": 54,
-      "thermal_acceptance_cases": 72,
-      "report_sha256": "04d2bc8e068bfc459704587c62730f7c9b3ae089299b5db9f36544561a55930e",
-      "thermal_report_sha256": "2100051383672e834d6ca40b2849ce6b5d36b6f32b984034c3a8235263760973",
+      "cases": 339,
+      "native_ctest_cases": 58,
+      "thermal_acceptance_cases": 80,
+      "report_sha256": "6246838015ca53883969cd9394853189635f89bc0017ff36513d4e4478bc635e",
+      "thermal_report_sha256": "bcf7e1393eb2a5209883138637de9c12c4883cd9f01a110cfe94530051042c87",
       "backend_capabilities": {
         "checkpoint": true,
         "compiler": "MSVC",
@@ -42,31 +150,90 @@
         "index_one_dae": true,
         "linear": "fcst_sparse_lu",
         "nonlinear": "fcst_damped_newton",
-        "source_revision": "e16f4b6400c5f544327ef16206aa8eb6b15fc381",
+        "source_revision": "acf91db0943e3d6ad4a4ee58d8f1dadc61904f5c",
         "stiff": true,
         "transient": "fcst_enthalpy_backward_euler_step_doubling"
       },
       "native_profile": {
-        "assembly_seconds": 0.2535485999999977,
+        "assembly_seconds": 0.21960039999999983,
         "event_probes": 0,
         "jacobian_evaluations": 3955,
-        "linear_seconds": 0.06368220000000001,
+        "linear_seconds": 0.05437499999999995,
         "linear_solves": 2636,
         "newton_iterations": 1317,
         "residual_evaluations": 8794,
-        "total_seconds": 0.5881537
+        "total_seconds": 0.5023225
+      },
+      "qualification_metrics": {
+        "transient-event-refinement": {
+          "coarse_error_s": 0.20075973475560627,
+          "medium_error_s": 0.10732312927230847,
+          "fine_error_s": 0.054435153847776085,
+          "fine_duty_error": 0.005347619986789454,
+          "coarse_steps": 32,
+          "medium_steps": 54,
+          "fine_steps": 108
+        },
+        "transient-network-profile": {
+          "equations": 256,
+          "nonzeros": 766,
+          "accepted_steps": 6,
+          "residual_evaluations": 134,
+          "jacobian_evaluations": 58,
+          "linear_solves": 38,
+          "assembly_seconds": 0.10492029999999991,
+          "linear_seconds": 0.07557909999999998,
+          "total_seconds": 0.2700434,
+          "energy_defect_J": -2.362554596402333e-11
+        },
+        "transient-network-localized": {
+          "equations": 256,
+          "nonzeros": 766,
+          "accepted_steps": 40,
+          "residual_evaluations": 854,
+          "jacobian_evaluations": 382,
+          "linear_solves": 254,
+          "assembly_seconds": 0.7405443000000002,
+          "linear_seconds": 0.5766563000000003,
+          "total_seconds": 1.9049174,
+          "energy_defect_J": 1.0459133559237443e-12
+        }
+      },
+      "source_comparisons": {
+        "sinda": {
+          "fixture_sha256": "1a029e19a99730946403684c07cf80fcab18d803db957ce243d3cbbf38f307b9",
+          "source_sha256": "de74918f436a3307aa04bc6857e823db3f17d4ece249dc758b518515d83dad87",
+          "model_hash": "427cd54499655ffaf73e874485358c7e6d6ed2fee62b4d46a20f791588591039",
+          "maximum_temperature_error_K": 0.00016634034977869305,
+          "maximum_boundary_power_error_W": 0.00016634034983553647,
+          "maximum_storage_error_J": 0.0003326806995573861,
+          "node_classes": 3,
+          "execution_mode": "fcst_native",
+          "vendor_qualified": false
+        },
+        "esatan": {
+          "fixture_sha256": "3660207cc150157c34d5546317d02d5a34effc0426a2d264fc68212d419013b5",
+          "source_sha256": "67b40f28124a3a13a667c6d6a3b5026735a7ff2360450156b0a4859e55987867",
+          "model_hash": "610689bbeec1a2a48a07f79b0abae25db4758b663f13176ffc260e31c4864ed1",
+          "maximum_temperature_error_K": 0.00016634034977869305,
+          "maximum_boundary_power_error_W": 0.00016634034983553647,
+          "maximum_storage_error_J": 0.0003326806995573861,
+          "node_classes": 3,
+          "execution_mode": "fcst_native",
+          "vendor_qualified": false
+        }
       }
     },
     {
       "id": "windows-release",
       "status": "passed",
-      "candidate": "e16f4b6400c5f544327ef16206aa8eb6b15fc381",
+      "candidate": "acf91db0943e3d6ad4a4ee58d8f1dadc61904f5c",
       "command": "python tools/verify.py --preset windows-release",
-      "cases": 337,
-      "native_ctest_cases": 54,
-      "thermal_acceptance_cases": 72,
-      "report_sha256": "db2aac5545e1250fcdb3cf3732a1b89cc8b9f4575bcc46c22d66d4bfdb828232",
-      "thermal_report_sha256": "4b46c983440e651b9d8c71973b6bfa1a3d031afd592e653327941132222be59d",
+      "cases": 339,
+      "native_ctest_cases": 58,
+      "thermal_acceptance_cases": 80,
+      "report_sha256": "f7a888d57a655e847a0038bc10a0f436dd0ccaee3438dc7e5fa27a9465feab2b",
+      "thermal_report_sha256": "30894fc8628580530966be76898129b4fd6b381098b1c2b5faff42ba63e3747f",
       "backend_capabilities": {
         "checkpoint": true,
         "compiler": "MSVC",
@@ -79,33 +246,93 @@
         "index_one_dae": true,
         "linear": "fcst_sparse_lu",
         "nonlinear": "fcst_damped_newton",
-        "source_revision": "e16f4b6400c5f544327ef16206aa8eb6b15fc381",
+        "source_revision": "acf91db0943e3d6ad4a4ee58d8f1dadc61904f5c",
         "stiff": true,
         "transient": "fcst_enthalpy_backward_euler_step_doubling"
       },
       "native_profile": {
-        "assembly_seconds": 0.007289099999999526,
+        "assembly_seconds": 0.008515399999999321,
         "event_probes": 0,
         "jacobian_evaluations": 3955,
-        "linear_seconds": 0.0025470000000000085,
+        "linear_seconds": 0.002963999999999942,
         "linear_solves": 2636,
         "newton_iterations": 1317,
         "residual_evaluations": 8794,
-        "total_seconds": 0.0229509
+        "total_seconds": 0.0270405
+      },
+      "qualification_metrics": {
+        "transient-event-refinement": {
+          "coarse_error_s": 0.20075973475560627,
+          "medium_error_s": 0.10732312927230847,
+          "fine_error_s": 0.054435153847776085,
+          "fine_duty_error": 0.005347619986789454,
+          "coarse_steps": 32,
+          "medium_steps": 54,
+          "fine_steps": 108
+        },
+        "transient-network-profile": {
+          "equations": 256,
+          "nonzeros": 766,
+          "accepted_steps": 6,
+          "residual_evaluations": 134,
+          "jacobian_evaluations": 58,
+          "linear_solves": 38,
+          "assembly_seconds": 0.004334799999999999,
+          "linear_seconds": 0.005719800000000001,
+          "total_seconds": 0.0189243,
+          "energy_defect_J": -2.362554596402333e-11
+        },
+        "transient-network-localized": {
+          "equations": 256,
+          "nonzeros": 766,
+          "accepted_steps": 40,
+          "residual_evaluations": 854,
+          "jacobian_evaluations": 382,
+          "linear_solves": 254,
+          "assembly_seconds": 0.02640050000000002,
+          "linear_seconds": 0.04104769999999996,
+          "total_seconds": 0.118075,
+          "energy_defect_J": 1.0459133559237443e-12
+        }
+      },
+      "source_comparisons": {
+        "sinda": {
+          "fixture_sha256": "1a029e19a99730946403684c07cf80fcab18d803db957ce243d3cbbf38f307b9",
+          "source_sha256": "de74918f436a3307aa04bc6857e823db3f17d4ece249dc758b518515d83dad87",
+          "model_hash": "427cd54499655ffaf73e874485358c7e6d6ed2fee62b4d46a20f791588591039",
+          "maximum_temperature_error_K": 0.00016634034977869305,
+          "maximum_boundary_power_error_W": 0.00016634034983553647,
+          "maximum_storage_error_J": 0.0003326806995573861,
+          "node_classes": 3,
+          "execution_mode": "fcst_native",
+          "vendor_qualified": false
+        },
+        "esatan": {
+          "fixture_sha256": "3660207cc150157c34d5546317d02d5a34effc0426a2d264fc68212d419013b5",
+          "source_sha256": "67b40f28124a3a13a667c6d6a3b5026735a7ff2360450156b0a4859e55987867",
+          "model_hash": "610689bbeec1a2a48a07f79b0abae25db4758b663f13176ffc260e31c4864ed1",
+          "maximum_temperature_error_K": 0.00016634034977869305,
+          "maximum_boundary_power_error_W": 0.00016634034983553647,
+          "maximum_storage_error_J": 0.0003326806995573861,
+          "node_classes": 3,
+          "execution_mode": "fcst_native",
+          "vendor_qualified": false
+        }
       }
     },
     {
-      "id": "isolated-security-regressions",
+      "id": "isolated-security-and-qualification-regressions",
       "status": "passed",
       "command": "python -S tools/check_security.py",
-      "cases": 316,
-      "report_sha256": "4e5dab2820ec0bcb33bec4705ca4a5de518e546a69aef3f65f534d95a539021d"
+      "cases": 318,
+      "report_sha256": "145a463c32323e53a470713947dfa1531337e96194b9e702c563455910fa45f7"
     }
   ],
   "input_sha256": {
-    "CMakeLists.txt": "33a9b288d23c567cd05b701911ea06d92cdcb95de13293dc43867f4b89faa395",
+    "CMakeLists.txt": "0aa86a76d737e91ea932ce15d676feba0e032c1aae2dc9c3bb5808e0978c98be",
     "CMakePresets.json": "68a5d94ecb715b8ed4ca4157fef64fd10c8f9b645f343184390faf3cd4649dbf",
-    "ci/thermal-acceptance.json": "53c6b08cb70a575ae53855c3cece9fe39492eaab2d6dfcf78e47ebf9d7ebb511",
+    "ci/thermal-acceptance.json": "babf409d88583155ec5a0c9a5320923dd89c2ebbec0d8e2b5665ca468ebce985",
+    "ci/thermal-qualification-v1.json": "69404ddfaf64bef21888a2469f0a8f183b919cb89bf0b7becd24ac9407077731",
     "engine/include/fcst/build_info.hpp.in": "a39b9c567abd186e960a5a4110df72507b40b0dbe6f1eb800cdfb9d076cc28cf",
     "engine/include/fcst/contract_bundle.hpp": "cc2e286bbe453ebdaf20ed21d34b724a58d9089090818fcbc378704ddacc6730",
     "engine/include/fcst/contract_types.hpp": "7c7af3a36204f732c3fc5fc610d12639e1c51240de2cdd4be7e7a099f55ea4f5",
@@ -123,14 +350,15 @@
     "engine/src/thermal_assembly.cpp": "3fa195ede5e801899f5e0b1364e3691514219d744a3362640af1b09bd5d6dfba",
     "engine/src/thermal_execution.inc": "40bb7834c79a5a3245e3fe2489a8c7112ca0ce8ffba541a1e39e30b5fde94306",
     "engine/src/thermal_loading.inc": "80298aa384abe1b277cabf0dc8ec19179cc1e0212f71daff8c59cb393da42e6a",
-    "engine/src/thermal_steady.cpp": "dee25cd9db22e24c5b02313d992f3040b1dcd76b908d12730588100033d0f0ea",
+    "engine/src/thermal_steady.cpp": "306b91f5e03de6875f2e422859a75f319fe89b5aa60fab68cb9da77735bc2d1e",
     "engine/src/thermal_transient.cpp": "0b023c6afc9afa082c17a0e161ad00ec7deea8e6c23a4e89a360621dd7deadf2",
     "engine/tests/thermal_assembly_tests.cpp": "8671ba427a1916df8cdd3cee02e29cf4a5e48ff69cb5c9c14194ecc914123ae5",
-    "engine/tests/thermal_steady_tests.cpp": "ddd099e08546df6ab4365462f1c1dd27fc256aaf88ef2efb8dbf94ec7613921e",
+    "engine/tests/thermal_steady_tests.cpp": "bdc69380ef3ed06ebe10867406419256f294f0a99c505d85577c967080b441fd",
     "engine/tests/thermal_tests.cpp": "e4261787958fb17cd1e0daf8ea4b0fecb20def4328dc9e9affeda436e59ec9bf",
-    "engine/tests/thermal_transient_tests.cpp": "8094c5531b30019415a9a53390cc3b0c370c8deb1bf0601176da2fd92603ee4d",
+    "engine/tests/thermal_transient_tests.cpp": "c9819f469deffe74aaf3070dd2585f0b099ec082bf66867006087cfc77c6567e",
     "engine/worker/main.cpp": "4d22157a1fbde69f9d7fcafd0cabace725e47d82e36a3a04cce7205853c5bdc6",
-    "python/fcst_tools/thermal.py": "19c65cf5d03d1f1ff904d03b9dd5f2ff51fa056de52d7a035841af3b9ff6792d",
+    "python/fcst_tools/thermal.py": "8827d98b787193de8b4a2d1c6ea2cfa008f2428c20c2e5869ab9ecae8f7abbf2",
+    "python/fcst_tools/thermal_qualification.py": "812af7125e81fd6dc7b9cdc9cda75ec6a9729fff996aa6b4ba7514c8a381163e",
     "spec/schemas/thermal-input-v1.schema.json": "3f31dbd12e15adef26ba4eaa3363bed003ad55f47bfe718191213aca31d63975",
     "tests/fixtures/thermal/algebraic-network.json": "af8f3c145913ca47e198eb4b0e2f9ed0728fcbe10cb43dbcfa83debc900d3e95",
     "tests/fixtures/thermal/case-network.json": "48a0b92e45849c149fefc914dd3015eea7d9e118d35415d17658313486db45d8",
@@ -141,6 +369,8 @@
     "tests/fixtures/thermal/material-network.json": "7087b931019c251e6ad1ca5ecc1eae348b22e4b6d105658d36487f3e631f9f4e",
     "tests/fixtures/thermal/power-network.json": "4bf3c2a32ae93f550ba8fd007a3e5576b11ecdf24ccfcba6f5a5f327098ba833",
     "tests/fixtures/thermal/prescribed-network.json": "3530dfe2a78819c9e01e06e48d75e07489df1927fa67bbeb91b19cec44809107",
+    "tests/fixtures/thermal/source-esatan-network.json": "3660207cc150157c34d5546317d02d5a34effc0426a2d264fc68212d419013b5",
+    "tests/fixtures/thermal/source-sinda-network.json": "1a029e19a99730946403684c07cf80fcab18d803db957ce243d3cbbf38f307b9",
     "tests/fixtures/thermal/steady-environment-anchor.json": "6c5ce55b809ebc7a780687e9c704ba1537e265ac090eddf56dc7c23a5448f018",
     "tests/fixtures/thermal/steady-opposite-defects.json": "57d9a53f2761133b475fbc5330fc67fed9421a71e408afa71260a95533ae2440",
     "tests/fixtures/thermal/steady-outside-domain.json": "ff003e37a911650e657a7f340453727e487d4ff3b584bb1fae55b5ef58809f76",
@@ -158,7 +388,8 @@
     "tests/fixtures/thermal/transient-single.json": "d9c06984f500af056330b85b39fdc2fe858afd0f63f510cd1511ad773c22a82b",
     "tests/fixtures/thermal/transient-stiff.json": "8a478bdbd81e6e5326f2f8c024f1869f7034eabd1e67146c470c2de9892b7ad0",
     "tests/fixtures/thermal/transient-two.json": "77c2f93ab11ed4c8d635f46e37239f3ebe1d613985c29da9084aec80d7063324",
-    "tools/check_thermal.py": "7359da5dfe61aaa15f63e9473888d9928a6b0035402f9bf50f3b77068e891b29",
+    "tools/check_thermal.py": "603baf9f369e4040d3092108273621ced258d40696f028590db77f1fe66fcc5a",
+    "tools/compare_thermal_reference.py": "11cd061e4c7b23d4cbc0cc025d66a5f95a85bd2d6c720c2288d0c501f3b8cd12",
     "tools/generate_contracts.py": "eb9a07618d3e200c751d04a5a579240d0ec439b856fd8088cc1cd9fefd1577e7",
     "tools/thermal_schema.py": "ba97f2ce6afb23b0a05e7002cf9920fef5da055cf31b11f13c6bc0615bfbaa96"
   },
@@ -166,10 +397,10 @@
   "native_transient_available": true,
   "durable_job_solver_available": false,
   "previous_evidence": {
-    "candidate": "2d16edf447527292a25a9fe43ffef42cc01235aa",
-    "tested_candidate": "875c3ca94beac0892ea7df7bc391b1f4d7185a58",
+    "candidate": "e4dae72b7358e175f51ae02af7a7c2ae77f2b503",
+    "tested_candidate": "e16f4b6400c5f544327ef16206aa8eb6b15fc381",
     "path": "plans/evidence/WP-11.json",
-    "scope": "WP-11.1 through WP-11.6 verification retained in Git history"
+    "scope": "WP-11.1 through WP-11.10 implementation verification retained in Git history"
   },
   "publication_privacy": "TST-021 requires exact staged/outgoing-history and approved identity scans plus final generated summary and PR-text clearance before upload. Only owned synthetic fixtures and bounded hash/count/timing/verdict evidence are public; raw inputs, trajectories, checkpoints, executables, debug files and compiler/backend logs remain local."
 }
