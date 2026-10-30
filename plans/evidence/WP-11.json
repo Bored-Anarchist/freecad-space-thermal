@@ -17,16 +17,39 @@
       "id": "native-thermal-and-steady-acceptance",
       "status": "passed",
       "configuration": "Debug",
-      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --assembly-tests ASSEMBLY_TEST_EXE --steady-tests STEADY_TEST_EXE --report .local/wp11-steady-debug.json",
+      "command": "python tools/check_thermal.py --worker WORKER_EXE --native-tests NATIVE_TEST_EXE --assembly-tests ASSEMBLY_TEST_EXE --steady-tests STEADY_TEST_EXE --report .local/windows-debug/thermal.json",
       "cases": 48,
-      "report_sha256": "663cc68e91734c525dc16f5364b8e881ce54e48e0384198cc0ed99ee95ea4152",
-      "identity": "Exact input_sha256 and four native binary hashes bind the tested implementation; candidate in this precommit report identifies the base revision."
+      "report_sha256": "d1e54c6b44226e851cd25b2e10086980589d10551e8471896d574f06f7aad60b",
+      "identity": "Candidate, exact input_sha256, four native binary hashes and worker build identity bind the tested implementation.",
+      "candidate": "875c3ca94beac0892ea7df7bc391b1f4d7185a58"
     },
     {
       "id": "standard-library-security-and-regressions",
       "status": "passed",
       "command": "python -S tools/check_security.py",
       "cases": 316
+    },
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-debug",
+      "candidate": "875c3ca94beac0892ea7df7bc391b1f4d7185a58",
+      "cases": 337,
+      "thermal_acceptance_cases": 48,
+      "native_ctest_cases": 35,
+      "report_sha256": "e9e2c8516163029953b809a5f82c4277a7385a86546a245f3845e8ed269c7517",
+      "thermal_report_sha256": "d1e54c6b44226e851cd25b2e10086980589d10551e8471896d574f06f7aad60b"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "command": "python tools/verify.py --preset windows-release",
+      "candidate": "875c3ca94beac0892ea7df7bc391b1f4d7185a58",
+      "cases": 337,
+      "thermal_acceptance_cases": 48,
+      "native_ctest_cases": 35,
+      "report_sha256": "b7a9a8893439bbc5d9a1644d4e377fc817e9a264247a345d03cea639e4cad468",
+      "thermal_report_sha256": "90f502bf2aa514b3ae2ccf174ae7c00ad71fe4e9223a22e183f646ffb7b5d3b6"
     }
   ],
   "remaining_substeps": [
@@ -85,5 +108,8 @@
     "candidate": "e8fd9d2a7e1b376ec8c8ca2f022d02c08deadaac",
     "path": "plans/evidence/WP-11.json",
     "scope": "WP-11.1 through WP-11.5 verification retained in Git history"
-  }
+  },
+  "tested_candidate": "875c3ca94beac0892ea7df7bc391b1f4d7185a58",
+  "native_steady_available": true,
+  "durable_job_solver_available": false
 }
