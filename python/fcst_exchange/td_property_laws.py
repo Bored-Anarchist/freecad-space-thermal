@@ -15,7 +15,7 @@ from .td_properties import (parse_properties,MATERIAL,OPTICS,
 PROFILE='td-property-laws/1'
 SCALARS={'tdp':MATERIAL|MATERIAL_FLAGS|{'TYPE','COLOR'},'rco':(OPTICS-OPTICAL_TABLES)|OPTICAL_FLAGS}
 TABLES={'tdp':MATERIAL_TABLES,'rco':OPTICAL_TABLES}
-AGGREGATE_SETTINGS={'WEIGHTTYPE','AGGREGATE_OVERRIDE_CONDUCTIVITY','AGGREGATE_OVERRIDE_SPECIFIC_HEAT_DENSITY'}
+AGGREGATE_SETTINGS={'WEIGHTTYPE','AGGREGATE_OVERRIDE_CONDUCTIVITY','AGGREGATE_OVERRIDE_SPECIFIC_HEAT_DENSITY','KXP','KYP','KZP'}
 COMPONENT_SCALARS={'THICKNESS','ORIENTATIONANGLE','KXP','KYP','KZP','MASSFRACTION','WEIGHT'}
 
 
@@ -115,13 +115,17 @@ def validate_laws(library,*,limits=Limits()):
             base={**row,'scalars':{**row['scalars'],'TYPE':0}}
             material_laws(base)
         elif kind=='tdp':
-            if 'aggregate' in row:reject('td_property_law_composite_structure')
+            if 'aggregate' in row:
+                _validate_aggregate(row,limits)
+                total+=len(row['aggregate']['components'])
+                if total>limits.records:reject('td_property_law_table_limit')
             material_laws(row)
         else:optical_laws(row)
         if kind=='rco' and 'aggregate' in row:reject('td_property_law_composite_structure')
     if kind=='tdp':
         catalog={r['name']:r for r in rows}
         for row in rows:
+            if row['scalars'].get('TYPE',0)==0:continue # Retain inactive editor settings without activating dependencies.
             for component in row.get('aggregate',{}).get('components',[]):
                 target=catalog.get(component['material'])
                 if target is None or target['scalars'].get('TYPE',0)!=0:reject('td_property_law_composite_reference')
@@ -133,16 +137,19 @@ def _validate_aggregate(row,limits):
     if not isinstance(aggregate,dict) or set(aggregate)!={'scalars','components'}:reject('td_property_law_composite_structure')
     settings=aggregate['scalars'];components=aggregate['components']
     if not isinstance(settings,dict) or set(settings)-AGGREGATE_SETTINGS:reject('td_property_law_composite_field')
-    for value in settings.values():
-        if _number(value) not in (0,1):reject('td_property_law_switch')
+    for tag,value in settings.items():
+        _number(value)
+        if tag in {'KXP','KYP','KZP'}:
+            if not 0<=value<=1:reject('td_property_law_composite_range')
+        elif value not in (0,1):reject('td_property_law_switch')
     if not isinstance(components,list) or not components or len(components)>limits.records:reject('td_property_law_composite_structure')
     for component in components:
         if (not isinstance(component,dict) or set(component)!={'material','scalars'} or not _name(component['material'])
                 or not isinstance(component['scalars'],dict) or set(component['scalars'])-COMPONENT_SCALARS):reject('td_property_law_composite_field')
         for tag,value in component['scalars'].items():
             _number(value)
-            if tag=='THICKNESS' and value<=0 or tag not in {'THICKNESS','ORIENTATIONANGLE'} and not 0<=value<=1:reject('td_property_law_composite_range')
-        if row['scalars']['TYPE']==1 and component['scalars'].get('THICKNESS',0)<=0:reject('td_property_law_composite_thickness')
+            if tag=='THICKNESS' and value<0 or tag not in {'THICKNESS','ORIENTATIONANGLE'} and not 0<=value<=1:reject('td_property_law_composite_range')
+        if row['scalars'].get('TYPE',0)==1 and component['scalars'].get('THICKNESS',0)<=0:reject('td_property_law_composite_thickness')
 
 
 def write_laws(library,*,limits=Limits()):
@@ -202,7 +209,7 @@ class PropertyLaw:
 
     def __post_init__(self):
         if self.mode not in {'constant','temperature-table','temperature-pressure-table','angle-table'}:reject('td_property_law_mode')
-        if not self.values or any(not math.isfinite(_number(v)) for v in self.values) or _number(self.scale)<=0:reject('td_property_law_number')
+        if not self.values or any(not math.isfinite(_number(v)) for v in self.values) or _number(self.scale)<0:reject('td_property_law_number')
         for axis,positive in ((self.temperature,True),(self.pressure,False),(self.angle,False)):_axis(axis,positive=positive)
         if self.mode=='constant':valid=len(self.values)==1 and not (self.temperature or self.pressure or self.angle)
         elif self.mode=='angle-table':valid=len(self.values)==len(self.angle) and not (self.temperature or self.pressure)
@@ -251,8 +258,8 @@ def material_laws(row):
     if s.get('TYPE',0)!=0:reject('td_property_law_composite_unmapped')
     if s.get('COLOR',1)!=int(s.get('COLOR',1)) or not 1<=s.get('COLOR',1)<=255:reject('td_property_color_range')
     if not 0<=s.get('EFFECTIVEEMISS',0)<=1:reject('td_property_material_range')
-    if any(_number(s.get(k,1))<=0 for k in ('DENSITY','DENSITYMULT','SPECHEAT','CONDUCT','CONDUCTY','CONDUCTZ','KUMULT','KVMULT','KWMULT')):reject('td_property_material_range')
-    if any(p[0]<=0 or p[1]<=0 for points in tables.values() for p in points):reject('td_property_material_range')
+    if any(_number(s.get(k,1))<0 for k in ('DENSITY','DENSITYMULT','SPECHEAT','CONDUCT','CONDUCTY','CONDUCTZ','KUMULT','KVMULT','KWMULT')):reject('td_property_material_range')
+    if any(p[0]<=0 or p[1]<0 for points in tables.values() for p in points):reject('td_property_material_range')
     for tag in MATERIAL_FLAGS:_switch(s,tag)
     axes=[]
     for suffix,mult in (('','KUMULT'),('Y','KVMULT'),('Z','KWMULT')):
@@ -261,7 +268,7 @@ def material_laws(row):
         t=vectors.get('BIVARTEMPERATURE'+suffix,[]);p=vectors.get('BIVARPRESSURE'+suffix,[]);v=vectors.get('BIVARCONDUCTIVITY'+suffix,[])
         if t or p or v:
             _axis(t,positive=True);_axis(p)
-            if not t or not p or len(v)!=len(t)*len(p) or any(x<=0 for x in v):reject('td_property_grid_shape')
+            if not t or not p or len(v)!=len(t)*len(p) or any(x<0 for x in v):reject('td_property_grid_shape')
         if use_grid:
             if not v:reject('td_property_law_active_table_missing')
             law=PropertyLaw('temperature-pressure-table','W/(m*K)',tuple(v),tuple(t),tuple(p),scale=scale)
@@ -270,7 +277,7 @@ def material_laws(row):
         axes.append(law)
     cp=_table(row,'VARSPECHEAT','J/(kg*K)') if _switch(s,'USEVARSPECHEAT') else PropertyLaw('constant','J/(kg*K)',(s.get('SPECHEAT',1),))
     density=s.get('DENSITY',1)*s.get('DENSITYMULT',1)
-    if not math.isfinite(density) or density<=0 or any(not math.isfinite(v*law.scale) or v*law.scale<=0 for law in [*axes,cp] for v in law.values):reject('td_property_material_range')
+    if not math.isfinite(density) or any(not math.isfinite(v*law.scale) for law in [*axes,cp] for v in law.values):reject('td_property_material_range')
     return {'mode':'orthotropic' if _switch(s,'USEANISO') else 'isotropic','density':{'value':density,'unit':'kg/m3'},
             'conductivity':tuple(axes),'specific_heat':cp,'effective_emissivity':s.get('EFFECTIVEEMISS',0)}
 
@@ -309,7 +316,8 @@ def law_report(library):
     validate_laws(library)
     return {'profile':PROFILE,'kind':library['kind'],'entries':len(library['entries']),
             'tables':sum(len(r['tables']) for r in library['entries']),'grid_vectors':sum(len(r['vectors']) for r in library['entries']),
-            'composite_entries':sum('aggregate' in r for r in library['entries']),
+            'composite_entries':sum(r['scalars'].get('TYPE',0) in (1,2) for r in library['entries']),
+            'aggregate_records':sum('aggregate' in r for r in library['entries']),
             'vendor_runtime_required':False,'native_ready':False,'qualified':False,
             'scope':'Basic property laws and composite definitions; explicit evaluation policies; composite physics and canonical variable/spectral bindings remain pending'}
 

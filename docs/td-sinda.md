@@ -200,6 +200,8 @@ first. The evaluator requires explicit `linear` or `previous` interpolation and
 that a vendor solver uses them. Temperatures are kelvin, pressures pascals and
 thermophysical quantities SI. Angle tables use the serialized source coordinate;
 the caller must establish the angle convention before physical evaluation.
+Zero-valued source definitions remain representable in this interchange; they
+cannot bypass the canonical material contract's strictly positive requirements.
 
 Optical laws retain separate solar and infrared constants, reflected and
 transmitted specularity, refractive-index ratios, angle tables, temperature
@@ -210,7 +212,8 @@ not claim arbitrary wavelength-spectrum or radiation-solver support.
 
 Laminate/aggregate definitions retain ordered component references, thickness,
 orientation, weights, conductivity scaling and override settings. Every component
-must resolve to a basic property in the document. The interchange rejects missing,
+of an active composite must resolve to a basic property in the document. Inactive
+aggregate editor records on basic materials remain inert and are preserved. The interchange rejects missing,
 composite-to-composite and cyclic references. It does not calculate effective
 mixture properties or silently replace a composite with a constant. Unknown
 fields, fusion, recession, thermoelectric and stress modes remain unsupported

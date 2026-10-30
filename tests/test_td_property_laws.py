@@ -66,11 +66,11 @@ class TdPropertyLawTests(unittest.TestCase):
 
     def test_grid_shapes_axes_modes_ranges_and_allocation_budgets_fail_closed(self):
         good=read_laws(grid(),'tdp')
-        for tag,value in [('USEVARCONDUCT',1),('USEVARCONDTEMPPRES',2),('KUMULT',0),('TYPE',2),('USEANISO',.5)]:
+        for tag,value in [('USEVARCONDUCT',1),('USEVARCONDTEMPPRES',2),('KUMULT',-1),('TYPE',2),('USEANISO',.5)]:
             bad=deepcopy(good);bad['entries'][0]['scalars'][tag]=value
             with self.assertRaises(ExchangeError):write_laws(bad)
         for tag,values in [('BIVARTEMPERATURE',[300,100]),('BIVARTEMPERATURE',[0,300]),('BIVARPRESSURE',[-1,100,300]),
-                           ('BIVARCONDUCTIVITY',[1,2]),('BIVARCONDUCTIVITY',[10,20,30,40,70,0])]:
+                           ('BIVARCONDUCTIVITY',[1,2]),('BIVARCONDUCTIVITY',[10,20,30,40,70,-1])]:
             bad=deepcopy(good);bad['entries'][0]['vectors'][tag]=values
             with self.assertRaises(ExchangeError):write_laws(bad)
         for change in (lambda b:b.update(kind=[]),lambda b:b.update(profile='future'),
@@ -179,21 +179,27 @@ class TdPropertyLawTests(unittest.TestCase):
         with patch('subprocess.Popen',side_effect=AssertionError('source must be inert')):
             library=read_laws(raw,'tdp');laws=material_laws(library['entries'][0])
             self.assertEqual(laws['conductivity'][0].evaluate(**POLICY),2)
+            library['entries'][0]['aggregate']={'scalars':{'KXP':.5},'components':[{'material':'INACTIVE UNRESOLVED','scalars':{'THICKNESS':0,'WEIGHT':0}}]}
             self.assertEqual(read_laws(write_laws(library),'tdp'),library)
+            self.assertEqual(law_report(library)['composite_entries'],0);self.assertEqual(law_report(library)['aggregate_records'],1)
             for bad in (raw.replace(b'100 5',b'100 __import__(x)'),raw.replace(b'100 5',b'300 5'),
                     raw.replace(b'100 5',b'100 1E-999'),raw.replace(b'2\n100 5',b'10000000\n100 5'),
-                    raw.replace(b'100 5',b'100 NaN'),raw.replace(b'[END]',b'[AGGREGATE]\n[COMPONENT]\n[MATERIALNAME]\nx\n[ENDCOMPONENT]\n[ENDAGGREGATE]\n[END]')):
+                    raw.replace(b'100 5',b'100 NaN'),raw.replace(b'[END]',b'[TYPE]\n1\n[AGGREGATE]\n[COMPONENT]\n[MATERIALNAME]\nx\n[ENDCOMPONENT]\n[ENDAGGREGATE]\n[END]')):
                 with self.assertRaises(ExchangeError):read_laws(bad,'tdp')
             for number in (True,float('inf'),float('nan'),10**400,'exec(source)'):
                 bad=deepcopy(library);bad['entries'][0]['scalars']['DENSITY']=number
                 with self.assertRaises(ExchangeError):write_laws(bad)
         self.assertFalse(law_report(library)['qualified']);self.assertFalse(law_report(library)['native_ready'])
+        zero=read_laws(database({'DENSITY':0,'SPECHEAT':0,'CONDUCT':0}),'tdp')
+        self.assertEqual(read_laws(write_laws(zero),'tdp'),zero)
+        self.assertEqual(material_laws(zero['entries'][0])['conductivity'][0].evaluate(**POLICY),0)
+        with self.assertRaises(ExchangeError):import_document(write_laws(zero),'tdp',[100,500])
 
     def test_laminate_and_aggregate_definitions_keep_component_order_settings_and_closed_references(self):
         library=read_laws(database({'CONDUCT':10,'DENSITY':1000,'SPECHEAT':800}),'tdp')
         for mode in (1,2):
             row={'name':'OWNED COMPOSITE','scalars':{'TYPE':mode},'tables':{},'vectors':{},
-                'aggregate':{'scalars':{'WEIGHTTYPE':0,'AGGREGATE_OVERRIDE_CONDUCTIVITY':1},'components':[
+                'aggregate':{'scalars':{'WEIGHTTYPE':0,'AGGREGATE_OVERRIDE_CONDUCTIVITY':1,'KXP':.2,'KYP':.5,'KZP':.8},'components':[
                     {'material':'OWNED LAW','scalars':{'THICKNESS':.001,'ORIENTATIONANGLE':30,'MASSFRACTION':.4,'KXP':.3}},
                     {'material':'OWNED LAW','scalars':{'THICKNESS':.002,'ORIENTATIONANGLE':-45,'MASSFRACTION':.6,'KXP':.7}}]}}
             library['entries'].append(row)
