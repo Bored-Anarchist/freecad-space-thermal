@@ -170,6 +170,10 @@ thermal::Data thermal_data(std::string_view input) {
         out.radiation.push_back(std::move(r));
       } else if (e.at("kind").str() == "element") {
         out.spatial_element_ids.push_back(id);
+      } else if (e.at("kind").str() == "control" &&
+                 std::find(out.active_control_ids.begin(),out.active_control_ids.end(),id)!=out.active_control_ids.end()) {
+        out.controls.push_back({id,e.at("load_id").str(),node_index.at(e.at("sensor_node_id").str()),
+          e.at("on_below").at("value").num(),e.at("off_above").at("value").num()});
       }
     }
     std::sort(out.active_environment_ids.begin(), out.active_environment_ids.end());

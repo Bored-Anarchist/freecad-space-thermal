@@ -6,9 +6,13 @@
     "WP-11.3",
     "WP-11.4",
     "WP-11.5",
-    "WP-11.6"
+    "WP-11.6",
+    "WP-11.7",
+    "WP-11.8",
+    "WP-11.9",
+    "WP-11.10"
   ],
-  "scope": "Owned preparation, material/storage laws, energy/DAE residuals, sparse Jacobians and native linear/nonlinear steady solves; transient/event/job qualification remains open",
+  "scope": "Owned network preparation, assembly, steady and adaptive enthalpy transient solves, index-one DAE initialization, hysteresis/schedule events, checkpoints, energy results and compiled profiling; durable jobs and paired vendor qualification remain separate",
   "required_cases": [
     "native-constant-law",
     "native-linear-law",
@@ -57,6 +61,30 @@
     "steady-options",
     "steady-cli-linear",
     "steady-cli-singular",
-    "steady-cli-rejections"
+    "steady-cli-rejections",
+    "transient-analytic",
+    "transient-two-node",
+    "transient-stiff",
+    "transient-initialization",
+    "transient-enthalpy",
+    "transient-independent-reference",
+    "transient-refinement",
+    "transient-rejection",
+    "transient-sampling",
+    "transient-heater",
+    "transient-schedule",
+    "transient-simultaneous",
+    "transient-checkpoint",
+    "transient-chattering",
+    "transient-energy",
+    "transient-results",
+    "transient-profiling",
+    "transient-limits",
+    "transient-failures",
+    "transient-cli-analytic",
+    "transient-cli-checkpoint",
+    "transient-cli-events",
+    "transient-cli-failures",
+    "transient-cli-capabilities"
   ]
 }

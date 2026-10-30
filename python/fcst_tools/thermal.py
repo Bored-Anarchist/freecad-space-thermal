@@ -1,9 +1,10 @@
 # SPDX-License-Identifier: MIT OR Apache-2.0
 """Owned thermal preparation acceptance identity, separate from solver qualification."""
 from hashlib import sha256
+import math
 from .gate import evaluate
 
-IMPLEMENTED_SUBSTEPS = [f'WP-11.{n}' for n in range(1,7)]
+IMPLEMENTED_SUBSTEPS = [f'WP-11.{n}' for n in range(1,11)]
 
 
 def input_hashes(root):
@@ -21,15 +22,28 @@ def input_hashes(root):
 def assess(report, policy, hashes, candidate):
     binaries = report.get('binary_sha256', {})
     build = report.get('worker_build', {})
-    if (report.get('schema_version') != 3 or report.get('candidate') != candidate
+    capabilities=report.get('backend_capabilities', {})
+    profile=report.get('native_profile', {})
+    counters=('residual_evaluations','jacobian_evaluations','linear_solves','newton_iterations')
+    times=('assembly_seconds','linear_seconds','total_seconds')
+    if (report.get('schema_version') != 4 or report.get('candidate') != candidate
             or report.get('input_sha256') != hashes or report.get('solver_available') is not False
             or report.get('steady_available') is not True
+            or report.get('transient_available') is not True
             or report.get('work_packages') != IMPLEMENTED_SUBSTEPS or policy.get('work_packages') != IMPLEMENTED_SUBSTEPS
-            or set(binaries) != {'worker','preparation_acceptance','assembly_acceptance','steady_acceptance'}
+            or set(binaries) != {'worker','preparation_acceptance','assembly_acceptance','steady_acceptance','transient_acceptance'}
             or any(not isinstance(v,str) or len(v)!=64 or set(v)-set('0123456789abcdef') for v in binaries.values())
             or build.get('engine') != 'fcst_native' or build.get('solver_available') is not False
             or build.get('steady_available') is not True
+            or build.get('transient_available') is not True
             or build.get('source_revision') != candidate
+            or capabilities.get('execution_mode') != 'fcst_native' or capabilities.get('external_reference') is not False
+            or capabilities.get('durable_job_solver') is not False or capabilities.get('source_revision') != candidate
+            or capabilities.get('linear') != 'fcst_sparse_lu' or capabilities.get('nonlinear') != 'fcst_damped_newton'
+            or capabilities.get('transient') != 'fcst_enthalpy_backward_euler_step_doubling'
+            or any(capabilities.get(k) is not True for k in ('stiff','index_one_dae','enthalpy','events','checkpoint'))
+            or any(type(profile.get(k)) is not int or profile[k]<=0 for k in counters)
+            or any(type(profile.get(k)) not in (int,float) or not math.isfinite(profile[k]) or profile[k]<0 for k in times)
             or report.get('gate', {}).get('status') != 'passed'
             or evaluate(policy['required_cases'], report.get('cases', []))['status'] != 'passed'):
         raise ValueError('thermal_engine_evidence_invalid')

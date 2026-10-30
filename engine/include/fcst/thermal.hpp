@@ -62,6 +62,7 @@ struct Node {
 };
 struct Conductor { std::string id; std::size_t from, to; double conductance; };
 struct Load { std::string id; std::size_t node; double power; std::optional<std::string> expression_id; bool active; };
+struct Control { std::string id, load_id; std::size_t sensor; double on_below, off_above; };
 struct Environment {
   std::string id, frame_id, epoch, time_scale;
   double background_temperature, solar_flux, time_origin;
@@ -91,6 +92,7 @@ struct Data {
   std::vector<Material> materials;
   std::vector<Conductor> conductors;
   std::vector<Load> loads;
+  std::vector<Control> controls; // Active, UUID ordered hysteresis controls only.
   std::vector<Environment> environments;
   std::vector<Radiation> radiation;
   std::vector<std::string> active_environment_ids, active_control_ids, spatial_element_ids;

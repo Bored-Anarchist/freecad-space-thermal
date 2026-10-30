@@ -326,8 +326,8 @@ control/spatial execution cannot silently gain support through the CLI.
 
 Build information declares `steady_available: true`. The existing
 `solver_available: false` refers to the frozen durable-job protocol, whose steady
-result/checkpoint publication is still pending; `--solve`, transient/event work
-and full job/result integration are not enabled by this substep.
+result/checkpoint publication is still pending; `--solve` and durable job/result integration are not enabled by the steady substep.
+The following transient API supplies the later WP-11.7 through WP-11.10 work.
 
 Acceptance includes hand-authored analytic steady values, a nonlinear quartic
 radiation/environment network, later-stage row pivots, a manufactured 10,000-row
@@ -337,5 +337,191 @@ temperature bounds, fill/iteration limits, false small-step convergence, energy
 defect cancellation and unrepresentable temperature gradients. The standalone
 CLI runs with Python/host/vendor search paths absent. Existing Q0 dense/band
 comparisons still run as their own numerical checkpoint; this does not replace
-their evidence or assert a new performance ranking. Full WP-11 qualification,
-paired source comparisons and later transient/event/job features remain open.
+their evidence or assert a new performance ranking. Paired vendor qualification and durable-job/host integration remain separate.
+The owned implementation acceptance below adds independent transient comparisons.
+
+
+## Adaptive transient execution (WP-11.7)
+
+`thermal_transient.hpp` exposes `solve_transient(Assembly, TransientOptions,
+optional<TransientCheckpoint>)`. The engine is compiled C++20 and requires no
+FreeCAD, Python, SUNDIALS or external thermal solver to execute. The owned
+backward Euler step is L-stable and solves
+`[H(T_new)-H(T_old)]/dt - Q(t_new,T_new) = 0` on differential rows and `-Q=0`
+on algebraic rows. Prescribed nodes stay outside the unknown vector. Initial
+consistency fixes differential temperatures exactly and solves algebraic rows;
+differential rates then follow from `Q/C(T)`. A singular algebraic block fails
+initialization. Higher-index/underdetermined systems are not regularized.
+
+Every candidate interval solves one full step and two half steps. The accepted
+state is the two-half-step solution, with no extrapolation. Their temperature
+difference estimates the first-order local error. The maximum over **all**
+unknowns of `abs(T_half2-T_full)/(atol_i + rtol*max(abs(T_old),abs(T_half2)))`
+must not exceed one. Default absolute tolerance is `1e-5 K`, relative tolerance
+`1e-6`; optional positive per-equation absolute tolerances use equation order.
+The controller uses `0.9/sqrt(error)` clipped to `[0.5,2]` after acceptance and
+`0.8/sqrt(error)` clipped to `[0.1,0.5]` after a tolerance rejection. Failed
+nonlinear/domain trials reduce the step by four. No trial changes committed
+thermal/event/duty/energy state. Attempts retain time bounds, error and reason;
+failures, minimum-step/time-representability and iteration/fill/attempt limits
+produce an invalid run with the last committed checkpoint, never a successful
+partial trajectory.
+
+Newton uses the owned sparse LU and analytic enthalpy Jacobian. Frozen row
+limits within each nonlinear solve use `max(1e-12 W, 1e-12*abs(Jij)*Tscale_j)`;
+initial fixed-temperature rows use `1e-10 K`. Both normalized power residual and
+a fresh correction (`1e-10 K + 1e-12*Tscale`) must pass, including a Jacobian rank
+check. Temperature trials respect nonnegative K and each storage material's
+validity range. Nonfinite callbacks, malformed derivatives and callback failures
+are fatal; recoverable physical-domain trials can backtrack/reject. A property
+law's exact nondifferentiable endpoint reports `nondifferentiable` rather than
+inventing a derivative.
+
+`output_times` must strictly increase from the original `start` through `end`.
+The integrator clips steps at requested times, schedule knots and the horizon,
+then re-solves; it does not interpolate requested temperatures. Results also
+include committed event samples and the restart point. Default initial/maximum
+steps are `0.01/1 s`, minimum step `1e-12 s`, with 100,000 attempts, 10,000 events
+and 30 Newton iterations. Scalar result storage is bounded separately (default
+two million values); exceeding it returns `result_limit`. There is no mandatory
+dense network matrix or unbounded output buffer.
+
+## Heater/schedule events and restart (WP-11.8)
+
+Active controls are loaded into typed UUID-ordered `Data::controls`. An assembly
+with controls needs an explicit `OperatingState`; `initial_operating_state(model)`
+starts heaters off. Initial consistency then switches a heater on at or below
+`on_below`, off at or above `off_above`, and retains the supplied state inside the
+deadband. Positive hysteresis width is required. Two controls cannot own the
+same load. The controlled load and its declared temperature derivatives are
+gated together; native callbacks remain pure functions of the supplied snapshot.
+
+`LoadSchedule` contains a load UUID and strictly increasing `(time_s,factor)`
+points. Schedules are sorted by UUID, start no later than the original run, and
+use nonnegative right-continuous multipliers. The old multiplier is frozen on
+the interval ending at a knot; the new multiplier applies immediately after it.
+Thus no implicit step averages a heater/schedule discontinuity. Schedules multiply
+the native load (including a registered load callback); they do not replace its
+power or bypass a heater gate. Boundaries and other callbacks must be smooth
+within a step; arbitrary undeclared time discontinuities are not supported.
+
+Directional heater guards are inspected at both accepted half-step endpoints.
+The first detected crossing is localized by bounded bisection, repeatedly solving
+the implicit path rather than accepting interpolated temperatures. Default event
+time tolerance is `1e-8 s`; roots within that tolerance form one batch at the first
+root. Continuous guards must have no hidden crossing-and-return within a half
+step; callers choose `maximum_step` accordingly for oscillatory native forcing.
+Exact sampled threshold hits can switch; hidden tangencies have no detection guarantee. This is an
+explicit supported detection contract, not a promise to detect arbitrary
+oscillation inside an unsampled interval.
+
+At a batch, schedules apply in load UUID order, then heater switches in control
+UUID order using the same pre-event temperatures/state. The assembly is replaced
+immutably and algebraic consistency is solved again while differential
+enthalpy/temperature stays fixed. Any newly triggered algebraic-sensor switches
+are processed in another bounded batch. A repeated switch within
+`minimum_event_separation` (default `1e-10 s`), 32 nonsettling reinitializations,
+or the event limit fails with `chattering`/`event_limit`. Failed batches do not
+publish provisional events or a new checkpoint. On-time is integrated only for
+accepted pre-event intervals; duty is on-time divided by original elapsed time.
+
+A version-one checkpoint contains original/committed temperatures, original and
+current time, next step, heater and scheduled factors, last-switch times,
+on-time, accepted/rejected/event counts and cumulative energy. SHA-256 binds
+all these values. The configuration digest also binds preparation identity,
+compiled source revision, numerical tolerances/limits/backend settings, original
+operating state, schedules and native callback revision. Callback callers must
+supply their exact registration/build SHA-256 as `callback_revision`; changing
+callback semantics without changing that digest violates the API contract.
+The CLI computes this digest from its explicit constant environment bindings.
+
+A restart validates the checksum/configuration, finite dimensions, active state,
+schedule position, duty/time bounds and algebraic consistency before advancing.
+A changed end time/requested sampling horizon is allowed; numerical configuration,
+original start and physics must match. Include any comparison/restart split as
+an output boundary in both runs for identical adaptive paths. The new run emits
+the checkpoint sample, then samples after it; earlier output times are not
+fabricated. This native checkpoint is separate from the frozen durable-worker
+transport checkpoint and does not claim job/HDF5 publication support.
+
+## Results, conservation and profiling (WP-11.9/11.10)
+
+Each valid committed sample includes full-node temperature, conductive/load/
+radiation/environment/storage/boundary power, oriented conductor flows, equation
+residuals, differential rates, exact storage change since the original start,
+operating state and duty cycles. Units are K, W, K/s, J and SI seconds. Node,
+conductor and equation UUID arrays define every vector index in the CLI.
+Algebraic/prescribed storage is exactly zero. Prescribed reservoir power remains
+positive into the modeled network. Prefix samples can be valid when the overall
+run fails; only `TransientResult.valid` / CLI `status: passed` denotes completion.
+
+Each accepted half step independently checks exact enthalpy change against its
+endpoint power quadrature, per unknown equation and globally. Internal radiation
+is never external energy; each registered internal radiation term must balance
+on its own before terms can cancel. Two half-step budgets are combined for the
+accepted interval; rejected trials contribute nothing. Cumulative storage is
+recomputed from original enthalpy, not integrated `C*Tdot` or accumulated rounded
+small changes. Global run defect is storage minus external energy (loads,
+environment and prescribed reservoirs). Default energy acceptance is `1e-8 J +
+1e-8*absolute_exchanged_energy`; it uses actual exchanged powers, not `G*T`.
+Step and cumulative budgets include per-node storage/external/conductive/boundary
+energy, absolute exchange and defect. Endpoint quadrature is the stated backward
+Euler discretization, not a claim of exact continuous power integration.
+
+Provenance carries model/preparation/configuration hashes and compiled source,
+compiler/version and backend IDs. Native counters measure residual/Jacobian
+evaluations, sparse LU solves, Newton iterations and event probes. Monotonic
+wall-clock timings cover assembly, sparse factor/solve work and the full native
+integration call; they include rejected/probe work. These are measured profiling
+records, not hardware-normalized throughput promises. `--thermal-capabilities`
+returns the explicit owned LU/Newton/transient backend, stiff/index-one DAE,
+enthalpy/event/checkpoint support and `external_reference: false`. No external
+reference execution mode can pass native acceptance. Paired vendor/reference
+runs belong to their separate qualification modes and reports.
+
+## Standalone transient CLI and acceptance
+
+`fcst-worker --thermal-transient` consumes a bounded one-MiB JSON object:
+
+```json
+{
+  "thermal_input": {"contract_version": "1.0.0", "model": {}, "material_laws": [], "node_storage": []},
+  "transient": {"start": 0, "end": 10, "output_times": [0, 5, 10]}
+}
+```
+
+The abbreviated `model` above must be a complete valid model-v1 snapshot. The
+`transient` object accepts the named scalar limits/tolerances above, optional
+`temperature_tolerances` and `schedules` (`load_id`, `points` with `time`/`factor`).
+Optional top-level `initial_operating` has `heaters` and `load_factors` maps;
+`checkpoint` accepts the exact serialized native checkpoint from a prior run.
+Optional `environment_power_W` explicitly maps active environment UUIDs to
+constant full-node W arrays. Zero exchange must be explicitly supplied; geometry,
+unknown radiation laws, expression execution and spatial elements are not silently
+omitted. Native API users supply their own registered nonlinear bindings.
+Unknown keys/modes, bad JSON/types/counts and stale/mutated checkpoints fail with
+bounded codes. The adapter never evaluates imported source code or echoes unknown
+input text. Exit zero requires completed native acceptance of the trajectory.
+`--build-info` adds `transient_available: true`; durable-job `solver_available`
+remains false until that transport's result integration is implemented.
+
+`tools/check_thermal.py` requires all five compiled binary hashes and native
+execution/build identity in report schema four. Both Windows presets run the
+same required cases and privacy-clear the exact summary before upload. Cases
+cover analytic single/two-node cooling and conservation, a 10 ns fast mode,
+nonlinear specific heat/enthalpy, consistent DAE/boundary power, tolerance
+refinement, an independent explicit RK4 nonlinear ODE comparison at two refined
+steps, exact sampling, rejection accounting, heater timing/duty, schedules,
+simultaneous ordering, checkpoint/restart equivalence and tamper rejection,
+chattering, energy defects, storage/fill/attempt/domain failures and profiling.
+The independent oracle never calls owned assembly/implicit/property-integral
+code; external solver results cannot replace any required native case. Public
+evidence is bounded source/build/hash/verdict data. Raw trajectory/checkpoint
+arrays, binaries and compiler/backend logs stay local under TST-021.
+
+
+The consistency and sign-change event assumptions were cross-checked against
+[the SUNDIALS IDA mathematical discussion](https://sundials.readthedocs.io/en/v7.7.0/ida/Mathematics_link.html)
+and [LLNL usage notes on discontinuities and reinitialization](https://computing.llnl.gov/projects/sundials/usage-notes).
+These references are background, not executable dependencies or acceptance substitutes;
+the owned method and its thresholds are specified above.

@@ -126,6 +126,24 @@ struct Assembly::Impl {
   std::vector<PowerBinding> powers;
   std::vector<BoundaryBinding> boundaries;
   std::shared_ptr<const Sparsity> sparsity;
+  OperatingState operating;
+  double factor(const std::string& id) const {
+    double value=operating.load_factors.contains(id)?operating.load_factors.at(id):1;
+    for (const auto& c:model.data().controls) if (c.load_id==id && !operating.heaters.at(c.id)) return 0;
+    return value;
+  }
+  void validate_state(const OperatingState& s) const {
+    if (s.heaters.size()!=model.data().controls.size()) throw Error("controls_require_state");
+    std::set<std::string> loads;
+    for (const auto& c:model.data().controls) {
+      if (!s.heaters.contains(c.id)) throw Error("controls_require_state",c.id);
+      if (!loads.insert(c.load_id).second) throw Error("control_conflict",c.id);
+    }
+    for (const auto& [id,v]:s.load_factors) {
+      if (!std::isfinite(v) || v<0) throw Error("range",id);
+      if (std::none_of(model.data().loads.begin(),model.data().loads.end(),[&](const auto& l){return l.id==id && l.active;})) throw Error("reference",id);
+    }
+  }
   Impl(Model m, std::vector<PowerBinding> p, std::vector<BoundaryBinding> b)
       : model(std::move(m)), powers(std::move(p)), boundaries(std::move(b)) {}
   [[noreturn]] void context(Error error, const std::string& id = {}) const {
@@ -136,10 +154,15 @@ struct Assembly::Impl {
     throw error;
   }
 };
-Assembly::Assembly(Model model, std::vector<PowerBinding> powers, std::vector<BoundaryBinding> boundaries) {
+OperatingState initial_operating_state(const Model& m) {
+  OperatingState s; for (const auto& c:m.data().controls) s.heaters.emplace(c.id,false); return s;
+}
+Assembly::Assembly(Model model, std::vector<PowerBinding> powers, std::vector<BoundaryBinding> boundaries,
+                   std::optional<OperatingState> operating) {
   auto impl = std::make_shared<Impl>(std::move(model), std::move(powers), std::move(boundaries));
   const auto& d = impl->model.data();
-  if (!d.active_control_ids.empty()) impl->context(Error("controls_require_state"), d.active_control_ids.front());
+  if (!operating && !d.active_control_ids.empty()) impl->context(Error("controls_require_state"), d.active_control_ids.front());
+  impl->operating=operating.value_or(OperatingState{}); impl->validate_state(impl->operating);
   if (!d.spatial_element_ids.empty()) impl->context(Error("unsupported_physics"), d.spatial_element_ids.front());
   const std::size_t n = d.differential_count + d.algebraic_count;
   std::vector<Entry> entries;
@@ -199,6 +222,12 @@ Assembly::Assembly(Model model, std::vector<PowerBinding> powers, std::vector<Bo
   impl_ = std::move(impl);
 }
 const Model& Assembly::model() const { return impl_->model; }
+Assembly Assembly::with_operating_state(OperatingState s) const {
+  impl_->validate_state(s); auto copy=std::make_shared<Impl>(*impl_); copy->operating=std::move(s);
+  auto result=*this; result.impl_=std::move(copy); return result;
+}
+const OperatingState& Assembly::operating_state() const { return impl_->operating; }
+bool Assembly::has_callbacks() const { return !impl_->powers.empty() || !impl_->boundaries.empty(); }
 const std::shared_ptr<const Sparsity>& Assembly::sparsity() const { return impl_->sparsity; }
 std::vector<double> Assembly::initial_temperature() const {
   std::vector<double> result(sparsity()->dimension());
@@ -258,6 +287,11 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
       catch (...) { throw Error("callback_failure"); }
       vector_check(value.watts,p.affected_nodes.size());
       vector_check(value.d_temperature,jacobian ? p.dependencies.size() : 0);
+      if (p.kind==PowerKind::load) {
+        const double factor=impl_->factor(p.entity_id);
+        for (double& v:value.watts) v=checked(v*factor);
+        for (double& v:value.d_temperature) v=checked(v*factor);
+      }
       if (p.kind==PowerKind::radiation) {
         long double net=0,absolute=0;
         for (double v:value.watts) { net+=v; absolute+=std::abs(v); }
@@ -276,7 +310,7 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
     } catch (const Error& error) { impl_->context(error,p.entity_id); }
   }
   for (const auto& load : d.loads) if (load.active && !bound_loads.contains(load.id)) {
-    try { b.load_in[load.node] = checked(b.load_in[load.node]+load.power); }
+    try { b.load_in[load.node] = checked(b.load_in[load.node]+checked(load.power*impl_->factor(load.id))); }
     catch (const Error& error) { impl_->context(error,load.id); }
   }
   long double storage_total = 0, external_total = 0, internal_total = 0;

@@ -17,13 +17,18 @@ class ThermalEvidenceTests(unittest.TestCase):
         policy = json.loads((ROOT/'ci/thermal-acceptance.json').read_bytes())
         hashes = input_hashes(ROOT)
         cases = [{'id':c,'status':'passed'} for c in policy['required_cases']]
-        report = {'schema_version':3,'candidate':'synthetic','input_sha256':hashes,
-                  'work_packages':IMPLEMENTED_SUBSTEPS,'solver_available':False,'steady_available':True,
-                  'worker_build':{'engine':'fcst_native','solver_available':False,'steady_available':True,'source_revision':'synthetic'},
-                  'binary_sha256':{key:'1'*64 for key in ('worker','preparation_acceptance','assembly_acceptance','steady_acceptance')},
+        report = {'schema_version':4,'candidate':'synthetic','input_sha256':hashes,
+                  'work_packages':IMPLEMENTED_SUBSTEPS,'solver_available':False,'steady_available':True,'transient_available':True,
+                  'worker_build':{'engine':'fcst_native','solver_available':False,'steady_available':True,'transient_available':True,'source_revision':'synthetic'},
+                  'binary_sha256':{key:'1'*64 for key in ('worker','preparation_acceptance','assembly_acceptance','steady_acceptance','transient_acceptance')},
+                  'backend_capabilities':{'execution_mode':'fcst_native','external_reference':False,'durable_job_solver':False,'source_revision':'synthetic',
+                                          'linear':'fcst_sparse_lu','nonlinear':'fcst_damped_newton','transient':'fcst_enthalpy_backward_euler_step_doubling',
+                                          **{k:True for k in ('stiff','index_one_dae','enthalpy','events','checkpoint')}},
+                  'native_profile':{**{k:1 for k in ('residual_evaluations','jacobian_evaluations','linear_solves','newton_iterations')},
+                                    **{k:.01 for k in ('assembly_seconds','linear_seconds','total_seconds')}},
                   'gate':evaluate(policy['required_cases'],cases),'cases':cases}
         self.assertTrue(assess(report,policy,hashes,'synthetic'))
-        for change in ('missing','duplicate','failed','skipped','extra','solver','candidate','hash','scope','binary','stale-build','old-schema','steady'):
+        for change in ('missing','duplicate','failed','skipped','extra','solver','candidate','hash','scope','binary','stale-build','old-schema','steady','transient','reference-mode','capability-mode','profile'):
             value = deepcopy(report)
             if change == 'missing': value['cases'].pop()
             if change == 'duplicate': value['cases'].append(deepcopy(value['cases'][0]))
@@ -37,6 +42,10 @@ class ThermalEvidenceTests(unittest.TestCase):
             if change == 'stale-build': value['worker_build']['source_revision'] = 'stale'
             if change == 'old-schema': value['schema_version'] = 1
             if change == 'steady': value['steady_available'] = False
+            if change == 'transient': value['transient_available'] = False
+            if change == 'reference-mode': value['worker_build']['engine'] = 'external_reference'
+            if change == 'capability-mode': value['backend_capabilities']['external_reference'] = True
+            if change == 'profile': value['native_profile']['linear_solves'] = 0
             with self.subTest(change=change), self.assertRaises(ValueError):
                 assess(value,policy,hashes,'synthetic')
 

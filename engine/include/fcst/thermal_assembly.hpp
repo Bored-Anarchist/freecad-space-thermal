@@ -53,6 +53,12 @@ struct BoundaryBinding {
   std::size_t node;
   std::function<double(double)> temperature; // Independent prescribed K as a function of SI time.
 };
+struct OperatingState {
+  std::map<std::string,bool> heaters;
+  std::map<std::string,double> load_factors; // Nonnegative scheduled multipliers, default one.
+  bool operator==(const OperatingState&) const = default;
+};
+OperatingState initial_operating_state(const Model&);
 struct State {
   double time;
   std::vector<double> temperature; // Unknown equation order: capacitive and algebraic.
@@ -85,7 +91,11 @@ struct NonlinearProblem {
 struct EvaluationDomainError : Error { explicit EvaluationDomainError(const Error& error) : Error(error) {} };
 class Assembly {
  public:
-  explicit Assembly(Model model, std::vector<PowerBinding> powers = {}, std::vector<BoundaryBinding> boundaries = {});
+  explicit Assembly(Model model, std::vector<PowerBinding> powers = {}, std::vector<BoundaryBinding> boundaries = {},
+                    std::optional<OperatingState> operating = {});
+  Assembly with_operating_state(OperatingState) const;
+  const OperatingState& operating_state() const;
+  bool has_callbacks() const;
   const Model& model() const;
   const std::shared_ptr<const Sparsity>& sparsity() const;
   std::vector<double> initial_temperature() const;

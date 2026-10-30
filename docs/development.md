@@ -1,13 +1,16 @@
 # Development and automated verification
 
-WP-11.1 through WP-11.6 add [owned thermal preparation, assembly and steady solves](thermal-engine.md), immutable
-typed node/equation/source indexes, conductive component diagnoses and material
-table/enthalpy/storage APIs, differential/algebraic residuals, prescribed boundary
-power, sparse analytic Jacobians and backend interfaces. Both Windows drivers run native acceptance and require
-the privacy-cleared `thermal.json` report. Native steady API/CLI solving is
-available; transient/event and durable-job solving remain unavailable.
+WP-11.1 through WP-11.10 add [owned thermal network solving](thermal-engine.md):
+immutable SI models, material/enthalpy laws, differential/algebraic assembly,
+sparse Jacobians, linear/nonlinear steady solving, adaptive stiff transients,
+hysteresis and schedule events, restart checkpoints, energy/provenance results
+and compiled-kernel profiling. Both Windows presets run native acceptance and
+require the source/build/five-binary-bound, privacy-cleared `thermal.json`.
+Standalone native steady and transient API/CLI execution is available. The
+frozen durable-job transport still reports `solver_available: false`; its thermal
+HDF5 publication/host integration and paired vendor qualification remain separate.
 
-WP-02 supplies a C++20 worker skeleton and standalone Python application/CLI/MCP package boundaries. The worker reports build information and rejects solve requests as unimplemented. No thermal physics or legacy-file compatibility is claimed.
+WP-02 supplies a C++20 worker skeleton and standalone Python application/CLI/MCP package boundaries. The worker reports build information; the generic `--solve` and durable-job protocol reject unimplemented operations. Thermal execution uses the explicit native APIs and `--thermal-steady` / `--thermal-transient` commands.
 
 Create an isolated Python 3.11 environment under `.local/venv`, activate it, and run:
 

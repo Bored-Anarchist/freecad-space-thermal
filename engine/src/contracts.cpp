@@ -3,6 +3,7 @@
 #include "fcst/contract_bundle.hpp"
 #include "fcst/thermal.hpp"
 #include "fcst/thermal_steady.hpp"
+#include "fcst/thermal_transient.hpp"
 #include "fcst/thermal_schema.hpp"
 #include <algorithm>
 #include <array>
@@ -441,6 +442,7 @@ thermal::Model thermal::load(std::string_view input) {
   catch (const thermal::Error&) { throw; }
   catch (const std::exception&) { throw thermal::Error("schema"); }
 }
+std::string thermal::thermal_digest(std::string_view bytes) { return sha256(std::string(bytes)); }
 std::string thermal::inspect(std::string_view input) {
   try {
     auto model = thermal::load(input);
@@ -508,6 +510,7 @@ std::string thermal::inspect_steady(std::string_view input) {
     return dump(J(out));
   } catch (...) { return "{\"status\":\"failed\",\"code\":\"unavailable\"}"; }
 }
+#include "thermal_execution.inc"
 int run_worker(const std::string& root, const std::string& job_id) {
   // Durable steady result publication is not implemented in this protocol yet.
   // The separate native steady API/CLI does not fabricate a job result artifact.

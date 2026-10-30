@@ -95,6 +95,7 @@ def main():
                                 "--native-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-tests.exe"),
                                 "--assembly-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-assembly-tests.exe"),
                                 "--steady-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-steady-tests.exe"),
+                                "--transient-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-transient-tests.exe"),
                                 "--report", str(output / "thermal.json")],
         "numerical-checkpoint": [sys.executable, "tools/check_numerical.py", "--configuration", config,
                                   "--report", str(output / "numerical.json")],
