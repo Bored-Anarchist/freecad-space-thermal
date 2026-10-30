@@ -17,6 +17,11 @@ from profile_support import ROOT, verified_download, cmake_tools, revision
 from dwg_build_support import digest,prepare_source,seal_tree,linked
 sys.path.insert(0,str(ROOT/'python'))
 from fcst_exchange.dwg_native import NativeRuntime,compare
+from fcst_exchange.td_writer import model_records,verify_network
+from fcst_exchange.td_decode import decode_drawing
+from fcst_exchange.independent_td import IndependentTdAdapter
+from fcst_app.persistence import Package,encode,save_package
+from fcst_exchange.core import target_id
 from fcst_tools.gate import evaluate
 
 
@@ -72,7 +77,7 @@ def main():
     license_dir=install/'share/fcst-dwg';license_dir.mkdir(parents=True,exist_ok=True)
     for name in ('LICENSE','README.md','preservation.patch'):
         shutil.copyfile(ROOT/'adapters/libredwg'/name,license_dir/name)
-    receipt={'protocol':'fcst-dwg-native/1','backend_profile':profile['runtime'],'executable':'bin/fcst-dwg.exe',
+    receipt={'protocol':'fcst-dwg-native/2','backend_profile':profile['runtime'],'executable':'bin/fcst-dwg.exe',
              'executable_sha256':digest(install/'bin/fcst-dwg.exe'),'source_tree_sha256':source_tree_sha,
              'source_inputs':profile['source_inputs'],'license':'GPL-3.0-or-later'}
     receipt_path=install/'backend.json';receipt_path.write_text(json.dumps(receipt,indent=2)+'\n',encoding='utf-8')
@@ -101,17 +106,51 @@ raise SystemExit(main())
                        env=cli_env,timeout=240,creationflags=subprocess.CREATE_NO_WINDOW)
     cli_pass=(cli.returncode==0 and (attempt/'export/source.dwg').is_file()
               and (attempt/'export/source.dwg').read_bytes()==fixture['source.dwg'])
+    model=json.loads((ROOT/'tests/fixtures/contracts/analytic-seed-native.json').read_bytes())
+    model['entities']=[e for e in model['entities'] if e['kind'] in {'submodel','node','conductor','load'}]
+    model.update(source_maps=[],mappings=[],attachments=[])
+    first_node=next(e for e in model['entities'] if e['kind']=='node')
+    first_node.update(classification='algebraic',temperature={'value':1,'unit':'K'},capacity={'value':0,'unit':'J/K'})
+    for entity in model['entities']:
+        if entity['kind']=='conductor':entity['conductance']['value']=0
+        if entity['kind']=='load':entity['power']['value']=0
+    data=encode(model);identifier=target_id(('dwg-selftest','model'))
+    manifest={'contract_version':'2.0.0','minimum_reader':'2.0.0','project_id':model['project_id'],'revision':0,
+              'model_artifact_id':identifier,'artifacts':[{'id':identifier,'role':'model',
+              'artifact':{'path':'model.json','sha256':sha256(data).hexdigest(),'byte_length':len(data)},'dependencies':[]}]}
+    save_package(Package(manifest,{'model.json':data}),attempt/'owned.fcst')
+    new_cli=subprocess.run([sys.executable,'-S','-c',script,'td-write-model',str(attempt/'owned.fcst'),
+                           str(attempt/'new-model'),'--backend',str(receipt_path),'--work',str(attempt/'new-cli')],
+                          stdin=subprocess.DEVNULL,stdout=subprocess.PIPE,stderr=subprocess.PIPE,
+                          env=cli_env,timeout=240,creationflags=subprocess.CREATE_NO_WINDOW)
+    if new_cli.returncode:raise ValueError('backend_new_model_cli_failed')
+    adapter=IndependentTdAdapter(runtime)
+    staged=adapter.preview(attempt/'new-model','network.dwg',attempt/'new-preview')
+    intended,_,_=model_records(model);handles=verify_network(staged.snapshot,intended)
+    edits=[]
+    for payload in decode_drawing(staged.snapshot).payloads:
+        if 'initial_temperature' in payload.fields:
+            if payload.fields['initial_temperature']==1:
+                edits.append({'handle':payload.record['handle'],'changes':{'initial_temperature':305,'mass_value':8}})
+        else:edits.append({'handle':payload.record['handle'],'changes':{'value':.75}})
+    edited=adapter.export_source(staged,attempt/'edited-model',edits,work=attempt/'edit-work')
+    original_unchanged=all((attempt/'new-model'/name).read_bytes()==raw for name,raw in staged.original.files)
+    companions_preserved=all((attempt/'edited-model'/name).read_bytes()==raw for name,raw in staged.original.files if name!='network.dwg')
     checks={'owned-fixture-read':first.report['objects']>0 and first.report['read_warning_bits']==0,
             'fresh-native-reopen':verdict['structural_roundtrip_verified'],
             'class-identity-and-version-preservation':first.native['classes']==second.native['classes'],
             'vendor-free-runtime':first.report['vendor_runtime_required'] is False and cli_pass,
-            'no-false-thermal-qualification':second.report['qualified'] is False and second.report['native_ready'] is False}
+            'no-false-thermal-qualification':second.report['qualified'] is False and second.report['native_ready'] is False,
+            'source-free-thermal-network-cli':new_cli.returncode==0,
+            'new-network-all-fields-and-references':len(handles)==4,
+            'compressed-scalar-edit-fresh-reopen':edited['edited_roundtrip_verified'] and len(edited['edits'])==3 and all(not e['bit_length_preserved'] for e in edited['edits']),
+            'edited-source-and-companion-preservation':original_unchanged and companions_preserved}
     records=[{'id':key,'status':'passed' if value else 'failed'} for key,value in checks.items()]
     report={'schema_version':1,'candidate':revision(),'profile':profile['runtime'],
             'gate':evaluate(profile['required_cases'],records),'cases':records,
             'input_sha256':profile['source_inputs'],'executable_sha256':receipt['executable_sha256'],
             'source_tree_sha256':source_tree_sha,'vendor_runtime_required':False,'qualified':False,
-            'scope':'Independent container and owned synthetic DWG only; TD thermal class codecs remain unimplemented'}
+            'scope':'Independent container, owned node/conductor/load profiles, source-free network writer and guarded scalar edits; complete TD model and target-product qualification pending'}
     args.report.parent.mkdir(parents=True,exist_ok=True)
     args.report.write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report['gate']));return 0 if report['gate']['status']=='passed' else 1

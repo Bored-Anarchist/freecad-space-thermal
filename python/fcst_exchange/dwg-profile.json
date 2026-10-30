@@ -1,11 +1,11 @@
 {
-  "protocol": "fcst-dwg-native/1",
+  "protocol": "fcst-dwg-native/2",
   "backend": "LibreDWG",
   "version": "0.14",
   "source_sha256": "62ebb73b984f865960f20ed26619ea5f8789d5e3fd088fa40a2598384da81275",
-  "patch_sha256": "7a2b5333904197a9c1d9c6efa45e2fc2d01c7406209e07ea87aef441abab513a",
-  "bridge_source_sha256": "1f2d929ec77fe2a811bb9306dfdc05059ab942c864adafcb0942b12b03a50d6b",
+  "patch_sha256": "3a3f663e316734a6ac90df3fbd6404f6b9afb9eb674efe33b79c31b80eeba369",
+  "bridge_source_sha256": "76dd954ae7fa9a16b8a3578303accf1ffb344d30635eeeca54ee9c2a648d878d",
   "configuration_sha256": "9fc697b346e90dd0410f5969bac5e25797133f4fde4c272b327f13a22a70b371",
   "cmake_sha256": "9a496fbd09f134ab80ae140b6d9bb72dcc11f9ff4cc8a079231ca09a5ae54a0e",
-  "scope": "independent container structures and opaque data; no TD thermal class semantics"
+  "scope": "independent container and typed node/conductor/load profiles; guarded scalar edits and source-free constant-network export; full-model qualification pending"
 }

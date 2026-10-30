@@ -7,18 +7,20 @@ native API, including otherwise unparsed datastorage sections. No TD class
 serialization layout is inferred from a container marker or a display proxy.
 """
 from dataclasses import dataclass, field
+from copy import deepcopy
 from hashlib import sha256
 import json
 import math
 from pathlib import Path
 import re
+import struct
 
 from .core import reject, Limits
 from .dwg_container import DwgAuditLimits
 from .tools import Tool, ToolRunner, Authorization
 from fcst_app.persistence import is_link
 
-PROTOCOL='fcst-dwg-native/1'
+PROTOCOL='fcst-dwg-native/2'
 
 
 class Fields(list):
@@ -86,8 +88,9 @@ class NativeSnapshot:
 
 def snapshot(native_raw,standard_raw,patch_sha256,*,limits=DwgAuditLimits()):
     native=_load(native_raw,limits=limits);standard=_load(standard_raw,True,limits)
-    if (not isinstance(native,dict) or set(native)!={'protocol','patch_sha256','version','read_errors','classes','objects','opaque_sections'}
+    if (not isinstance(native,dict) or set(native)!={'protocol','patch_sha256','version','opaque_encoding','read_errors','classes','objects','opaque_sections'}
             or native['protocol']!=PROTOCOL or native['version']!='AC1032'
+            or native.get('opaque_encoding')!='msb-first-final-byte/1'
             or native['patch_sha256']!=patch_sha256 or not re.fullmatch('[0-9a-f]{64}',patch_sha256)
             or not _integer(native['read_errors'],127)):
         reject('native_dwg_protocol')
@@ -105,15 +108,18 @@ def snapshot(native_raw,standard_raw,patch_sha256,*,limits=DwgAuditLimits()):
             reject('native_dwg_class')
         class_ids.add(row['number'])
     for row in objects:
-        if (not isinstance(row,dict) or set(row)!={'handle','type','kind','bits','data','rest_bits','rest'}
+        if (not isinstance(row,dict) or set(row)!={'handle','type','kind','bits','data','rest_bits','rest','object_bits','common_bits','data_bits','string_bits','handle_bits'}
                 or not _integer(row['handle'],18446744073709551615) or not row['handle'] or row['handle'] in handles
                 or not _integer(row['type'],65535) or row['type']>=500 and row['type'] not in class_ids
                 or not isinstance(row['kind'],str) or len(row['kind'])>65536
-                or not _integer(row['bits'],134217728) or not _integer(row['rest_bits'],134217728)):
+                or not _integer(row['bits'],134217728) or not _integer(row['rest_bits'],134217728)
+                or any(not _integer(row[key],536870912) for key in ('object_bits','common_bits','data_bits','string_bits','handle_bits'))):
             reject('native_dwg_object')
         handles.add(row['handle'])
         row['data']=_bytes(row['data'],(row['bits']+7)//8)
         row['rest']=_bytes(row['rest'],(row['rest_bits']+7)//8)
+        for count,key in ((row['bits'],'data'),(row['rest_bits'],'rest')):
+            if count%8 and int(row[key][-2:],16)&((1<<(8-count%8))-1):reject('native_dwg_noncanonical_tail')
         total+=(row['bits']+7)//8+(row['rest_bits']+7)//8
     for row in sections:
         if (not isinstance(row,dict) or set(row)!={'name','byte_length','data'}
@@ -138,6 +144,11 @@ def snapshot(native_raw,standard_raw,patch_sha256,*,limits=DwgAuditLimits()):
     numbers=[_one(row,'number') for row in standard_classes]
     if (len(observed)!=len(handles) or set(observed)!=handles or len(numbers)!=len(class_ids) or set(numbers)!=class_ids):
         reject('native_dwg_standard_inventory')
+    by_class={row['number']:row for row in classes}
+    for row in standard_classes:
+        match=by_class[_one(row,'number')]
+        for key in ('cppname','dxfname','appname'):
+            if match[key]!=_one(row,key):reject('native_dwg_class_text_mismatch')
     digest=sha256(native_raw+b'\0'+standard_raw).hexdigest()
     return NativeSnapshot(native,standard,digest)
 
@@ -175,7 +186,10 @@ def compare(before,after):
     if before.native['patch_sha256']!=after.native['patch_sha256']:reject('native_dwg_profile_changed')
     a,b=before.native,after.native
     classes=lambda data:{row['number']:row for row in data['classes']}
-    objects=lambda data:{row['handle']:row for row in data['objects']}
+    # Stream coordinates are physical encoding metadata. The actual payload
+    # bytes, bit counts and standard logical fields remain mandatory matches.
+    physical={'object_bits','common_bits','data_bits','string_bits','handle_bits'}
+    objects=lambda data:{row['handle']:{k:v for k,v in row.items() if k not in physical} for row in data['objects']}
     sections=lambda data:{row['name']:row for row in data['opaque_sections']}
     equal_native=(classes(a)==classes(b) and objects(a)==objects(b) and sections(a)==sections(b)
                   and a['read_errors']==b['read_errors'] and a['version']==b['version'])
@@ -187,6 +201,30 @@ def compare(before,after):
             'vendor_runtime_required':False,'thermal_mapping':'unmapped','native_ready':False,'qualified':False}
 
 
+def compare_edits(before,after,edits):
+    """Verify exactly the application-decoded payload changes and no others."""
+    edit_packet(edits) # Same closed metadata/size contract as native execution.
+    expected=deepcopy(before.native);index={row['handle']:row for row in expected['objects']}
+    changed=set()
+    for original,replacement in edits:
+        if original!=index.get(original['handle']):reject('native_dwg_edit_stale_snapshot')
+        index[original['handle']]=dict(replacement);changed.add(original['handle'])
+    expected['objects']=list(index.values())
+    native=compare(NativeSnapshot(expected,before.standard,''),after)['native_records_preserved']
+    a,b=_standard(before),_standard(after)
+    # The native records above verify all opaque bytes. Only their corresponding
+    # top-level raw-payload text fields may change in the secondary field stream.
+    for handle in changed:
+        for document in (a,b):
+            if handle not in document.get('OBJECTS',{}):reject('native_dwg_edit_missing_standard_object')
+            document['OBJECTS'][handle]['fields']=[pair for pair in document['OBJECTS'][handle]['fields']
+                                                   if pair[0] not in {'unknown_bits','num_unknown_bits'}]
+    preserved=native and a==b
+    return {'requested_payloads_verified':native,'unrequested_standard_fields_preserved':a==b,
+            'edited_roundtrip_verified':preserved,'edited_objects':len(changed),
+            'vendor_runtime_required':False,'native_ready':False,'qualified':False}
+
+
 @dataclass(frozen=True)
 class NativeRuntime:
     """Application-approved tool registration; never reconstructed from model data."""
@@ -194,19 +232,24 @@ class NativeRuntime:
     executable_sha256:str
     patch_sha256:str
 
-    def run(self,operation,raw,work):
-        if operation not in {'inspect','rewrite','fixture'}:reject('native_dwg_operation')
+    def run(self,operation,raw,work,*,edits=None):
+        if operation not in {'inspect','rewrite','rewrite-edited','fixture','create-network'}:reject('native_dwg_operation')
+        if edits is not None and operation!='rewrite-edited':reject('native_dwg_edit_operation')
         if not re.fullmatch('[0-9a-f]{64}',self.patch_sha256):reject('native_dwg_patch')
-        if operation!='fixture' and (not isinstance(raw,bytes) or not raw.startswith(b'AC1032') or len(raw)>67108864):
+        if operation not in {'fixture','create-network'} and (not isinstance(raw,bytes) or not raw.startswith(b'AC1032') or len(raw)>67108864):
             reject('independent_dwg_container_profile')
-        outputs=('source.dwg',) if operation=='fixture' else ('native.json','standard.json')+(('derived.dwg',) if operation=='rewrite' else ())
+        outputs=('source.dwg',) if operation=='fixture' else ('native.json','standard.json')+(('derived.dwg',) if operation in {'rewrite','rewrite-edited'} else ())
         inputs={'fixture.json':b'{"kind":"fcst-owned-container-fixture/1"}'} if operation=='fixture' else {'source.dwg':raw}
+        if operation=='create-network':
+            if not isinstance(raw,bytes) or not raw.startswith(b'FCSTNEW2') or len(raw)>16777216:reject('native_dwg_new_network_packet')
+            inputs={'network.bin':raw};outputs=('derived.dwg',)
+        if operation=='rewrite-edited':inputs['edits.bin']=edit_packet(edits)
         profile='fcst-native-dwg-'+operation
         tool=Tool(profile,self.executable,self.executable_sha256,(operation,),timeout_seconds=180,memory_mb=4096,output_bytes=1048576)
         result,receipt=ToolRunner([tool]).run(profile,Path(work).absolute(),inputs,outputs,
                                             Authorization(profile,'convert','independent-container-v1'),
                                             limits=Limits(files=16,file_bytes=67108864,total_bytes=268435456))
-        if operation=='fixture':return result,receipt
+        if operation in {'fixture','create-network'}:return result,receipt
         decoded=snapshot(result['native.json'],result['standard.json'],self.patch_sha256)
         return decoded,result.get('derived.dwg'),receipt
 
@@ -227,3 +270,26 @@ class NativeRuntime:
         tool=Tool('fcst-native-dwg-inspect',runtime.executable,runtime.executable_sha256,('inspect',),memory_mb=4096)
         ToolRunner([tool]).probe(tool.profile)
         return runtime
+
+
+def edit_packet(edits):
+    if not isinstance(edits,(list,tuple)) or not 1<=len(edits)<=10000:reject('native_dwg_edits')
+    out=bytearray(b'FCSTEDIT2'+struct.pack('<I',len(edits)));seen=set()
+    for pair in edits:
+        if not isinstance(pair,(list,tuple)) or len(pair)!=2:reject('native_dwg_edit_record')
+        before,after=pair
+        fields={'handle','type','kind','bits','data','rest_bits','rest','object_bits','common_bits','data_bits','string_bits','handle_bits'}
+        if (not isinstance(before,dict) or not isinstance(after,dict) or set(before)!=fields or set(after)!=fields
+                or before['handle'] in seen or not _integer(before['handle'],18446744073709551615) or before['handle']==0
+                or any(not _integer(row[key],536870912) for row in (before,after) for key in
+                       ('bits','object_bits','data_bits','common_bits','string_bits','handle_bits'))):
+            reject('native_dwg_edit_identity')
+        seen.add(before['handle']);delta=after['bits']-before['bits']
+        if delta not in {0,64,128}:reject('native_dwg_edit_size')
+        expected={**before,'data':after['data'],'bits':after['bits'],
+                  'object_bits':before['object_bits']+delta,'data_bits':before['data_bits']+delta}
+        if after!=expected:reject('native_dwg_edit_unrequested_metadata')
+        a=bytes.fromhex(_bytes(before['data'],(before['bits']+7)//8));b=bytes.fromhex(_bytes(after['data'],(after['bits']+7)//8))
+        out.extend(struct.pack('<QII',before['handle'],before['bits'],after['bits']));out.extend(a);out.extend(b)
+        if len(out)>33554432:reject('native_dwg_edit_budget')
+    return bytes(out)

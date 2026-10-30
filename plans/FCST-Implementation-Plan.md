@@ -33,7 +33,13 @@ The corrected native bridge preserves ordered duplicate decoder fields and check
 complete opaque bit payloads and every unrequested logical field without echoing
 private values. A separate required CI job builds the locked GPL component and
 rewrites/reopens an owned fixture; candidate/source-bound bounded evidence is
-required by the final handoff. Native TD thermal semantics remain unmapped. Scan the exact owned probe/audit sources, synthetic
+required by the final handoff. Typed RcNode v22/RcConductor v22/RcHeatLoad v17 and property readers now
+support guarded source-field edits and source-free constant-network DWG export.
+Execute `tests/test_td_payloads.py` and `tests/test_td_properties.py`; the required
+native job independently reopens all generated fields/references and compressed
+scalar edits while preserving every unrequested source field. Full-model semantics
+remain incomplete. Scan the exact owned codecs/writers, synthetic filer fixtures,
+CLI sources, preservation patch and source-hash locks alongside probe/audit sources, synthetic
 tests, pinned dependency metadata, updated scope documents and bounded summaries
 before publication. Policy v5 scans native headers/patches as text, retains all
 sensitive patterns/budgets and rejects binary disguises. Preserve GPL attribution
@@ -355,9 +361,11 @@ The [independent exchange decision](../docs/decisions/0004-independent-thermal-e
 requires TD/SINDA import and export without TD, OpenTD, AutoCAD/CRTechCAD,
 SINDA/FLUINT, vendor licenses, prior vendor conversion or conversion servers.
 The earlier OpenTD-first implementation is retained only as optional external
-reference tooling. The direct SINDA subset is implemented; direct DWG thermal
-codecs and lossless changed-DWG export remain unimplemented. WP-08 stays in
-progress, and its historical evidence retains its narrower original scope.
+reference tooling. The direct SINDA subset and independent typed TD
+node/conductor/heat-load/property profiles are implemented, with guarded source-field
+edits and source-free constant-network DWG export. Required geometry, case, manager,
+dynamic and dependency semantics, canonical import and full-model reverse mapping
+remain incomplete. WP-08 stays in progress; historical evidence retains its scope.
 
 1. Retain the corrected independent LibreDWG 0.14 native component, locked source,
    compiler, preservation patch and GPL notices. Its implementation fixes observed

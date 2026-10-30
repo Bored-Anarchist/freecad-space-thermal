@@ -1,7 +1,8 @@
 # Independent Thermal Desktop import and export
 
 Decision date: 29 October 2026. Status: accepted product constraint; direct DWG
-thermal codecs and product deployment remain unimplemented.
+typed constant-network profiles implemented; full-model semantics and
+qualification remain open.
 
 ## Required behavior
 
@@ -43,7 +44,8 @@ optics, cases, controls, expressions and dependency files. Freeze a separate
 codec profile for the TD serialization version and DWG container version; the
 `AC1032` container marker alone cannot identify a TD release. Custom classes
 observed in the local research include nodes, conductors, loads, surfaces,
-solids and case/logic managers. Their payloads remain opaque today.
+solids and case/logic managers. Node, conductor and heat-load structures now
+have owned readers; the other required classes remain explicit holds.
 
 The writer must serialize supported edits and reconstruct the object graph,
 including reference relocation, bit alignment, compression and checksums. Keep
@@ -83,17 +85,51 @@ A private same-version AC1032 experiment preserved 1,219 object records, 54 clas
 records, 1,025 objects with opaque payloads and the complete raw datastorage
 section through rewrite and fresh-process reopen. All logical standard fields
 matched. Original bytes remained unchanged. These observations establish the
-tested container slice only: no owned TD thermal class field codec exists yet,
-and warning bits for unhandled classes/unparsed datastorage remain explicit.
-AC1032 does not identify the TD release. Semantic dependency closure, edited
-thermal DWG and new-model DWG export remain unimplemented and unqualified.
+tested container slice. Warning bits for unhandled classes/unparsed datastorage
+remain explicit. AC1032 does not identify the TD release. The new typed profiles
+below extend the implementation without qualifying complete thermal models.
 
 The independently usable product slice exposes `td-preview` and
 `td-export-source`: inspect native container records and retain the entire
 immutable source tree exactly, including opaque companions and empty directories.
-These operations never construct a runnable thermal model. Thermal edits reject
-before export. `td-audit-rewrite` is a private preservation experiment and is
+These operations never construct a runnable thermal model. Guarded source-field
+edits are now supported for the declared constant profiles; native-ready requests
+still reject while complete semantic closure remains unresolved. `td-audit-rewrite` is a private preservation experiment and is
 never promoted to a user export. No operation imports or falls back to OpenTD.
+
+Owned `RcNode` v22, `RcConductor` v22 and `RcHeatLoad` v17 codecs now consume
+complete data, text and reference streams. Separate UCS-2 text lengths, common
+references, expression/table/logic structures and stream boundaries are verified.
+Neutral names retain unresolved selector fields; the reader never fabricates a
+semantic interpretation or executes source logic. Native protocol v2 fixes full
+Unicode class identity and normalizes LibreDWG's LSB-packed final partial byte
+to MSB-first wire order. Unknown layouts stay opaque.
+
+Guarded source-field export supports node temperature/mass values, constant
+conductor values, scalar loads and allowlisted constant `.tdp`/`.rco` fields.
+Dynamic modes and unsupported laws/distributions reject. Compressed zero/one
+fields can grow by 64 bits, preserving every following stream bit. A native
+rewrite and fresh process reopen must match every requested payload and all
+unrequested logical fields, datastorage, classes, companions and directories.
+Original bytes are checked again before atomic publication to a new tree.
+
+`td-write-model` generates a new constant network from a native `.fcst` model,
+without a source drawing/template. It constructs thermal objects, a fresh DWG
+container, text/handle streams and deterministic identities from owned data.
+Every generated field/reference is independently decoded and compared before
+publication. Companion canonical metadata and identity receipts preserve labels
+and source mappings. Unknown entities/fields/associations and empty submodels
+reject. The preservation patch disables dummy/point substitution; an export
+missing its thermal objects cannot pass the fresh-reader check.
+
+Private original-file validation structurally decoded 918 nodes, 46 conductors,
+14 heat loads and both property databases (21 thermophysical/22 optical entries).
+Three guarded DWG edits, including compressed expansion, preserved every
+unrequested field after fresh reopen. No original or sampled proprietary payload
+is a public fixture. Public tests build independently owned analytic inputs.
+These are serialization and preservation checks; full canonical reconstruction,
+geometry/case/manager/environment/dynamic semantics, required dependency closure,
+full-model reverse mapping and target-product qualification remain incomplete.
 
 The direct SINDA path now also writes a new source tree from a native FCST model,
 without needing an imported deck. Its closed constant-network subset covers
@@ -134,19 +170,22 @@ WP-08 remains in progress. Deliver these slices in order:
 Build and self-test with `python tools/build_independent_dwg.py`. This downloads
 only locked public source/toolchain assets, keeps build artifacts local and
 produces a bounded `dwg-backend.json` report. Foundation CI requires that job and
-checks its candidate, source hashes, five cases and nonqualification flags in
+checks its candidate, source hashes, nine cases and nonqualification flags in
 the final handoff. It publishes only the privacy-cleared summary.
 
 For private corpus research use
 `python tools/probe_independent_dwg.py --drawing <local.dwg> --backend <trusted-install/backend.json> --work <new-private-directory> --report <new-local-report.json>`.
 The driver downloads nothing and preserves originals. Decoder values and derived
 drawings remain local. Success always retains `native_ready=false` and
-`qualified=false` because thermal codecs remain unmapped.
+`qualified=false` because complete thermal semantics remain incomplete.
 
-`tests/test_native_dwg.py`, `tests/test_sinda_writer.py` and the existing SINDA,
+`tests/test_native_dwg.py`, `tests/test_sinda_writer.py`,
+`tests/test_td_payloads.py`, `tests/test_td_properties.py` and the existing SINDA,
 container and optional-reference tests run in both Windows configurations and
 the standard-library security job. They cover retained duplicate occurrences,
-partial payload bytes, unrequested field changes, safe source patches/caches,
+partial payload bytes, Unicode/stream bounds, fixed-width and compressed scalar
+edits, dynamic-profile refusal, new-model generation, property modes,
+unrequested field changes, safe source patches/caches,
 source overlap/staleness, exact source copies, new-model SINDA generation and
 vendor-import rejection. No manual acceptance execution is assigned to the user.
 

@@ -6,6 +6,9 @@ from fcst_exchange.sinda import SindaAdapter,SindaUnits
 
 def parsers(commands):
     commands.add_parser('td-probe')
+    td_writer=commands.add_parser('td-write-model')
+    td_writer.add_argument('project');td_writer.add_argument('destination')
+    td_writer.add_argument('--backend',required=True);td_writer.add_argument('--work',required=True)
     writer=commands.add_parser('sinda-write-model')
     writer.add_argument('project');writer.add_argument('destination')
     for field in ('temperature','capacity','conductance','power','time'):
@@ -14,6 +17,7 @@ def parsers(commands):
         parser=commands.add_parser(name);parser.add_argument('root');parser.add_argument('entry')
         parser.add_argument('--backend',required=True);parser.add_argument('--work',required=True)
         if name!='td-preview':parser.add_argument('destination')
+        if name=='td-export-source':parser.add_argument('--edits')
     for name in ('sinda-preview','sinda-export','sinda-package','sinda-result'):
         parser=commands.add_parser(name);parser.add_argument('root');parser.add_argument('entry')
         parser.add_argument('--temperature-unit',required=True);parser.add_argument('--capacity-unit',required=True)
@@ -29,10 +33,23 @@ def execute(args):
     if args.command.startswith('td-'):
         from fcst_exchange.dwg_native import NativeRuntime
         from fcst_exchange.independent_td import IndependentTdAdapter
-        adapter=IndependentTdAdapter(NativeRuntime.from_receipt(args.backend))
+        runtime=NativeRuntime.from_receipt(args.backend)
+        if args.command=='td-write-model':
+            from fcst_app.persistence import recover_package
+            from fcst_exchange.td_writer import export_model
+            return export_model(recover_package(args.project).model,runtime,args.destination,args.work)
+        adapter=IndependentTdAdapter(runtime)
         staged=adapter.preview(args.root,args.entry,args.work)
         if args.command=='td-preview':return staged.report
-        if args.command=='td-export-source':return adapter.export_source(staged,args.destination)
+        if args.command=='td-export-source':
+            edits=()
+            if args.edits:
+                from fcst_contracts import loads
+                from fcst_exchange.core import reject
+                with Path(args.edits).open('rb') as stream:raw=stream.read(1048577)
+                if len(raw)>1048576:reject('td_source_edit_file_limit')
+                edits=loads(raw)
+            return adapter.export_source(staged,args.destination,edits,work=Path(args.work).with_name(Path(args.work).name+'-export'))
         return adapter.audit_rewrite(staged,args.destination)
     units=SindaUnits(args.temperature_unit,args.capacity_unit,args.conductance_unit,args.power_unit,args.time_unit)
     if args.command=='sinda-write-model':

@@ -41,7 +41,8 @@ The [FCST implementation project](https://github.com/users/Bored-Anarchist/proje
 
 ## Publication privacy (TST-021)
 
-WP-08 adds the [TD/SINDA implementation](td-sinda.md), its source-only C# sidecar
+WP-08 adds the [TD/SINDA implementation](td-sinda.md), owned binary codecs and
+source-free DWG writer, direct property readers, its source-only C# sidecar
 and runtime-independent `td.json` summary. Both Windows CI presets execute the
 frozen cases and scan that exact summary before upload. Local installed-API
 receipts contain hashes and bounded status only. Q1 vendor/native/paired ESA

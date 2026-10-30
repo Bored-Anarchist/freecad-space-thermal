@@ -21,3 +21,16 @@ thermal-class semantics or qualify native thermal editing.
 
 `fixture` creates only an owned synthetic geometry/container example. It never
 creates an alleged Thermal Desktop model or supplies TD qualification evidence.
+
+Protocol `fcst-dwg-native/2` retains full Unicode class names and normalizes partial
+opaque bytes to MSB-first wire order. Stream coordinates are explicit. The owned
+`rewrite-edited` packet permits only bounded RcNode/RcConductor/RcHeatLoad payload
+replacements tied to exact original bytes. Application codecs guard permitted
+scalar fields; independent reopen checks all unrequested logical fields.
+
+`create-network` consumes an owned bounded binary packet and creates new node,
+conductor and heat-load objects in a new container, including separate text and
+reference streams. It uses no source model template. The preservation patch
+removes upstream dummy/point substitution; missing thermal objects or changed
+fields fail the required fresh-process decoder comparison. Neither a structural
+round trip nor a synthetic fixture grants target-product/full-model qualification.

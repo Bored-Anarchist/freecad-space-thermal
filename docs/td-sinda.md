@@ -4,8 +4,9 @@
 TD, OpenTD, AutoCAD and SINDA installations. The
 [independent exchange decision](decisions/0004-independent-thermal-exchange.md)
 supersedes the OpenTD-first migration design. The direct SINDA subset already
-works without those tools. Direct DWG thermal codecs remain unimplemented;
-the independent container experiment does not establish thermal compatibility.
+works without those tools. Direct DWG node, conductor and heat-load profiles,
+property readers, guarded source-field edits and source-free constant-network
+DWG export are implemented. Complete-model thermal compatibility remains open.
 The OpenTD implementation below is retained only for optional external reference
 work and cannot satisfy the product's import/export requirement.
 
@@ -23,25 +24,89 @@ with the Windows x64 Framework compiler against the separately installed assembl
 it does not redistribute vendor DLLs. 2025 R2 and 2026 R1 profiles are explicitly
 unimplemented. An absent or mismatched profile fails before source mutation.
 
-## Independent native DWG container slice
+## Independent DWG profiles and exports
 
 `python tools/build_independent_dwg.py` builds the locked separate GPL backend
-and runs an owned synthetic rewrite/fresh-process reopen. Its trusted installation
-receipt is selected explicitly, outside imported project data.
+and runs nine unattended native checks, including the actual vendor-free CLI,
+new-model generation, compressed scalar edits and fresh-process reopen. Select
+its trusted installation receipt explicitly, outside imported project data.
 
 ```text
 fcst td-preview source main.dwg --backend .local/dwg-backend/install/backend.json --work .local/new-preview
 fcst td-export-source source main.dwg derived-source --backend .local/dwg-backend/install/backend.json --work .local/new-export-preview
+fcst td-export-source source main.dwg edited-source --edits edits.json --backend .local/dwg-backend/install/backend.json --work .local/new-edit-preview
+fcst td-write-model native.fcst new-td-project --backend .local/dwg-backend/install/backend.json --work .local/new-writer
 ```
 
-These commands require no TD/OpenTD/AutoCAD/SINDA installation or license. They
-inspect container records and preserve complete source trees; they do not map
-TD thermal classes. Any thermal edit or native-ready request is rejected.
-`td-audit-rewrite` runs a private structural preservation audit. All native class
-records, opaque bytes/datastorage and logical standard fields are checked after
-fresh-process reopen; derived research drawings are never user exports.
-See the decision and `adapters/libredwg/README.md` for scope, pinned provenance
-and component license obligations. Raw inventories and source data remain local.
+These commands require no TD/OpenTD/AutoCAD/SINDA installation, API, license,
+prior vendor conversion or service. Original files remain immutable. Exports
+publish a new tree atomically after validation; existing destinations, source/work
+overlap, stale sources and unrequested changes reject.
+
+The declared binary payload profiles are **RcNode v22**, **RcConductor v22** and
+**RcHeatLoad v17**. These are serialization versions, not TD release claims.
+Readers consume the entire data, separate UCS-2 text and reference streams;
+unsupported versions remain opaque with an explicit diagnostic. They inventory
+source expressions, tables, logic and unresolved selectors without executing or
+guessing their meaning. Preview reports contain counts, handles and bounded
+status codes, never source names, material values, source logic or decoded bytes.
+Native thermal readiness and Q1 qualification remain false.
+
+`edits.json` is a bounded array of closed edit records. For example, using handles
+from the local preview:
+
+```json
+[
+  {"handle": 101, "changes": {"initial_temperature": 305}},
+  {"handle": 103, "changes": {"value": 0.75}},
+  {"path": "materials.tdp", "changes": [{"entry": "OWNED MATERIAL", "field": "SPECHEAT", "value": 900}]}
+]
+```
+
+Node source fields `initial_temperature` and `mass_value`, conductor `value` and
+heat-load `value` are supported when their constant-field guards pass. Values
+are serialized source values; this interface does not imply a canonical unit or
+change a material/volume/capacitance mode. Dynamic expressions, source logic,
+nonconstant conductor laws, time tables and unsupported heat-load distributions
+reject affected edits. Compressed zero/one doubles can expand by 64 bits; separate
+text and handle streams move intact. All other object payloads, datastorage,
+classes, ordered standard logical fields, companions and empty directories are
+checked and retained. `td-audit-rewrite` remains a separate private preservation
+audit; it does not grant full-model readiness.
+
+The direct UTF-8 `[UNICODE]` `.tdp`/`.rco` readers retain original bytes, comments,
+unknown tags and nested composite blocks. Allowlisted constant numeric edits
+preserve every unselected byte and independently reparse. Stored thermophysical
+scalars use SI; switching property modes, active variable optics, composites and
+nonconstant fields is unsupported. These readers do not yet reconstruct all
+material/optical models or their complete drawing dependencies.
+
+`td-write-model` accepts a native `.fcst` model containing only explicit submodels,
+capacitive/algebraic/prescribed nodes, linear conductors and scalar loads. It
+rejects unsupported entities, fields, associations and empty submodels. It
+serializes new thermal objects and a new AC1032 container from owned inputs,
+without borrowing an existing DWG or vendor template. A fresh native process
+reopens the result; every intended class, identifier, scalar, string and connection
+must match. `canonical.json` and `identity-map.json` retain canonical annotations
+and deterministic source identities beside `network.dwg`. This is a tested
+constant-network structural export, not a qualified full Thermal Desktop model.
+
+Private corpus checks decoded all 918 nodes, 46 conductors and 14 heat loads in
+the available drawing, and 21 thermophysical/22 optical database entries. Three
+representative DWG source-field edits, including compressed expansion, reopened
+without unrequested changes. All original bytes were preserved. These counts do
+not establish coverage for geometry, cases, managers, dynamic laws or other
+serialization/source versions.
+
+Remaining implementation: required surface/solid/mesh, material/optical, case,
+manager, orbit/environment and dynamic-expression semantics; complete dependency
+closure and canonical import/reverse mapping; full-model edited/new-model export;
+remaining SINDA constructs and source versions. Owned-engine and paired ESATAN
+Q1 comparisons remain separate holds. The unattended suite retains these holds;
+no acceptance-test execution is assigned to the user.
+
+See the decision and `adapters/libredwg/README.md` for pinned provenance and
+component license obligations. Raw inventories and source data remain local.
 
 ## SINDA 6.3 constant-network profile
 

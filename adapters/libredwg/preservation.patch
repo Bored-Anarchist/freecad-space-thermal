@@ -43,7 +43,16 @@
            if (obj->fixedtype == DWG_TYPE_FREED)
 --- a/src/encode.c
 +++ b/src/encode.c
-@@ -2269,7 +2269,7 @@
+@@ -54,6 +54,8 @@
+ #include "bits.h"
+ #include "dwg.h"
+ #include "encode.h"
++/* FCST: never substitute thermal payloads with dummy geometry. */
++#undef ENCODE_UNKNOWN_AS_DUMMY
+ #include "decode.h"
+ #include "classes.h"
+ #include "dynapi.h"
+@@ -2269,7 +2271,7 @@
                     klass->item_class_id);
          SINCE (R_2004a)
          {
@@ -52,7 +61,7 @@
              {
                klass->dwg_version = (BITCODE_BL)dwg->header.dwg_version;
                klass->maint_version = (BITCODE_BL)dwg->header.maint_version;
-@@ -2331,7 +2331,7 @@
+@@ -2331,7 +2333,7 @@
                     klass->item_class_id);
          SINCE (R_2004a)
          {
@@ -61,7 +70,7 @@
              {
                klass->dwg_version = (BITCODE_BL)dwg->header.dwg_version;
                klass->maint_version = (BITCODE_BL)dwg->header.maint_version;
-@@ -2995,11 +2995,11 @@
+@@ -2995,11 +2997,11 @@
            // pre-R13b1 must stay 0 (set by dxf_fixup_header or decode)
            _obj->dwg_version = _verp->dwg_version;
        }
@@ -76,7 +85,7 @@
        _obj->app_maint_version = _obj->maint_version;
      if (!_obj->codepage)
        _obj->codepage = dat->codepage;
-@@ -3769,6 +3769,17 @@
+@@ -3769,6 +3771,17 @@
              break;
            case SECTION_ACDS:
              {

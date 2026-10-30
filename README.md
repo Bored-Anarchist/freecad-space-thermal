@@ -23,8 +23,10 @@ drivers, 33 exchange acceptance cases, security regressions and foundation hando
 WP-08 requires [fully independent TD/SINDA import and export](docs/decisions/0004-independent-thermal-exchange.md).
 The direct SINDA subset imports, edits and writes new models without vendor installations.
 A corrected independent native DWG backend supports container inspection, exact
-source-tree retention and private structural rewrite audits; TD thermal codecs,
-edited thermal DWG and new-model DWG export remain unimplemented. The existing OpenTD sidecar is an optional external reference
+source-tree retention, typed node/conductor/heat-load payloads, direct property
+databases, guarded scalar edits and source-free constant-network DWG generation.
+Required geometry/case/manager/dynamic semantics, complete canonical mapping and
+full-model DWG qualification remain open. The existing OpenTD sidecar is an optional external reference
 harness. Q1 remains unqualified; public CI exercises
 runtime-independent contracts without proprietary software or data.
 

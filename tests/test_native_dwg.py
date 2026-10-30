@@ -21,17 +21,17 @@ PATCH='a'*64
 
 
 def packet():
-    return {'protocol':'fcst-dwg-native/1','patch_sha256':PATCH,'version':'AC1032','read_errors':4,
+    return {'protocol':'fcst-dwg-native/2','patch_sha256':PATCH,'version':'AC1032','opaque_encoding':'msb-first-final-byte/1','read_errors':4,
             'classes':[dict(number=500,proxyflag=0,appname='owned',cppname='FcstOwnedFixture',
                             dxfname='OWNED',is_zombie=0,item_class_id=499,num_instances=1,
                             dwg_version=0,maint_version=0,unknown_1=0,unknown_2=0)],
-            'objects':[dict(handle=1,type=500,kind='UNKNOWN_OBJ',bits=9,data='aa80',rest_bits=1,rest='80')],
+            'objects':[dict(handle=1,type=500,kind='UNKNOWN_OBJ',bits=9,data='aa80',rest_bits=1,rest='80',object_bits=9,common_bits=0,data_bits=9,string_bits=0,handle_bits=0)],
             'opaque_sections':[dict(name='AcDsPrototype_1b',byte_length=2,data='0102')]}
 
 
 def standard(first=1):
     return ('{"FILEHEADER":{"version":"AC1032"},"HEADER":{"INSUNITS":6},'
-            '"CLASSES":[{"number":500}],"OBJECTS":[{"handle":[0,1,1],"index":0,"size":20,"bitsize":100,'
+            '"CLASSES":[{"number":500,"cppname":"FcstOwnedFixture","dxfname":"OWNED","appname":"owned"}],"OBJECTS":[{"handle":[0,1,1],"index":0,"size":20,"bitsize":100,'
             '"type":500,"_subclass":"A","value":'+str(first)+',"_subclass":"B","value":2}]}').encode()
 
 
@@ -84,7 +84,7 @@ class NativeDwgTests(unittest.TestCase):
                 preview=adapter.preview(source,'main.dwg',root/'work')
             self.assertFalse(preview.report['operations']['thermal-native-reconstruction'])
             with self.assertRaisesRegex(ExchangeError,'semantics_unmapped'):preview.require_native()
-            with self.assertRaisesRegex(ExchangeError,'semantics_unmapped'):adapter.export_source(preview,root/'edited',[{}])
+            with self.assertRaisesRegex(ExchangeError,'edit_work_required'):adapter.export_source(preview,root/'edited',[{}])
             result=adapter.export_source(preview,root/'export')
             self.assertTrue(result['exact_source_bytes_preserved']);self.assertFalse(result['qualified'])
             self.assertEqual((root/'export/extra.bin').read_bytes(),b'\x00\xff-preserved')
