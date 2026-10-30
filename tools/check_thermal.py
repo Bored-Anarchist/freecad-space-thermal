@@ -223,7 +223,7 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
     def transient_failures():
         for raw in (b'{',b'[]',b'\xff',b'{}'):
             assert transient(raw)['status']=='failed'
-        for change in ('unknown','mode','tolerance','sampling','count','environment','checkpoint'):
+        for change in ('unknown','mode','tolerance','sampling','count','environment','checkpoint','environment-text','schedule-text','state-text'):
             value=transient_input()
             if change=='unknown':value['private_payload']='opaque-marker'
             if change=='mode':value['transient']['execution_mode']='external_reference'
@@ -232,6 +232,9 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
             if change=='count':value['transient']['maximum_attempts']=1.5
             if change=='environment':value['environment_power_W']={uid(999):[0,0]}
             if change=='checkpoint':value['checkpoint']={}
+            if change=='environment-text':value['environment_power_W']={'opaque-marker':[0,0]}
+            if change=='schedule-text':value['transient']['schedules']=[{'load_id':'opaque-marker','points':[{'time':0,'factor':1}]}]
+            if change=='state-text':value['initial_operating']={'heaters':{},'load_factors':{'opaque-marker':1}}
             result=transient(value)
             assert result['status']=='failed' and 'opaque-marker' not in json.dumps(result)
         value=transient_input();value['transient']['maximum_attempts']=1

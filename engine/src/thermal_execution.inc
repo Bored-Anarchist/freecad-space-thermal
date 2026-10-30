@@ -116,7 +116,12 @@ std::string thermal::inspect_transient(std::string_view input) {
         {"linear_seconds",J(p.linear_seconds)},{"total_seconds",J(p.total_seconds)}})}};
     if(!result.entity_id.empty())out.emplace("entity_id",J(result.entity_id));if(!result.source_map_id.empty())out.emplace("source_map_id",J(result.source_map_id));
     return dump(J(out));
-  } catch(const thermal::Error& e) {J::O out{{"status",J("failed")},{"code",J(e.code)}};if(!e.entity_id.empty())out.emplace("entity_id",J(e.entity_id));return dump(J(out));}
+  } catch(const thermal::Error& e) {
+    J::O out{{"status",J("failed")},{"code",J(e.code)}};
+    if(e.entity_id.size()==36 && std::regex_match(e.entity_id,std::regex("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}")))
+      out.emplace("entity_id",J(e.entity_id));
+    return dump(J(out));
+  }
     catch(const fcst::Error& e) {return dump(J(J::O{{"status",J("failed")},{"code",J(e.code)}}));}
     catch(...) {return "{\"status\":\"failed\",\"code\":\"schema\"}";}
 }
