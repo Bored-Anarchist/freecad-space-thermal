@@ -1,8 +1,9 @@
 # Independent ESATAN file conversion
 
-Status: accepted product constraint and WP-09 implementation plan. ESATAN
-conversion remains planned; this document does not claim implemented readers,
-writers, native execution or qualified compatibility.
+Status: accepted product constraint; WP-09 implementation in progress. The
+[implemented subset](../esatan.md) supplies owned constant D-deck conversion,
+native syntax inventories, bound TMD queries and streaming XML inspection.
+Complete native-project/campaign conversion and Q1 qualification remain open.
 
 ## Required behavior
 
@@ -99,5 +100,6 @@ owned source, synthetic fixtures, manifests, bounded summaries and final GitHub
 prose. Preserve originals locally; never publish raw native models, decoder dumps,
 private paths, user procedures, binary libraries or raw logs as test evidence.
 
-WP-09 stays Planned until implementation starts. Documentation changes and an
-available ESATAN installation cannot qualify the independent conversion path.
+WP-09 is In progress. Its implemented cases do not close the full completion
+criteria above. Documentation or an available ESATAN installation cannot qualify
+the independent conversion path.

@@ -33,7 +33,13 @@ additional formats and full-model DWG qualification remain open. The existing Op
 harness. Q1 remains unqualified; public CI exercises
 runtime-independent contracts without proprietary software or data.
 
-WP-09 requires [independent ESATAN native-project, deck and result conversion](docs/decisions/0005-independent-esatan-exchange.md), with no vendor installation, API, license, prior export or conversion service. Its implementation remains Planned; the documentation change does not claim a working ESATAN converter.
+WP-09 now provides [independent ESATAN constant D-deck conversion](docs/esatan.md),
+byte-preserving native syntax inventories, bound TMD temperature/power queries and
+streaming XML inspection without a vendor installation, API, license or service.
+The full LFS XML was recovered from the original GitLab repository with exact hash
+verification; it contains postprocessing data rather than a native project schema.
+Complete native-project/campaign semantics, geometry/environment/motion conversion,
+source runtime and owned-engine/paired qualification remain open. WP-09 is in progress.
 
 [WP-03 contracts](spec/contracts/README.md) freeze native model, operation, result, HDF5 layout and worker protocol version 1.0.0. Independent C++ and Python readers validate typed entities, references, quantities, frames and expression types, and agree on normalized snapshots and semantic hashes. Both Windows configurations run the same positive/negative fixtures and bounded framing checks.
 

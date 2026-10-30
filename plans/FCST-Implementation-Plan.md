@@ -53,6 +53,15 @@ sensitive patterns/budgets and rejects binary disguises. Preserve GPL attributio
 and scan exact build configuration, patch pre/post hashes and provenance alongside
 the source. WP-09 independent ESATAN plans/fixtures/evidence use the same TST-021
 rule; documentation does not qualify an unimplemented converter.
+WP-09 now applies TST-021 to exact owned codecs, CLI, acquisition/profile locks,
+synthetic D-deck/TMD/XML fixtures, bounded `esatan.json` summaries and final GitHub
+prose. Both Windows drivers execute the frozen unattended cases and clear the
+final summary before upload. Before publication, run the standard-library security
+gate plus staged, outgoing-history and approved-identity preflight. The acquired
+XML was recovered from its original public GitLab mirror with exact LFS hash and
+length verification; retain that payload, baseline pointer, decoded inventories,
+result arrays and raw acquisition/test logs locally. Recovery adds no permission
+to publish engineering data or claim full native-project/campaign qualification.
 Raw drawings, companion files, decoded JSON, runtime binaries
 and raw logs remain local; the original corpus remains unchanged. This adds no
 permission to redistribute third-party models or proprietary libraries.
@@ -447,10 +456,19 @@ Q1 TD status remains held until its paired ESA qualification also passes.
 The [independent ESATAN exchange decision](../docs/decisions/0005-independent-esatan-exchange.md)
 requires original native-project, companion, network and result conversion without
 ESATAN-TMS/ESARAD, vendor APIs, licenses, conversion services or prior vendor exports.
-The earlier native-API/export prerequisite is superseded. WP-09 remains Planned;
-these are required implementation and unattended acceptance tasks, not completed
-converter capabilities. A D-deck or STEP-TAS subset cannot replace native-project
-and campaign semantics.
+The earlier native-API/export prerequisite is superseded. WP-09 is In progress;
+the [implemented subset](../docs/esatan.md) covers owned constant D-deck conversion,
+native syntax inventories, bound TMD temperature/power queries and streaming XML
+inspection. The frozen acceptance register is `ci/esatan-acceptance.json`; complete
+native-project/campaign, geometry/environment/motion, runtime and paired numerical
+coverage remain required. A D-deck or STEP-TAS subset cannot replace native-project
+and campaign semantics. PyCanha's pinned MIT source informed format research without
+becoming a runtime dependency or supplying complete preservation qualification.
+
+The original GitLab mirror supplied the full acquired LFS XML at the exact pinned
+SHA-256 and length. Preserve the original pointer and resolved payload separately.
+The XML root identifies postprocessing chart/result data, not a native project
+descriptor; resolving its bytes does not close the project/campaign schema gate.
 
 1. Freeze exact native geometry/environment/kinematics/project, D-deck and result
    dialect/schema profiles from authorized fixtures. Inventory all source files,

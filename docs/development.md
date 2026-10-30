@@ -92,6 +92,17 @@ The native worker accepts `--contract model`, `--contract manifest`, `--contract
 
 All new outgoing fixtures are synthetic JSON; generated schemas, the embedded C++ schema table and shared types are scanned as actual text bytes. The bounded `contracts.json` report contains case IDs and fixture hashes only and is included in the existing pre-upload privacy gate. Native binaries, HDF5 arrays, raw reader/compiler logs and imported model originals remain local. TST-021's existing adversarial tests, staged/outgoing-history scans and approved identity checks still apply to this complete publication copy.
 
+WP-09 adds `tools/check_esatan.py` and its frozen acceptance/profile registers.
+Both Windows drivers execute the owned constant-network, native-syntax, bound-TMD
+and streaming-XML cases and clear exact `esatan.json` bytes before upload. The
+aggregate gate verifies candidate, coverage, source hashes and explicit Q1 holds.
+The standard-library security suite does not import optional array dependencies;
+TMD cases run separately in the locked standalone environment. The reproducible
+hash-bound XML acquisition tool writes only a new local destination; baseline
+pointers and acquired originals remain unchanged. Resolved XML, decoded native
+inventories, result arrays and raw logs are excluded from publication. See the
+[ESATAN contract and limitations](esatan.md).
+
 The user approved the public maintainer identity recorded in `ci/publication-policy.json`. No private author email is used. The staged Git index is the sanitized publication copy; restricted originals and raw engineering evidence remain outside it. Install version-controlled hooks with:
 
 ```text

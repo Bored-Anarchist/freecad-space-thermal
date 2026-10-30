@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "work_package": "WP-09",
+  "profiles": [
+    {
+      "id": "esatan-d-constant/1",
+      "source_versions": [
+        "2018-sp1",
+        "2020"
+      ],
+      "units": "explicit caller contract",
+      "scope": "Constant nodes T/C, GL conductors, scalar locals and initial T/QI; no complete source runtime or campaign semantics",
+      "qualified": false
+    },
+    {
+      "id": "esatan-erg-ere-erk-syntax/1",
+      "source_versions": [
+        "2018-sp1",
+        "2020"
+      ],
+      "scope": "Direct byte-preserving lexical and declarative inventory; no canonical geometry/environment/motion reconstruction",
+      "qualified": false
+    },
+    {
+      "id": "esatan-tmd-analysisset/1",
+      "producer_versions": [
+        "2025"
+      ],
+      "scope": "Exact hash/model/case bound AnalysisSet temperature and internal power arrays; other producer versions and model hierarchies held",
+      "qualified": false
+    },
+    {
+      "id": "esatan-postprocess-xml-inspection/1",
+      "scope": "Bounded streaming chart/result companion inspection; not a native project schema",
+      "qualified": false
+    }
+  ],
+  "provenance": [
+    "inventory/source-lock.json",
+    "docs/decisions/0005-independent-esatan-exchange.md"
+  ],
+  "policy": "Owned synthetic public tests; preserved originals remain local. No vendor runtime or previous vendor export is required.",
+  "source_review": {
+    "repository": "pycanha-project/pycanha",
+    "revision": "01c5e219c086ea25fbe00868ecd0e27994619fb3",
+    "license": "MIT",
+    "disposition": "Format research only; no runtime dependency or copied upstream implementation",
+    "files": [
+      "src/pycanha/io/esatan_reader.py",
+      "src/pycanha/io/esatan/grammars/esatan_geometry.lark",
+      "src/pycanha/io/esatan/geometry/builder.py",
+      "src/pycanha/io/esatan/geometry/writer.py"
+    ]
+  }
+}

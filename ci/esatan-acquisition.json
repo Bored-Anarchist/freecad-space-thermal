@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "source_repository": "https://gitlab.com/acubesat/thermal/esatan-model",
+  "revision": "18ace5b528854783dd4aba8301add7134c78bf9e",
+  "pointer_path": ".local/corpus/originals/ESA-ACUBESAT-NATIVE/cubesat/v2/model/summer-2022.xml",
+  "pointer_sha256": "f5b1a2f8d73e42fb2926481e01eecffc491076d4d162bf64411c9541f721f20a",
+  "payload_sha256": "2c896d1b4d9dbf6dea79598c5b723c8defc98d89c403dcd39aac07d16f5dde9f",
+  "payload_bytes": 211760264,
+  "source_url": "https://gitlab.com/acubesat/thermal/esatan-model/-/raw/18ace5b528854783dd4aba8301add7134c78bf9e/cubesat/v2/model/summer-2022.xml?inline=false",
+  "content_role": "postprocessing-xml",
+  "redistribution": "hold",
+  "policy": "Preserve the locked baseline pointer and original engineering bytes locally; do not publish the XML or decoded chart data."
+}

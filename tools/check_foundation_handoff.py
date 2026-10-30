@@ -42,6 +42,14 @@ def check(directory):
                 or td["gate"]["status"]!="passed"):
             raise ValueError("td_adapter_regression_or_false_qualification")
         if numerical["gate"]["status"]!="passed" or persistence["gate"]["status"]!="passed": raise ValueError("baseline_regression")
+        esatan=load(path.parent/'esatan.json')
+        if (esatan.get('candidate')!=candidate or esatan.get('qualified') is not False
+                or evaluate(load(ROOT/'ci/esatan-acceptance.json')['required_cases'],esatan['cases'])['status']!='passed'
+                or esatan['gate']['status']!='passed'
+                or esatan.get('qualification_holds')!=load(ROOT/'ci/esatan-acceptance.json')['qualification_holds']
+                or not esatan.get('input_sha256')
+                or any(sha256((ROOT/name).read_bytes()).hexdigest()!=digest for name,digest in esatan['input_sha256'].items())):
+            raise ValueError('esatan_regression_stale_inputs_or_false_qualification')
         contracts=load(path.parent/"contracts.json")
         if contracts["status"]!="passed": raise ValueError("contract_regression")
     hosts=list(directory.rglob("fem-probe.json"))

@@ -34,7 +34,7 @@ jobs:
       - name: Clear exact public reports
         id: clear
         if: always()
-        run: python tools/publication_preflight.py --file .local/${{ matrix.preset }}/verification.json --file .local/${{ matrix.preset }}/build-info.json --file .local/${{ matrix.preset }}/contracts.json --file .local/${{ matrix.preset }}/numerical.json --file .local/${{ matrix.preset }}/persistence.json --file .local/${{ matrix.preset }}/spatial.json --file .local/${{ matrix.preset }}/jobs.json --file .local/${{ matrix.preset }}/exchange.json --file .local/${{ matrix.preset }}/td.json
+        run: python tools/publication_preflight.py --file .local/${{ matrix.preset }}/verification.json --file .local/${{ matrix.preset }}/build-info.json --file .local/${{ matrix.preset }}/contracts.json --file .local/${{ matrix.preset }}/numerical.json --file .local/${{ matrix.preset }}/persistence.json --file .local/${{ matrix.preset }}/spatial.json --file .local/${{ matrix.preset }}/jobs.json --file .local/${{ matrix.preset }}/exchange.json --file .local/${{ matrix.preset }}/td.json --file .local/${{ matrix.preset }}/esatan.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always() && steps.clear.outcome == 'success'
         with:
@@ -49,6 +49,7 @@ jobs:
             .local/${{ matrix.preset }}/jobs.json
             .local/${{ matrix.preset }}/exchange.json
             .local/${{ matrix.preset }}/td.json
+            .local/${{ matrix.preset }}/esatan.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
