@@ -172,3 +172,16 @@ class TdPayloadTests(unittest.TestCase):
         for record in (replace(records()[0],data_bits=0),replace(records()[0],string_bits=32768),
                        replace(records()[0],references=(999,)),replace(records()[0],data=b'')):
             with self.assertRaises(ExchangeError):network_packet([record])
+
+    def test_public_probe_summary_excludes_source_handles_names_and_decoded_records(self):
+        import sys
+        sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
+        from probe_independent_dwg import bounded_preview
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory);source=root/'source';source.mkdir();(source/'main.dwg').write_bytes(b'AC1032-owned')
+            runtime=NativeRuntime(root/'converter.exe','b'*64,PATCH);adapter=IndependentTdAdapter(runtime)
+            with patch.object(NativeRuntime,'run',return_value=(drawing(records()),None,{})):staged=adapter.preview(source,'main.dwg',root/'preview')
+            report=bounded_preview(staged);raw=json.dumps(report)
+            self.assertNotIn('handle',raw);self.assertNotIn('owned',raw);self.assertNotIn('records',raw)
+            self.assertNotIn('RcNode',raw);self.assertEqual(report['decoded_profile_counts']['td-rcnode-v22/1'],2)
+            self.assertFalse(report['qualified']);self.assertFalse(report['native_ready'])

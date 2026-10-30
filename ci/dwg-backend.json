@@ -82,7 +82,7 @@
     "python/fcst_exchange/dwg_bits.py": "47b0dd26e69250fbd18659e3f203f0af01ad35c067c1473f70df14615e6a8e4f",
     "python/fcst_cli/td.py": "f4b36fc8e215a2259c4eb1173fb09f773e5f351f64bee498240759700eb474bd",
     "tests/td_fixture.py": "3d90b2b6268a275c18b6b46281bc5ae9ca8cc90cd827be4a0c01d8702408338c",
-    "tests/test_td_payloads.py": "524b5b7ee6be2aeb6f110654d5591d1d7b1fcb4acf71bace18d7e438b4064cd9",
+    "tests/test_td_payloads.py": "6aae3d46f04567de78065c23056252b3e194e74869ab828c7a78f3a5c5b1d3b5",
     "tests/test_td_properties.py": "53970c5499d11d7f72a5e42e554c662478c23f0ebb3dfadf7a243e71e1c7a679",
     "tests/fixtures/contracts/analytic-seed-native.json": "fdbdc75745c4ae3606e052f39ecb091585794ca147081e7b469d1dbe109861ac"
   },
