@@ -31,6 +31,12 @@
       "status": "passed",
       "required_cases": 17,
       "report_sha256": "da1d9c008f11655146dada8bc3f35be0102ea0ed02b1a0138704e690e7449d1a"
+    },
+    {
+      "id": "independent_dwg_shared_source_closure",
+      "status": "passed",
+      "required_cases": 24,
+      "report_sha256": "b399a897d95e955a964b7110ddd00be20edf7a818e5023a08e3b1fade1be8f8a"
     }
   ],
   "blockers": [],
@@ -87,5 +93,6 @@
     "tools/install_workbench.py": "ef023c447c385e13a723305ebbc4914971abe8fef4b22278b80a74c01d749fd2",
     "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec"
   },
-  "validation_policy": "Full Debug/Release baselines precede the final host-only frame mapping metadata and recovery changes. The final host source tree and 339-case standard-library suite pass separately. GitHub Actions reruns all 363 checks and the 17-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines."
+  "validation_policy": "Full Debug/Release baselines precede the final host-only frame mapping metadata and recovery changes. The final host source tree and 339-case standard-library suite pass separately. GitHub Actions reruns all 363 checks and the 17-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines.",
+  "shared_source_inventory": "ci/dwg-backend.json pins the changed store and FEM adapter; the complete 24-case native backend gate passed with vendor imports denied."
 }
