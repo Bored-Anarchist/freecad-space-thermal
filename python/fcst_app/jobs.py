@@ -87,7 +87,7 @@ class JobStore:
             reject("unauthorized")
 
     def submit(self, actor, scopes, key, case_id, *, expected_revision, execution,
-               budget=None, seeds=None, parent=None, checkpoint=None):
+               budget=None, seeds=None, parent=None, checkpoint=None, max_active_jobs=None):
         self._authority(actor, scopes, "job.submit")
         if not isinstance(key, str) or not key or len(key) > 128:
             reject("invalid_key")
@@ -129,6 +129,13 @@ class JobStore:
                 if prior[0] != request_hash:
                     reject("idempotency_conflict")
                 return self._get(prior[1])
+            # Trusted caller limit is checked under the submission write lock;
+            # concurrent MCP clients cannot race a count followed by insertion.
+            if max_active_jobs is not None:
+                if type(max_active_jobs) is not int or max_active_jobs<1: reject('resource_budget')
+                active=sum(loads(row[0])['state'] in {'queued','running','cancelling'}
+                           for row in self.db.execute('SELECT record FROM jobs'))
+                if active>=max_active_jobs: reject('resource_budget')
             model = self.project.snapshot()
             if model["revision"] != expected_revision:
                 reject("stale_revision")

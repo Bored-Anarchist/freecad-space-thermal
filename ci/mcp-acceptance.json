@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "protocols": [
+    "2026-07-28",
+    "2025-11-25"
+  ],
+  "sdk": "mcp==1.26.0",
+  "transport": "stdio",
+  "required_cases": [
+    "test_artifact_uuid_access_checks_actor_case_revision_and_byte_pages",
+    "test_bounded_pagination_and_versioned_resource_authorization",
+    "test_budget_and_readonly_policy_fail_before_submission",
+    "test_candidate_bound_gate_rejects_missing_substituted_or_changed_evidence",
+    "test_case_scope_cannot_be_bypassed_by_generic_edits_or_undo",
+    "test_closed_schemas_atomic_validation_and_no_arbitrary_tools",
+    "test_filesystem_export_authority_new_target_and_import_binding",
+    "test_injection_cannot_change_authority_status_or_audit",
+    "test_live_job_cancel_is_independent_of_stdio_and_cannot_publish_partial",
+    "test_modern_per_request_discovery_and_version_errors",
+    "test_modern_real_process_build_solve_reconnect_parity",
+    "test_modern_responses_match_pinned_official_schema",
+    "test_native_queued_cancel_and_service_restart_truth",
+    "test_native_steady_case_uses_explicit_environment_and_publishes_results",
+    "test_no_listener_and_publication_summary_redacts_raw_inputs",
+    "test_official_sdk_legacy_real_client",
+    "test_preview_apply_replay_undo_and_scope",
+    "test_separate_legacy_handshake_and_notifications",
+    "test_tool_discovery_is_bounded_complete_and_stable",
+    "test_wire_malformed_duplicate_nonfinite_batch_and_oversize"
+  ],
+  "analytic_temperature_tolerance_K": 0.0003,
+  "analytic_energy_tolerance_J": 1e-05,
+  "qualified": false,
+  "schema_sha256": "ef70b61f99b6d2e5e3b46863822eab08dff6a45bedc7a08914e0e5b133f40203"
+}

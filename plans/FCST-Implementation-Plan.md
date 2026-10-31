@@ -253,6 +253,17 @@ Apply this rule to every outgoing online destination, including private reposito
 6. **Keep evidence sanitized.** Scanner failures identify category and safe relative location without echoing matched secrets or private values. Bind the public clearance report to the exact outgoing byte hashes and policy version. Recheck generated changes after sanitization and before upload; release publication requires both engineering qualification and privacy clearance.
 7. **Handle existing exposure explicitly.** Stop further affected publication, revoke/rotate exposed credentials through the appropriate owner and remove exposed artifacts where authorized. Coordinate history rewrites and other destructive cleanup; changing the current file does not remove older copies. Preserve restricted incident evidence without reposting the sensitive contents.
 
+WP-14 extends TST-021 to the exact typed MCP gateway, closed schemas, launcher
+policy, durable native job adapter, official protocol schema/license and SDK
+wheel lock, owned attack/parity fixtures, bounded `mcp.json` and final GitHub
+prose. Run `tests/test_mcp.py`, `tools/check_mcp.py`, the full Windows matrix and
+privacy regressions unattended. Scan actual staged bytes, outgoing history and
+approved identities before push; CI clears the exact generated report before
+upload. Launch configurations, operational SQLite/audit databases, imported
+packages, result arrays, native binaries, screenshots and raw process/compiler
+logs stay local. Original engineering bytes remain preserved. Artifact UUIDs,
+client metadata and imported text cannot grant export authority or qualification.
+
 WP-02 implements TST-021 through `tools/publication_preflight.py`, versioned policy and pre-commit/pre-push hooks. The driver inspects actual staged blobs, every reachable commit tree, complete commit objects, author/committer/tagger identities, outgoing prose and bounded nested archives. It rejects unsupported binaries/media, links, archive traversal, encrypted/unreadable inputs and inspection limits; safe reports contain opaque location IDs and categories without matched values. Clearance binds exact outgoing byte hashes and policy version/hash. Synthetic adversarial tests include deleted-history secrets, staged/worktree differences, personal paths/contact data, credentials, private identifier hashes, nested generated outputs and safe negative cases. CI repeats the same checks; direct API publication scans its exact payload before posting. See [developer commands and limitations](../docs/development.md). Restricted originals remain local; unsupported media needs an appropriate sanitization/inspection path before publication, and pattern detection does not infer every confidential engineering meaning.
 
 WP-03 extends that executable publication boundary to the generated v1 schemas, shared types, embedded native schema table and synthetic JSON fixtures. The fast driver generates a bounded contract-conformance report with IDs and fixture hashes; both Windows jobs scan that exact report with verification/build metadata before upload. Local staged/outgoing-history and final prose scans remain mandatory. Native executables, raw compiler/reader logs, HDF5 payloads and acquired engineering originals remain local; the contract bundle does not authorize their publication. TST-021 acceptance remains `python tools/check_security.py` plus actual outgoing preflight, without new suppressions or private fixture contents.
@@ -729,6 +740,18 @@ Before implementing overlapping objects, editors or visualization, complete the 
 **Outputs:** usable workbench, inspectors, visualization, FEM component assessment/adapters and unattended host harness. **Completion:** a clean runner builds/saves/reopens a model through the UI, verifies canonical hashes and plotted values, exercises face changes and failure recovery, and completes without a person clicking through the test. Implement the applicable P0/Q1 FEM-REUSE-001/002/004/005 checks with their features; the coverage gate rejects missing assessment/API/license evidence, operation/units/mapping differences and stale fields. Spatial extensions remain WP-16.
 
 ### Step 14 — WP-14: implement typed MCP automation and policy enforcement
+
+Implementation: [local MCP gateway and declared profiles](../docs/mcp.md), with
+frozen `ci/mcp-acceptance.json` and candidate/input/worker-bound `mcp.json` from
+`tools/check_mcp.py` in both Windows verification presets. The modern profile
+uses the released 2026-07-28 metadata lifecycle and pinned upstream wire schema;
+the official `mcp==1.26.0` client independently exercises the 2025-11-25 legacy
+handshake. Native conduction case parity includes empty-project construction,
+typed editing, durable solve/reconnect, analytic temperature/energy checks,
+queued/live cancellation, interrupted-service recovery and terminal truth.
+Unavailable production mesh/radiation submission, vendor conversion and viewport
+capture are declared capabilities; no placeholder can report a successful solve.
+Integrated two-surface parity remains WP-15, and these receipts do not grant Q1.
 
 1. Add a local stdio server over the shared application operations. Verify the chosen released protocol lifecycle/SDK instead of inferring compatibility from an API method name.
 2. Publish operation-specific tool argument/result schemas, capability discovery, project inspection, typed edits/transactions, job controls, results and import/export/report tools from the specification.

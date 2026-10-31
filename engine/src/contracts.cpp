@@ -479,8 +479,21 @@ std::string thermal::inspect(std::string_view input) {
 }
 std::string thermal::inspect_steady(std::string_view input) {
   try {
-    auto model=thermal::load(input); auto model_hash=model.data().model_hash, preparation_hash=model.data().preparation_hash;
-    thermal::Assembly assembly(std::move(model)); auto result=thermal::solve_steady(assembly);
+    auto j=Parser{input}.parse();
+    const bool wrapped=j.has("thermal_input");
+    if(wrapped) {
+      if(j.obj().size()!=2 || !j.has("environment_power_W")) fail("schema");
+    }
+    auto model=thermal::load(wrapped?dump(j.at("thermal_input")):input);
+    auto model_hash=model.data().model_hash, preparation_hash=model.data().preparation_hash;
+    std::vector<thermal::PowerBinding> powers;
+    if(wrapped) for(const auto& [id,power]:j.at("environment_power_W").obj()) {
+      std::vector<double> watts;std::vector<std::size_t> nodes;
+      for(const auto& value:power.arr()) {nodes.push_back(watts.size());watts.push_back(value.num());}
+      if(watts.size()!=model.data().nodes.size())fail("dimension");
+      powers.push_back({id,thermal::PowerKind::environment,nodes,{},[watts](double,std::span<const double>,bool){return thermal::PowerEvaluation{watts,{}};}});
+    }
+    thermal::Assembly assembly(std::move(model),std::move(powers)); auto result=thermal::solve_steady(assembly);
     J::A nodes,scales;
     if (result.balance) for (std::size_t i=0;i<assembly.model().data().nodes.size();++i) {
       const auto& node=assembly.model().data().nodes[i];

@@ -12,9 +12,11 @@ dependencies = []
 
 [project.optional-dependencies]
 arrays = ["h5py==3.12.1", "numpy==2.2.3"]
+mcp = ["jsonschema==4.23.0", "h5py==3.12.1", "numpy==2.2.3"]
 
 [project.scripts]
 fcst = "fcst_cli.__main__:main"
+fcst-mcp = "fcst_mcp.__main__:main"
 
 [tool.setuptools.packages.find]
 where = ["python"]
