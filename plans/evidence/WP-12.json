@@ -1,0 +1,374 @@
+{
+  "work_package": "WP-12",
+  "status": "complete",
+  "scope": "Owned CPU diffuse-gray radiation and thermal coupling with frozen statistical and native analytical/source qualification; licensed vendor compatibility and full project Q1 remain separate.",
+  "contract": "docs/radiation-engine.md",
+  "acceptance_register": "ci/radiation-acceptance-v1.json",
+  "candidate": "b6d200e5d0a9bbde37d19262bc06652b1b7f1252",
+  "profiles": [
+    {
+      "preset": "windows-debug",
+      "candidate": "b6d200e5d0a9bbde37d19262bc06652b1b7f1252",
+      "verification_sha256": "765551544b50cbdf0a066e91b3c05cbc45827cb4bcbbef17cde85ca100db475d",
+      "radiation_sha256": "7a606720a6d23b81f1f56198d61d03bc6c6c6c51025242e89f22ab15e92ac467",
+      "verification_cases": 351,
+      "radiation_cases": 16,
+      "ensemble": {
+        "4096": 0.006444743385059139,
+        "16384": 0.0033348224406992643,
+        "65536": 0.0015466926420994263
+      },
+      "simultaneous_intervals": 576,
+      "interval_misses": 0,
+      "independent_reference": {
+        "plate_quadrature": 0.19982489569838735,
+        "quadrature_error_bound": 5.539013840639246e-15,
+        "maximum_radiosity_error": 1.0857093002414331e-11,
+        "coupled_steady_temperature_error_K": 5.4569682106375694e-11
+      },
+      "million_facet_measurements": [
+        {
+          "facets": 1000000,
+          "samples": 4096,
+          "replicate": 0,
+          "seed": 1701,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3598499840,
+          "build_seconds": 106.3870729,
+          "trace_seconds": 0.1367337,
+          "rays_per_second": 59912.07727136762,
+          "maximum_absolute_error": 0.011600885551612539,
+          "raw_sha256": "3d01fa5c8863f1a28f3a525ee7211a3935f87afcda886f7f33b6f3381f3224e6"
+        },
+        {
+          "facets": 1000000,
+          "samples": 16384,
+          "replicate": 0,
+          "seed": 1701,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3598499840,
+          "build_seconds": 106.3870729,
+          "trace_seconds": 0.3790955,
+          "rays_per_second": 86437.32252163373,
+          "maximum_absolute_error": 0.0024456121141125386,
+          "raw_sha256": "ec1c368a56477460a1041391f8792df01f83e1cbd506eb3d4d666f6d28fcf076"
+        },
+        {
+          "facets": 1000000,
+          "samples": 65536,
+          "replicate": 0,
+          "seed": 1701,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3598499840,
+          "build_seconds": 106.3870729,
+          "trace_seconds": 1.3378661,
+          "rays_per_second": 97970.94044015316,
+          "maximum_absolute_error": 0.0019420720750500386,
+          "raw_sha256": "00092bbb1b6f602ec8d2abcf13e272da8a260e9b1ea38c7d89f44f252480ab6b"
+        },
+        {
+          "facets": 1000000,
+          "samples": 4096,
+          "replicate": 1,
+          "seed": 2903,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3599433728,
+          "build_seconds": 106.085537,
+          "trace_seconds": 0.126483,
+          "rays_per_second": 64767.59722650474,
+          "maximum_absolute_error": 0.005244817573387461,
+          "raw_sha256": "8637f7007d1b81fbcd6ac2f18783bd1e8a8f7d4b2aadba2e3ae78f4e672a242a"
+        },
+        {
+          "facets": 1000000,
+          "samples": 16384,
+          "replicate": 1,
+          "seed": 2903,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3599433728,
+          "build_seconds": 106.085537,
+          "trace_seconds": 0.3673743,
+          "rays_per_second": 89195.13422686345,
+          "maximum_absolute_error": 0.0018352605516125386,
+          "raw_sha256": "7317b5d5fe225a012763e6f654a8af24fe35c941c1102219183b884325fcca0f"
+        },
+        {
+          "facets": 1000000,
+          "samples": 65536,
+          "replicate": 1,
+          "seed": 2903,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3599433728,
+          "build_seconds": 106.085537,
+          "trace_seconds": 1.3376445,
+          "rays_per_second": 97987.17073183497,
+          "maximum_absolute_error": 0.0017894841844250386,
+          "raw_sha256": "ede666e88c996178c31f63fe98aeba7f3cda67d073f6350a3b238c617c536bc8"
+        },
+        {
+          "facets": 1000000,
+          "samples": 4096,
+          "replicate": 2,
+          "seed": 4421,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3599409152,
+          "build_seconds": 110.3862209,
+          "trace_seconds": 0.1291341,
+          "rays_per_second": 63437.93002777732,
+          "maximum_absolute_error": 0.005488958198387461,
+          "raw_sha256": "82bf54a83d706a769d41a765c3d16836d9b92fa6e67d9b7068be7ca3b4ae0470"
+        },
+        {
+          "facets": 1000000,
+          "samples": 16384,
+          "replicate": 2,
+          "seed": 4421,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3599409152,
+          "build_seconds": 110.3862209,
+          "trace_seconds": 0.3693032,
+          "rays_per_second": 88729.26094331162,
+          "maximum_absolute_error": 0.0034747980421374614,
+          "raw_sha256": "aa1505b96fe5f86d0ff1f2d91968c616817916a3598257ad9a053dce1198b092"
+        },
+        {
+          "facets": 1000000,
+          "samples": 65536,
+          "replicate": 2,
+          "seed": 4421,
+          "storage_bytes": 963398546,
+          "peak_working_set_bytes": 3599409152,
+          "build_seconds": 110.3862209,
+          "trace_seconds": 1.3333755,
+          "rays_per_second": 98300.89123431471,
+          "maximum_absolute_error": 0.0007587335890124614,
+          "raw_sha256": "bade1c9a2a155484c19c5cc836721cc0106351db52ceb14e13fdf6b1e809c14b"
+        }
+      ],
+      "input_sha256": {
+        "ci/radiation-acceptance-v1.json": "c79359d9cd18961f183be0531352a5a3d2b6b3e0e72befdbce3942de24c3d3f8",
+        "ci/numerical-criteria-v1.json": "ade493eba9c1f67ebbb501dffb7190d2f2c882ef2df367b699c1abb95a3b2c5c",
+        "tools/check_radiation.py": "4bc8e6d59dd49307aca9fd024ea730a68a49ce91a7f38a66813d7041b11b1462",
+        "python/fcst_tools/radiation.py": "14de1b2297a72027ad76841843db226e9dea7bb7e9d6f90773d26eeadf901000",
+        "engine/src/radiation.cpp": "b809ced42258c7123ddcf8fbbb2faf6dc7fb54dd45a199f862ad7ed38bab08e5",
+        "engine/src/radiation_loading.inc": "b34f99e6693c22282e5e78973e80c421bc157b4ad93775d9ebdf06110766f8b2",
+        "engine/include/fcst/radiation.hpp": "9e1689fa2f9da1dffc7e65ab23ffe4b411f3a8a19ed14fc9dddaacbcc38df452",
+        "engine/tests/radiation_fixtures.hpp": "09c985d33107028aa34adb3fa2122a01ec312bed16018c45518a726b0105d8ee",
+        "engine/tests/radiation_tests.cpp": "691b765e830342085729aa856ee03c2fe8830dac5cb262cd8b476af6a49de581",
+        "engine/tests/radiation_subject.cpp": "c4c15e60ad655a2d20aad25e04315853996e8d665c94bdcf33158e7d6d8f665d",
+        "tests/fixtures/radiation/plates.json": "98453d802d19bda60a5d7e59ea116f302218684aa11949e83abf5c5e42b5727a",
+        "tests/fixtures/radiation/steady.json": "458867e98448d9b102f7b22728612e37378a4d46c046177aef5d0704ce1be293"
+      }
+    },
+    {
+      "preset": "windows-release",
+      "candidate": "b6d200e5d0a9bbde37d19262bc06652b1b7f1252",
+      "verification_sha256": "f30b6ef326e5124480e278c450c6a25cf95583d2b7949c22e533713283799e49",
+      "radiation_sha256": "f01584f7ac9ab0b57cf85c869b1733e5e5f7956233edb3dc156918ea90a5ad37",
+      "verification_cases": 351,
+      "radiation_cases": 16,
+      "ensemble": {
+        "4096": 0.006444743385059139,
+        "16384": 0.0033348224406992643,
+        "65536": 0.0015466926420994263
+      },
+      "simultaneous_intervals": 576,
+      "interval_misses": 0,
+      "independent_reference": {
+        "plate_quadrature": 0.19982489569838735,
+        "quadrature_error_bound": 5.539013840639246e-15,
+        "maximum_radiosity_error": 1.0857093002414331e-11,
+        "coupled_steady_temperature_error_K": 5.4569682106375694e-11
+      },
+      "million_facet_measurements": [
+        {
+          "facets": 1000000,
+          "samples": 4096,
+          "replicate": 0,
+          "seed": 1701,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380761600,
+          "build_seconds": 5.412035,
+          "trace_seconds": 0.0560591,
+          "rays_per_second": 146131.49337038945,
+          "maximum_absolute_error": 0.011600885551612539,
+          "raw_sha256": "0e12e4ff0f6b35df29ff4847f601b9d4eb305094e0bb475b80ba8b5e5204e594"
+        },
+        {
+          "facets": 1000000,
+          "samples": 16384,
+          "replicate": 0,
+          "seed": 1701,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380761600,
+          "build_seconds": 5.412035,
+          "trace_seconds": 0.0853256,
+          "rays_per_second": 384034.8031540358,
+          "maximum_absolute_error": 0.0024456121141125386,
+          "raw_sha256": "6bb9e009fcffd9b4982d25c4b82db8ffce9346e22a9be38462d64788e8a7296b"
+        },
+        {
+          "facets": 1000000,
+          "samples": 65536,
+          "replicate": 0,
+          "seed": 1701,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380761600,
+          "build_seconds": 5.412035,
+          "trace_seconds": 0.256031,
+          "rays_per_second": 511938.00750690344,
+          "maximum_absolute_error": 0.0019420720750500386,
+          "raw_sha256": "bb37ac6307d938ff9e53cf12aa6828db914a2d8f8e895ca8c372ccee5d409929"
+        },
+        {
+          "facets": 1000000,
+          "samples": 4096,
+          "replicate": 1,
+          "seed": 2903,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380712448,
+          "build_seconds": 4.8327868,
+          "trace_seconds": 0.0443706,
+          "rays_per_second": 184626.7573573492,
+          "maximum_absolute_error": 0.005244817573387461,
+          "raw_sha256": "b78f43a6b61e66af3de273644fb9240aeb71200e348700542873176c7c27ea9d"
+        },
+        {
+          "facets": 1000000,
+          "samples": 16384,
+          "replicate": 1,
+          "seed": 2903,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380712448,
+          "build_seconds": 4.8327868,
+          "trace_seconds": 0.0801393,
+          "rays_per_second": 408888.0237286824,
+          "maximum_absolute_error": 0.0018352605516125386,
+          "raw_sha256": "6d7aa54d47c5fa28816c821046cabbf229e691e1eb9d1cd201bdab876e165c8b"
+        },
+        {
+          "facets": 1000000,
+          "samples": 65536,
+          "replicate": 1,
+          "seed": 2903,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380712448,
+          "build_seconds": 4.8327868,
+          "trace_seconds": 0.2559635,
+          "rays_per_second": 512073.0104096873,
+          "maximum_absolute_error": 0.0017894841844250386,
+          "raw_sha256": "2186434969379130ef1bcc8dea45e5a7c49fda32d8b213ca66123b34618c61f0"
+        },
+        {
+          "facets": 1000000,
+          "samples": 4096,
+          "replicate": 2,
+          "seed": 4421,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380708352,
+          "build_seconds": 4.744595,
+          "trace_seconds": 0.0389688,
+          "rays_per_second": 210219.45761737597,
+          "maximum_absolute_error": 0.005488958198387461,
+          "raw_sha256": "b215cf89de1b4fa8448e624536b7ae3e454675658c47528c673b91173c744e7f"
+        },
+        {
+          "facets": 1000000,
+          "samples": 16384,
+          "replicate": 2,
+          "seed": 4421,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380708352,
+          "build_seconds": 4.744595,
+          "trace_seconds": 0.0989793,
+          "rays_per_second": 331059.1204423551,
+          "maximum_absolute_error": 0.0034747980421374614,
+          "raw_sha256": "dc064fa771491c54fe7d5bdd116714436e7f2f3127285b857fd2ec9c0b70d0cc"
+        },
+        {
+          "facets": 1000000,
+          "samples": 65536,
+          "replicate": 2,
+          "seed": 4421,
+          "storage_bytes": 875398370,
+          "peak_working_set_bytes": 1380708352,
+          "build_seconds": 4.744595,
+          "trace_seconds": 0.2512877,
+          "rays_per_second": 521601.3358393586,
+          "maximum_absolute_error": 0.0007587335890124614,
+          "raw_sha256": "877781eefc3f859f9abba011df1606237f478e82b2214dc8796d847d9b9bdfd3"
+        }
+      ],
+      "input_sha256": {
+        "ci/radiation-acceptance-v1.json": "c79359d9cd18961f183be0531352a5a3d2b6b3e0e72befdbce3942de24c3d3f8",
+        "ci/numerical-criteria-v1.json": "ade493eba9c1f67ebbb501dffb7190d2f2c882ef2df367b699c1abb95a3b2c5c",
+        "tools/check_radiation.py": "4bc8e6d59dd49307aca9fd024ea730a68a49ce91a7f38a66813d7041b11b1462",
+        "python/fcst_tools/radiation.py": "14de1b2297a72027ad76841843db226e9dea7bb7e9d6f90773d26eeadf901000",
+        "engine/src/radiation.cpp": "b809ced42258c7123ddcf8fbbb2faf6dc7fb54dd45a199f862ad7ed38bab08e5",
+        "engine/src/radiation_loading.inc": "b34f99e6693c22282e5e78973e80c421bc157b4ad93775d9ebdf06110766f8b2",
+        "engine/include/fcst/radiation.hpp": "9e1689fa2f9da1dffc7e65ab23ffe4b411f3a8a19ed14fc9dddaacbcc38df452",
+        "engine/tests/radiation_fixtures.hpp": "09c985d33107028aa34adb3fa2122a01ec312bed16018c45518a726b0105d8ee",
+        "engine/tests/radiation_tests.cpp": "691b765e830342085729aa856ee03c2fe8830dac5cb262cd8b476af6a49de581",
+        "engine/tests/radiation_subject.cpp": "c4c15e60ad655a2d20aad25e04315853996e8d665c94bdcf33158e7d6d8f665d",
+        "tests/fixtures/radiation/plates.json": "98453d802d19bda60a5d7e59ea116f302218684aa11949e83abf5c5e42b5727a",
+        "tests/fixtures/radiation/steady.json": "458867e98448d9b102f7b22728612e37378a4d46c046177aef5d0704ce1be293"
+      }
+    }
+  ],
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed"
+    },
+    {
+      "id": "windows-release",
+      "status": "passed"
+    }
+  ],
+  "blockers": [],
+  "remaining_project_gates": [
+    "WP-17 moving geometry and environmental loads",
+    "WP-20 advanced optics",
+    "WP-19 licensed TD/ESATAN paired compatibility",
+    "WP-13 GUI and WP-14 automation integration"
+  ],
+  "publication_privacy": "TST-021 scans staged sources fixtures criteria docs and evidence plus all outgoing history approved identities generated reports and final GitHub prose; raw meshes trajectories binaries debug files logs and engineering originals remain local.",
+  "requirements": {
+    "ARC-007": [
+      "intersections",
+      "worker-replay"
+    ],
+    "RAD-001": [
+      "geometry-mapping",
+      "occlusion-groups",
+      "black-gray-sphere"
+    ],
+    "RAD-002": [
+      "exchange-correction",
+      "fixed-ensemble"
+    ],
+    "RAD-003": [
+      "seed-streams",
+      "worker-replay",
+      "fixed-ensemble"
+    ],
+    "RAD-004": [
+      "geometry-mapping",
+      "black-gray-sphere",
+      "limits-failures"
+    ],
+    "PHY-007": [
+      "thermal-coupling",
+      "worker-coupled-steady"
+    ],
+    "VNV-010": [
+      "fixed-ensemble"
+    ],
+    "TST-011": [
+      "fixed-ensemble"
+    ],
+    "TST-021": [
+      "staged-history-identity-report-and-prose-preflight"
+    ]
+  }
+}

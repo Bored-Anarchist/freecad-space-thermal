@@ -689,6 +689,10 @@ presets and the candidate-bound foundation handoff require this acceptance.
 Specular/transmissive optics, moving environments, durable solver jobs, GUI wiring
 and licensed vendor compatibility retain their separately mapped gates.
 
+[Completion evidence](evidence/WP-12.json) records both Windows verification
+configurations, all 576 simultaneous intervals, independent numerical comparisons
+and measured scaling through one million facets on the tested implementation.
+
 1. Build radiation meshes with facet/surface/node identity maps, orientation, front/back activation, groups/exclusions and optical assignments. Detect invalid geometry and mapping areas before tracing.
 2. Implement a CPU intersection abstraction and BVH/intersection backend. Test geometric intersections independently from radiative estimators.
 3. Implement seeded sampling, ray distributions, occlusion, escape and a documented view-factor estimator. Assign reproducible streams to stable work identities; thread scheduling must not silently change the reference experiment.
