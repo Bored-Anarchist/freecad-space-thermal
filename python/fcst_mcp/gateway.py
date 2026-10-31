@@ -35,17 +35,23 @@ class Gateway:
         m=self.store.snapshot()
         return dict(project_id=m['project_id'],revision=m['revision'],semantic_hash=semantic_hash(m),entity_count=len(m['entities']))
 
-    def audit(self,name,args,before,outcome):
+    def audit(self,name,args,before,outcome,sequence=None):
         after=self.store.snapshot()['revision']
         event=dict(actor=self.policy.actor,provider=self.policy.provider,tool=name,version=VERSION,
             argument_sha256=sha256(encode(args)).hexdigest(),before_revision=before,after_revision=after,
             changes=[h['after_hash'] for h in self.store.state()['history'] if before<h['revision']<=after],outcome=outcome)
-        self.db.execute('INSERT INTO mcp_audit(data) VALUES(?)',(encode(event),))
+        if sequence is None:
+            return self.db.execute('INSERT INTO mcp_audit(data) VALUES(?)',(encode(event),)).lastrowid
+        self.db.execute('UPDATE mcp_audit SET data=? WHERE sequence=?',(encode(event),sequence))
 
     def call(self,name,args):
         before=self.store.snapshot()['revision']
-        # Reserve audit capacity before any consequential operation.
-        if self.db.execute('SELECT count(*) FROM mcp_audit').fetchone()[0]>=10000: reject('audit_capacity')
+        # Reserve a durable event under a write lock before any operation. A
+        # crash can leave an incomplete event, never an unrecorded mutation or
+        # a fabricated success. Canonical history/idempotency recover its effect.
+        with self.store.transaction():
+            if self.db.execute('SELECT count(*) FROM mcp_audit').fetchone()[0]>=10000: reject('audit_capacity')
+            sequence=self.audit(name,args,before,'in_progress')
         try:
             if name not in TOOLS: reject('unsupported_operation')
             checked(TOOLS[name]['inputSchema'],args)
@@ -56,7 +62,7 @@ class Gateway:
             result=self.execute(name,deepcopy(args))
             checked(TOOLS[name]['outputSchema'],result)
             if len(encode(result))>self.policy.max_response_bytes//2: reject('response_limit')
-            self.audit(name,args,before,'succeeded')
+            self.audit(name,args,before,'succeeded',sequence)
             return result
         except Exception as error:
             from fcst_app.persistence import PersistenceError
@@ -64,7 +70,7 @@ class Gateway:
             from fcst_exchange import ExchangeError
             code=error.code if isinstance(error,(PersistenceError,ExchangeError)) else (
                 error.diagnostic.code if isinstance(error,ContractError) else 'operation_failed')
-            self.audit(name,args,before,code)
+            self.audit(name,args,before,code,sequence)
             if isinstance(error,(PersistenceError,ContractError,ExchangeError)): raise
             reject(code)
 

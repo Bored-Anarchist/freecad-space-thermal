@@ -124,6 +124,26 @@ class MCPTests(unittest.TestCase):
         self.assertEqual(records[-1]['outcome'],'authorization_required')
         self.assertFalse(self.policy.allow_export)
 
+    def test_audit_reservation_survives_interrupted_committed_edit_and_replay(self):
+        from unittest.mock import patch
+        class AbruptExit(BaseException):pass
+        execute=self.gateway.execute
+        def crash(name,args):
+            execute(name,args)
+            raise AbruptExit()
+        with patch.object(self.gateway,'execute',side_effect=crash):
+            with self.assertRaises(AbruptExit):self.edit()
+        self.assertEqual(self.store.snapshot()['revision'],1)
+        row=json.loads(self.store.db.execute('SELECT data FROM mcp_audit').fetchone()[0])
+        self.assertEqual(row['outcome'],'in_progress')
+        self.assertEqual(row['actor'],self.policy.actor)
+        result=self.edit()
+        self.assertEqual(result['revision'],1)
+        self.assertEqual(self.store.snapshot()['revision'],1)
+        rows=[json.loads(r[0]) for r in self.store.db.execute('SELECT data FROM mcp_audit ORDER BY sequence')]
+        self.assertEqual(rows[-1]['outcome'],'succeeded')
+        self.assertEqual(rows[0]['argument_sha256'],rows[-1]['argument_sha256'])
+
     def test_bounded_pagination_and_versioned_resource_authorization(self):
         seen=[];offset=0
         while True:

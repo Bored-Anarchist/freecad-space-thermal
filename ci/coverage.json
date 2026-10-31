@@ -134,6 +134,7 @@
     "test_jobs.JobTests.test_queued_cancellation_and_terminal_callbacks_are_idempotent",
     "test_jobs.JobTests.test_restart_lease_and_linked_fresh_attempt",
     "test_mcp.MCPTests.test_artifact_uuid_access_checks_actor_case_revision_and_byte_pages",
+    "test_mcp.MCPTests.test_audit_reservation_survives_interrupted_committed_edit_and_replay",
     "test_mcp.MCPTests.test_bounded_pagination_and_versioned_resource_authorization",
     "test_mcp.MCPTests.test_budget_and_readonly_policy_fail_before_submission",
     "test_mcp.MCPTests.test_candidate_bound_gate_rejects_missing_substituted_or_changed_evidence",
