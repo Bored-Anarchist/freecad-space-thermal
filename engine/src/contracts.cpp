@@ -493,6 +493,8 @@ std::string thermal::inspect_steady(std::string_view input) {
       {"outcome",J(std::string(thermal::status_code(result.solve.status)))},
       {"reason",J(std::string(thermal::reason_code(result.solve.diagnostics.reason)))},
       {"model_hash",J(model_hash)},{"preparation_hash",J(preparation_hash)},
+      {"backend",J(J::O{{"execution_mode",J("fcst_native")},{"external_reference",J(false)},
+        {"source_revision",J(thermal::thermal_backend_capabilities().source_revision)}})},
       {"iterations",J(static_cast<double>(result.solve.iterations))},
       {"evaluations",J(static_cast<double>(result.solve.diagnostics.evaluations))},
       {"rejected_trials",J(static_cast<double>(result.solve.diagnostics.rejected_trials))},

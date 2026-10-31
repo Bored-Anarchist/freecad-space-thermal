@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "host_profile": "ci/host-profile.json",
+  "graphics": {
+    "mode": "bundled_mesa",
+    "source": "bin/opengl32sw.dll",
+    "alias": "bin/opengl32.dll",
+    "sha256": "38870631e23fe7f7c1f5a1981d4ffa70bbd147caff31d4c1c4f1ef8cf5ff4860",
+    "policy": "Use only the software OpenGL library from the hash-verified official host bundle; retain all original bundle bytes and notices; alias only in the isolated test cache."
+  },
+  "required_cases": [
+    "FEM-REUSE-001",
+    "FEM-REUSE-002",
+    "FEM-REUSE-004",
+    "FEM-REUSE-005",
+    "HOST-EDITORS",
+    "HOST-UNDO-HISTORY",
+    "HOST-CREATE",
+    "HOST-FRAME",
+    "HOST-PACKAGE-RECOVERY",
+    "HOST-MULTI-DOCUMENT",
+    "HOST-SELECTION",
+    "HOST-SOLVE",
+    "HOST-CANCEL",
+    "HOST-ASYNC-RACE",
+    "HOST-SAVE-RECOVERY",
+    "HOST-TOPOLOGY",
+    "HOST-THREAD",
+    "HOST-RENDER"
+  ],
+  "criteria": {
+    "temperature_absolute_K": 0.01,
+    "energy_absolute_J": 1e-07,
+    "deadline_seconds": 240,
+    "minimum_coloured_chart_pixels": 40,
+    "minimum_contour_coloured_pixels_per_band": 100,
+    "screenshot_role": "local supplementary rendering evidence only"
+  },
+  "remaining_spatial_qualification": "Production meshing, FD/FE and spatial assignments remain WP-16; FEM-REUSE-003/006 are not satisfied by host display tests.",
+  "progress_phases": [
+    "fem_create",
+    "fem_colour_setter",
+    "fem_save_reopen",
+    "field_native_solve",
+    "spatial_import",
+    "spatial_temperature",
+    "spatial_vectors",
+    "spatial_normals",
+    "spatial_axes",
+    "spatial_capture",
+    "multi_document",
+    "dataset_restore",
+    "final_render"
+  ]
+}

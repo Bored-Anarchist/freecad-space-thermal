@@ -54,6 +54,15 @@ The [FCST implementation project](https://github.com/users/Bored-Anarchist/proje
 
 ## Publication privacy (TST-021)
 
+WP-13's [FreeCAD workbench](freecad-workbench.md) runs installed, isolated host
+acceptance in both Windows presets. Scan exact host adapters, synthetic templates,
+source/license assessments, bounded `host.json` reports, completion evidence and
+final publication prose before upload, together with staged bytes, outgoing
+history and approved identities. The aggregate gate binds host coverage and
+source hashes to the candidate and the thermal acceptance worker. Generated CAD,
+portable projects, spatial/results, screenshots, preferences, operational SQLite
+stores, binaries and raw process logs remain local. Preserve all restricted originals.
+
 Policy v6 recognizes GitHub's exact public service identity only as a committer.
 Maintainer author and annotated-tagger identities still require the existing
 approved maintainer list. Other names/emails and case variants reject. The public

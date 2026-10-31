@@ -1,0 +1,126 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+"""Unattended installed-workbench acceptance on the exact pinned Windows host."""
+import argparse
+from hashlib import sha256
+import json
+import os
+import re
+import shutil
+from pathlib import Path
+import subprocess
+import sys
+import uuid
+from profile_support import ROOT, run, revision
+from install_workbench import install
+
+sys.path.insert(0,str(ROOT/'python'))
+from fcst_tools.gate import evaluate
+
+
+def input_hashes():
+    paths=[p for folder in ('python/fcst_host','python/fcst_app','python/fcst_contracts','freecad/FCST') for p in (ROOT/folder).rglob('*') if p.suffix in ('.py','.json')]
+    paths += [ROOT/p for p in ('tools/check_host.py','tools/host_acceptance_payload.py','tools/install_workbench.py','tools/profile_support.py','tools/host_smoke.py','tools/host_smoke_payload.py','ci/host-acceptance.json','ci/host-reuse.json','ci/fem-reuse.json','ci/host-profile.json','tests/test_host.py','engine/src/contracts.cpp','tests/fixtures/contracts/network.json','tests/fixtures/spatial/solid-surface-rotated.json')]
+    paths += [ROOT/'LICENSE',*(ROOT/'LICENSES').glob('*.txt')]
+    return {p.relative_to(ROOT).as_posix():sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
+
+
+def assess(report, candidate, inputs, policy):
+    if (report.get('candidate')!=candidate or report.get('input_sha256')!=inputs
+            or report.get('gate',{}).get('status')!='passed'
+            or evaluate(policy['required_cases'],report.get('cases',[]))['status']!='passed'
+            or report.get('host_version')!=['1','1','4'] or report.get('python_abi')!='cp311'
+            or report.get('spatial_solver_qualified') is not False):
+        raise ValueError('host_acceptance_incomplete_or_stale')
+
+
+def check(worker, report):
+    report.unlink(missing_ok=True)
+    frozen_inputs=input_hashes()
+    candidate=revision()
+    import host_smoke
+    host_smoke.main()
+    policy=json.loads((ROOT/'ci/host-acceptance.json').read_bytes())
+    profile=json.loads((ROOT/'ci/host-profile.json').read_bytes())
+    folder=ROOT/'.local/wp13'/uuid.uuid4().hex; folder.mkdir(parents=True)
+    (folder/'tmp').mkdir()
+    addon=install(folder/'Mod')
+    hosts=list((ROOT/'.local/host/Windows/bundle').rglob('FreeCAD.exe'))
+    hosts=[p for p in hosts if p.parent.name.lower()=='bin']
+    if len(hosts)!=1: raise ValueError('ambiguous_host')
+    host=hosts[0]
+    graphics=policy['graphics'];software=host.parent/'opengl32sw.dll';alias=host.parent/'opengl32.dll'
+    if sha256(software.read_bytes()).hexdigest()!=graphics['sha256']:raise ValueError('host_graphics_lock')
+    if alias.exists():
+        if sha256(alias.read_bytes()).hexdigest()!=graphics['sha256']:raise ValueError('host_graphics_alias_mismatch')
+    else:shutil.copyfile(software,alias)
+    manifest=json.loads((ROOT/'ci/fem-reuse.json').read_bytes())
+    for group in manifest['groups']:
+        for entry in group['files']:
+            raw=(host.parent.parent/entry['asset_path']).read_bytes()
+            if sha256(raw).hexdigest()!=entry['sha256'] or sha256(b''.join(raw.splitlines(keepends=True)[:30])).hexdigest()!=entry['notice_sha256']:
+                raise ValueError('host_source_license_mismatch')
+    worker=Path(worker).resolve()
+    worker_hash=sha256(worker.read_bytes()).hexdigest()
+    identity=subprocess.run([str(worker),'--build-info'],capture_output=True,timeout=30)
+    if identity.returncode or json.loads(identity.stdout)['source_revision']!=candidate:
+        raise ValueError('host_worker_candidate_mismatch')
+    macro=folder/'acceptance.FCMacro'
+    macro.write_text('import os\nfrom pathlib import Path\nexec(compile(Path(os.environ["FCST_HOST_PAYLOAD"]).read_text(encoding="utf-8"), "host_acceptance_payload.py", "exec"))\n')
+    env=dict(os.environ,FCST_HOST_PAYLOAD=str(ROOT/'tools/host_acceptance_payload.py'),
+        FCST_HOST_OUTPUT=str(folder),FCST_HOST_ADDON=str(addon),FCST_HOST_ROOT=str(ROOT),
+        FCST_HOST_WORKER=str(worker),QT_QPA_PLATFORM='windows',QT_OPENGL='desktop',OMP_NUM_THREADS='1',
+        TEMP=str(folder/'tmp'),TMP=str(folder/'tmp'))
+    for key in ('PYTHONPATH','PYTHONHOME'): env.pop(key,None)
+    try:
+        run([str(host),str(macro),'--user-cfg',str(folder/'user.cfg'),'--system-cfg',str(folder/'system.cfg')],
+            folder,folder/'host.log',env=env,timeout=policy['criteria']['deadline_seconds'])
+    except Exception as error:
+        records=[]
+        try:
+            progress=json.loads((folder/'progress.json').read_bytes())
+            records=[dict(id=r['id'],status=r['status']) for r in progress
+                if r.get('id') in policy['required_cases'] and r.get('status') in ('passed','failed')]
+        except (ValueError,OSError,KeyError,TypeError):pass
+        reason='timeout' if isinstance(error,subprocess.TimeoutExpired) else 'gui_process_failed'
+        failure=dict(reason=reason,phase='tests_started' if (folder/'started.json').is_file() else 'gui_startup',
+                     last_completed_case=records[-1]['id'] if records else None)
+        try:
+            phase=json.loads((folder/'stage.json').read_bytes()).get('phase')
+            if phase in policy['progress_phases']:failure['phase']=phase
+        except (ValueError,OSError,AttributeError):pass
+        try:
+            trace=(folder/'payload-error.log').read_text(encoding='utf-8')
+            lines=re.findall(r'File "host_acceptance_payload.py", line ([0-9]+)',trace)
+            if lines:failure['payload_line']=int(lines[-1])
+        except OSError:pass
+        bounded=dict(candidate=candidate,input_sha256=frozen_inputs,cases=records,
+            gate=evaluate(policy['required_cases'],records),failure=failure,spatial_solver_qualified=False,
+            host_version=[],python_abi=None,asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash)
+        report.parent.mkdir(parents=True,exist_ok=True);report.write_text(json.dumps(bounded,indent=2)+'\n')
+        print(json.dumps(dict(host_failure=failure)),flush=True)
+        raise
+    data=json.loads((folder/'host.json').read_bytes())
+    if input_hashes()!=frozen_inputs or revision()!=candidate or sha256(worker.read_bytes()).hexdigest()!=worker_hash:
+        raise ValueError('host_sources_changed_during_acceptance')
+    data.update(candidate=candidate,input_sha256=frozen_inputs,
+        asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash,
+        graphics='bundled_mesa',graphics_sha256=graphics['sha256'])
+    data['gate']=evaluate(policy['required_cases'],data['cases'])
+    assess(data,revision(),input_hashes(),policy)
+    report.parent.mkdir(parents=True,exist_ok=True)
+    report.write_text(json.dumps(data,indent=2)+'\n')
+    print('WP-13 installed host acceptance: passed',flush=True)
+
+
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--worker',type=Path,required=True)
+    parser.add_argument('--report',type=Path,default=ROOT/'.local/wp13/host.json')
+    args=parser.parse_args()
+    try: check(args.worker,args.report)
+    except Exception:
+        print('WP-13 host acceptance: failed; raw diagnostics retained locally')
+        import traceback
+        failure=ROOT/'.local/wp13/supervisor-error.log'; failure.parent.mkdir(parents=True,exist_ok=True)
+        failure.write_text(traceback.format_exc())
+        raise SystemExit(1)

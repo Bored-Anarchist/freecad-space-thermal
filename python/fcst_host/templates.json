@@ -1,0 +1,284 @@
+{
+  "submodel": {
+    "id": "00000000-0000-4000-8000-000000000003",
+    "kind": "submodel"
+  },
+  "node": {
+    "id": "00000000-0000-4000-8000-000000000005",
+    "kind": "node",
+    "submodel_id": "00000000-0000-4000-8000-000000000003",
+    "classification": "prescribed",
+    "temperature": {
+      "value": 300,
+      "unit": "K"
+    },
+    "capacity": {
+      "value": 0,
+      "unit": "J/K"
+    }
+  },
+  "conductor": {
+    "id": "00000000-0000-4000-8000-000000000006",
+    "kind": "conductor",
+    "from_node_id": "00000000-0000-4000-8000-000000000004",
+    "to_node_id": "00000000-0000-4000-8000-000000000005",
+    "conductance": {
+      "value": 2,
+      "unit": "W/K"
+    }
+  },
+  "frame": {
+    "id": "00000000-0000-4000-8000-000000000008",
+    "kind": "frame",
+    "origin": [
+      {
+        "value": 1,
+        "unit": "in"
+      },
+      {
+        "value": 0,
+        "unit": "mm"
+      },
+      {
+        "value": -0.0,
+        "unit": "m"
+      }
+    ],
+    "rotation": [
+      [
+        0,
+        -1,
+        0
+      ],
+      [
+        1,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        1
+      ]
+    ]
+  },
+  "geometry": {
+    "id": "00000000-0000-4000-8000-000000000009",
+    "kind": "geometry",
+    "frame_id": "00000000-0000-4000-8000-000000000008",
+    "artifact": {
+      "path": "geometry/body.brep",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "byte_length": 0
+    },
+    "revision": 1
+  },
+  "face": {
+    "id": "00000000-0000-4000-8000-000000000010",
+    "kind": "face",
+    "geometry_id": "00000000-0000-4000-8000-000000000009",
+    "persistent_ref": "face-1",
+    "signature": "1111111111111111111111111111111111111111111111111111111111111111",
+    "area": {
+      "value": 1,
+      "unit": "m2"
+    }
+  },
+  "mesh": {
+    "id": "00000000-0000-4000-8000-000000000012",
+    "kind": "mesh",
+    "frame_id": "00000000-0000-4000-8000-000000000008",
+    "artifact": {
+      "path": "arrays/elements.h5",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "byte_length": 0
+    },
+    "role": "conduction"
+  },
+  "material": {
+    "id": "00000000-0000-4000-8000-000000000013",
+    "kind": "material",
+    "density": {
+      "value": 1000,
+      "unit": "kg/m3"
+    },
+    "specific_heat": {
+      "value": 100,
+      "unit": "J/(kg*K)"
+    },
+    "conductivity": {
+      "value": 2,
+      "unit": "W/(m*K)"
+    },
+    "conductivity_tensor": [
+      [
+        2,
+        0,
+        0
+      ],
+      [
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        0,
+        4
+      ]
+    ],
+    "frame_id": "00000000-0000-4000-8000-000000000008",
+    "valid_temperature": [
+      {
+        "value": 0,
+        "unit": "K"
+      },
+      {
+        "value": 1000,
+        "unit": "K"
+      }
+    ]
+  },
+  "optics": {
+    "id": "00000000-0000-4000-8000-000000000014",
+    "kind": "optics",
+    "solar_absorptivity": 0.5,
+    "ir_emissivity": 0.8,
+    "specular_fraction": 0.1,
+    "transmissivity": 0.1
+  },
+  "facet": {
+    "id": "00000000-0000-4000-8000-000000000015",
+    "kind": "facet",
+    "mesh_id": "00000000-0000-4000-8000-000000000011",
+    "area": {
+      "value": 1,
+      "unit": "m2"
+    },
+    "side": "front",
+    "optics_id": "00000000-0000-4000-8000-000000000014"
+  },
+  "element": {
+    "id": "00000000-0000-4000-8000-000000000016",
+    "kind": "element",
+    "mesh_id": "00000000-0000-4000-8000-000000000012",
+    "material_id": "00000000-0000-4000-8000-000000000013",
+    "frame_id": "00000000-0000-4000-8000-000000000008",
+    "volume": 1,
+    "topology": "tetrahedron"
+  },
+  "load": {
+    "id": "00000000-0000-4000-8000-000000000017",
+    "kind": "load",
+    "node_id": "00000000-0000-4000-8000-000000000004",
+    "power": {
+      "value": 2000,
+      "unit": "mW"
+    },
+    "expression_id": "00000000-0000-4000-8000-000000000018"
+  },
+  "expression": {
+    "id": "00000000-0000-4000-8000-000000000023",
+    "kind": "expression",
+    "dimension": "power",
+    "ast": {
+      "op": "table",
+      "input": {
+        "op": "literal",
+        "quantity": {
+          "value": 0,
+          "unit": "s"
+        }
+      },
+      "x": [
+        {
+          "value": 0,
+          "unit": "s"
+        },
+        {
+          "value": 1,
+          "unit": "min"
+        }
+      ],
+      "y": [
+        {
+          "value": 1,
+          "unit": "W"
+        },
+        {
+          "value": 2000,
+          "unit": "mW"
+        }
+      ],
+      "interpolation": "previous",
+      "extrapolation": "error",
+      "discontinuities": [
+        1
+      ]
+    }
+  },
+  "environment": {
+    "id": "00000000-0000-4000-8000-000000000019",
+    "kind": "environment",
+    "frame_id": "00000000-0000-4000-8000-000000000008",
+    "background_temperature": {
+      "value": 3,
+      "unit": "K"
+    },
+    "solar_flux": {
+      "value": 1360,
+      "unit": "W/m2"
+    },
+    "epoch": "2000-01-01T12:00:00",
+    "time_scale": "TAI",
+    "time_origin": {
+      "value": 0,
+      "unit": "s"
+    }
+  },
+  "radiation": {
+    "id": "00000000-0000-4000-8000-000000000020",
+    "kind": "radiation",
+    "facet_ids": [
+      "00000000-0000-4000-8000-000000000015"
+    ],
+    "environment_id": "00000000-0000-4000-8000-000000000019",
+    "method": "diffuse",
+    "excluded_facet_ids": []
+  },
+  "control": {
+    "id": "00000000-0000-4000-8000-000000000021",
+    "kind": "control",
+    "sensor_node_id": "00000000-0000-4000-8000-000000000004",
+    "load_id": "00000000-0000-4000-8000-000000000017",
+    "on_below": {
+      "value": 20,
+      "unit": "degC"
+    },
+    "off_above": {
+      "value": 22,
+      "unit": "degC"
+    }
+  },
+  "case": {
+    "id": "00000000-0000-4000-8000-000000000022",
+    "kind": "case",
+    "mode": "transient",
+    "start": {
+      "value": 0,
+      "unit": "s"
+    },
+    "end": {
+      "value": 1,
+      "unit": "min"
+    },
+    "environment_id": "00000000-0000-4000-8000-000000000019",
+    "load_ids": [
+      "00000000-0000-4000-8000-000000000017"
+    ],
+    "control_ids": [
+      "00000000-0000-4000-8000-000000000021"
+    ],
+    "overlays": []
+  }
+}
