@@ -18,7 +18,7 @@ WP-02 supplies a C++20 worker skeleton and standalone Python application/CLI/MCP
 Create an isolated Python 3.11 environment under `.local/venv`, activate it, and run:
 
 ```text
-python -m pip install --require-hashes --only-binary=:all: -r ci/requirements.lock
+python -m pip install --require-hashes --only-binary=:all: -r ci/requirements.lock -r ci/mcp-requirements.lock
 python tools/verify.py --tier fast --preset windows-debug
 ```
 
@@ -153,3 +153,7 @@ python tools/publication_preflight.py --file release-notes.md --file package.zip
 The scanner detects credential/contact/path/network patterns, hashed project-private identifiers, restricted paths, unapproved commit identities and nested archive findings. It bounds archive size/count/depth and rejects traversal, links and encrypted inputs. Unknown binaries, images, document containers and unsupported encodings fail closed until a suitable sanitization/inspection path exists; they are not cleared by their filename. Safe reports contain categories, opaque location IDs, byte counts and hashes, never sensitive matched values. Keep reports local until they themselves pass preflight. Narrow exceptions must bind exact content hashes and categories and retain required public license attribution.
 
 Pattern scanning cannot infer all confidential engineering meaning. Use synthetic public fixtures and exclude restricted originals. Add hashes of private identifiers to the policy without publishing their raw values, and review the outgoing content classification. Do not weaken detection to force publication. If previously published content is exposed, address credentials and coordinate affected history/artifact cleanup explicitly.
+
+WP-14 adds [typed local MCP automation](mcp.md), independent modern/legacy
+client profiles and native thermal HDF5 job publication through its adapter.
+The fast driver requires candidate-bound MCP acceptance in both configurations.

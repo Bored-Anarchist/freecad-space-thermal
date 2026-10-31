@@ -63,7 +63,7 @@ std::string thermal::inspect_transient(std::string_view input) {
     const auto& settings=j.at("transient");execution_keys(settings,{"start","end","output_times"},
       {"initial_step","minimum_step","maximum_step","absolute_temperature_tolerance","relative_temperature_tolerance",
        "absolute_energy_tolerance","relative_energy_tolerance","event_time_tolerance","minimum_event_separation",
-       "maximum_attempts","maximum_events","maximum_newton_iterations","temperature_tolerances","schedules","maximum_result_values"});
+       "maximum_attempts","maximum_events","maximum_newton_iterations","temperature_tolerances","schedules","maximum_result_values","include_steps"});
     TransientOptions o;o.start=settings.at("start").num();o.end=settings.at("end").num();o.output_times=execution_numbers(settings.at("output_times"));
     for(auto [key,target]:std::initializer_list<std::pair<const char*,double*>>{
       {"initial_step",&o.initial_step},{"minimum_step",&o.minimum_step},{"maximum_step",&o.maximum_step},
@@ -100,7 +100,8 @@ std::string thermal::inspect_transient(std::string_view input) {
         {"rate_K_per_s",numbers(s.rate)},{"storage_change_J",numbers(s.storage_change)},
         {"operating",state_json(s.operating)},{"duty_cycles",J(duty)},{"run_energy",budget_json(s.run_energy)}});
     }
-    for(const auto& s:result.steps)steps.emplace_back(J::O{{"start_s",J(s.start)},{"end_s",J(s.end)},{"error_norm",J(s.error_norm)},
+    const bool include_steps=!settings.has("include_steps") || std::get<bool>(settings.at("include_steps").v);
+    if(include_steps)for(const auto& s:result.steps)steps.emplace_back(J::O{{"start_s",J(s.start)},{"end_s",J(s.end)},{"error_norm",J(s.error_norm)},
       {"accepted",J(s.accepted)},{"reason",J(s.reason)},{"energy",budget_json(s.energy)}});
     for(const auto& e:result.events)events.emplace_back(J::O{{"time_s",J(e.time)},{"entity_id",J(e.entity_id)},
       {"kind",J(e.kind)},{"before",J(e.before)},{"after",J(e.after)}});
@@ -108,7 +109,8 @@ std::string thermal::inspect_transient(std::string_view input) {
     J::O out{{"status",J(result.valid?"passed":"failed")},{"valid",J(result.valid)},{"reason",J(result.reason)},
       {"model_hash",J(result.model_hash)},{"preparation_hash",J(result.preparation_hash)},{"configuration_id",J(result.configuration_id)},
       {"backend",capabilities_json()},{"node_ids",J(node_ids)},{"equation_node_ids",J(equation_ids)},{"conductor_ids",J(conductor_ids)},
-      {"samples",J(samples)},{"steps",J(steps)},{"events",J(events)},
+      {"samples",J(samples)},{"steps",J(steps)},{"step_records_included",J(include_steps)},
+      {"step_count",J(static_cast<double>(result.steps.size()))},{"events",J(events)},
       {"checkpoint",result.checkpoint?checkpoint_json(*result.checkpoint):J()},
       {"profile",J(J::O{{"residual_evaluations",J(static_cast<double>(p.residual_evaluations))},{"jacobian_evaluations",J(static_cast<double>(p.jacobian_evaluations))},
         {"linear_solves",J(static_cast<double>(p.linear_solves))},{"newton_iterations",J(static_cast<double>(p.newton_iterations))},

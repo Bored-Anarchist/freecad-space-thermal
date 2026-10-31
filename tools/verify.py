@@ -18,13 +18,13 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "thermal-preparation", "thermal-reference-comparison", "radiation-acceptance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange", "esatan-exchange", "host-acceptance"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "thermal-preparation", "thermal-reference-comparison", "radiation-acceptance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange", "esatan-exchange", "host-acceptance", "mcp-acceptance"]
 
 
 def command(args, log, env=None):
     with log.open("wb") as output:
         result = subprocess.run(args, cwd=ROOT, stdout=output, stderr=subprocess.STDOUT,
-                                env=env, timeout=1800 if "tools/check_radiation.py" in args else 600)
+                                env=env, timeout=1800 if "tools/check_radiation.py" in args else 1200 if "tools/check_mcp.py" in args else 600)
     return result.returncode == 0
 
 
@@ -113,6 +113,7 @@ def main():
         "td-exchange": [sys.executable,"tools/check_td.py","--report",str(output / "td.json")],
         "esatan-exchange": [sys.executable,"tools/check_esatan.py","--report",str(output / "esatan.json")],
         "host-acceptance": [sys.executable,"tools/check_host.py","--worker",str(install / "bin/fcst-worker.exe"),"--report",str(output / "host.json")],
+        "mcp-acceptance": [sys.executable,"tools/check_mcp.py","--worker",str(install / "bin/fcst-worker.exe"),"--report",str(output / "mcp.json")],
     }
     for case_id in STEPS:
         start = time.monotonic()

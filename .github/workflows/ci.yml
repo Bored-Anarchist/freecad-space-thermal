@@ -28,13 +28,13 @@ jobs:
           python-version: '3.11.9'
       - name: Install locked standalone tooling
         run: >-
-          python -m pip install --require-hashes --only-binary=:all: -r ci/requirements.lock
+          python -m pip install --require-hashes --only-binary=:all: -r ci/requirements.lock -r ci/mcp-requirements.lock
       - name: Execute identical local driver
         run: python tools/verify.py --preset ${{ matrix.preset }}
       - name: Clear exact public reports
         id: clear
         if: always()
-        run: python tools/publication_preflight.py --file .local/${{ matrix.preset }}/verification.json --file .local/${{ matrix.preset }}/build-info.json --file .local/${{ matrix.preset }}/contracts.json --file .local/${{ matrix.preset }}/numerical.json --file .local/${{ matrix.preset }}/persistence.json --file .local/${{ matrix.preset }}/spatial.json --file .local/${{ matrix.preset }}/jobs.json --file .local/${{ matrix.preset }}/exchange.json --file .local/${{ matrix.preset }}/td.json --file .local/${{ matrix.preset }}/esatan.json --file .local/${{ matrix.preset }}/thermal.json --file .local/${{ matrix.preset }}/thermal-references.json --file .local/${{ matrix.preset }}/radiation.json --file .local/${{ matrix.preset }}/host.json
+        run: python tools/publication_preflight.py --file .local/${{ matrix.preset }}/verification.json --file .local/${{ matrix.preset }}/build-info.json --file .local/${{ matrix.preset }}/contracts.json --file .local/${{ matrix.preset }}/numerical.json --file .local/${{ matrix.preset }}/persistence.json --file .local/${{ matrix.preset }}/spatial.json --file .local/${{ matrix.preset }}/jobs.json --file .local/${{ matrix.preset }}/exchange.json --file .local/${{ matrix.preset }}/td.json --file .local/${{ matrix.preset }}/esatan.json --file .local/${{ matrix.preset }}/thermal.json --file .local/${{ matrix.preset }}/thermal-references.json --file .local/${{ matrix.preset }}/radiation.json --file .local/${{ matrix.preset }}/host.json --file .local/${{ matrix.preset }}/mcp.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always() && steps.clear.outcome == 'success'
         with:
@@ -54,6 +54,7 @@ jobs:
             .local/${{ matrix.preset }}/thermal-references.json
             .local/${{ matrix.preset }}/radiation.json
             .local/${{ matrix.preset }}/host.json
+            .local/${{ matrix.preset }}/mcp.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30
