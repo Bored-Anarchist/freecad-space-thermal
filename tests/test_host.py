@@ -107,6 +107,15 @@ class HostTests(unittest.TestCase):
         with self.assertRaises(PersistenceError):review.display(result,3)
         with self.assertRaises(PersistenceError):review.display(result,0,review.uid(99))
 
+    def test_prescribed_boundaries_use_equation_residual_ids_without_padding(self):
+        model=review.example_model();model['entities'][2].update(classification='prescribed',capacity=dict(value=0,unit='J/K'))
+        result=synthetic(model);result['equation_node_ids']=[review.uid(4)]
+        for sample in result['samples']:sample['residual_W']=[0]
+        value=review.validate_result(result,model)
+        self.assertEqual(review.display(value,1)['powers']['residual_W'],[0])
+        result['equation_node_ids']=[review.uid(5)]
+        with self.assertRaises(PersistenceError):review.validate_result(result,model)
+
     def test_result_publication_save_reopen_staleness_and_historical_queries(self):
         with tempfile.TemporaryDirectory() as folder:
             folder=Path(folder)

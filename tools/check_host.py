@@ -4,6 +4,7 @@ import argparse
 from hashlib import sha256
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -61,16 +62,38 @@ def check(worker, report):
     macro.write_text('import os\nfrom pathlib import Path\nexec(compile(Path(os.environ["FCST_HOST_PAYLOAD"]).read_text(encoding="utf-8"), "host_acceptance_payload.py", "exec"))\n')
     env=dict(os.environ,FCST_HOST_PAYLOAD=str(ROOT/'tools/host_acceptance_payload.py'),
         FCST_HOST_OUTPUT=str(folder),FCST_HOST_ADDON=str(addon),FCST_HOST_ROOT=str(ROOT),
-        FCST_HOST_WORKER=str(worker),QT_QPA_PLATFORM='windows',OMP_NUM_THREADS='1',
+        FCST_HOST_WORKER=str(worker),QT_QPA_PLATFORM='windows',QT_OPENGL='software',OMP_NUM_THREADS='1',
         TEMP=str(folder/'tmp'),TMP=str(folder/'tmp'))
     for key in ('PYTHONPATH','PYTHONHOME'): env.pop(key,None)
-    run([str(host),str(macro),'--user-cfg',str(folder/'user.cfg'),'--system-cfg',str(folder/'system.cfg')],
-        folder,folder/'host.log',env=env,timeout=240)
+    try:
+        run([str(host),str(macro),'--user-cfg',str(folder/'user.cfg'),'--system-cfg',str(folder/'system.cfg')],
+            folder,folder/'host.log',env=env,timeout=policy['criteria']['deadline_seconds'])
+    except Exception as error:
+        records=[]
+        try:
+            progress=json.loads((folder/'progress.json').read_bytes())
+            records=[dict(id=r['id'],status=r['status']) for r in progress
+                if r.get('id') in policy['required_cases'] and r.get('status') in ('passed','failed')]
+        except (ValueError,OSError,KeyError,TypeError):pass
+        reason='timeout' if isinstance(error,subprocess.TimeoutExpired) else 'gui_process_failed'
+        failure=dict(reason=reason,phase='tests_started' if (folder/'started.json').is_file() else 'gui_startup',
+                     last_completed_case=records[-1]['id'] if records else None)
+        try:
+            trace=(folder/'payload-error.log').read_text(encoding='utf-8')
+            lines=re.findall(r'File "host_acceptance_payload.py", line ([0-9]+)',trace)
+            if lines:failure['payload_line']=int(lines[-1])
+        except OSError:pass
+        bounded=dict(candidate=candidate,input_sha256=frozen_inputs,cases=records,
+            gate=evaluate(policy['required_cases'],records),failure=failure,spatial_solver_qualified=False,
+            host_version=[],python_abi=None,asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash)
+        report.parent.mkdir(parents=True,exist_ok=True);report.write_text(json.dumps(bounded,indent=2)+'\n')
+        print(json.dumps(dict(host_failure=failure)),flush=True)
+        raise
     data=json.loads((folder/'host.json').read_bytes())
     if input_hashes()!=frozen_inputs or revision()!=candidate or sha256(worker.read_bytes()).hexdigest()!=worker_hash:
         raise ValueError('host_sources_changed_during_acceptance')
     data.update(candidate=candidate,input_sha256=frozen_inputs,
-        asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash)
+        asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash,graphics='qt_software')
     data['gate']=evaluate(policy['required_cases'],data['cases'])
     assess(data,revision(),input_hashes(),policy)
     report.parent.mkdir(parents=True,exist_ok=True)

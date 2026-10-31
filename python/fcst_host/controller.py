@@ -104,6 +104,7 @@ class Session:
         self.result_id, self.result, self.panel, self.job = None, None, None, None
         self.options = deepcopy(review.DEFAULT_SETTINGS)
         self.case_id = None
+        self.undo_revisions=[]
         self.bindings = {}
         self.observer = Observer(self)
         self.project()
@@ -144,13 +145,18 @@ class Session:
             session.options=review.settings(configuration['options'])
             session.case_id=configuration['case_id']
             session.spatial_id=configuration.get('spatial_id')
+            session.undo_revisions=configuration.get('undo_revisions',[])
+            known={r['revision'] for r in store.state()['history'] if r['operation']!='changes.undo'}
+            if not set(session.undo_revisions)<=known:reject('review_configuration')
             for binding in configuration.get('bindings',[]):
                 target=session.objects.get(binding['target_id'])
                 if target is None or shape_signature(target.Shape)!=binding['source_revision']:
                     reject('attachment_reassignment_required')
                 session.bind(binding['entity_id'],target,binding['subelement'])
+        restore_spatial=not configurations or 'spatial_id' not in configuration or session.spatial_id is not None
         for artifact in store._artifacts():
             if artifact[2].startswith('review-fields/'):
+                if not restore_spatial:break
                 if session.spatial_id is not None and artifact[0]!=session.spatial_id:continue
                 from fcst_contracts import loads
                 value=loads(artifact[3])
@@ -161,7 +167,7 @@ class Session:
                     break
         if session.spatial_id is not None and session.spatial_view is None:reject('review_configuration')
         # Portable projection is rebuilt. No package-supplied Python or host path runs.
-        candidates = [d for d in store.state()['derived'] if d['kind'] == 'solve' and not d['stale']]
+        candidates = [] if session.spatial_view is not None else [d for d in store.state()['derived'] if d['kind'] == 'solve' and not d['stale']]
         for item in reversed(candidates):
             try:
                 session.load_result(item['id'])
@@ -305,6 +311,7 @@ class Session:
         self.store.mark_host_dirty()
         revision = self.store.snapshot()['revision'] if expected_revision is None else expected_revision
         outcome = review.change(self.store, entity, expected_revision=revision)
+        self.undo_revisions.append(outcome['revision'])
         self.clear_display()
         with self.projection():
             self.doc.openTransaction('FCST edit')
@@ -318,11 +325,13 @@ class Session:
 
     def undo(self):
         assert_thread()
+        if self.diverged:reject('host_reconciliation_required')
         state = self.store.state()
-        if not state['history']:
+        if not self.undo_revisions:
             reject('unknown_revision')
         outcome = self.store.apply('local-workbench', {'changes.undo'}, state['model']['project_id'],
-            state['model']['revision'], str(uuid.uuid4()), {'revision': state['history'][-1]['revision']}, operation='changes.undo')
+            state['model']['revision'], str(uuid.uuid4()), {'revision': self.undo_revisions[-1]}, operation='changes.undo')
+        self.undo_revisions.pop()
         self.store.mark_host_dirty()
         self.clear_display()
         self.project()
@@ -353,7 +362,7 @@ class Session:
                         bindings.append(dict(entity_id=key,target_id=target.FCSTEntityId,
                             subelement=names[0],source_revision=obj.FCSTSourceRevision))
             self.store.add_artifact(artifact_id,'evidence','review-settings/'+artifact_id+'.json',
-                encode(dict(sequence=sequence,options=self.options,case_id=self.case_id,bindings=bindings,spatial_id=self.spatial_id)),
+                encode(dict(sequence=sequence,options=self.options,case_id=self.case_id,bindings=bindings,spatial_id=self.spatial_id,undo_revisions=self.undo_revisions)),
                 expected_revision=self.store.snapshot()['revision'])
             staging = self.workspace/('save-'+uuid.uuid4().hex+'.FCStd')
             self.doc.recompute()
@@ -398,8 +407,9 @@ class Session:
         geometry = dict(id=geometry_id,kind='geometry',frame_id=frame_id,artifact=dict(path=path,sha256=sha256(raw).hexdigest(),byte_length=len(raw)),revision=0)
         face_value = dict(id=face_id,kind='face',geometry_id=geometry_id,persistent_ref=subelement,
             signature=shape_signature(face),area=dict(value=face.Area*1e-6,unit='m2'))
-        self.store.apply('local-workbench',{'changes.apply'},model['project_id'],model['revision'],str(uuid.uuid4()),
+        outcome=self.store.apply('local-workbench',{'changes.apply'},model['project_id'],model['revision'],str(uuid.uuid4()),
                          dict(upsert=[frame,geometry,face_value],delete=[]))
+        self.undo_revisions.append(outcome['revision'])
         self.store.mark_host_dirty(); self.clear_display(); self.project()
         self.diverged = False
         with self.projection():host_object.ViewObject.Visibility=False
@@ -447,6 +457,8 @@ class Session:
         artifact_id=str(uuid.uuid4())
         self.store.add_artifact(artifact_id,'evidence','review-fields/'+artifact_id+'.json',encode(value),
                                 expected_revision=self.store.snapshot()['revision'])
+        self.clear_display()
+        self.result_id=None
         self.spatial_view=view
         self.spatial_id=artifact_id
         return view
@@ -457,7 +469,10 @@ class Session:
             reject('attachment_reassignment_required')
         if self.diverged:
             reject('host_reconciliation_required')
-        self.result = review.query_result(self.store, result_id)
+        result = review.query_result(self.store, result_id)
+        if self.spatial_view is not None:self.spatial_view.hide()
+        self.spatial_view,self.spatial_id=None,None
+        self.result = result
         self.result_id = result_id
         return self.result
 

@@ -1,12 +1,14 @@
 {
   "schema_version": 1,
   "host_profile": "ci/host-profile.json",
+  "graphics": "Qt software OpenGL from the pinned host bundle; no physical GPU required",
   "required_cases": [
     "FEM-REUSE-001",
     "FEM-REUSE-002",
     "FEM-REUSE-004",
     "FEM-REUSE-005",
     "HOST-EDITORS",
+    "HOST-UNDO-HISTORY",
     "HOST-CREATE",
     "HOST-FRAME",
     "HOST-PACKAGE-RECOVERY",

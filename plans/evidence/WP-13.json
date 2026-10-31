@@ -21,22 +21,22 @@
       "report_sha256": "c4f5e88bbbad5b20b2de160bf8612a979a81a88c50eac7fb946ef9739a9e5ebd"
     },
     {
-      "id": "final_standard_library_regressions",
-      "status": "passed",
-      "required_cases": 339,
-      "report_sha256": "f48b5514cde2de270f3b59a26d197c09d3b8cf72bfd091ad7cc0af0d4cbe5fac"
-    },
-    {
-      "id": "final_installed_workbench",
-      "status": "passed",
-      "required_cases": 17,
-      "report_sha256": "da1d9c008f11655146dada8bc3f35be0102ea0ed02b1a0138704e690e7449d1a"
-    },
-    {
       "id": "independent_dwg_shared_source_closure",
       "status": "passed",
       "required_cases": 24,
       "report_sha256": "b399a897d95e955a964b7110ddd00be20edf7a818e5023a08e3b1fade1be8f8a"
+    },
+    {
+      "id": "final_standard_library_regressions",
+      "status": "passed",
+      "required_cases": 340,
+      "report_sha256": "051be11166560c34f60f8add951fc032ba1384dc81df67479df1939acd515c05"
+    },
+    {
+      "id": "final_installed_workbench",
+      "status": "passed",
+      "required_cases": 18,
+      "report_sha256": "e9dd36fc069868341ab5d1902bf80c51fccfb56803e2cec577ec2fd77a2b087f"
     }
   ],
   "blockers": [],
@@ -52,7 +52,7 @@
   "review_status": "Implementation branch prepared for pull-request review; main-branch merge remains pending",
   "input_sha256": {
     "ci/fem-reuse.json": "affa8267243714bc05708cc7bff80fdf5f112d7bbd0572c000df8730b3bee6f5",
-    "ci/host-acceptance.json": "d7a51f8c4a52595772f8c6e7ae18deda25d7520f526565ebedc79e80dd54c665",
+    "ci/host-acceptance.json": "d76dccbc2ce0080b301fb075fd0be4d0f69b3126c5b16c604248cda8e609407c",
     "ci/host-profile.json": "5662cd6012f669ab610f6c90d11f7dabd0d516bf7dda369ea9ec49630b90b3f0",
     "ci/host-reuse.json": "3cd5ef9a019a9e41c8b5ab4001b736c2c937cfeac48e1aae640e357c25ffdd94",
     "engine/src/contracts.cpp": "f1ca69f6508b6333b43587465728d99f1449af7740a0f70c641f7d60afb0c44b",
@@ -77,22 +77,30 @@
     "python/fcst_contracts/types.py": "d399ea1521fbbb899bfa2a9194532ef1e7892e6719a6b3e9c54ca14cd43e9824",
     "python/fcst_contracts/worker.py": "a8da22e6d4c3534ce73494312fd0641ed10bfb2866ab34ef87a196a9827fbadf",
     "python/fcst_host/__init__.py": "281bedd49c2fd49f96ca0e4176708f5a38edac66beee1f6c0bbdadf0d86b5f1f",
-    "python/fcst_host/controller.py": "29646a314b48f4d7cace870bbb48d0bca0b69baf98bca26b2b95c5eb35b0d567",
-    "python/fcst_host/review.py": "e3d51dae76ba1ecde816b5db7082a43e57bcd8d08ecac64434b3542b5b6df2de",
+    "python/fcst_host/controller.py": "38916c1f0a31570671ed92d0a5b11d5e190444b74e249293859b1fd7624b048f",
+    "python/fcst_host/review.py": "45c7d19ce37741e7caf6e8880d3b133b79672ffdd950ccfb319eb907d2b28be4",
     "python/fcst_host/spatial.py": "20313acae5207b657d76245a98e0aecc7aeb758e179fbb60e4d00b518866f80f",
     "python/fcst_host/templates.json": "b7ba367105b4e0eeea7855003fcb402cf6621fd432f6e1dcb6e21657729342eb",
-    "python/fcst_host/widgets.py": "74803afa23df32295fb5b98ae0c35794b2d3a059b97bb32d4928a36d394cdb9d",
+    "python/fcst_host/widgets.py": "a5d0bba26de327d6b353e5b19801b5709d3cb574835c0eaa7683748edb41e5f8",
     "python/fcst_host/workbench.py": "93b9aaabec5c8a72273a3a53cab3bdec9d326cebccf9cb8b9039414d05dfd5d3",
     "tests/fixtures/contracts/network.json": "856953a18cc4f3e633c99d24be86201bb2f08776b3b8968f660eff656292c806",
     "tests/fixtures/spatial/solid-surface-rotated.json": "49c3eba18add86b72acc6f750d249c68397baf60315a82b3dc95d0a6f256c301",
-    "tests/test_host.py": "a6e58bb0372727173a20db5f85302be47b6dedbb8eacc534b1bd5a96d28a3b2d",
-    "tools/check_host.py": "95d2d6621d22778c43c8e3c06235c3bf2031b8c6a85ec2898649f8ba64f6959d",
-    "tools/host_acceptance_payload.py": "f5d03562e8bdb578fafd040290bfaef027dec1dec2334495a245f9bdc87b7807",
+    "tests/test_host.py": "b57f644e523d637a67642ac9baa23e2e20b9ce3121b1889970b2d476e6f2c234",
+    "tools/check_host.py": "d175b9a56f01166882717e36da6f5e6a5496dc5b2b2c080e586a8dcbccac484b",
+    "tools/host_acceptance_payload.py": "9efbeeb7f43ec8952f636ed9498fedb51fa6e8219938464473bd32dc597f2b1a",
     "tools/host_smoke.py": "c015342ca66773663af8469df9c3343e7756e0298b60f190b41b70dc93311b81",
     "tools/host_smoke_payload.py": "aa87726597dc97b6d8ef79e5e78dee6602f347f38961584e9ce963f81c4f48c4",
     "tools/install_workbench.py": "ef023c447c385e13a723305ebbc4914971abe8fef4b22278b80a74c01d749fd2",
     "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec"
   },
-  "validation_policy": "Full Debug/Release baselines precede the final host-only frame mapping metadata and recovery changes. The final host source tree and 339-case standard-library suite pass separately. GitHub Actions reruns all 363 checks and the 17-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines.",
-  "shared_source_inventory": "ci/dwg-backend.json pins the changed store and FEM adapter; the complete 24-case native backend gate passed with vendor imports denied."
+  "validation_policy": "Full Debug/Release baselines precede the final host-only changes. The final host source tree and 340-case standard-library suite pass separately. GitHub Actions reruns all 364 checks and the 18-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines.",
+  "shared_source_inventory": "ci/dwg-backend.json pins the changed store and FEM adapter; the complete 24-case native backend gate passed with vendor imports denied.",
+  "graphics": "qt_software",
+  "final_host_regressions": [
+    "Single active dataset with saved selection",
+    "Prescribed-boundary equation residual maps",
+    "Repeated inverse Undo with saved cursor",
+    "Software-rendered native FEM contours",
+    "Bounded failure diagnostics without raw logs"
+  ]
 }

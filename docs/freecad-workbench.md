@@ -74,12 +74,17 @@ The exact [reuse assessment](../ci/host-reuse.json) records source hashes,
 dependencies, licenses and the pinned `NodeColor` getter limitation. The native
 `NodeColorArray` and underlying fields, rather than the unavailable getter, are
 used for acceptance. Original upstream notices remain in the official bundle.
+One result dataset is active at a time. Opening a spatial field selects that
+dataset; completing or loading a native solve selects its network result. Both
+remain stored, and save/reopen preserves the active dataset and its time range.
 
 Edits hide current contours and histories. Direct host edits, document Undo/Redo
 or changed topology leave the host dirty. **Undo thermal edit** executes a shared
 inverse transaction; ordinary host Undo alone cannot change canonical truth.
 **Rebuild host from project** explicitly restores that truth. Face split, merge,
 deletion, reordering and ambiguous signatures require explicit reassignment.
+Repeated thermal Undo walks the saved edit history rather than undoing the
+previous Undo operation. Its cursor is preserved in portable project saves.
 
 **Save project** coordinates a portable `.fcst` file and companion `.FCStd` file
 through the durable two-file journal. Reopening rebuilds the host projection from

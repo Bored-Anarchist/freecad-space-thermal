@@ -218,7 +218,7 @@ class NativeJob(QtCore.QObject):
             result_id = review.attach_result(self.session.store,value,self.model,self.input,self.worker_hash)
             self.session.load_result(result_id)
             self.update('succeeded')
-        except ValueError:
+        except (ValueError,OSError):
             self.update('rejected')
 
     def failed(self, error):
@@ -395,7 +395,10 @@ class ReviewPanel(QtWidgets.QDockWidget):
             self.status.setText('CURRENT • native result • t = '+format(value['time_s'],'.6g')+' s')
             self.legend.setText(f"{value['lower']:.4g} — {value['upper']:.4g} {value['unit']}  /  fixed scale")
             self.history.points=value['history']; self.history.unit=value['unit']; self.history.update()
-            lines=['HEAT FLOW / W  •  canonical node order']
+            lines=['HEAT FLOW / W','Node order: '+', '.join(self.session.result['node_ids'])]
+            native=self.session.result['native']
+            if 'conductor_ids' in native:lines.append('Conductor order: '+', '.join(native['conductor_ids']))
+            if 'equation_node_ids' in native:lines.append('Residual equation order: '+', '.join(native['equation_node_ids']))
             lines += [k.replace('_',' ')+': '+', '.join(format(v,'.5g') for v in values) for k,values in value['powers'].items()]
             lines += ['ENERGY / J',json.dumps(value['energy'],sort_keys=True),'HEATER DUTY / fraction',json.dumps(value['duty'],sort_keys=True)]
             self.budget.setPlainText('\n'.join(lines))

@@ -62,7 +62,7 @@ DEFAULT_SETTINGS = dict(mode='transient',start=0, end=2, samples=21, absolute_te
 def configuration(value, model):
     """Closed, inert view metadata; malformed packages never leave a half-open host."""
     required={'sequence','options','case_id','bindings'}
-    if not isinstance(value,dict) or not required<=value.keys() or set(value)-required-{'spatial_id'}:
+    if not isinstance(value,dict) or not required<=value.keys() or set(value)-required-{'spatial_id','undo_revisions'}:
         reject('review_configuration')
     sequence=value['sequence']
     if type(sequence) not in (int,float) or not math.isfinite(sequence) or sequence<0 or sequence!=int(sequence):
@@ -87,6 +87,10 @@ def configuration(value, model):
     if value.get('spatial_id') is not None:
         try:uuid.UUID(value['spatial_id'])
         except (ValueError,TypeError,AttributeError):reject('review_configuration')
+    undo=value.get('undo_revisions',[])
+    if (not isinstance(undo,list) or any(type(r) not in (int,float) or not math.isfinite(r) or r<1 or r!=int(r) for r in undo)
+            or len(set(undo))!=len(undo) or undo!=sorted(undo)):
+        reject('review_configuration')
     return deepcopy(value)
 
 
@@ -153,9 +157,18 @@ def validate_result(value, model):
                 or any(type(v) not in (int,float) or v < 0 for v in temperatures)):
             reject('result_samples')
         for name in ('boundary_power_W', 'conductive_in_W', 'radiation_in_W', 'load_in_W',
-                     'environment_in_W', 'storage_power_W', 'residual_W'):
+                     'environment_in_W', 'storage_power_W'):
             if name in sample and (not isinstance(sample[name], list) or len(sample[name]) != len(node_ids)
                                    or any(type(v) not in (int,float) for v in sample[name])):
+                reject('result_samples')
+        if 'residual_W' in sample:
+            equation_ids=value.get('equation_node_ids',[])
+            expected_equations={e['id'] for e in model['entities'] if e['kind']=='node' and e['classification']!='prescribed'}
+            residual=sample['residual_W']
+            if (not isinstance(equation_ids,list) or any(not isinstance(i,str) for i in equation_ids)
+                    or set(equation_ids)!=expected_equations or len(equation_ids)!=len(expected_equations)
+                    or not isinstance(residual,list) or len(residual)!=len(equation_ids)
+                    or any(type(v) not in (int,float) for v in residual)):
                 reject('result_samples')
         if not isinstance(sample.get('duty_cycles',{}),dict) or any(type(duty) not in (int,float) or not 0 <= duty <= 1 for duty in sample.get('duty_cycles', {}).values()):
             reject('result_samples')

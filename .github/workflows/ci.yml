@@ -79,11 +79,15 @@ jobs:
         run: python tools/host_smoke.py
       - name: Pinned FEM foundation probes
         run: python tools/fem_probe.py
+      - name: Build candidate worker for early GUI feedback
+        run: python tools/build_host_worker.py
+      - name: Installed workbench and software-rendered GUI acceptance
+        run: python tools/check_host.py --worker out/windows-release/Release/fcst-worker.exe --report .local/host/workbench-host.json
       - name: Clear exact host report
         id: clear
         if: always()
         shell: bash
-        run: python tools/publication_preflight.py --file .local/host/*/host-smoke.json --file .local/fem-probe/fem-probe.json
+        run: python tools/publication_preflight.py --file .local/host/*/host-smoke.json --file .local/fem-probe/fem-probe.json --file .local/host/workbench-host.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         if: always() && steps.clear.outcome == 'success'
         with:
@@ -91,6 +95,7 @@ jobs:
           path: |
             .local/host/*/host-smoke.json
             .local/fem-probe/fem-probe.json
+            .local/host/workbench-host.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30

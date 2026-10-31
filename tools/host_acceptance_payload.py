@@ -55,6 +55,19 @@ def main():
         expected=review.change(standalone,node,expected_revision=0)
         assert actual==expected
     session.undo(); assert semantic_hash(session.store.snapshot())==semantic_hash(original)
+    for temperature in (315,320):
+        entity=deepcopy(session.store.snapshot()['entities'][1]);entity['temperature']=dict(value=temperature,unit='K')
+        session.edit(entity)
+    session.save(folder/'undo-history.FCStd',folder/'undo-history.fcst')
+    undo_session=Session.open(folder/'undo-history.fcst',folder/'undo-history-reopened')
+    for temperature in (315,310):
+        undo_session.undo()
+        assert next(e for e in undo_session.store.snapshot()['entities'] if e['id']==review.uid(4))['temperature']['value']==temperature
+    rejects(undo_session.undo,'unknown_revision')
+    undo_session.close();App.closeDocument(undo_session.doc.Name);App.setActiveDocument(session.doc.Name)
+    session.undo();session.undo()
+    assert semantic_hash(session.store.snapshot())==semantic_hash(original)
+    passed('HOST-UNDO-HISTORY')
     session.save(folder/'saved.FCStd',folder/'saved.fcst')
     assert session.store.state()['host']['dirty'] is False
     assert Package.open(folder/'saved.fcst').model==session.store.snapshot()
@@ -66,8 +79,9 @@ def main():
         assert editor.value()==templates[kind]
         editor.close()
     editor=EntityEditor(session,original['entities'][1],panel); editor.show()
+    before_invalid=session.store.snapshot()['revision']
     editor.fields['temperature'][1].setText('-1'); editor.fields['temperature'][2].setCurrentText('K')
-    editor.commit(); assert editor.error.text() and session.store.snapshot()['revision']==2
+    editor.commit(); assert editor.error.text() and session.store.snapshot()['revision']==before_invalid
     editor.fields['temperature'][1].setText('36.85'); editor.fields['temperature'][2].setCurrentText('degC')
     editor.commit(); assert editor.result()==QtWidgets.QDialog.Accepted
     node=next(e for e in session.store.snapshot()['entities'] if e['id']==review.uid(4))
@@ -232,7 +246,12 @@ def main():
     rejects(lambda:fem_adapter.query(doc.FCSTResult,value,'0'*64),'stale_result')
     App.closeDocument(doc.Name)
     field_session=Session.create(folder/'field-session',model)
+    field_job=NativeJob(field_session,panel.worker);field_session.job=field_job;field_job.start()
+    wait(lambda:field_job.state not in ('queued','running'))
+    assert field_job.state=='succeeded' and field_session.result is not None
+    network_result_id=field_session.result_id
     field_view=field_session.import_field(value)
+    assert field_session.result is None and field_session.result_id is None
     field_panel=workbench.show(field_session);field_panel.unit.setCurrentText('degC')
     field_panel.time.setValue(1);field_panel.field_vertex.setCurrentIndex(2)
     assert field_panel.history.points==[(0,302-273.15),(1,302-273.15)]
@@ -263,8 +282,14 @@ def main():
     App.closeDocument(other.Name)
     passed('HOST-MULTI-DOCUMENT')
     spatial_reopened=Session.open(folder/'spatial.fcst',folder/'spatial-reopened')
-    assert spatial_reopened.spatial_view is not None and spatial_reopened.spatial_view.value==value
+    assert spatial_reopened.spatial_view is not None and spatial_reopened.spatial_view.value==value and spatial_reopened.result is None
+    spatial_reopened.load_result(network_result_id)
+    assert spatial_reopened.spatial_view is None and spatial_reopened.result is not None
+    spatial_reopened.save(folder/'network-selected.FCStd',folder/'network-selected.fcst')
     spatial_reopened.close();App.closeDocument(spatial_reopened.doc.Name)
+    network_reopened=Session.open(folder/'network-selected.fcst',folder/'network-selected')
+    assert network_reopened.spatial_view is None and network_reopened.result is not None
+    network_reopened.close();App.closeDocument(network_reopened.doc.Name)
     passed('FEM-REUSE-005')
     session.close();App.closeDocument(session.doc.Name)
     session=Session.open(folder/'solved.fcst',folder/'render-reopened')
@@ -287,6 +312,7 @@ def main():
 
 
 def run():
+    (folder/'started.json').write_text('{"phase":"tests_started"}\n')
     try:
         main()
     except BaseException:
