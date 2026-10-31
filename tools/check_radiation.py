@@ -46,7 +46,7 @@ def check(subject, native, worker, output):
         env.pop(key, None)
     records, runs = [], []
     def execute(exe, arguments, stem, data=None):
-        r = subprocess.run([str(exe), *map(str, arguments)], input=data, capture_output=True, cwd=ROOT, env=env, timeout=240)
+        r = subprocess.run([str(exe), *map(str, arguments)], input=data, capture_output=True, cwd=ROOT, env=env, timeout=600)
         (work/(stem+'.json')).write_bytes(r.stdout)
         (work/(stem+'.log')).write_bytes(r.stderr)
         return r
@@ -128,12 +128,15 @@ def check(subject, native, worker, output):
     records.append(dict(id='worker-replay', status='passed' if replay.stdout == r.stdout else 'failed'))
     curves = []
     for size in policy['scaling_subdivisions']:
-        for n in policy['scaling_samples']:
-            for replicate in range(policy['scaling_replicates']):
-                seed = statistical['seeds'][replicate]
-                rscale = execute(subject, ['plates', seed, n, size], f'scale-{size}-{n}-{replicate}')
-                require(rscale.returncode == 0 and not rscale.stderr)
-                run = validate_run(json.loads(rscale.stdout), 'plates', seed, n, candidate)
+        for replicate in range(policy['scaling_replicates']):
+            seed = statistical['seeds'][replicate]
+            rscale = execute(subject, ['plates', seed, 0, size], f'scale-{size}-{replicate}')
+            require(rscale.returncode == 0 and not rscale.stderr)
+            lines = rscale.stdout.splitlines(keepends=True)
+            require(len(lines) == len(policy['scaling_samples']))
+            for n, raw in zip(policy['scaling_samples'], lines):
+                (work/f'scale-{size}-{n}-{replicate}.json').write_bytes(raw)
+                run = validate_run(json.loads(raw), 'plates', seed, n, candidate)
                 require(run['facets'] == 4*size*size and run['storage_bytes'] <= policy['maximum_storage_bytes_per_facet']*run['facets'])
                 estimates = [sum(c['hits'] for c in row['counts'])/n for row in run['rows']]
                 practical_error = max(abs(p-reference) for p in estimates)
@@ -141,7 +144,7 @@ def check(subject, native, worker, output):
                 curves.append(dict(facets=run['facets'], samples=n, replicate=replicate, seed=seed,
                                    storage_bytes=run['storage_bytes'], peak_working_set_bytes=run['peak_working_set_bytes'], build_seconds=run['build_seconds'], trace_seconds=run['trace_seconds'],
                                    rays_per_second=2*n/run['trace_seconds'], maximum_absolute_error=practical_error,
-                                   raw_sha256=hashlib.sha256(rscale.stdout).hexdigest()))
+                                   raw_sha256=hashlib.sha256(raw).hexdigest()))
         print(f'scaling: {4*size*size} facets complete', flush=True)
     records.append(dict(id='million-facet-scaling', status='passed'))
     report = dict(schema_version=1, profile=policy['profile'], candidate=candidate, execution_mode='fcst_native',

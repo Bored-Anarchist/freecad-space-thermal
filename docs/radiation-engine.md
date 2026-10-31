@@ -126,7 +126,10 @@ not executions of COMSOL or licensed TD/ESATAN. Vendor compatibility and overall
 project Q1 remain unqualified under their existing WP-19 gates.
 
 Three retained repetitions at each sample count measure 1024, 10000, 99856 and
-1000000 facets. The public `radiation.json` contains build time, ray throughput,
+1000000 facets. Each repetition constructs a fresh BVH and then reuses it across
+the three sample refinements; its construction measurement is shared by those
+three curve records. Trace timings exclude construction and earlier refinements.
+The public `radiation.json` contains build time, ray throughput,
 accounted storage, measured process peak working set, error and input/build/raw
 hashes for every repetition. Process peak includes construction allocations;
 accounted storage is an estimate excluding allocator overhead. Timings describe
