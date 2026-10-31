@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "foundation": "ci/fem-reuse.json",
+  "source_revision": "4fd3bf320d9566a27e60069fc8387448aaa3a094",
+  "asset_sha256": "4828741fc91ee37fafcdb97a1abacb18b04ba451ac4372d9ff7a7349b36f4d6d",
+  "disposition": "reuse_api",
+  "files": [
+    {
+      "source_path": "src/Mod/Fem/Gui/ViewProviderFemMeshPyImp.cpp",
+      "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/Gui/ViewProviderFemMeshPyImp.cpp",
+      "sha256": "05432f598ea74ea7e6195815b9af1bb689e99618fbd5153ba3aca49d2e145231",
+      "source_adoption": "API inspection only; no copied or adapted source"
+    },
+    {
+      "source_path": "src/Mod/Fem/Gui/ViewProviderFemMesh.cpp",
+      "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/Gui/ViewProviderFemMesh.cpp",
+      "sha256": "9d41145dfd56bd2d4e5663a7e8716afb3337a02b5d46a9d329cc081b7bbe396e",
+      "source_adoption": "API inspection only; no copied or adapted source"
+    },
+    {
+      "source_path": "src/Mod/Fem/Gui/ViewProviderFemMesh.pyi",
+      "source_url": "https://github.com/FreeCAD/FreeCAD/blob/4fd3bf320d9566a27e60069fc8387448aaa3a094/src/Mod/Fem/Gui/ViewProviderFemMesh.pyi",
+      "sha256": "d243caf63fef9858afb94ca9d7d1169545b317c642bb8354bc13d5dd868adadc",
+      "source_adoption": "API inspection only; no copied or adapted source"
+    }
+  ],
+  "api": [
+    "ObjectsFem.makeAnalysis",
+    "ObjectsFem.makeMaterialSolid",
+    "ObjectsFem.makeMeshResult",
+    "ObjectsFem.makeResultMechanical",
+    "Gui.Selection",
+    "ViewProviderFemMesh.NodeColor setter",
+    "ViewProviderFemMesh.NodeColorArray",
+    "pivy.coin"
+  ],
+  "license_disposition": "Official bundle notices retained. ViewProviderFemMesh.cpp declares LGPL-2.0-or-later. Wrapper and stub files have no independent license header; no grant inferred and no source adopted. Newly authored host adapters use LGPL-2.1-or-later.",
+  "limitation": "NodeColor getter raises AttributeError: Not yet implemented. Both setNodeColorByScalars and NodeColor setter work. FCST uses NodeColor setter and validates NodeColorArray, canonical IDs, SI fields and rendering.",
+  "editors": "Reuse FEM grouping material assignment mesh and result APIs. Owned forms adapt shared FCST transactions quantities references and solver settings; solver-deck-specific editors cannot own the canonical model.",
+  "overlays": "Bundled Coin is used only for normals material axes and flux vectors; FEM renders mesh contours. Geometry-free node histories and budgets are owned Qt views.",
+  "dependencies": [
+    "official FreeCAD 1.1.4 Windows cp311 bundle",
+    "bundled PySide6 6.8.3",
+    "bundled pivy/Coin"
+  ],
+  "additional_runtime_dependencies": [],
+  "mesher_selection": "Existing offline tet4/tri3 UNV profile retained. Production Gmsh/Netgen selection and spatial qualification remain WP-16.",
+  "external_references": "CalculiX and Elmer deferred under WP-16; no external solve substitutes for native acceptance.",
+  "acceptance": "tools/check_host.py; ci/host-acceptance.json"
+}

@@ -76,7 +76,7 @@ def create(doc, value):
     return obj, result
 
 
-def query(result, value, model_hash):
+def query(result, value, model_hash, sample=0):
     assert_thread()
     value = read("spatial", value)
     if result.FCSTModelHash != model_hash or model_hash != value["model_hash"]:
@@ -88,7 +88,7 @@ def query(result, value, model_hash):
     for f in value["fields"]:
         quantity = f["quantity"]
         actual = [[float(v)] for v in result.Temperature] if quantity == "temperature" else [[v.x, v.y, v.z] for v in result.HeatFlux]
-        if actual != field_global(value, quantity):
+        if actual != field_global(value, quantity, sample):
             reject("host_field_values")
         observed[quantity] = actual
     return observed

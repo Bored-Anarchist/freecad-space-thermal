@@ -2,14 +2,15 @@ FCST licensing by component
 
 Copyright 2026 FCST contributors.
 
-Newly authored engine/, python/, tools/, tests/, ci/ code and build configuration:
+Newly authored engine/, python/, tools/, tests/, ci/ code and build configuration,
+except files explicitly marked LGPL below:
 MIT OR Apache-2.0, at your option. See LICENSES/MIT.txt and LICENSES/Apache-2.0.txt.
 
 Original README, specification, plans and documentation:
 CC-BY-4.0. See LICENSES/CC-BY-4.0.txt. Attribution: FCST contributors.
 
-Future newly authored freecad/ workbench code:
-LGPL-2.1-or-later, as proposed by the specification; no workbench is shipped here.
+Newly authored freecad/, python/fcst_host/ and python/fcst_app/fem_adapter.py:
+LGPL-2.1-or-later. See LICENSES/LGPL-2.1-or-later.txt.
 
 Third-party components retain their own licenses and required notices. This
 project does not license proprietary vendor software, files or restricted models.

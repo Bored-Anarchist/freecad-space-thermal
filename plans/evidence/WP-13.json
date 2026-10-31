@@ -1,0 +1,108 @@
+{
+  "work_package": "WP-13",
+  "status": "in_progress",
+  "scope": "FreeCAD host editors visualization transactions and unattended installed-workbench acceptance; production spatial physics remains WP-16",
+  "tested_worktree_base": "67acf5ada6a269abf0283d1045aafbb6dc860cd7",
+  "checks": [
+    {
+      "id": "full_windows_debug_baseline",
+      "status": "passed",
+      "candidate": "d8c6da7",
+      "required_checks": 362,
+      "native_ctest_cases": 68,
+      "report_sha256": "d8cbffa9601ef225de24e8420082542038a3ce118d2d93bae1f7e4fbe529bc1c"
+    },
+    {
+      "id": "full_windows_release_baseline",
+      "status": "passed",
+      "candidate": "d8c6da7",
+      "required_checks": 362,
+      "native_ctest_cases": 68,
+      "report_sha256": "c4f5e88bbbad5b20b2de160bf8612a979a81a88c50eac7fb946ef9739a9e5ebd"
+    },
+    {
+      "id": "independent_dwg_shared_source_closure",
+      "status": "passed",
+      "required_cases": 24,
+      "report_sha256": "b399a897d95e955a964b7110ddd00be20edf7a818e5023a08e3b1fade1be8f8a"
+    },
+    {
+      "id": "final_standard_library_regressions",
+      "status": "passed",
+      "required_cases": 340,
+      "report_sha256": "051be11166560c34f60f8add951fc032ba1384dc81df67479df1939acd515c05"
+    },
+    {
+      "id": "final_installed_workbench",
+      "status": "passed",
+      "required_cases": 18,
+      "report_sha256": "675ad9531ffc765993c1bf236d766b45273087af90175154a40b3ca047d4e094"
+    }
+  ],
+  "blockers": [],
+  "remaining_qualification": [
+    "WP-16 production spatial physics and FEM-REUSE-003/006",
+    "WP-14/15 MCP and integrated P0 parity",
+    "WP-17/18 production environments and campaigns",
+    "TD/ESATAN paired and complete Q1 release qualification"
+  ],
+  "publication": "Owned synthetic fixtures source-only adapters and bounded host.json summaries; raw documents screenshots arrays logs binaries preferences and engineering originals stay local",
+  "implementation_delivery": "implemented",
+  "acceptance_status": "passed_on_declared_host_subset",
+  "review_status": "Implementation branch prepared for pull-request review; main-branch merge remains pending",
+  "input_sha256": {
+    "ci/fem-reuse.json": "affa8267243714bc05708cc7bff80fdf5f112d7bbd0572c000df8730b3bee6f5",
+    "ci/host-acceptance.json": "3030becd140034c0f31c73ab9c3c4a31a8b1d4cc66783b3174e2a8dd5653b2a4",
+    "ci/host-profile.json": "5662cd6012f669ab610f6c90d11f7dabd0d516bf7dda369ea9ec49630b90b3f0",
+    "ci/host-reuse.json": "3cd5ef9a019a9e41c8b5ab4001b736c2c937cfeac48e1aae640e357c25ffdd94",
+    "engine/src/contracts.cpp": "f1ca69f6508b6333b43587465728d99f1449af7740a0f70c641f7d60afb0c44b",
+    "freecad/FCST/Init.py": "8186b055c3ede8302b2df17f226a1d0e5f7b97f46189240b7460299b5e8fb02e",
+    "freecad/FCST/InitGui.py": "ec6af225f2faa5b1a62bc503544e762c2b2b1a37247de973a61f3d6001af468e",
+    "LICENSE": "11958a8dd20d4b21e3f37f81e3c920db7a0ee58efa2ae01c1c0f800ddb35078f",
+    "LICENSES/Apache-2.0.txt": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+    "LICENSES/CC-BY-4.0.txt": "d557539df68e771cc1eedcc91d13f70fca930e508d11eedcafa4b15db49e3744",
+    "LICENSES/LGPL-2.1-or-later.txt": "5749785c8bdefafcb5d798270ed0a967036fe2ca63dcedade1627565dfef81d2",
+    "LICENSES/MIT.txt": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0",
+    "python/fcst_app/__init__.py": "d5fb80b0622163ad4bf6b9ad0e3a10147a13f6017315a49d4e946d6f1822579e",
+    "python/fcst_app/arrays.py": "1bbb1a369796ff4da422ed63edd898a5479aec4db782c20bb4b2a016556f14ab",
+    "python/fcst_app/fem_adapter.py": "f79add478cda57ce558b3cfec025e8e7d15d24bd57fb89e76f8d0947a0f717bb",
+    "python/fcst_app/jobs.py": "e261b47ff350eec2cad4dc7d7eded8db571f228c565b25f65661f269c8b8776c",
+    "python/fcst_app/persistence.py": "ceca343f03e5f2b42c108475955c833f618c4f7c0cb0eb71c41f586b3dd57778",
+    "python/fcst_app/process_limits.py": "fbae3c77add596d49b2cd7e9c3fd0dab54012cd97bd42f293cacb07462e975f4",
+    "python/fcst_app/spatial_arrays.py": "ec1793b9aee9d0c7b16fa415a6921469a941300dd1e985254057bb8aef2cb1f7",
+    "python/fcst_app/store.py": "7232b254199c11b07f82ad859ebf5c288578a3820ca136caaa6d814224d9be59",
+    "python/fcst_contracts/__init__.py": "7ce10d4ade7d2f111eca73a4ab136ab1d184e6368b16c2d91bbaf4ecf1ed48c5",
+    "python/fcst_contracts/bundle.json": "785584588917e6d882f80247f25632cf1bd84c5ed9cb2c4116a96bc10365b932",
+    "python/fcst_contracts/spatial.py": "5019c4dce9233055e91b4cd63ba713324c252a12900de2d6bdde703238fb5e4a",
+    "python/fcst_contracts/types.py": "d399ea1521fbbb899bfa2a9194532ef1e7892e6719a6b3e9c54ca14cd43e9824",
+    "python/fcst_contracts/worker.py": "a8da22e6d4c3534ce73494312fd0641ed10bfb2866ab34ef87a196a9827fbadf",
+    "python/fcst_host/__init__.py": "281bedd49c2fd49f96ca0e4176708f5a38edac66beee1f6c0bbdadf0d86b5f1f",
+    "python/fcst_host/controller.py": "38916c1f0a31570671ed92d0a5b11d5e190444b74e249293859b1fd7624b048f",
+    "python/fcst_host/review.py": "45c7d19ce37741e7caf6e8880d3b133b79672ffdd950ccfb319eb907d2b28be4",
+    "python/fcst_host/spatial.py": "20313acae5207b657d76245a98e0aecc7aeb758e179fbb60e4d00b518866f80f",
+    "python/fcst_host/templates.json": "b7ba367105b4e0eeea7855003fcb402cf6621fd432f6e1dcb6e21657729342eb",
+    "python/fcst_host/widgets.py": "a5d0bba26de327d6b353e5b19801b5709d3cb574835c0eaa7683748edb41e5f8",
+    "python/fcst_host/workbench.py": "93b9aaabec5c8a72273a3a53cab3bdec9d326cebccf9cb8b9039414d05dfd5d3",
+    "tests/fixtures/contracts/network.json": "856953a18cc4f3e633c99d24be86201bb2f08776b3b8968f660eff656292c806",
+    "tests/fixtures/spatial/solid-surface-rotated.json": "49c3eba18add86b72acc6f750d249c68397baf60315a82b3dc95d0a6f256c301",
+    "tests/test_host.py": "b57f644e523d637a67642ac9baa23e2e20b9ce3121b1889970b2d476e6f2c234",
+    "tools/check_host.py": "b536e88edc1484b0fc9c252f67e77d7d4bbdced7b9d3f888f0b80bee4fcad764",
+    "tools/host_acceptance_payload.py": "9bdc03245ca4a14cc271c33e67bee63e2cd3beb7b787aa2bb9a123e36a44018a",
+    "tools/host_smoke.py": "c015342ca66773663af8469df9c3343e7756e0298b60f190b41b70dc93311b81",
+    "tools/host_smoke_payload.py": "aa87726597dc97b6d8ef79e5e78dee6602f347f38961584e9ce963f81c4f48c4",
+    "tools/install_workbench.py": "ef023c447c385e13a723305ebbc4914971abe8fef4b22278b80a74c01d749fd2",
+    "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec"
+  },
+  "validation_policy": "Full Debug/Release baselines precede the final host-only changes. The final host source tree and 340-case standard-library suite pass separately. GitHub Actions reruns all 364 checks and the 18-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines.",
+  "shared_source_inventory": "ci/dwg-backend.json pins the changed store and FEM adapter; the complete 24-case native backend gate passed with vendor imports denied.",
+  "graphics": "bundled_mesa",
+  "final_host_regressions": [
+    "Single active dataset with saved selection",
+    "Prescribed-boundary equation residual maps",
+    "Repeated inverse Undo with saved cursor",
+    "Software-rendered native FEM contours",
+    "Bounded failure diagnostics without raw logs"
+  ],
+  "graphics_sha256": "38870631e23fe7f7c1f5a1981d4ffa70bbd147caff31d4c1c4f1ef8cf5ff4860",
+  "graphics_policy": "Use only the hash-pinned software OpenGL DLL already shipped in the verified official bundle. Preserve its original bytes and notices and create the alias only in the isolated local test cache. Qt and native FEM rendering share that software implementation."
+}

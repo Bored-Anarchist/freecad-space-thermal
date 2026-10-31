@@ -224,6 +224,23 @@ class ProjectStore:
     def snapshot(self):
         return self.state()["model"]
 
+    def add_artifact(self, artifact_id, role, path, data, *, expected_revision):
+        """Register immutable input bytes before a transaction refers to them.
+
+        An unused input is harmless and remains auditable if the subsequent edit
+        fails. Package validation checks its type, path, bounds and exact bytes.
+        """
+        with self.transaction():
+            state = self.state()
+            self._revision(state, state['model']['project_id'], expected_revision)
+            artifact = (artifact_id, role, path, bytes(data), [])
+            package = Package.create(state['model'], [*self._artifacts(), artifact], state=state,
+                                     **self._package_metadata())
+            self.db.execute('INSERT INTO artifacts VALUES(?,?,?,?,?)',
+                            (artifact_id, role, path, encode([]), bytes(data)))
+            self.db.execute('UPDATE package_manifest SET data=? WHERE id=1', (encode(package.manifest),))
+        return artifact_id
+
     @staticmethod
     def _authorize(actor, scopes, operation):
         if (not isinstance(actor, str) or not actor or len(actor) > 128
