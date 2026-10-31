@@ -31,7 +31,7 @@ identity metadata is informational and never grants authority.
 
 Defaults allow reversible project edits and deny file exports. Explicit launch
 options `allow_export` and `allow_source_export` permit new local output files
-and separately permit copying preserved source artifacts. Existing destinations,
+and separately permit copying preserved source artifacts. Package outputs use `.fcst`; generated reports use `.json`. Existing destinations,
 source overwrite, traversal, links, junctions and hardlinks are rejected. There
 is no external-disclosure or privileged-execution implementation to enable.
 The working root is an application I/O boundary, not an operating-system sandbox.
@@ -68,7 +68,8 @@ license preserved. Optional HTTP, Tasks and subscriptions are unsupported.
 
 `tools/list` publishes operation-specific argument/result schemas and paginates
 the discovery response. `schemas_get` retrieves an individual published contract.
-Unknown fields and operations are rejected. JSON is bounded and rejects duplicate
+Unknown fields and operations are rejected. Request IDs are limited to 128 characters or exact integers within the IEEE-754
+safe range. JSON is bounded and rejects duplicate
 keys, nonfinite numbers and excessive nesting. Responses never include raw
 exceptions or local filesystem paths.
 
@@ -85,7 +86,10 @@ properties to a thermal node. Unsupported spatial features cannot become solves.
 and control that job across stdio processes. A separate scheduler is launched
 automatically and exits after an idle interval. Stdio EOF or
 `notifications/cancelled` has no application cancellation authority. A killed
-scheduler leaves an interrupted attempt, and cannot manufacture success.
+scheduler leaves an interrupted attempt, and cannot manufacture success. On
+reconnect, the server wakes the queue service so abandoned attempts recover
+without resubmission. Client launchers that terminate process trees can interrupt
+a worker; confirmed terminal outcomes remain durable.
 Application cancellation has a bounded worker-termination fallback. Completed
 jobs retain their outcomes, including when cancellation races completion.
 
@@ -101,7 +105,7 @@ handshake still reports `solver_available: false`; this adapter invokes the
 separate native thermal CLI and publishes verified HDF5 through `JobStore`.
 
 `results_query` pages samples and selected node UUIDs; historical access must be
-explicit. `results_compare` requires matching node identities/time grids.
+explicit. Times use seconds, temperatures use kelvin, and power/residual values use watts. `results_compare` requires matching node identities/time grids.
 `balances_get` returns a resource containing native boundary-power sums and
 equation residual summaries. It does not infer a new energy acceptance verdict.
 Model edits make prior results stale for live-model use.
@@ -136,6 +140,10 @@ python tools/check_mcp.py --worker out/windows-release/Release/fcst-worker.exe -
 python tools/verify.py --preset windows-debug
 python tools/verify.py --preset windows-release
 ```
+
+Qualification gives native Debug/Release test jobs an explicit 300-second wall
+budget and bounds the client wait around that budget; numerical temperature and
+energy thresholds remain fixed.
 
 The frozen acceptance list covers in-process attacks, real modern stdio model
 construction/native solve/reconnection, independent analytic temperature/energy

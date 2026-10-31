@@ -1,0 +1,93 @@
+{
+  "work_package": "WP-14",
+  "status": "complete",
+  "scope": "Typed local MCP gateway authorization audit and resource paging; native geometry-free conduction and portable FCST package profiles",
+  "tested_worktree_base": "4c49973024314c0df78c39cb227f0bdd1d5dc168",
+  "implementation_delivery": "implemented",
+  "acceptance_status": "passed_on_declared_profiles",
+  "review_status": "Ready for code review",
+  "protocols": [
+    "2026-07-28",
+    "2025-11-25"
+  ],
+  "legacy_sdk": "mcp==1.26.0",
+  "checks": [
+    {
+      "id": "windows_debug_full_driver",
+      "status": "passed",
+      "candidate": "4c49973024314c0df78c39cb227f0bdd1d5dc168",
+      "required_checks": 381,
+      "unit_cases": 356,
+      "native_ctest_cases": 68,
+      "mcp_cases": 21,
+      "host_cases": 18,
+      "report_sha256": "02b098f0312b38b6be1c4764e6ba4f18130d9988d76a8e3479e6817c03b00846",
+      "mcp_report_sha256": "e1e6a058ba19256d9d74d03ae258a8375fe9116611b14c1577e1823e45d5d21a",
+      "host_report_sha256": "818dd0204cc50935ec3f0abb70f9f005af7839430040b259b42f1b02d5070fc6",
+      "native_worker_sha256": "f80495049a7dec610cb330568cdc00532a73aa4387dca309900b706ea8da872c"
+    },
+    {
+      "id": "windows_release_full_driver",
+      "status": "passed",
+      "candidate": "4c49973024314c0df78c39cb227f0bdd1d5dc168",
+      "required_checks": 381,
+      "unit_cases": 356,
+      "native_ctest_cases": 68,
+      "mcp_cases": 21,
+      "host_cases": 18,
+      "report_sha256": "66da098aa9e51d7d7b887b6a0ff4341be33a0058e1185e3a5bb12612b24a5bc1",
+      "mcp_report_sha256": "43e6808a48f97e0de8c806b566075ac3a4f79ac0353facda88bf05870cd845f3",
+      "host_report_sha256": "d4f7f47b4b9d22d50340ce5ca489fbf4e68b2a214e9e476dd13fef237453a005",
+      "native_worker_sha256": "6ed7bfc1aaeddae538134d38dd3073341ac5856a986d07d59438a22c8241e1fa"
+    }
+  ],
+  "blockers": [],
+  "input_sha256": {
+    "ci/mcp-acceptance.json": "9e91b95c518012e0e562d10271dda5d441c4a7430ab7fd89d9510420616b5024",
+    "ci/mcp-requirements.lock": "7712cfe5e6cf3747e80d3bcf8899d88c1abae082d65c25478401d578d184626a",
+    "engine/src/contracts.cpp": "bb26120855ff1f359d076cd34b15f0bd28771ad7fd202579ef938ea3545a8eff",
+    "engine/src/thermal_execution.inc": "7246337506fa0a73b233ce97d62525ee3cde380d26e7380d01a51c0f8bcb1476",
+    "python/fcst_app/jobs.py": "93782a1f821182b51b3b4920691151bbf5c16039f3dada472ca459e72e597103",
+    "python/fcst_host/review.py": "d4b22fd15e2b7c0e137ee1b563e4723a3174c90bff0930f511139f8ca6ae170e",
+    "python/fcst_mcp/__init__.py": "99c3a199d2d962d2dd9da5bd5d6e1e5fe2b2287ed6fa1bf9f366e639dc16b02f",
+    "python/fcst_mcp/__main__.py": "da6df6733ac17119f7089f01e36f9b3d82ce98d9f44cdc44b9afe5070584630b",
+    "python/fcst_mcp/gateway.py": "44784f4d36592230c6e46417a7adcaf187f81bd8662a51ad2e01eddcba7bf51a",
+    "python/fcst_mcp/native_peer.py": "6a5e9e7b65d44639edee8468afed8d6c6d962178532c22735d287b82b307e7dd",
+    "python/fcst_mcp/policy.py": "819fa6e65ee2d20646059621d9a766bf8e7bdd785cd39dc1e08808efabd6e536",
+    "python/fcst_mcp/schemas.py": "d3e95449680ddc1482fa61cc899fdc5069468c55fe9a3ef5578b0d67d71d40ee",
+    "python/fcst_mcp/server.py": "528c32054ce6f04e43143815471c26f672c819d562ee48966d629d14086aa959",
+    "python/fcst_mcp/service.py": "dc4ccc6702cd58a035ca0d8f023d9310137e24943d7379e2d37b23ca59e4017a",
+    "python/fcst_tools/mcp.py": "03f338bf115c28634432f5b907b386177153ca9aad0465e542e0562466b57148",
+    "spec/mcp/2026-07-28.schema.json": "ef70b61f99b6d2e5e3b46863822eab08dff6a45bedc7a08914e0e5b133f40203",
+    "spec/mcp/LICENSE": "0382b0057770ca05e9c350a50aa3b1c1fea84da0bc81d723bf00b9aa841be58a",
+    "tests/test_mcp.py": "2273ab032f15d75b177f59e72118f5b3d2b31b6f6484d537d1c18341f1059087",
+    "tools/check_mcp.py": "8e69f09b542ad81aa4af2ce25e9927ee82ab99a3afe38440ae5df89ef2ff397e"
+  },
+  "requirements": [
+    "AI-001",
+    "AI-002",
+    "AI-003",
+    "AI-004",
+    "AI-005",
+    "AI-006",
+    "AI-007",
+    "AI-008",
+    "AI-009",
+    "AI-010",
+    "AI-011",
+    "SEC-005",
+    "TST-021"
+  ],
+  "publication": "Exact staged files outgoing history approved metadata generated bounded reports and final PR prose are cleared before push; launch configurations operational databases source packages arrays screenshots native binaries and raw logs remain local",
+  "remaining_qualification": [
+    "WP-15 integrated two-node two-surface GUI/CLI/MCP parity",
+    "WP-16 production spatial discretization and qualified callbacks",
+    "Vendor paired and complete Q1 release qualification"
+  ],
+  "unavailable_capabilities": [
+    "Production mesh and radiation submission through this MCP profile",
+    "Vendor-specific conversion tools through this MCP profile",
+    "Viewport capture and optional network MCP"
+  ],
+  "acceptance_native_wall_s": 300
+}

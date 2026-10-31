@@ -30,6 +30,9 @@ class Gateway:
         self.db.execute('CREATE TABLE IF NOT EXISTS mcp_audit (sequence INTEGER PRIMARY KEY, data BLOB NOT NULL)')
         self.db.execute('CREATE TABLE IF NOT EXISTS mcp_exchange (id TEXT PRIMARY KEY, data BLOB NOT NULL)')
         self.db.execute('CREATE TABLE IF NOT EXISTS mcp_resources (id TEXT PRIMARY KEY, revision INTEGER NOT NULL, actor TEXT NOT NULL, cases BLOB NOT NULL, data BLOB NOT NULL)')
+        # Reconnecting with only a durable job UUID must recover a crashed
+        # scheduler, without requiring a second submission to trigger recovery.
+        if self.backend and self.wake:self.wake()
 
     def summary(self):
         m=self.store.snapshot()

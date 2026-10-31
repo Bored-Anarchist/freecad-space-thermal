@@ -188,6 +188,26 @@ class MCPAcceptance(MCPTests):
                         resources=await session.list_resources()
                         resource=await session.read_resource(resources.resources[0].uri)
                         self.assertEqual(len(resource.contents),1)
+                        submitted=await session.call_tool('solve_submit',self.base|dict(case_id=CASE,
+                            idempotency_key='sdk-job',options=review.DEFAULT_SETTINGS))
+                        self.assertFalse(submitted.isError)
+                        key=submitted.structuredContent['job_id']
+                        cancelled=await session.call_tool('jobs_cancel',dict(project_id=self.policy.project_id,job_id=key))
+                        self.assertFalse(cancelled.isError)
+                        deadline=time.monotonic()+10
+                        while time.monotonic()<deadline:
+                            response=await session.call_tool('jobs_get',dict(project_id=self.policy.project_id,job_id=key))
+                            state=response.structuredContent['state']
+                            if state in {'cancelled','succeeded','failed','interrupted'}:break
+                            await asyncio.sleep(.05)
+                        self.assertIn(state,{'cancelled','succeeded'})
+                # SDK launchers may terminate a child process tree at disconnect;
+                # confirmed outcomes remain durable after opening a new session.
+                async with stdio_client(parameters,errlog=log) as (reader,writer):
+                    async with ClientSession(reader,writer) as session:
+                        await session.initialize()
+                        retained=await session.call_tool('jobs_get',dict(project_id=self.policy.project_id,job_id=key))
+                        self.assertEqual(retained.structuredContent['state'],state)
         asyncio.run(asyncio.wait_for(workflow(),timeout=25))
 
     def test_native_queued_cancel_and_service_restart_truth(self):
@@ -208,8 +228,15 @@ class MCPAcceptance(MCPTests):
         self.assertEqual(gateway.job(job['job_id'])['state'],'cancelled')
         running=gateway.call('solve_submit',args|dict(idempotency_key='interrupted'))
         value=gateway.job(running['job_id']);value['state']='running';gateway.jobs._put(value)
-        with Scheduler(gateway.jobs,self.root/'runs',{}):pass
-        self.assertEqual(gateway.job(running['job_id'])['state'],'interrupted')
+        client=Client(self.config())
+        try:
+            deadline=time.monotonic()+10
+            while time.monotonic()<deadline:
+                recovered=client.call('jobs_get',dict(project_id=self.policy.project_id,job_id=running['job_id']))
+                if recovered['state']=='interrupted':break
+                time.sleep(.05)
+            self.assertEqual(recovered['state'],'interrupted')
+        finally:client.close()
 
     def test_native_steady_case_uses_explicit_environment_and_publishes_results(self):
         node=deepcopy(next(e for e in fixture()['entities'] if e['id']==review.uid(5)))
