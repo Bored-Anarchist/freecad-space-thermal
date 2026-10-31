@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "host_profile": "ci/host-profile.json",
+  "required_cases": [
+    "FEM-REUSE-001",
+    "FEM-REUSE-002",
+    "FEM-REUSE-004",
+    "FEM-REUSE-005",
+    "HOST-EDITORS",
+    "HOST-CREATE",
+    "HOST-SELECTION",
+    "HOST-SOLVE",
+    "HOST-CANCEL",
+    "HOST-ASYNC-RACE",
+    "HOST-SAVE-RECOVERY",
+    "HOST-TOPOLOGY",
+    "HOST-THREAD",
+    "HOST-RENDER"
+  ],
+  "criteria": {
+    "temperature_absolute_K": 0.01,
+    "energy_absolute_J": 1e-7,
+    "deadline_seconds": 240,
+    "minimum_coloured_chart_pixels": 40,
+    "minimum_contour_coloured_pixels_per_band": 100,
+    "screenshot_role": "local supplementary rendering evidence only"
+  },
+  "remaining_spatial_qualification": "Production meshing, FD/FE and spatial assignments remain WP-16; FEM-REUSE-003/006 are not satisfied by host display tests."
+}

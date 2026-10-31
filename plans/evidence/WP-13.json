@@ -1,0 +1,28 @@
+{
+  "work_package": "WP-13",
+  "status": "in_progress",
+  "scope": "FreeCAD host editors visualization transactions and unattended installed-workbench acceptance; production spatial physics remains WP-16",
+  "tested_worktree_base": "67acf5ada6a269abf0283d1045aafbb6dc860cd7",
+  "checks": [
+    {
+      "id": "portable_host_contracts",
+      "status": "passed",
+      "command": "python -m unittest discover -s tests -p test_host.py"
+    },
+    {
+      "id": "installed_workbench",
+      "status": "passed",
+      "command": "python tools/check_host.py --worker PATH_TO_TESTED_WORKER"
+    }
+  ],
+  "blockers": [
+    "Final candidate Debug and Release verification and CI publication remain pending"
+  ],
+  "remaining_qualification": [
+    "WP-16 production spatial physics and FEM-REUSE-003/006",
+    "WP-14/15 MCP and integrated P0 parity",
+    "WP-17/18 production environments and campaigns",
+    "TD/ESATAN paired and complete Q1 release qualification"
+  ],
+  "publication": "Owned synthetic fixtures source-only adapters and bounded host.json summaries; raw documents screenshots arrays logs binaries preferences and engineering originals stay local"
+}

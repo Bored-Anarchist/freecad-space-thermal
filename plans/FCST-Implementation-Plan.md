@@ -706,6 +706,15 @@ and measured scaling through one million facets on the tested implementation.
 
 ### Step 13 — WP-13: build the FreeCAD host and model-review interface
 
+The [host implementation](../docs/freecad-workbench.md) supplies the installed
+workbench, schema-derived editors, canonical transactions and inverse Undo,
+signed CAD capture/review links, asynchronous native steady/transient execution,
+coordinated saves and linked contour/history/budget views. The supplemental
+[reuse assessment](../ci/host-reuse.json) retains the foundation's pinned FEM
+objects and native contour rendering; bundled Coin adds engineering overlays.
+Both Windows drivers require `tools/check_host.py` and candidate/source/worker-bound
+`host.json` evidence. Production spatial physics and FEM-REUSE-003/006 remain WP-16.
+
 Before implementing overlapping objects, editors or visualization, complete the initial [FEM reuse assessment](../docs/decisions/0003-freecad-fem-reuse.md), including mesh candidates for WP-16. Record reuse/adapt/replace/defer decisions with pinned APIs, licenses and prototype evidence in the WP-13 issue/implementation PR. Route selected components through FCST adapters and the shared transaction/result contracts. The existing geometry smoke is not FEM evidence.
 
 1. Add workbench registration, document/project links, tree objects and view providers using the pinned host APIs.
