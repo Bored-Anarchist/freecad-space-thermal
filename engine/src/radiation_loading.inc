@@ -52,6 +52,11 @@ std::string radiation::inspect(std::string_view input,bool steady) {
     std::vector<double> temperatures;
     if(value.has("temperatures_K")) for(const auto& t:array(value.at("temperatures_K"))) temperatures.push_back(number(t));
     J::O out{{"status",J("passed")},{"execution_mode",J("fcst_native")},{"schema_version",J(1.0)},
+      {"source_revision",J(thermal::thermal_backend_capabilities().source_revision)},
+      {"input_sha256",J(thermal::thermal_digest(input))},
+      {"estimator",J("area-uniform cosine-hemisphere Bernoulli hit fraction")},
+      {"stream_version",J("splitmix64-fnv1a-surface-side-v1")},
+      {"confidence_method",J("pointwise two-sided Wilson 95 percent; ensemble qualification uses Bonferroni")},
       {"seed",J(static_cast<double>(sampling.seed))},{"samples_per_patch",J(static_cast<double>(sampling.samples))}};
     if(steady) {
       if(!value.has("thermal_input") || value.has("temperatures_K")) fail("schema");
@@ -99,9 +104,19 @@ std::string radiation::inspect(std::string_view input,bool steady) {
           {"condition",J(p.optics.dataset.condition)},{"provenance",J(p.optics.dataset.provenance)},
           {"absolute_uncertainty",J(J::A{J(p.optics.dataset.absolute_uncertainty[0]),J(p.optics.dataset.absolute_uncertainty[1])})}})}});
       const auto& r=exchange->raw()[i]; J::A counts;
-      for(const auto& c:r.counts) counts.emplace_back(J::O{{"target",J(static_cast<double>(c.target))},{"hits",J(static_cast<double>(c.hits))}});
+      constexpr double quantile=1.959963984540054;
+      for(const auto& c:r.counts) {
+        auto interval=radiation::wilson(c.hits,r.samples,quantile);
+        counts.emplace_back(J::O{{"target",J(static_cast<double>(c.target))},{"hits",J(static_cast<double>(c.hits))},
+          {"estimate",J(interval.estimate)},{"lower",J(interval.lower)},{"upper",J(interval.upper)}});
+      }
+      auto escape_interval=radiation::wilson(r.escaped,r.samples,quantile);
+      auto blocked_interval=radiation::wilson(r.blocked,r.samples,quantile);
       raw.emplace_back(J::O{{"source",J(static_cast<double>(i))},{"samples",J(static_cast<double>(r.samples))},
-        {"escaped",J(static_cast<double>(r.escaped))},{"blocked",J(static_cast<double>(r.blocked))},{"counts",J(counts)}});
+        {"escaped",J(static_cast<double>(r.escaped))},{"blocked",J(static_cast<double>(r.blocked))},{"counts",J(counts)},
+        {"escape_interval",J(J::A{J(escape_interval.lower),J(escape_interval.upper)})},
+        {"blocked_interval",J(J::A{J(blocked_interval.lower),J(blocked_interval.upper)})},
+        {"unlisted_zero_hit_upper",J(radiation::wilson(0,r.samples,quantile).upper)}});
     }
     // Bounded first page; the native Exchange API supports subsequent pages.
     for(const auto& e:exchange->page(0,std::min<std::size_t>(4096,exchange->edges().size()))) edges.emplace_back(J::O{

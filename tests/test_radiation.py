@@ -87,7 +87,7 @@ class RadiationTests(unittest.TestCase):
                     execution_mode='fcst_native', status='passed', vendor_compatibility_qualified=False, q1_qualified=False, native_sha256='1'*64, worker_sha256='2'*64,
                     cases=[dict(id=c, status='passed') for c in cases], ensemble=assess(runs, self.policy, self.statistical, self.candidate), scaling=curves,
                     runs=[dict(geometry=r['geometry'], seed=r['seed'], samples=r['samples'], raw_sha256='3'*64) for r in runs],
-                    independent_reference=dict(plate_quadrature=.19982489569838746, quadrature_error_bound=1e-13, maximum_radiosity_error=1e-10, coupled_steady_temperature_error_K=1e-10))
+                    independent_reference=dict(plate_quadrature=.19982489569838746, quadrature_error_bound=1e-13, maximum_radiosity_error=1e-10, coupled_steady_temperature_error_K=1e-10), independent_backends=self.policy['independent_backends'])
 
     def test_handoff_recomputes_intervals_scaling_coverage_and_provenance(self):
         r = self.report()

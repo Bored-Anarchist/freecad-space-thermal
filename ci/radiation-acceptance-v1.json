@@ -18,6 +18,7 @@
   "maximum_storage_bytes_per_facet": 2048,
   "scaling_practical_error": 0.02,
   "source_comparison_tolerance_W": 0.000001,
+  "independent_backends": {"numpy": "2.2.3", "scipy": "1.15.2"},
   "references": [
     "https://www.thermalradiation.net/calc/sectionc/C-11.html",
     "https://doc.comsol.com/6.4/doc/com.comsol.help.models.heat.view_factor/view_factor.html"

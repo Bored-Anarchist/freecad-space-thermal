@@ -29,12 +29,16 @@ def input_hashes():
 
 def check(subject, native, worker, output):
     import numpy as np
+    import scipy
     from scipy.integrate import dblquad
     from scipy.optimize import brentq
+    from fcst_tools.radiation import wilson
     policy = json.loads((ROOT/'ci/radiation-acceptance-v1.json').read_bytes())
     statistical = json.loads((ROOT/'ci/numerical-criteria-v1.json').read_bytes())['statistical_policy']
     frozen_hashes = input_hashes()
     candidate = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=ROOT, text=True).strip()
+    reference_versions = dict(numpy=np.__version__, scipy=scipy.__version__)
+    require(reference_versions == policy['independent_backends'])
     work = output.parent/('radiation-attempt-'+str(time.time_ns()))
     work.mkdir(parents=True)
     env = dict(os.environ, PATH=str(worker.parent))
@@ -46,6 +50,8 @@ def check(subject, native, worker, output):
         (work/(stem+'.json')).write_bytes(r.stdout)
         (work/(stem+'.log')).write_bytes(r.stderr)
         return r
+    identity = execute(worker, ['--build-info'], 'worker-identity')
+    require(identity.returncode == 0 and json.loads(identity.stdout)['source_revision'] == candidate)
     for case in policy['native_cases']:
         r = execute(native, [case, ROOT/'tests/fixtures/thermal'], 'native-'+case)
         records.append(dict(id=case, status='passed' if r.returncode == 0 and r.stdout == b'passed\r\n' or r.returncode == 0 and r.stdout == b'passed\n' else 'failed'))
@@ -69,6 +75,11 @@ def check(subject, native, worker, output):
     r = execute(worker, ['--radiation-evaluate'], 'worker-evaluation', json.dumps(fixture).encode())
     require(r.returncode == 0 and not r.stderr)
     result = json.loads(r.stdout)
+    require(result['source_revision'] == candidate and result['input_sha256'] == hashlib.sha256(json.dumps(fixture).encode()).hexdigest())
+    for row in result['raw']:
+        for count_entry in row['counts']:
+            expected = wilson(count_entry['hits'], row['samples'], 1.959963984540054)
+            require(all(abs(count_entry[k]-v) < 1e-14 for k, v in zip(('estimate','lower','upper'), expected)))
     patches = result['patches']; count = len(patches)
     areas = np.array([p['area_m2'] for p in patches]); factors = np.zeros((count, count))
     for edge in result['edges']:
@@ -140,6 +151,7 @@ def check(subject, native, worker, output):
                   ensemble=ensemble, runs=[dict(geometry=x['geometry'], seed=x['seed'], samples=x['samples'],
                   raw_sha256=digest(work/f"{x['geometry']}-{x['seed']}-{x['samples']}.json")) for x in runs],
                   independent_reference=dict(plate_quadrature=quadrature, quadrature_error_bound=error, maximum_radiosity_error=source_error, coupled_steady_temperature_error_K=steady_error), scaling=curves)
+    report['independent_backends'] = reference_versions
     require(frozen_hashes == input_hashes())
     if report['status'] == 'passed': assess_report(report, policy, statistical, frozen_hashes, candidate)
     output.write_text(json.dumps(report, indent=2, allow_nan=False)+'\n')

@@ -78,6 +78,7 @@ def assess_report(report, policy, statistical, hashes, candidate):
     require(report['schema_version'] == 1 and report['profile'] == policy['profile'] and report['candidate'] == candidate)
     require(report['input_sha256'] == hashes and report['scope'] == policy['scope'] and report['execution_mode'] == 'fcst_native')
     require(report['status'] == 'passed' and report['vendor_compatibility_qualified'] is False and report['q1_qualified'] is False)
+    require(report['independent_backends'] == policy['independent_backends'])
     for field in ('native_sha256', 'worker_sha256'):
         require(isinstance(report[field], str) and re.fullmatch('[0-9a-f]{64}', report[field]))
     expected_cases = set(policy['native_cases']) | {'fixed-ensemble', 'independent-quadrature-and-radiosity', 'worker-input-boundary', 'worker-replay', 'worker-coupled-steady', 'million-facet-scaling'}

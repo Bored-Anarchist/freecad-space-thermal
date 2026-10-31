@@ -56,6 +56,10 @@ reciprocity defect and maximum directed view-factor correction are reported.
 Independent tests check bounds, reciprocity, closure, analytical agreement and
 the correction magnitude. Corrected factors never replace raw estimator counts
 in statistical acceptance. `page` limits edge queries to 4096 records.
+Worker artifacts also report the estimator/stream version, input digest, build
+revision, pointwise Wilson 95 percent intervals and a zero-hit upper bound for
+unlisted sparse targets. Pointwise intervals do not replace the simultaneous
+qualification intervals.
 
 IR radiosity solves
 

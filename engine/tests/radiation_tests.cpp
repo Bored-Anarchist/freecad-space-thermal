@@ -43,6 +43,8 @@ int main(int argc,char** argv) {
       auto r=trace_row(two,1,{17,512,100});require(r.escaped==512); // lower back sees space
       Mesh excluded(fs,{fs[2].id,fs[3].id});require(excluded.facets().size()==2);
       for(std::size_t i=0;i<excluded.patches().size();++i) require(trace_row(excluded,i,{17,512,100}).escaped==512);
+      auto both=trace(excluded,{17,512,100});auto value=evaluate(both,std::vector<double>{300,300},{200,1e-12,100,{100,100}});
+      near(sum(value.environment),1.3*5.670374419e-8*(std::pow(200.,4)-std::pow(300.,4))+120);
     } else if(name=="seed-streams") {
       auto fs=plates();Mesh a(fs);auto first=trace_row(a,0,{1701,4096,100});std::reverse(fs.begin(),fs.end());Mesh b(fs);
       auto second=trace_row(b,0,{1701,4096,100});require(first.counts[0].hits==second.counts[0].hits);
