@@ -56,6 +56,11 @@ def check(directory):
         assess_thermal(load(path.parent/'thermal.json'), load(ROOT/'ci/thermal-acceptance.json'), thermal_hashes(ROOT), candidate)
         from fcst_tools.thermal_references import assess as assess_references, input_hashes as reference_hashes
         assess_references(load(path.parent/'thermal-references.json'),load(ROOT/'ci/thermal-reference-v1.json'),reference_hashes(ROOT),candidate)
+        from fcst_tools.radiation import assess_report as assess_radiation
+        from check_radiation import input_hashes as radiation_hashes
+        assess_radiation(load(path.parent/'radiation.json'),load(ROOT/'ci/radiation-acceptance-v1.json'),
+                        load(ROOT/'ci/numerical-criteria-v1.json')['statistical_policy'],radiation_hashes(),candidate)
+
     hosts=list(directory.rglob("fem-probe.json"))
     if len(hosts)!=1: raise ValueError("missing_or_duplicate_host_report")
     host=load(hosts[0]);inputs=input_hashes(ROOT)
@@ -87,7 +92,7 @@ def check(directory):
     scanner=Scanner(load(POLICY_PATH))
     # Every exact report and every candidate path is inspected before publication.
     for path in sorted(directory.rglob("*.json")):
-        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json","jobs.json","exchange.json","td.json","dwg-backend.json","thermal.json","thermal-references.json","esatan.json"}:
+        if path.name in {"verification.json","spatial.json","fem-probe.json","contracts.json","numerical.json","persistence.json","build-info.json","host-smoke.json","jobs.json","exchange.json","td.json","dwg-backend.json","thermal.json","thermal-references.json","radiation.json","esatan.json"}:
             scanner.scan(path.name,path.read_bytes())
     # Full outgoing history is additionally required locally before push. CI checks
     # the actual checked-out candidate (checkout may intentionally be shallow).

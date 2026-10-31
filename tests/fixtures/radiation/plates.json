@@ -1,0 +1,265 @@
+{
+  "schema_version": 1,
+  "facets": [
+    {
+      "id": "lower-a",
+      "surface_id": "lower",
+      "group": "main",
+      "node": 0,
+      "vertices_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ]
+      ],
+      "front": {
+        "solar_absorptance": 0.3,
+        "ir_emittance": 0.7,
+        "active": true,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      },
+      "back": {
+        "solar_absorptance": 1,
+        "ir_emittance": 1,
+        "active": false,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      }
+    },
+    {
+      "id": "lower-b",
+      "surface_id": "lower",
+      "group": "main",
+      "node": 0,
+      "vertices_m": [
+        [
+          0,
+          0,
+          0
+        ],
+        [
+          1,
+          1,
+          0
+        ],
+        [
+          0,
+          1,
+          0
+        ]
+      ],
+      "front": {
+        "solar_absorptance": 0.3,
+        "ir_emittance": 0.7,
+        "active": true,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      },
+      "back": {
+        "solar_absorptance": 1,
+        "ir_emittance": 1,
+        "active": false,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      }
+    },
+    {
+      "id": "upper-a",
+      "surface_id": "upper",
+      "group": "main",
+      "node": 1,
+      "vertices_m": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          0,
+          1
+        ]
+      ],
+      "front": {
+        "solar_absorptance": 0.8,
+        "ir_emittance": 0.4,
+        "active": true,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      },
+      "back": {
+        "solar_absorptance": 1,
+        "ir_emittance": 1,
+        "active": false,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      }
+    },
+    {
+      "id": "upper-b",
+      "surface_id": "upper",
+      "group": "main",
+      "node": 1,
+      "vertices_m": [
+        [
+          0,
+          1,
+          1
+        ],
+        [
+          1,
+          0,
+          1
+        ],
+        [
+          0,
+          0,
+          1
+        ]
+      ],
+      "front": {
+        "solar_absorptance": 0.8,
+        "ir_emittance": 0.4,
+        "active": true,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      },
+      "back": {
+        "solar_absorptance": 1,
+        "ir_emittance": 1,
+        "active": false,
+        "dataset": {
+          "solar_band": "solar",
+          "infrared_band": "infrared",
+          "valid_temperature_K": [
+            0,
+            10000
+          ],
+          "condition": "BOL",
+          "absolute_uncertainty": [
+            0,
+            0
+          ],
+          "provenance": "synthetic constant-gray acceptance declaration"
+        }
+      }
+    }
+  ],
+  "excluded_facets": [],
+  "sampling": {
+    "seed": 1701,
+    "samples": 16384
+  },
+  "temperatures_K": [
+    350,
+    300
+  ],
+  "environment": {
+    "temperature_K": 200,
+    "solar_incident_W_m2": [
+      100,
+      20
+    ]
+  }
+}

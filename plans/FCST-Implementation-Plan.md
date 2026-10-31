@@ -169,6 +169,17 @@ The foundation, planning, publication, exact host smoke and candidate packaging 
 
 ### 2.2 Privacy and sanitization before publication
 
+WP-12 extends TST-021 to exact native BVH/sampling/radiosity/coupling sources,
+optical declarations, synthetic plate/steady fixtures, frozen ensemble quantities,
+statistical driver, bounded `radiation.json`, scaling curves and final GitHub
+prose. Both Windows drivers execute `tools/check_radiation.py`; CI preflights the
+final report before upload and the handoff checks exact candidate/source hashes,
+all seed/quantity/sample records and every scaling repetition. Scan staged bytes,
+outgoing history and approved identities before push. Raw meshes, per-process
+observations, binaries/debug files, logs and engineering originals stay local;
+no new scanner exception or vendor compatibility qualification is introduced.
+
+
 WP-11.1 through WP-11.10 run `tools/check_thermal.py` and the native CTest acceptance on owned
 synthetic fixtures. Scan the exact C++ API/adapter/generated schema, test/driver
 sources, bounded `thermal.json` reports and final GitHub prose before publication.
@@ -663,6 +674,20 @@ output completion without skipping elapsed time or exceeding the step cap.
 
 
 ### Step 12 — WP-12: implement CPU radiation and thermal coupling
+
+Implementation: [owned CPU radiation engine](../docs/radiation-engine.md), native
+BVH and geometry validation, stable surface/side streams, sparse raw/corrected
+exchange, separate solar/IR constant diffuse-gray optics with provenance/domain
+metadata, radiosity, derivative solves and separate internal/environment thermal
+callbacks. Strict installed-worker evaluation and coupled steady commands are
+included. Native tests cover transient coupling and energy accounting.
+`tools/check_radiation.py` requires all 16 seeds at three sample counts, 576
+predeclared simultaneous intervals, analytical/independent quadrature and dense
+radiosity comparisons, boundary/replay failures, correction checks and three
+scaling repetitions per sample count through one million facets. Both Windows
+presets and the candidate-bound foundation handoff require this acceptance.
+Specular/transmissive optics, moving environments, durable solver jobs, GUI wiring
+and licensed vendor compatibility retain their separately mapped gates.
 
 1. Build radiation meshes with facet/surface/node identity maps, orientation, front/back activation, groups/exclusions and optical assignments. Detect invalid geometry and mapping areas before tracing.
 2. Implement a CPU intersection abstraction and BVH/intersection backend. Test geometric intersections independently from radiative estimators.

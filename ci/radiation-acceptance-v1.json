@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "profile": "WP-12-cpu-radiation-v1",
+  "statistical_policy": "ci/numerical-criteria-v1.json#statistical_policy",
+  "quantities": {
+    "plates": {"lower/front->upper/front": 0.19982489569838746, "upper/front->lower/front": 0.19982489569838746},
+    "spheres": {"inner/front->inner/front": 0.0, "inner/front->outer/front": 1.0, "outer/front->inner/front": 0.25, "outer/front->outer/front": 0.75},
+    "cube": {"bottom/front->top/front": 0.19982489569838746, "top/front->bottom/front": 0.19982489569838746, "left/front->right/front": 0.19982489569838746, "right/front->left/front": 0.19982489569838746, "near/front->far/front": 0.19982489569838746, "far/front->near/front": 0.19982489569838746}
+  },
+  "geometry_size": {"plates": 1, "spheres": 2, "cube": 1},
+  "interval_family": "All 12 quantities times all 16 seeds times all 3 sample counts; any miss fails and is retained for investigation",
+  "practical_error": "Every quantity at the largest sample count must satisfy the frozen 0.01 absolute error bound",
+  "convergence": "Aggregate RMS over all predeclared quantities and seeds must strictly decrease at each sample count",
+  "native_cases": ["intersections", "geometry-mapping", "seed-streams", "occlusion-groups", "exchange-correction", "black-gray-sphere", "jacobian", "thermal-coupling", "limits-failures", "sparse-storage"],
+  "scaling_subdivisions": [16, 50, 158, 500],
+  "scaling_replicates": 3,
+  "scaling_samples": [4096, 16384, 65536],
+  "maximum_storage_bytes_per_facet": 2048,
+  "scaling_practical_error": 0.02,
+  "source_comparison_tolerance_W": 0.000001,
+  "references": [
+    "https://www.thermalradiation.net/calc/sectionc/C-11.html",
+    "https://doc.comsol.com/6.4/doc/com.comsol.help.models.heat.view_factor/view_factor.html"
+  ],
+  "scope": "Owned CPU radiation and coupled thermal acceptance; analytical sources and independent quadrature/dense radiosity comparison; no TD/ESATAN compatibility qualification"
+}

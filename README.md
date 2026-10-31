@@ -73,3 +73,5 @@ Start with [the specification](spec/FreeCAD-Space-Thermal-Specification.md). Sup
 - [Package consistency validator](spec/tools/validate_spec.py): checks registers, references, schemas, and examples; requires Python and `jsonschema`.
 
 These are design requirements and draft interface contracts, **not an implemented product or evidence of existing file compatibility**. Required compatibility and numerical testing, source-model fixtures, and unresolved inputs are explicit in the specification. JSON examples use synthetic identifiers and hashes; they are not engineering models.
+
+WP-12 native CPU radiation, fixed-ensemble acceptance and bounded worker commands are documented in [the radiation engine contract](docs/radiation-engine.md).
