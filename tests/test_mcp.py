@@ -241,7 +241,32 @@ class MCPTests(unittest.TestCase):
             allowed.call('export_submit',self.base|dict(plan_id=plan['plan_id'],plan_hash=plan['plan_hash'],destination='other.fcst'))
         allowed.call('export_submit',self.base|dict(plan_id=plan['plan_id'],plan_hash=plan['plan_hash'],destination='copy.fcst'))
         plan=allowed.call('import_preview',self.base|dict(path='copy.fcst'))
-        allowed.call('import_submit',self.base|dict(plan_id=plan['plan_id'],plan_hash=plan['plan_hash'],destination='imported.fcst'))
+        # The exact bytes whose hash is checked must also be parsed/copied;
+        # reopening a mutable source path after checking it would introduce a race.
+        from unittest.mock import patch
+        from fcst_app.persistence import read_bounded
+        def mutate_after_read(path,limit):
+            raw=read_bounded(path,limit)
+            Path(path).write_bytes(b'inert changed synthetic source')
+            return raw
+        with patch('fcst_mcp.gateway.read_bounded',side_effect=mutate_after_read):
+            allowed.call('import_submit',self.base|dict(plan_id=plan['plan_id'],plan_hash=plan['plan_hash'],destination='imported.fcst'))
+        self.assertEqual(semantic_hash(Package.open(self.root/'imported.fcst').model),semantic_hash(fixture()))
+        from contextlib import contextmanager
+        from fcst_app.persistence import publication_lock
+        @contextmanager
+        def concurrent_writer(path):
+            with publication_lock(path):
+                Path(path).write_bytes(b'synthetic incumbent')
+                yield
+        with patch('fcst_mcp.gateway.publication_lock',concurrent_writer):
+            with self.assertRaisesRegex(PersistenceError,'new_destination_required'):
+                allowed.call('snapshot_create',self.base|dict(destination='raced.fcst'))
+        self.assertEqual((self.root/'raced.fcst').read_bytes(),b'synthetic incumbent')
+        bounded=Gateway(self.store,replace(self.policy,allow_export=True,max_artifact_bytes=32))
+        with self.assertRaisesRegex(PersistenceError,'resource_budget'):
+            bounded.call('snapshot_create',self.base|dict(destination='bounded.fcst'))
+        self.assertFalse((self.root/'bounded.fcst').exists())
 
     def test_wire_malformed_duplicate_nonfinite_batch_and_oversize(self):
         for raw in (b'{bad}\n',b'{"jsonrpc":"2.0","id":1,"id":2}\n',b'{"x":NaN}\n',b'[]\n'):

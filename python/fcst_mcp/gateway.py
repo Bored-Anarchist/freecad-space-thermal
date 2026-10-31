@@ -7,7 +7,7 @@ import uuid
 
 from jsonschema import Draft202012Validator, FormatChecker
 from fcst_contracts import BUNDLE, loads, read, normalize
-from fcst_app.persistence import Package, encode, reject, semantic_hash, atomic_file, read_bounded
+from fcst_app.persistence import Package, encode, reject, semantic_hash, atomic_file, read_bounded, publication_lock
 from fcst_app.store import references
 from fcst_app.jobs import JobStore, reference
 from . import VERSION, PROTOCOL, LEGACY
@@ -83,6 +83,16 @@ class Gateway:
         self.db.execute('INSERT INTO mcp_resources VALUES(?,?,?,?,?)',(key,revision,self.policy.actor,encode(sorted(self.policy.case_ids)),raw))
         return dict(uri=f'fcst://projects/{self.policy.project_id}/revisions/{revision}/artifacts/{key}',
                     sha256=sha256(raw).hexdigest(),byte_length=len(raw))
+
+    def write_new(self,destination,raw):
+        if len(raw)>self.policy.max_artifact_bytes:reject('resource_budget')
+        path=self.policy.path(destination,new=True)
+        # Cooperative application writers share this lock. Recheck after taking
+        # it so concurrent exports cannot turn new-file permission into overwrite.
+        with publication_lock(path):
+            path=self.policy.path(destination,new=True)
+            atomic_file(path,raw)
+        return self.resource(dict(destination=destination,**reference(destination,raw)))
 
     def job(self,key):
         value=self.jobs._get(key)
@@ -192,30 +202,33 @@ class Gateway:
                         same_snapshot=left['job']['semantic_hash']==right['job']['semantic_hash'])
         if name in {'snapshot_create','reports_generate'}:
             if not p.allow_export: reject('authorization_required')
-            target=p.path(a['destination'],new=True)
             if name=='snapshot_create':
-                if any(x[1].startswith('source_') for x in self.store._artifacts()) and not p.allow_source_export:
+                package=self.store.export_package()
+                if package.model!=m:reject('stale_revision')
+                if any(x['role'].startswith('source_') for x in package.manifest['artifacts']) and not p.allow_source_export:
                     reject('source_export_authorization')
-                self.store.save(target)
+                raw=package.zip_bytes()
             else:
-                atomic_file(target,encode(dict(summary=self.summary(),qualification='unqualified',
+                raw=encode(dict(summary=self.summary(),qualification='unqualified',
                     jobs=[self.job_summary(loads(r[0])) for r in self.db.execute('SELECT record FROM jobs WHERE actor=?',(actor,))
-                          if loads(r[0])['case_id'] in p.case_ids])))
-            return self.resource(dict(destination=a['destination'],**reference(a['destination'],target.read_bytes())))
+                          if loads(r[0])['case_id'] in p.case_ids]))
+            return self.write_new(a['destination'],raw)
         if name in {'import_preview','export_preview'}:
             if name=='import_preview':
-                package=Package.open(p.path(a['path']))
+                raw=read_bounded(p.path(a['path']),p.max_artifact_bytes)
+                package=Package.from_zip(raw)
                 if package.model['project_id']!=p.project_id: reject('wrong_project')
                 for e in package.model['entities']:
                     if e['kind']=='case': p.case(e['id'])
-                raw=read_bounded(p.path(a['path']),p.max_artifact_bytes)
                 plan=dict(operation=name,source=a['path'],source_hash=sha256(raw).hexdigest(),revision=m['revision'],
                           model_hash=semantic_hash(m),actor=actor)
                 count=len(package.manifest['artifacts'])
             else:
                 p.path(a['path'],new=True)
                 plan=dict(operation=name,destination=a['path'],revision=m['revision'],model_hash=semantic_hash(m),actor=actor)
-                count=len(self.store.export_package().manifest['artifacts'])
+                package=self.store.export_package()
+                if package.model!=m:reject('stale_revision')
+                count=len(package.manifest['artifacts'])
             key=str(uuid.uuid4()); digest=sha256(encode(plan)).hexdigest()
             self.db.execute('INSERT INTO mcp_exchange VALUES(?,?)',(key,encode(plan)))
             return dict(plan_id=key,plan_hash=digest,artifact_count=count)
@@ -230,13 +243,12 @@ class Gateway:
             if name=='import_submit':
                 source=p.path(plan['source']); raw=read_bounded(source,p.max_artifact_bytes)
                 if sha256(raw).hexdigest()!=plan['source_hash']: reject('stale_source')
-                package=Package.open(source)
+                package=Package.from_zip(raw)
             else:
                 if a['destination']!=plan['destination']: reject('invalid_plan')
                 package=self.store.export_package()
+                if package.model!=m:reject('stale_revision')
             if any(item['role'].startswith('source_') for item in package.manifest['artifacts']) and not p.allow_source_export:
                 reject('source_export_authorization')
-            from fcst_app.persistence import save_package
-            save_package(package,target)
-            return self.resource(dict(destination=a['destination'],**reference(a['destination'],target.read_bytes())))
+            return self.write_new(a['destination'],package.zip_bytes())
         reject('unsupported_operation')
