@@ -1,6 +1,6 @@
 {
   "work_package": "WP-13",
-  "status": "in_progress",
+  "status": "complete",
   "scope": "FreeCAD host editors visualization transactions and unattended installed-workbench acceptance; production spatial physics remains WP-16",
   "tested_worktree_base": "67acf5ada6a269abf0283d1045aafbb6dc860cd7",
   "checks": [
@@ -37,6 +37,24 @@
       "status": "passed",
       "required_cases": 18,
       "report_sha256": "675ad9531ffc765993c1bf236d766b45273087af90175154a40b3ca047d4e094"
+    },
+    {
+      "id": "final_candidate_windows_debug",
+      "status": "passed",
+      "candidate": "d91f00761854262f39a3bd42ce980229668610b0",
+      "required_checks": 364,
+      "host_cases": 18,
+      "report_sha256": "76d7b420a624e2a832d4b01ea1d8bb41402bee4489994c4a11ccd15d2b8300bf",
+      "host_report_sha256": "dcf13f3438278c72acf2c084d3eb32b6eea19c6501ffcc081f01c3c891d7320e"
+    },
+    {
+      "id": "final_candidate_windows_release",
+      "status": "passed",
+      "candidate": "d91f00761854262f39a3bd42ce980229668610b0",
+      "required_checks": 364,
+      "host_cases": 18,
+      "report_sha256": "cb56c295ca8ee2a2f71f583f6d6394a485f844ab761cb80be2248134e4e21307",
+      "host_report_sha256": "6bbb064e1f9db2bd6cb19f32c550dd2d9b15dbe06abfc51c612c109ae27689ef"
     }
   ],
   "blockers": [],
@@ -49,7 +67,7 @@
   "publication": "Owned synthetic fixtures source-only adapters and bounded host.json summaries; raw documents screenshots arrays logs binaries preferences and engineering originals stay local",
   "implementation_delivery": "implemented",
   "acceptance_status": "passed_on_declared_host_subset",
-  "review_status": "Implementation branch prepared for pull-request review; main-branch merge remains pending",
+  "review_status": "Complete; approved for merge in PR #33",
   "input_sha256": {
     "ci/fem-reuse.json": "affa8267243714bc05708cc7bff80fdf5f112d7bbd0572c000df8730b3bee6f5",
     "ci/host-acceptance.json": "3030becd140034c0f31c73ab9c3c4a31a8b1d4cc66783b3174e2a8dd5653b2a4",
@@ -93,7 +111,7 @@
     "tools/install_workbench.py": "ef023c447c385e13a723305ebbc4914971abe8fef4b22278b80a74c01d749fd2",
     "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec"
   },
-  "validation_policy": "Full Debug/Release baselines precede the final host-only changes. The final host source tree and 340-case standard-library suite pass separately. GitHub Actions reruns all 364 checks and the 18-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines.",
+  "validation_policy": "The final implementation candidate d91f00761854262f39a3bd42ce980229668610b0 passed all 364 checks in both Windows configurations, all 18 installed-host cases, required aggregate/Planning/privacy gates and native package probes. This completion update changes only planning and evidence records; functional source hashes remain those of the tested implementation. Remaining spatial, integration and vendor qualification stays with the work packages listed above.",
   "shared_source_inventory": "ci/dwg-backend.json pins the changed store and FEM adapter; the complete 24-case native backend gate passed with vendor imports denied.",
   "graphics": "bundled_mesa",
   "final_host_regressions": [
@@ -104,5 +122,8 @@
     "Bounded failure diagnostics without raw logs"
   ],
   "graphics_sha256": "38870631e23fe7f7c1f5a1981d4ffa70bbd147caff31d4c1c4f1ef8cf5ff4860",
-  "graphics_policy": "Use only the hash-pinned software OpenGL DLL already shipped in the verified official bundle. Preserve its original bytes and notices and create the alias only in the isolated local test cache. Qt and native FEM rendering share that software implementation."
+  "graphics_policy": "Use only the hash-pinned software OpenGL DLL already shipped in the verified official bundle. Preserve its original bytes and notices and create the alias only in the isolated local test cache. Qt and native FEM rendering share that software implementation.",
+  "tested_candidate": "d91f00761854262f39a3bd42ce980229668610b0",
+  "implementation_pr": "https://github.com/Bored-Anarchist/freecad-space-thermal/pull/33",
+  "final_ci_run": "https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41227743419"
 }
