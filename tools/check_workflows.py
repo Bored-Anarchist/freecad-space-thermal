@@ -37,6 +37,9 @@ def validate():
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
     build_steps = workflow["jobs"]["build"]["steps"]
+    assert any('publication_preflight.py' in step.get('run','') and 'radiation.json' in step['run'] for step in build_steps), 'WP-12 report lacks clearance'
+    assert any('radiation.json' in step.get('with',{}).get('path','') for step in build_steps if step.get('uses','').startswith('actions/upload-artifact@')), 'WP-12 report absent'
+
     assert any('publication_preflight.py' in step.get('run','') and 'thermal.json' in step['run'] for step in build_steps), 'WP-11 preparation report lacks clearance'
     assert any('thermal.json' in step.get('with',{}).get('path','') for step in build_steps if step.get('uses','').startswith('actions/upload-artifact@')), 'WP-11 preparation report absent'
     assert any('publication_preflight.py' in step.get('run','') and 'thermal-references.json' in step['run'] for step in build_steps), 'Independent reference report lacks clearance'

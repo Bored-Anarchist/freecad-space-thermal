@@ -4,6 +4,7 @@
 #include "fcst/thermal.hpp"
 #include "fcst/thermal_steady.hpp"
 #include "fcst/thermal_transient.hpp"
+#include "fcst/radiation.hpp"
 #include "fcst/thermal_schema.hpp"
 #include <algorithm>
 #include <array>
@@ -511,6 +512,7 @@ std::string thermal::inspect_steady(std::string_view input) {
   } catch (...) { return "{\"status\":\"failed\",\"code\":\"unavailable\"}"; }
 }
 #include "thermal_execution.inc"
+#include "radiation_loading.inc"
 int run_worker(const std::string& root, const std::string& job_id) {
   // Durable steady result publication is not implemented in this protocol yet.
   // The separate native steady API/CLI does not fabricate a job result artifact.
