@@ -84,9 +84,12 @@ class Gateway:
         return dict(uri=f'fcst://projects/{self.policy.project_id}/revisions/{revision}/artifacts/{key}',
                     sha256=sha256(raw).hexdigest(),byte_length=len(raw))
 
-    def write_new(self,destination,raw):
+    def write_new(self,destination,raw,*,report=False):
         if len(raw)>self.policy.max_artifact_bytes:reject('resource_budget')
         path=self.policy.path(destination,new=True)
+        # Data export authority must not place packages in executable/autoload
+        # locations such as hooks, scripts or interpreter ZIP search paths.
+        if path.suffix.lower()!=('.json' if report else '.fcst'):reject('destination_type')
         # Cooperative application writers share this lock. Recheck after taking
         # it so concurrent exports cannot turn new-file permission into overwrite.
         with publication_lock(path):
@@ -212,7 +215,7 @@ class Gateway:
                 raw=encode(dict(summary=self.summary(),qualification='unqualified',
                     jobs=[self.job_summary(loads(r[0])) for r in self.db.execute('SELECT record FROM jobs WHERE actor=?',(actor,))
                           if loads(r[0])['case_id'] in p.case_ids]))
-            return self.write_new(a['destination'],raw)
+            return self.write_new(a['destination'],raw,report=name=='reports_generate')
         if name in {'import_preview','export_preview'}:
             if name=='import_preview':
                 raw=read_bounded(p.path(a['path']),p.max_artifact_bytes)

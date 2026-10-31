@@ -72,12 +72,31 @@ class MCPAcceptance(MCPTests):
         self.addCleanup(self.wait_service)
 
     def wait_service(self):
-        time.sleep(3.5)
+        from fcst_app.jobs import JobStore
+        from fcst_app.persistence import loads, publication_lock
+        for name in ('project.db','client.db'):
+            database=self.root/name
+            if not database.exists():continue
+            with ProjectStore(database) as store:
+                jobs=JobStore(store)
+                for row in store.db.execute('SELECT record FROM jobs').fetchall():
+                    job=loads(row[0])
+                    if job['actor']==self.policy.actor and job['state'] in {'queued','running','cancelling'}:
+                        jobs.cancel(self.policy.actor,{'job.cancel'},job['id'])
+            deadline=time.monotonic()+10
+            while True:
+                try:
+                    with publication_lock(database.with_name(database.name+'.scheduler')):pass
+                    break
+                except ValueError:
+                    if time.monotonic()>=deadline:raise
+                    time.sleep(.05)
 
     def config(self,database='project.db'):
         config=self.root/'launch.json'
+        wall=json.loads((ROOT/'ci/mcp-acceptance.json').read_bytes())['native_test_wall_s']
         config.write_bytes(encode(dict(database=database,worker=str(WORKER),policy=dict(
-            project_id=self.policy.project_id,case_ids=[CASE],root=str(self.root),actor=self.policy.actor))))
+            project_id=self.policy.project_id,case_ids=[CASE],root=str(self.root),actor=self.policy.actor,max_wall_s=wall))))
         return config
 
     def test_modern_real_process_build_solve_reconnect_parity(self):
@@ -107,7 +126,8 @@ class MCPAcceptance(MCPTests):
         try:
             replay=client.call('solve_submit',args)
             self.assertEqual(first['job_id'],replay['job_id'])
-            deadline=time.monotonic()+40
+            wait=json.loads((ROOT/'ci/mcp-acceptance.json').read_bytes())['native_test_wall_s']+30
+            deadline=time.monotonic()+wait
             while time.monotonic()<deadline:
                 job=client.call('jobs_get',dict(project_id=self.policy.project_id,job_id=first['job_id']))
                 if job['state'] in {'succeeded','failed','interrupted','cancelled'}:break
@@ -116,7 +136,7 @@ class MCPAcceptance(MCPTests):
             ids=[e['id'] for e in expected_model['entities'] if e['kind']=='node']
             data=client.call('results_query',dict(project_id=self.policy.project_id,job_id=job['job_id'],quantity='temperature',entity_ids=ids))
             flag,payload=review.request(expected_model,options,CASE)
-            native=subprocess.run([str(WORKER),flag],input=encode(payload),capture_output=True,timeout=30)
+            native=subprocess.run([str(WORKER),flag],input=encode(payload),capture_output=True,timeout=wait)
             self.assertEqual(native.returncode,0)
             expected=review.validate_result(json.loads(native.stdout),expected_model)
             self.assertFalse(expected['native']['step_records_included'])

@@ -38,6 +38,9 @@ class Server:
             request_id=message.get('id')
             if 'id' in message and (type(request_id) not in (str,int,float) or isinstance(request_id,float) and not request_id.is_integer()):
                 request_id=None;raise RPCError(-32600,'Invalid request')
+            if (isinstance(request_id,str) and len(request_id)>128
+                    or type(request_id) in (int,float) and abs(request_id)>2**53-1):
+                request_id=None;raise RPCError(-32600,'Request ID limit')
             if isinstance(request_id,float):request_id=int(request_id)
             params=message.get('params',{})
             if not isinstance(params,dict):raise RPCError(-32602,'Invalid params')
@@ -59,6 +62,7 @@ class Server:
             else:
                 if modern:
                     version=meta[PREFIX+'protocolVersion']
+                    if not isinstance(version,str) or len(version)>32:raise RPCError(-32602,'Invalid params')
                     if version!=PROTOCOL:raise RPCError(-32022,'Unsupported protocol version',dict(supported=[PROTOCOL,LEGACY],requested=version))
                     if not isinstance(meta.get(PREFIX+'clientCapabilities'),dict):raise RPCError(-32602,'Invalid params')
                 elif not (self.legacy and self.initialized):

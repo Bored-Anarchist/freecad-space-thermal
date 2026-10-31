@@ -267,6 +267,12 @@ class MCPTests(unittest.TestCase):
         with self.assertRaisesRegex(PersistenceError,'resource_budget'):
             bounded.call('snapshot_create',self.base|dict(destination='bounded.fcst'))
         self.assertFalse((self.root/'bounded.fcst').exists())
+        for destination in ('script.py','post-commit','python311.zip'):
+            with self.assertRaisesRegex(PersistenceError,'destination_type'):
+                allowed.call('snapshot_create',self.base|dict(destination=destination))
+            self.assertFalse((self.root/destination).exists())
+        with self.assertRaisesRegex(PersistenceError,'destination_type'):
+            allowed.call('reports_generate',self.base|dict(destination='report.py'))
 
     def test_wire_malformed_duplicate_nonfinite_batch_and_oversize(self):
         for raw in (b'{bad}\n',b'{"jsonrpc":"2.0","id":1,"id":2}\n',b'{"x":NaN}\n',b'[]\n'):
@@ -274,6 +280,12 @@ class MCPTests(unittest.TestCase):
             self.assertIn('error',json.loads(stream.getvalue()))
         stream=io.BytesIO();serve(self.gateway,io.BytesIO(b'x'*1048577+b'\n'),stream)
         self.assertEqual(json.loads(stream.getvalue())['error']['message'],'Frame limit')
+        for request in (dict(jsonrpc='2.0',id='x'*200000,method='ping'),
+                        dict(jsonrpc='2.0',id=2**53,method='ping'),
+                        dict(jsonrpc='2.0',id=1,method='ping',params={'_meta':metadata('x'*200000)})):
+            response=self.server.handle(request)
+            self.assertIn('error',response)
+            self.assertLess(len(encode(response)),self.policy.max_response_bytes)
         self.assertEqual(self.store.snapshot()['revision'],0)
 
     def test_budget_and_readonly_policy_fail_before_submission(self):

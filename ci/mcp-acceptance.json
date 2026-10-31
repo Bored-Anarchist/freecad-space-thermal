@@ -32,5 +32,6 @@
   "analytic_temperature_tolerance_K": 0.0003,
   "analytic_energy_tolerance_J": 1e-05,
   "qualified": false,
-  "schema_sha256": "ef70b61f99b6d2e5e3b46863822eab08dff6a45bedc7a08914e0e5b133f40203"
+  "schema_sha256": "ef70b61f99b6d2e5e3b46863822eab08dff6a45bedc7a08914e0e5b133f40203",
+  "native_test_wall_s": 300
 }

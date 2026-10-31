@@ -80,7 +80,7 @@ for name,kind in [('nodes_create','node'),('conductors_create','conductor'),('ma
                   ('optics_assign','optics'),('loads_assign','load'),('cases_create','case')]:
     add(name,BOUND|KEY|dict(entity={'$ref':'#/$defs/'+kind}),CHANGE_RESULT,edit=True)
 add('model_validate',BOUND,obj(dict(valid=dict(const=True),semantic_hash=TEXT)))
-add('snapshot_create',BOUND|dict(destination=PATH),REF,edit=True)
+add('snapshot_create',BOUND|dict(destination=PATH|dict(description='New .fcst package inside the authorized root')),REF,edit=True)
 OPTIONS = obj(dict(mode=dict(enum=['steady','transient']),start=dict(type='number',minimum=0),
     end=dict(type='number',exclusiveMinimum=0), samples=dict(type='integer',minimum=2,maximum=1001),
     absolute_temperature_tolerance=dict(type='number',exclusiveMinimum=0),
@@ -99,8 +99,8 @@ add('results_query',dict(project_id=UUID,job_id=UUID,historical=dict(type='boole
 add('balances_get',dict(project_id=UUID,job_id=UUID,historical=dict(type='boolean')),REF,['project_id','job_id'])
 add('results_compare',dict(project_id=UUID,left_job_id=UUID,right_job_id=UUID),
     obj(dict(max_temperature_difference_K=dict(type='number',minimum=0),same_snapshot=dict(type='boolean'))))
-add('reports_generate',BOUND|dict(destination=PATH),REF,edit=True)
+add('reports_generate',BOUND|dict(destination=PATH|dict(description='New .json report inside the authorized root')),REF,edit=True)
 for name in ('import_preview','export_preview'):
     add(name,BOUND|dict(path=PATH),obj(dict(plan_id=UUID,plan_hash=TEXT,artifact_count=REV)),edit=True)
 for name in ('import_submit','export_submit'):
-    add(name,BOUND|dict(plan_id=UUID,plan_hash=TEXT,destination=PATH),REF,edit=True)
+    add(name,BOUND|dict(plan_id=UUID,plan_hash=TEXT,destination=PATH|dict(description='New .fcst package inside the authorized root')),REF,edit=True)
