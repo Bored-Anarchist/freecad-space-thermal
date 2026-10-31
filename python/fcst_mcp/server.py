@@ -107,25 +107,58 @@ class Server:
                 code=error.diagnostic.code if isinstance(error,ContractError) else error.code
                 return dict(content=[dict(type='text',text=encode(dict(code=code)).decode())],isError=True)
         if method=='resources/templates/list':
-            return dict(resourceTemplates=[dict(name='Versioned entities',uriTemplate='fcst://projects/{project_id}/revisions/{revision}/entities/{entity_id}',mimeType='application/json')])
+            return dict(resourceTemplates=[dict(name=name,uriTemplate='fcst://projects/{project_id}/revisions/{revision}/'+suffix,mimeType='application/json')
+                for name,suffix in [('Versioned entities','entities/{entity_id}'),('Tool schemas','schemas/{tool_name}'),
+                    ('Job logs','jobs/{job_id}/logs'),('Job result bytes','jobs/{job_id}/result'),('Artifacts','artifacts/{artifact_id}')]])
         if method=='resources/list':
             if params:raise RPCError(-32602,'Invalid params')
             m=g.store.snapshot();base=f"fcst://projects/{g.policy.project_id}/revisions/{int(m['revision'])}"
             return dict(resources=[dict(uri=base+'/summary',name='Project summary',mimeType='application/json'),
                                    dict(uri=base+'/diagnostics',name='Diagnostics',mimeType='application/json'),
+                                   dict(uri=base+'/schemas',name='Schema catalog',mimeType='application/json'),
+                                   dict(uri=base+'/compatibility',name='Compatibility profiles',mimeType='application/json'),
                                    dict(uri=base+'/audit',name='Redacted audit',mimeType='application/json')])
         if method=='resources/read':
             if set(params)!={'uri'} or not isinstance(params['uri'],str):raise RPCError(-32602,'Invalid params')
             uri=params['uri']
-            match=re.fullmatch(r'fcst://projects/([a-f0-9-]{36})/revisions/([0-9]{1,12})/(summary|diagnostics|audit|entities/[a-f0-9-]{36}|artifacts/[a-f0-9-]{36})(?:\?offset=([0-9]{1,9})&limit=([0-9]{1,2}))?',uri)
+            match=re.fullmatch(r'fcst://projects/([a-f0-9-]{36})/revisions/([0-9]{1,12})/(summary|diagnostics|audit|schemas|schemas/[a-z_]{1,64}|compatibility|jobs/[a-f0-9-]{36}/(?:logs|result)|entities/[a-f0-9-]{36}|artifacts/[a-f0-9-]{36})(?:\?offset=([0-9]{1,9})&limit=([0-9]{1,2}))?',uri)
             if not match:raise RPCError(-32602,'Invalid resource')
             project,revision,part,offset,limit=match.groups();revision=int(revision)
             if project!=g.policy.project_id:raise RPCError(-32002,'Resource unavailable')
             m=g.store.snapshot();base=dict(project_id=project,expected_revision=revision)
-            if revision!=m['revision'] and not part.startswith('artifacts/'):raise RPCError(-32002,'Resource revision unavailable')
+            if revision!=m['revision'] and not part.startswith(('artifacts/','jobs/')):raise RPCError(-32002,'Resource revision unavailable')
             try:
                 if part=='summary':value=g.call('project_inspect',base)
                 elif part=='diagnostics':value=g.call('model_validate',base)
+                elif part=='compatibility':value=g.call('compatibility_inspect',base)
+                elif part=='schemas':value=dict(tools=sorted(TOOLS))
+                elif part.startswith('schemas/'):
+                    name=part.split('/')[1]
+                    if name not in TOOLS:raise RPCError(-32002,'Resource unavailable')
+                    value=g.call('schemas_get',dict(name=name))
+                elif part.startswith('jobs/'):
+                    _,key,kind=part.split('/')
+                    record=g.job(key)
+                    if record['revision']!=revision:raise RPCError(-32002,'Resource revision unavailable')
+                    start,count=int(offset or 0),int(limit or 16)
+                    if not 1<=count<=64:raise RPCError(-32602,'Invalid page')
+                    if kind=='logs':
+                        rows=g.db.execute('SELECT sequence,data FROM job_events WHERE job=? AND sequence>=? ORDER BY sequence LIMIT ?',(key,start,count)).fetchall()
+                        events=[]
+                        for sequence,raw in rows:
+                            event=loads(raw);item=dict(sequence=sequence,type=event['type'])
+                            if event['type']=='terminal':item['outcome']=event['payload']['outcome']
+                            if event['type']=='progress':item['fraction']=event['payload']['fraction']
+                            events.append(item)
+                        value=dict(job_id=key,state=record['state'],events=events,next_offset=rows[-1][0]+1 if rows else None)
+                    else:
+                        # Naming the frozen revision is explicit historical access.
+                        info=g.result(key,True);raw=g.jobs.bytes(key,'result/data')
+                        import base64
+                        chunk=raw[start:start+count*512]
+                        value=dict(encoding='base64',offset=start,data=base64.b64encode(chunk).decode(),
+                            sha256=info['manifest']['data']['sha256'],byte_length=len(raw),
+                            next_offset=start+len(chunk) if start+len(chunk)<len(raw) else None)
                 elif part=='audit':
                     start,count=int(offset or 0),int(limit or 16)
                     if not 1<=count<=64:raise RPCError(-32602,'Invalid page')

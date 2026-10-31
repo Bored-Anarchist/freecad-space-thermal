@@ -178,9 +178,12 @@ class MCPTests(unittest.TestCase):
             ('server/discover',{},'DiscoverResult'),('tools/list',{},'ListToolsResult'),
             ('resources/list',{},'ListResourcesResult'),
             ('resources/templates/list',{},'ListResourceTemplatesResult'),
+            ('resources/read',dict(uri=f'fcst://projects/{self.policy.project_id}/revisions/0/schemas'),'ReadResourceResult'),
             ('tools/call',dict(name='project_inspect',arguments=self.base),'CallToolResult')]:
             validator=Draft202012Validator({'$ref':'#/$defs/'+definition,'$defs':schema['$defs']})
             validator.validate(self.rpc(method,params)['result'])
+        for path in ('compatibility','schemas/solve_submit'):
+            self.assertIn('contents',self.rpc('resources/read',dict(uri=f'fcst://projects/{self.policy.project_id}/revisions/0/{path}'))['result'])
 
     def test_artifact_uuid_access_checks_actor_case_revision_and_byte_pages(self):
         value={'synthetic':'x'*9000}

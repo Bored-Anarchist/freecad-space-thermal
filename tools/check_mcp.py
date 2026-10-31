@@ -132,6 +132,11 @@ class MCPAcceptance(MCPTests):
                 self.assertAlmostEqual(2*values[0]+3*values[1],2*315+3*290,delta=1e-5)
             ref=client.call('balances_get',dict(project_id=self.policy.project_id,job_id=job['job_id']))
             self.assertIn('contents',client.request('resources/read',dict(uri=ref['uri'])))
+            uri=f"fcst://projects/{self.policy.project_id}/revisions/{int(job['revision'])}/jobs/{job['job_id']}"
+            log=client.request('resources/read',dict(uri=uri+'/logs?offset=0&limit=2'))
+            self.assertTrue(json.loads(log['contents'][0]['text'])['events'])
+            artifact=client.request('resources/read',dict(uri=uri+'/result?offset=0&limit=1'))
+            self.assertEqual(json.loads(artifact['contents'][0]['text'])['encoding'],'base64')
             self.assertEqual(client.call('jobs_cancel',dict(project_id=self.policy.project_id,job_id=job['job_id']))['state'],'succeeded')
             # Transport-level cancellation notification cannot change job truth.
             client.process.stdin.write(encode(dict(jsonrpc='2.0',method='notifications/cancelled',params=dict(requestId=1)))+b'\n');client.process.stdin.flush()
