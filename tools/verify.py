@@ -18,7 +18,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 
-STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "thermal-preparation", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange", "esatan-exchange"]
+STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "thermal-preparation", "thermal-reference-comparison", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange", "esatan-exchange"]
 
 
 def command(args, log, env=None):
@@ -97,6 +97,9 @@ def main():
                                 "--steady-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-steady-tests.exe"),
                                 "--transient-tests", str(ROOT / "out" / args.preset / config / "fcst-thermal-transient-tests.exe"),
                                 "--report", str(output / "thermal.json")],
+        "thermal-reference-comparison": [sys.executable, "tools/check_thermal_references.py", "--configuration", config,
+                                        "--subject", str(ROOT / "out" / args.preset / config / "fcst-thermal-reference-subject.exe"),
+                                        "--report", str(output / "thermal-references.json")],
         "numerical-checkpoint": [sys.executable, "tools/check_numerical.py", "--configuration", config,
                                   "--report", str(output / "numerical.json")],
         "persistence-conformance": [sys.executable, "tools/check_persistence.py", "--report", str(output / "persistence.json")],

@@ -123,8 +123,9 @@ require `thermal.json`, validate its exact case coverage, source hashes, native
 binary hashes and worker build revision in the
 aggregate, and privacy-clear its actual bytes before upload. Raw compiler output,
 input/output values, executable/debug files and restricted engineering models
-remain local. WP-11.7 through WP-11.10, transient/event solving, solver job integration
-and full WP-11 qualification remain open.
+remain local. The later sections describe the implemented WP-11.7 through
+WP-11.10 transient/event APIs and numerical qualification; durable-job integration
+retains its separate follow-on gate.
 
 ## Energy and algebraic residuals (WP-11.3/11.4)
 
@@ -239,9 +240,10 @@ implicit Jacobian, and steady/enthalpy-step Jacobians against independently
 perturbed residual evaluations on smooth fixtures. Nonlinear radiation, cross-node
 load dependence, environment exchange and variable capacity are exercised together.
 Analytic-answer test adapters verify both backend interfaces and false-convergence
-rejection. Native steady algorithms are implemented under WP-11.6 below. Stiff
-time integration, events and solver job/result publication remain WP-11.7 through
-WP-11.10; the frozen job protocol's `solver_available` stays false.
+rejection. Native steady algorithms are implemented under WP-11.6 below. The later
+WP-11.7 through WP-11.10 sections implement stiff integration and events.
+Durable-job/result integration remains separate; the frozen job protocol's
+`solver_available` stays false.
 
 ## Native steady solves (WP-11.6)
 
@@ -621,3 +623,39 @@ The arithmetic rationale is the gradual-underflow absolute-error property in
 The safeguard and its regression are owned code, not a copied numerical library
 implementation. Profiles remain measured workloads rather than performance
 qualification on a reference hardware profile.
+
+## Independent numerical sign-off
+
+The user-approved [alternative reference profile](../ci/thermal-reference-v1.json)
+requires a separate executable SUNDIALS IDA 7.3.0 full-DAE formulation and SciPy
+1.15.2 Radau reduced-ODE formulation across eight owned cases. Pycanha core
+0.23.0 additionally runs refined constant-capacity cooling, closed-network and
+zero-capacity-DAE trials. [The reference contract](../references/thermal/README.md)
+specifies equations, accuracy settings, analytic oracles, event/energy/steady
+comparisons, artifact identities and explicit adapter exclusions. The native
+subject alone uses engine model loading, assembly and algorithms. External
+reference code never links/imports those implementations.
+
+`python tools/check_thermal_references.py --subject PATH_TO_SUBJECT
+--configuration Debug --report .local/thermal-references.json` runs the same gate
+as both Windows verification presets. It requires 46 distinct run receipts and
+63 comparisons; all 80 existing native cases remain mandatory. The public
+summary is candidate/source/binary/runtime bound and the standard-library
+assessor rejects missing, stale, failed, nonfinite, duplicated or substituted
+reference evidence. CI scans the exact summary before upload and the foundation
+aggregate reassesses it. Compiler/runtime logs, downloaded dependencies,
+binaries and raw numerical arrays remain local.
+
+The new exact-grid enthalpy benchmark exposed a decimal capped-step remainder
+smaller than the allowed minimum step just before the requested end time. The
+native integrator now splits the remaining interval when a capped step would
+leave such a remainder. Both subintervals are solved with their actual duration;
+no elapsed time is skipped and no step cap or accuracy criterion is relaxed.
+The native enthalpy acceptance case checks every requested knot and final energy.
+
+Passing this profile closes engine numerical sign-off under PHY-001; absence
+of a licensed reference runner does not block that claim. Vendor-specific
+TD/SINDA and ESATAN compatibility remains unqualified, and their wider source
+semantics, host/MCP parity, radiation/environment and durable-job integration
+retain the owning work packages and project Q1 gates. No external solver is a
+production dependency or a substitute for native acceptance.

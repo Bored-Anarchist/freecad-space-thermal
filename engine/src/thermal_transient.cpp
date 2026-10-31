@@ -290,6 +290,12 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
       auto output=std::upper_bound(o.output_times.begin(),o.output_times.end(),c.time);
       double stop=std::min(next_schedule(o,c.time),output==o.output_times.end()?o.end:*output);
       double h=std::min({c.next_step,o.maximum_step,stop-c.time});
+      // A capped step can leave a floating-point remainder smaller than the
+      // minimum step at an exact output/schedule boundary. Split the remaining
+      // interval instead; both solves retain their actual durations, without
+      // skipping time, exceeding the cap or accepting a sub-minimum step.
+      const double remaining=stop-c.time;
+      if(h<remaining && remaining-h<o.minimum_step && remaining/2>=o.minimum_step)h=remaining/2;
       if(h<o.minimum_step || c.time+h==c.time || c.time+h/2==c.time)throw Failure{"step_underflow",{}};
       Engine::Trial trial; std::string failure;
       try { trial=engine.trial(a,c.time,c.temperature,h); }

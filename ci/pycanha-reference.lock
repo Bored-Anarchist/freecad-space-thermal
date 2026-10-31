@@ -1,0 +1,11 @@
+# Isolated Windows CPython 3.13 numerical reference only. Binary wheels; no GUI dependencies.
+intel-cmplr-lib-ur==2025.3.3 --hash=sha256:6f019c5563aaa231d7f618b400cfb4a8a5eac18bbb5084b1ebb1361696b6c7dd
+intel-openmp==2025.3.3 --hash=sha256:20a0f9306a9eb7f56065e7e912ae359d64bfeebc37513464f92840fa3c0d0c4b
+mkl==2025.3.1 --hash=sha256:74084f58784c4cde1dc3284bdf3a19df30fbfe11416567e4ba6419d3bd9ce33e
+numpy==2.4.3 --hash=sha256:0a60e17a14d640f49146cb38e3f105f571318db7826d9b6fef7e4dce758faecd
+onemkl-license==2025.3.1 --hash=sha256:9fa45b274f05a61797f9ec3166b136124250ec7c9c91dedb87f3a926bfed9a54
+pycanha-core==0.23.0 --hash=sha256:6b5f364a8cc6384ec7f795bc6049aac584ca77057b11bf3265ed7647c78c9d4a
+scipy==1.15.2 --hash=sha256:a5080a79dfb9b78b768cebf3c9dcbc7b665c5875793569f48bf0e2b1d7f68f6f
+tbb==2022.3.1 --hash=sha256:8187e4c50a77c75c51ca9395febddd3a67d88dcb4cc537947d68d244925710f7
+tcmlib==1.6.0 --hash=sha256:7f65c0a6d56f2b1383b3022e873175f5025db00a5c7d0aaeb019300c25f5d482
+umf==1.0.3 --hash=sha256:2182a623433329bd53863ac3b15a4af253d0eda62c603dc7c4e2bdce78658270

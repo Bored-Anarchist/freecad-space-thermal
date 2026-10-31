@@ -1,7 +1,7 @@
 # WP-11 qualification and remaining gates
 
-All ten numbered native implementation substeps are present. The remaining
-locally executable acceptance work adds fixed-step event/duty refinement,
+All ten numbered native implementation substeps are present. Native
+qualification acceptance includes fixed-step event/duty refinement,
 representative manufactured/localized compiled-network profiling, subnormal-tail
 linear-solve acceptance, independent source-literal oracles,
 captured-result contract checks and requirement coverage receipts.
@@ -19,7 +19,7 @@ without changing those planning semantics or claiming full Q1 qualification.
 | --- | --- | --- |
 | ARC-009 | Installed C++ worker, preparation and native steady/transient cases with host/vendor search paths absent | Release/profile qualification belongs to WP-19 |
 | ARC-015 | Compiled assembly/LU counters and timings on manufactured and localized 256-equation networks; Python-orchestrated source/CLI comparisons | Host and MCP parity in WP-13/WP-14 |
-| PHY-001 | Analytic and independent RK4 cases; mixed capacitive/algebraic/prescribed SINDA/ESATAN literal-source comparisons | Licensed paired-source profile/reference admission |
+| PHY-001 | Analytic/RK4 and independently formulated IDA/Radau benchmarks; Pycanha cooling/closed/DAE trials; source-literal comparisons | Vendor compatibility requires its own source-profile admission |
 | PHY-005 | Fixed 0.2/0.1/0.05 s event-time/duty refinement, schedules, simultaneous ordering, restart and chatter rejection | Broader environment-dependent controls with WP-17 |
 | PHY-006 | Singular/nonconvergent/fill/step/attempt failures, rejected trials and explicit termination diagnostics | Job/result orchestration remains follow-on integration |
 | PHY-007 | Closed/open energy, enthalpy, boundary power and explicit defect failures | Coupled radiation/environment implementations in WP-12/WP-17 |
@@ -46,8 +46,24 @@ models, printed/TMD arrays, operational/reviewer/license data, native binaries
 and logs remain local under TST-021. Only separately privacy-cleared bounded
 verdict/hash/count/timing evidence is published.
 
-WP-11 therefore retains `in_progress` for its full Q1 completion gate. Native
-coverage can pass while paired qualification remains blocked. Durable-job/HDF5,
-host and MCP integration is follow-on work across WP-06/13/14/15, not an omitted
-eleventh native-engine implementation substep. This PR is not automatically
-merged and its work-package issue is not closed on partial qualification.
+The user approved independent alternatives for engine numerical qualification,
+including a Pycanha trial. [The frozen profile](../ci/thermal-reference-v1.json)
+requires separately formulated IDA and Radau equations for eight benchmarks,
+reference refinement and agreement, seven analytical transient oracles, four
+manufactured steady equilibria and three refined Pycanha trials. The
+[reference contract](../references/thermal/README.md) records formulation,
+settings, exclusions and reproducible pinned runtime provision. Both Windows
+presets require 46 run receipts and 63 comparisons alongside all 80 native cases;
+no external receipt satisfies a native case. Missing/stale/substituted or
+inflated evidence fails. The exact-grid enthalpy regression also checks the
+native correction for sub-minimum decimal step remainders.
+
+Engine numerical completion is assessed against this independent profile and
+the native register. Licensed paired results are optional additional evidence
+for that numerical scope. Their absence retains vendor compatibility holds,
+without blocking PHY-001's analytical/independent-solver requirement. Project Q1
+remains unqualified: TD/ESA source semantics, host/MCP parity, coupled physics,
+durable-job/HDF5 and release integration retain their own work packages.
+The work-package evidence separates engine completion from those wider gates;
+its actual tested candidates and bounded report hashes are recorded after both
+Windows presets pass. This PR is not automatically merged.

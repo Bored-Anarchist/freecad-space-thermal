@@ -65,6 +65,17 @@ int main(int argc,char** argv) {
     auto r=solve_transient(assembly(root,"enthalpy"),options(10));success(r);
     near(r.samples.back().balance.temperature[0],std::sqrt(95000.),1e-7);
     near(r.samples.back().storage_change[0],50,1e-7);near(r.samples.back().run_energy.external_energy[0],50,1e-7);
+    // Decimal caps must reach every exact output knot, including the end,
+    // without leaving an unrepresentably small remainder after many steps.
+    auto decimal=options(10);decimal.initial_step=.01;decimal.maximum_step=.1;
+    decimal.absolute_temperature_tolerance=1e-6;decimal.output_times={0,.5,1,2,5,10};
+    auto bounded=solve_transient(assembly(root,"enthalpy"),decimal);success(bounded);
+    require(bounded.samples.size()==decimal.output_times.size());
+    for(std::size_t i=0;i<bounded.samples.size();++i) {
+      require(bounded.samples[i].time==decimal.output_times[i]);
+      near(bounded.samples[i].balance.temperature[0],std::sqrt(90000+500*decimal.output_times[i]),1e-7);
+    }
+    for(const auto& s:bounded.steps)if(s.accepted)require(s.end-s.start>=decimal.minimum_step && s.end-s.start<=decimal.maximum_step+1e-14);
   } else if(name=="independent-reference") {
     auto m=fixture(root,"enthalpy");
     auto power=[](double t,double temperature) {return 5+std::sin(t)-1e-8*(std::pow(temperature,4)-std::pow(300.,4));};
