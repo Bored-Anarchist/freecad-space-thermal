@@ -5,6 +5,7 @@ from hashlib import sha256
 import json
 import os
 import re
+import shutil
 from pathlib import Path
 import subprocess
 import sys
@@ -47,6 +48,11 @@ def check(worker, report):
     hosts=[p for p in hosts if p.parent.name.lower()=='bin']
     if len(hosts)!=1: raise ValueError('ambiguous_host')
     host=hosts[0]
+    graphics=policy['graphics'];software=host.parent/'opengl32sw.dll';alias=host.parent/'opengl32.dll'
+    if sha256(software.read_bytes()).hexdigest()!=graphics['sha256']:raise ValueError('host_graphics_lock')
+    if alias.exists():
+        if sha256(alias.read_bytes()).hexdigest()!=graphics['sha256']:raise ValueError('host_graphics_alias_mismatch')
+    else:shutil.copyfile(software,alias)
     manifest=json.loads((ROOT/'ci/fem-reuse.json').read_bytes())
     for group in manifest['groups']:
         for entry in group['files']:
@@ -62,7 +68,7 @@ def check(worker, report):
     macro.write_text('import os\nfrom pathlib import Path\nexec(compile(Path(os.environ["FCST_HOST_PAYLOAD"]).read_text(encoding="utf-8"), "host_acceptance_payload.py", "exec"))\n')
     env=dict(os.environ,FCST_HOST_PAYLOAD=str(ROOT/'tools/host_acceptance_payload.py'),
         FCST_HOST_OUTPUT=str(folder),FCST_HOST_ADDON=str(addon),FCST_HOST_ROOT=str(ROOT),
-        FCST_HOST_WORKER=str(worker),QT_QPA_PLATFORM='windows',QT_OPENGL='software',OMP_NUM_THREADS='1',
+        FCST_HOST_WORKER=str(worker),QT_QPA_PLATFORM='windows',QT_OPENGL='desktop',OMP_NUM_THREADS='1',
         TEMP=str(folder/'tmp'),TMP=str(folder/'tmp'))
     for key in ('PYTHONPATH','PYTHONHOME'): env.pop(key,None)
     try:
@@ -79,6 +85,10 @@ def check(worker, report):
         failure=dict(reason=reason,phase='tests_started' if (folder/'started.json').is_file() else 'gui_startup',
                      last_completed_case=records[-1]['id'] if records else None)
         try:
+            phase=json.loads((folder/'stage.json').read_bytes()).get('phase')
+            if phase in policy['progress_phases']:failure['phase']=phase
+        except (ValueError,OSError,AttributeError):pass
+        try:
             trace=(folder/'payload-error.log').read_text(encoding='utf-8')
             lines=re.findall(r'File "host_acceptance_payload.py", line ([0-9]+)',trace)
             if lines:failure['payload_line']=int(lines[-1])
@@ -93,7 +103,8 @@ def check(worker, report):
     if input_hashes()!=frozen_inputs or revision()!=candidate or sha256(worker.read_bytes()).hexdigest()!=worker_hash:
         raise ValueError('host_sources_changed_during_acceptance')
     data.update(candidate=candidate,input_sha256=frozen_inputs,
-        asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash,graphics='qt_software')
+        asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash,
+        graphics='bundled_mesa',graphics_sha256=graphics['sha256'])
     data['gate']=evaluate(policy['required_cases'],data['cases'])
     assess(data,revision(),input_hashes(),policy)
     report.parent.mkdir(parents=True,exist_ok=True)

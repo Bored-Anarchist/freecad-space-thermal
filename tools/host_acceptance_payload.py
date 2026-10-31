@@ -29,6 +29,8 @@ def main():
     from fcst_host.widgets import EntityEditor, NativeJob, SettingsEditor
     from fcst_host.spatial import SpatialView
     cases=[]
+    def mark(phase):
+        (folder/'stage.json').write_text(json.dumps(dict(phase=phase)))
     def passed(case):
         cases.append(dict(id=case,status='passed'))
         (folder/'progress.json').write_text(json.dumps(cases))
@@ -233,37 +235,46 @@ def main():
     model=loads((Path(os.environ['FCST_HOST_ROOT'])/'tests/fixtures/contracts/network.json').read_bytes())
     value=loads((Path(os.environ['FCST_HOST_ROOT'])/'tests/fixtures/spatial/solid-surface-rotated.json').read_bytes())
     doc=App.newDocument('FCSTFields')
+    mark('fem_create')
     mesh,field=fem_adapter.create(doc,value)
     assert fem_adapter.query(field,value,semantic_hash(model))['heat_flux']==[[-3,2,8]]*4
     # Both setters work; inspect the exact getter limitation without relying on it.
+    mark('fem_colour_setter')
     mesh.ViewObject.setNodeColorByScalars(field.NodeNumbers,field.Temperature)
     try: unused=mesh.ViewObject.NodeColor
     except AttributeError as error: assert str(error)=='Not yet implemented'
     else: raise AssertionError('pinned_contour_disposition_changed')
+    mark('fem_save_reopen')
     doc.saveAs(str(folder/'fields.FCStd')); App.closeDocument(doc.Name)
     doc=App.openDocument(str(folder/'fields.FCStd'))
     assert fem_adapter.query(doc.FCSTResult,value,semantic_hash(model))['temperature']==[[300],[301],[302],[303]]
     rejects(lambda:fem_adapter.query(doc.FCSTResult,value,'0'*64),'stale_result')
     App.closeDocument(doc.Name)
     field_session=Session.create(folder/'field-session',model)
+    mark('field_native_solve')
     field_job=NativeJob(field_session,panel.worker);field_session.job=field_job;field_job.start()
     wait(lambda:field_job.state not in ('queued','running'))
     assert field_job.state=='succeeded' and field_session.result is not None
     network_result_id=field_session.result_id
+    mark('spatial_import')
     field_view=field_session.import_field(value)
     assert field_session.result is None and field_session.result_id is None
     field_panel=workbench.show(field_session);field_panel.unit.setCurrentText('degC')
     field_panel.time.setValue(1);field_panel.field_vertex.setCurrentIndex(2)
     assert field_panel.history.points==[(0,302-273.15),(1,302-273.15)]
     assert 'CURRENT' in field_panel.status.text() and 'degC' in field_panel.legend.text()
+    mark('spatial_temperature')
     field_view.show('temperature',1);assert field_view.displayed_scalars==[300,301,302,303]
     actual_colours=[list(c) for c in field_view.mesh.ViewObject.NodeColorArray]
     assert len(actual_colours)==4
     for i,rgb in enumerate(actual_colours,1):
         assert max(abs(a-b) for a,b in zip(rgb,field_view.displayed_colours[i]))<1e-6
+    mark('spatial_vectors')
     field_view.show('heat_flux',1);assert field_view.result.HeatFlux[0]==App.Vector(-3,2,8)
-    field_view.show('normals');field_view.show('material_axes')
+    mark('spatial_normals');field_view.show('normals')
+    mark('spatial_axes');field_view.show('material_axes')
     field_view.show('temperature');Gui.Selection.clearSelection();Gui.activeDocument().activeView().viewAxonometric();Gui.activeDocument().activeView().fitAll();Gui.updateGui()
+    mark('spatial_capture')
     Gui.activeDocument().activeView().saveImage(str(folder/'contour.png'),900,650,'Current')
     contour=QtGui.QImage(str(folder/'contour.png'));blue=teal=0
     for x in range(contour.width()):
@@ -273,6 +284,7 @@ def main():
             if c.green()>c.red()*1.2 and c.green()>70:teal+=1
     assert blue>100 and teal>100,'native_contour_not_coloured'
     field_session.save(folder/'spatial.FCStd',folder/'spatial.fcst')
+    mark('multi_document')
     other=App.newDocument('OtherReviewDocument');marker=other.addObject('PartDesign::Feature','UnrelatedMarker');marker.Shape=Part.makeBox(1,2,3)
     other_scene=Gui.getDocument(other.Name).activeView().getSceneGraph()
     field_view.show('normals')
@@ -281,6 +293,7 @@ def main():
     assert field_session.closed and abs(marker.Shape.Volume-6)<1e-12
     App.closeDocument(other.Name)
     passed('HOST-MULTI-DOCUMENT')
+    mark('dataset_restore')
     spatial_reopened=Session.open(folder/'spatial.fcst',folder/'spatial-reopened')
     assert spatial_reopened.spatial_view is not None and spatial_reopened.spatial_view.value==value and spatial_reopened.result is None
     spatial_reopened.load_result(network_result_id)
@@ -292,6 +305,7 @@ def main():
     network_reopened.close();App.closeDocument(network_reopened.doc.Name)
     passed('FEM-REUSE-005')
     session.close();App.closeDocument(session.doc.Name)
+    mark('final_render')
     session=Session.open(folder/'solved.fcst',folder/'render-reopened')
     panel=workbench.show(session);panel.select_entity(review.uid(4));panel.time.setValue(10)
     QtWidgets.QApplication.processEvents(); QtTest.QTest.qWait(100)

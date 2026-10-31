@@ -36,7 +36,7 @@
       "id": "final_installed_workbench",
       "status": "passed",
       "required_cases": 18,
-      "report_sha256": "e9dd36fc069868341ab5d1902bf80c51fccfb56803e2cec577ec2fd77a2b087f"
+      "report_sha256": "675ad9531ffc765993c1bf236d766b45273087af90175154a40b3ca047d4e094"
     }
   ],
   "blockers": [],
@@ -52,7 +52,7 @@
   "review_status": "Implementation branch prepared for pull-request review; main-branch merge remains pending",
   "input_sha256": {
     "ci/fem-reuse.json": "affa8267243714bc05708cc7bff80fdf5f112d7bbd0572c000df8730b3bee6f5",
-    "ci/host-acceptance.json": "d76dccbc2ce0080b301fb075fd0be4d0f69b3126c5b16c604248cda8e609407c",
+    "ci/host-acceptance.json": "3030becd140034c0f31c73ab9c3c4a31a8b1d4cc66783b3174e2a8dd5653b2a4",
     "ci/host-profile.json": "5662cd6012f669ab610f6c90d11f7dabd0d516bf7dda369ea9ec49630b90b3f0",
     "ci/host-reuse.json": "3cd5ef9a019a9e41c8b5ab4001b736c2c937cfeac48e1aae640e357c25ffdd94",
     "engine/src/contracts.cpp": "f1ca69f6508b6333b43587465728d99f1449af7740a0f70c641f7d60afb0c44b",
@@ -86,8 +86,8 @@
     "tests/fixtures/contracts/network.json": "856953a18cc4f3e633c99d24be86201bb2f08776b3b8968f660eff656292c806",
     "tests/fixtures/spatial/solid-surface-rotated.json": "49c3eba18add86b72acc6f750d249c68397baf60315a82b3dc95d0a6f256c301",
     "tests/test_host.py": "b57f644e523d637a67642ac9baa23e2e20b9ce3121b1889970b2d476e6f2c234",
-    "tools/check_host.py": "d175b9a56f01166882717e36da6f5e6a5496dc5b2b2c080e586a8dcbccac484b",
-    "tools/host_acceptance_payload.py": "9efbeeb7f43ec8952f636ed9498fedb51fa6e8219938464473bd32dc597f2b1a",
+    "tools/check_host.py": "b536e88edc1484b0fc9c252f67e77d7d4bbdced7b9d3f888f0b80bee4fcad764",
+    "tools/host_acceptance_payload.py": "9bdc03245ca4a14cc271c33e67bee63e2cd3beb7b787aa2bb9a123e36a44018a",
     "tools/host_smoke.py": "c015342ca66773663af8469df9c3343e7756e0298b60f190b41b70dc93311b81",
     "tools/host_smoke_payload.py": "aa87726597dc97b6d8ef79e5e78dee6602f347f38961584e9ce963f81c4f48c4",
     "tools/install_workbench.py": "ef023c447c385e13a723305ebbc4914971abe8fef4b22278b80a74c01d749fd2",
@@ -95,12 +95,14 @@
   },
   "validation_policy": "Full Debug/Release baselines precede the final host-only changes. The final host source tree and 340-case standard-library suite pass separately. GitHub Actions reruns all 364 checks and the 18-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines.",
   "shared_source_inventory": "ci/dwg-backend.json pins the changed store and FEM adapter; the complete 24-case native backend gate passed with vendor imports denied.",
-  "graphics": "qt_software",
+  "graphics": "bundled_mesa",
   "final_host_regressions": [
     "Single active dataset with saved selection",
     "Prescribed-boundary equation residual maps",
     "Repeated inverse Undo with saved cursor",
     "Software-rendered native FEM contours",
     "Bounded failure diagnostics without raw logs"
-  ]
+  ],
+  "graphics_sha256": "38870631e23fe7f7c1f5a1981d4ffa70bbd147caff31d4c1c4f1ef8cf5ff4860",
+  "graphics_policy": "Use only the hash-pinned software OpenGL DLL already shipped in the verified official bundle. Preserve its original bytes and notices and create the alias only in the isolated local test cache. Qt and native FEM rendering share that software implementation."
 }
