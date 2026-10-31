@@ -1,0 +1,271 @@
+{
+  "contract_version": "1.0.0",
+  "model": {
+    "contract_version": "1.0.0",
+    "minimum_reader": "1.0.0",
+    "project_id": "00000000-0000-4000-8000-000000000001",
+    "revision": 0,
+    "entities": [
+      {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "kind": "submodel"
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "capacitive",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 6,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000005",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "algebraic",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000006",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "prescribed",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000007",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000004",
+        "to_node_id": "00000000-0000-4000-8000-000000000005",
+        "conductance": {
+          "value": 2,
+          "unit": "W/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000008",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000005",
+        "to_node_id": "00000000-0000-4000-8000-000000000006",
+        "conductance": {
+          "value": 2,
+          "unit": "W/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000009",
+        "kind": "material",
+        "density": {
+          "value": 2,
+          "unit": "kg/m3"
+        },
+        "specific_heat": {
+          "value": 3,
+          "unit": "J/(kg*K)"
+        },
+        "conductivity": {
+          "value": 10,
+          "unit": "W/(m*K)"
+        },
+        "valid_temperature": [
+          {
+            "value": 200,
+            "unit": "K"
+          },
+          {
+            "value": 400,
+            "unit": "K"
+          }
+        ],
+        "frame_id": "00000000-0000-4000-8000-000000000010",
+        "conductivity_tensor": [
+          [
+            2,
+            1,
+            0
+          ],
+          [
+            1,
+            3,
+            0
+          ],
+          [
+            0,
+            0,
+            4
+          ]
+        ]
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000010",
+        "kind": "frame",
+        "origin": [
+          {
+            "value": 0,
+            "unit": "m"
+          },
+          {
+            "value": 0,
+            "unit": "m"
+          },
+          {
+            "value": 0,
+            "unit": "m"
+          }
+        ],
+        "rotation": [
+          [
+            1,
+            0,
+            0
+          ],
+          [
+            0,
+            1,
+            0
+          ],
+          [
+            0,
+            0,
+            1
+          ]
+        ]
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000012",
+        "kind": "load",
+        "node_id": "00000000-0000-4000-8000-000000000004",
+        "power": {
+          "value": 5,
+          "unit": "W"
+        },
+        "expression_id": "00000000-0000-4000-8000-000000000023"
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000023",
+        "kind": "expression",
+        "dimension": "power",
+        "ast": {
+          "op": "literal",
+          "quantity": {
+            "value": 5,
+            "unit": "W"
+          }
+        }
+      }
+    ],
+    "source_maps": [
+      {
+        "id": "00000000-0000-4000-8000-000000000011",
+        "version": "1.0.0",
+        "source_revision": "0000000000000000000000000000000000000000000000000000000000000000",
+        "source_tool": "synthetic",
+        "source_version": "1.0",
+        "entries": [
+          {
+            "namespace": "a",
+            "handle": "101",
+            "entity_id": "00000000-0000-4000-8000-000000000004",
+            "submodel_handle": "a",
+            "node_number": 101
+          },
+          {
+            "namespace": "b",
+            "handle": "101",
+            "entity_id": "00000000-0000-4000-8000-000000000005",
+            "submodel_handle": "b",
+            "node_number": 101
+          }
+        ]
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000015",
+        "version": "1.0.0",
+        "source_revision": "0000000000000000000000000000000000000000000000000000000000000000",
+        "source_tool": "synthetic",
+        "source_version": "1.0",
+        "entries": [
+          {
+            "namespace": "a",
+            "handle": "101",
+            "entity_id": "00000000-0000-4000-8000-000000000004",
+            "submodel_handle": "a",
+            "node_number": 101
+          }
+        ]
+      }
+    ],
+    "assumptions": [],
+    "limitations": [],
+    "mappings": [],
+    "attachments": []
+  },
+  "material_laws": [
+    {
+      "material_id": "00000000-0000-4000-8000-000000000009",
+      "specific_heat": {
+        "temperature": [
+          {
+            "value": 200,
+            "unit": "K"
+          },
+          {
+            "value": 300,
+            "unit": "K"
+          },
+          {
+            "value": 400,
+            "unit": "K"
+          }
+        ],
+        "values": [
+          {
+            "value": 2,
+            "unit": "J/(kg*K)"
+          },
+          {
+            "value": 3,
+            "unit": "J/(kg*K)"
+          },
+          {
+            "value": 4,
+            "unit": "J/(kg*K)"
+          }
+        ],
+        "interpolation": "linear",
+        "extrapolation": "error",
+        "discontinuities": []
+      }
+    }
+  ],
+  "node_storage": [
+    {
+      "node_id": "00000000-0000-4000-8000-000000000004",
+      "material_id": "00000000-0000-4000-8000-000000000009",
+      "mass": {
+        "value": 2,
+        "unit": "kg"
+      }
+    }
+  ]
+}

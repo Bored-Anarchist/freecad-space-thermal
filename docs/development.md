@@ -1,6 +1,19 @@
 # Development and automated verification
 
-WP-02 supplies a C++20 worker skeleton and standalone Python application/CLI/MCP package boundaries. The worker reports build information and rejects solve requests as unimplemented. No thermal physics or legacy-file compatibility is claimed.
+WP-11.1 through WP-11.10 add [owned thermal network solving](thermal-engine.md):
+immutable SI models, material/enthalpy laws, differential/algebraic assembly,
+sparse Jacobians, linear/nonlinear steady solving, adaptive stiff transients,
+hysteresis and schedule events, restart checkpoints, energy/provenance results
+and compiled-kernel profiling. Both Windows presets run native acceptance and
+require the source/build/five-binary-bound, privacy-cleared `thermal.json`.
+The [qualification register](../plans/WP-11-qualification.md) adds fixed-step
+event refinement, representative network profiling, owned source-literal
+comparisons and requirement receipts; licensed paired/Q1 gates remain explicit.
+Standalone native steady and transient API/CLI execution is available. The
+frozen durable-job transport still reports `solver_available: false`; its thermal
+HDF5 publication/host integration and paired vendor qualification remain separate.
+
+WP-02 supplies a C++20 worker skeleton and standalone Python application/CLI/MCP package boundaries. The worker reports build information; the generic `--solve` and durable-job protocol reject unimplemented operations. Thermal execution uses the explicit native APIs and `--thermal-steady` / `--thermal-transient` commands.
 
 Create an isolated Python 3.11 environment under `.local/venv`, activate it, and run:
 

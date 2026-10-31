@@ -1,6 +1,10 @@
 // SPDX-License-Identifier: MIT OR Apache-2.0
 #include "fcst/contracts.hpp"
 #include "fcst/contract_bundle.hpp"
+#include "fcst/thermal.hpp"
+#include "fcst/thermal_steady.hpp"
+#include "fcst/thermal_transient.hpp"
+#include "fcst/thermal_schema.hpp"
 #include <algorithm>
 #include <array>
 #include <bit>
@@ -430,10 +434,86 @@ std::string sha256(const std::string& bytes) {
   auto status=BCryptHash(BCRYPT_SHA256_ALG_HANDLE,nullptr,0,reinterpret_cast<PUCHAR>(const_cast<char*>(bytes.data())),static_cast<ULONG>(bytes.size()),digest.data(),static_cast<ULONG>(digest.size()));
   if(status<0) fail("artifact"); return hex(std::string_view(reinterpret_cast<const char*>(digest.data()),digest.size()));
 }
+#include "thermal_loading.inc"
 } // namespace
+thermal::Model thermal::load(std::string_view input) {
+  try { return Model(thermal_data(input)); }
+  catch (const fcst::Error& e) { throw thermal::Error(e.code, e.entity, e.source); }
+  catch (const thermal::Error&) { throw; }
+  catch (const std::exception&) { throw thermal::Error("schema"); }
+}
+std::string thermal::thermal_digest(std::string_view bytes) { return sha256(std::string(bytes)); }
+std::string thermal::inspect(std::string_view input) {
+  try {
+    auto model = thermal::load(input);
+    const auto& data = model.data();
+    J::A nodes, components;
+    for (const auto& node : data.nodes) {
+      auto index = [](const std::optional<std::size_t>& i) { return i ? J(static_cast<double>(*i)) : J(); };
+      nodes.emplace_back(J::O{{"id", J(node.id)}, {"equation", index(node.equation)},
+        {"differential_index", index(node.differential_index)}, {"algebraic_index", index(node.algebraic_index)},
+        {"classification", J(node.classification == thermal::NodeClass::capacitive ? "capacitive" :
+          node.classification == thermal::NodeClass::algebraic ? "algebraic" : "prescribed")}});
+    }
+    for (const auto& component : data.components) {
+      J::A ids;
+      for (auto i : component.nodes) ids.emplace_back(data.nodes.at(i).id);
+      components.emplace_back(J::O{{"node_ids", J(ids)}, {"prescribed_anchor", J(component.prescribed_anchor)},
+        {"storage_anchor", J(component.storage_anchor)},
+        {"steady_conduction_singular", J(component.steady_conduction_singular)},
+        {"transient_algebraic_singular", J(component.transient_algebraic_singular)}});
+    }
+    return dump(J(J::O{{"status", J("passed")}, {"solver_available", J(false)},
+      {"model_hash", J(data.model_hash)}, {"preparation_hash", J(data.preparation_hash)},
+      {"nodes", J(nodes)}, {"components", J(components)},
+      {"material_count", J(static_cast<double>(data.materials.size()))},
+      {"source_identity_count", J(static_cast<double>(data.source_identities.size()))},
+      {"deferred_entity_count", J(static_cast<double>(data.deferred_entity_ids.size()))}}));
+  } catch (const thermal::Error& e) {
+    J::O out{{"status", J("failed")}, {"code", J(e.code)}};
+    if (!e.entity_id.empty()) out.emplace("entity_id", J(e.entity_id));
+    if (!e.source_map_id.empty()) out.emplace("source_map_id", J(e.source_map_id));
+    return dump(J(out));
+  }
+}
+std::string thermal::inspect_steady(std::string_view input) {
+  try {
+    auto model=thermal::load(input); auto model_hash=model.data().model_hash, preparation_hash=model.data().preparation_hash;
+    thermal::Assembly assembly(std::move(model)); auto result=thermal::solve_steady(assembly);
+    J::A nodes,scales;
+    if (result.balance) for (std::size_t i=0;i<assembly.model().data().nodes.size();++i) {
+      const auto& node=assembly.model().data().nodes[i];
+      nodes.emplace_back(J::O{{"node_id",J(node.id)},{"temperature_K",J(result.balance->temperature[i])},
+        {"residual_W",node.equation?J(result.balance->residual[*node.equation]):J()},
+        {"boundary_power_W",J(result.balance->boundary_power[i])}});
+    }
+    for (double v:result.residual_limits) scales.emplace_back(v);
+    J::O out{{"status",J(result.solve.status==thermal::SolveStatus::converged?"passed":"failed")},
+      {"outcome",J(std::string(thermal::status_code(result.solve.status)))},
+      {"reason",J(std::string(thermal::reason_code(result.solve.diagnostics.reason)))},
+      {"model_hash",J(model_hash)},{"preparation_hash",J(preparation_hash)},
+      {"iterations",J(static_cast<double>(result.solve.iterations))},
+      {"evaluations",J(static_cast<double>(result.solve.diagnostics.evaluations))},
+      {"rejected_trials",J(static_cast<double>(result.solve.diagnostics.rejected_trials))},
+      {"scaled_residual_norm",result.solve.residual_norm?J(*result.solve.residual_norm):J()},
+      {"scaled_correction_norm",result.solve.diagnostics.correction_norm?J(*result.solve.diagnostics.correction_norm):J()},
+      {"energy_defect_W",result.balance?J(result.balance->energy_defect):J()},
+      {"internal_exchange_defect_W",result.balance?J(result.balance->internal_exchange_defect):J()},
+      {"residual_limits_W",J(scales)},{"nodes",J(nodes)}};
+    if (!result.entity_id.empty()) out.emplace("entity_id",J(result.entity_id));
+    if (!result.source_map_id.empty()) out.emplace("source_map_id",J(result.source_map_id));
+    return dump(J(out));
+  } catch (const thermal::Error& e) {
+    J::O out{{"status",J("failed")},{"code",J(e.code)}};
+    if (!e.entity_id.empty()) out.emplace("entity_id",J(e.entity_id));
+    if (!e.source_map_id.empty()) out.emplace("source_map_id",J(e.source_map_id));
+    return dump(J(out));
+  } catch (...) { return "{\"status\":\"failed\",\"code\":\"unavailable\"}"; }
+}
+#include "thermal_execution.inc"
 int run_worker(const std::string& root, const std::string& job_id) {
-  // This boundary stays engine-only. Physics remains WP-11; unsupported work
-  // produces a truthful failed terminal rather than a fabricated thermal result.
+  // Durable steady result publication is not implemented in this protocol yet.
+  // The separate native steady API/CLI does not fabricate a job result artifact.
   try {
     if (!std::regex_match(job_id,std::regex("[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}"))) fail("schema");
     auto emit=[&](const J& message) {

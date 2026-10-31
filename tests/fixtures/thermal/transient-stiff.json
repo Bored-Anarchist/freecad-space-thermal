@@ -1,0 +1,84 @@
+{
+  "contract_version": "1.0.0",
+  "model": {
+    "contract_version": "1.0.0",
+    "minimum_reader": "1.0.0",
+    "project_id": "00000000-0000-4000-8000-000000000001",
+    "revision": 0,
+    "entities": [
+      {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "kind": "submodel"
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000004",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "capacitive",
+        "temperature": {
+          "value": 310,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0.0001,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000005",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "capacitive",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 1,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000006",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "prescribed",
+        "temperature": {
+          "value": 290,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000007",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000004",
+        "to_node_id": "00000000-0000-4000-8000-000000000005",
+        "conductance": {
+          "value": 10000.0,
+          "unit": "W/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000008",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000005",
+        "to_node_id": "00000000-0000-4000-8000-000000000006",
+        "conductance": {
+          "value": 1,
+          "unit": "W/K"
+        }
+      }
+    ],
+    "source_maps": [],
+    "assumptions": [],
+    "limitations": [],
+    "mappings": [],
+    "attachments": []
+  },
+  "material_laws": [],
+  "node_storage": []
+}

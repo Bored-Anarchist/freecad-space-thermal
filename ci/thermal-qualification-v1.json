@@ -1,0 +1,115 @@
+{
+  "schema_version": 1,
+  "work_package": "WP-11",
+  "scope": "Owned native acceptance and bounded source-literal comparisons; no licensed paired-source or full Q1 qualification",
+  "requirements": {
+    "ARC-009": [
+      "native-preparation",
+      "steady-cli-linear",
+      "transient-cli-analytic",
+      "build-identity"
+    ],
+    "ARC-015": [
+      "transient-network-profile",
+      "transient-cli-capabilities",
+      "source-sinda-network",
+      "source-esatan-network",
+      "transient-network-localized"
+    ],
+    "PHY-001": [
+      "steady-nonlinear",
+      "transient-independent-reference",
+      "transient-initialization",
+      "source-sinda-network",
+      "source-esatan-network",
+      "steady-lu-subnormal-tail"
+    ],
+    "PHY-005": [
+      "transient-event-refinement",
+      "transient-schedule",
+      "transient-simultaneous",
+      "transient-checkpoint",
+      "transient-chattering"
+    ],
+    "PHY-006": [
+      "steady-singular",
+      "steady-limits",
+      "transient-rejection",
+      "transient-failures",
+      "transient-cli-failures"
+    ],
+    "PHY-007": [
+      "assembly-balance",
+      "steady-energy",
+      "transient-energy",
+      "transient-two-node"
+    ],
+    "TST-004": [
+      "assembly-callback-contracts",
+      "assembly-physics-coverage",
+      "source-oracle-rejections",
+      "transient-cli-failures",
+      "captured-reference-contract"
+    ]
+  },
+  "remaining_q1_gates": {
+    "ARC-015": [
+      "WP-13 host parity",
+      "WP-14 MCP parity"
+    ],
+    "PHY-001": [
+      "GAP-LICENSES",
+      "GAP-RESULTS"
+    ],
+    "PHY-007": [
+      "WP-12 radiation coupling",
+      "WP-17 environments"
+    ],
+    "TST-004": [
+      "WP-12 radiation suite",
+      "WP-17 environment suite"
+    ]
+  },
+  "source_oracle": {
+    "initial_K": 310,
+    "algebraic_guess_K": 350,
+    "boundary_K": 300,
+    "capacity_J_per_K": 2,
+    "link_W_per_K": 2,
+    "load_W": 4,
+    "output_times_s": [
+      0,
+      1,
+      2,
+      4
+    ],
+    "temperature_tolerance_K": 0.005,
+    "power_tolerance_W": 0.005,
+    "storage_tolerance_J": 0.01
+  },
+  "event_refinement": {
+    "step_caps_s": [
+      0.2,
+      0.1,
+      0.05
+    ],
+    "maximum_fine_error_s": 0.07,
+    "maximum_error_ratio": 0.65,
+    "maximum_fine_duty_error": 0.02
+  },
+  "representative_network": {
+    "equations": 256,
+    "nonzeros": 766,
+    "maximum_energy_defect_J": 1e-06
+  },
+  "captured_reference": {
+    "maximum_temperature_error_K": 0.01,
+    "maximum_relative_temperature_error": 1e-06,
+    "maximum_input_bytes": 1048576,
+    "maximum_result_bytes": 67108864,
+    "required_ecosystems": [
+      "sinda",
+      "esatan"
+    ]
+  }
+}

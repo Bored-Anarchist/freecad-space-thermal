@@ -1,0 +1,13 @@
+{
+  "ecosystem": "esatan",
+  "source_version": "2018-sp1",
+  "filename": "network.d",
+  "units": [
+    "degC",
+    "J/K",
+    "W/K",
+    "W",
+    "s"
+  ],
+  "source_ascii": "# Owned WP-11 source-comparison network\n$MODEL MAIN\n$NODES\nD1='storage', T=36.85, C=2;\nD2='constraint', T=76.85, C=0;\nB3='reservoir', T=26.85, C=0;\n$CONDUCTORS\nGL(1,2)=2;\nGL(2,3)=2;\n$INITIAL\nQI1=4;\n$ENDMODEL\n"
+}

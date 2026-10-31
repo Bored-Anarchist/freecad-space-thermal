@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "profile": "WP-11-independent-numerical-v1",
+  "scope": "engine_numerical_qualification",
+  "vendor_compatibility_qualified": false,
+  "cases": [
+    "cooling",
+    "closed",
+    "dae",
+    "enthalpy",
+    "stiff",
+    "heater",
+    "schedule",
+    "nonlinear"
+  ],
+  "required_backends": {
+    "sundials_ida": "7.3.0",
+    "scipy_radau": "1.15.2"
+  },
+  "levels": {
+    "coarse": 1e-09,
+    "fine": 1e-11
+  },
+  "reference_maximum_step_s": 0.025,
+  "reference_agreement": {
+    "temperature": 1e-05,
+    "links": 0.0001,
+    "boundary_power": 1e-05,
+    "storage_change": 0.0001,
+    "external_energy": 0.0001,
+    "boundary_energy": 0.0001,
+    "energy_defect": 0.0001,
+    "duty": 1e-05,
+    "event_time": 1e-05
+  },
+  "native_agreement": {
+    "temperature": 0.002,
+    "links": 0.005,
+    "boundary_power": 0.005,
+    "storage_change": 0.02,
+    "external_energy": 0.02,
+    "boundary_energy": 0.02,
+    "energy_defect": 0.02,
+    "duty": 0.002,
+    "event_time": 0.003
+  },
+  "stiff_native_overrides": {
+    "temperature": 0.01,
+    "links": 0.02,
+    "boundary_power": 0.02
+  },
+  "steady_temperature_K": 1e-05,
+  "steady_power_W": 1e-05,
+  "pycanha": {
+    "version": "0.23.0",
+    "backend": "pycanha_core",
+    "solver": "TSCNRLDS_EIGEN",
+    "required_cases": [
+      "cooling",
+      "closed",
+      "dae"
+    ],
+    "coarse_step_s": 0.001,
+    "fine_step_s": 0.0005,
+    "temperature_agreement_K": 1e-05,
+    "native_temperature_agreement_K": 0.002,
+    "excluded_cases": {
+      "enthalpy": "variable_capacity_not_in_this_adapter",
+      "stiff": "fixed_step_trial_does_not_resolve_fast_mode",
+      "heater": "event_callback_not_in_this_adapter",
+      "schedule": "schedule_callback_not_in_this_adapter",
+      "nonlinear": "nonlinear_callback_not_in_this_adapter"
+    }
+  },
+  "acceptance_basis": "Frozen before executing new comparisons; independent literal equations, true zero-capacity DAE, reduced ODE algebraic elimination, reference refinement, analytic checks, full requested grids, events, energy and native steady results. Native acceptance remains mandatory.",
+  "native_temperature_atol_K": {
+    "default": 1e-07,
+    "stiff": 1e-05,
+    "heater": 5e-08
+  },
+  "native_settings": {
+    "rtol": 0,
+    "maximum_step_s": 0.1,
+    "initial_step_s": 0.01,
+    "steady_absolute_power_W": 1e-08,
+    "steady_absolute_energy_W": 1e-08
+  },
+  "settings_note": "Comparison thresholds frozen before execution. Trial at 1e-6 K exceeded fixed closed-network flow and heater temperature limits; native integration was tightened, without relaxing comparison thresholds. A 1e-8 K heater trial exceeded the Debug per-process runtime bound; the final 5e-8 K setting must still meet the same frozen numerical limits."
+}

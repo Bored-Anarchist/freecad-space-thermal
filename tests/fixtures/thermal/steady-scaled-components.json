@@ -1,0 +1,116 @@
+{
+  "contract_version": "1.0.0",
+  "model": {
+    "contract_version": "1.0.0",
+    "minimum_reader": "1.0.0",
+    "project_id": "00000000-0000-4000-8000-000000000001",
+    "revision": 0,
+    "entities": [
+      {
+        "id": "00000000-0000-4000-8000-000000000002",
+        "kind": "submodel"
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000030",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "capacitive",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 1,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000031",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "prescribed",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000032",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000030",
+        "to_node_id": "00000000-0000-4000-8000-000000000031",
+        "conductance": {
+          "value": 1e-100,
+          "unit": "W/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000033",
+        "kind": "load",
+        "node_id": "00000000-0000-4000-8000-000000000030",
+        "power": {
+          "value": 2e-100,
+          "unit": "W"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000040",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "capacitive",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 1,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000041",
+        "kind": "node",
+        "submodel_id": "00000000-0000-4000-8000-000000000002",
+        "classification": "prescribed",
+        "temperature": {
+          "value": 300,
+          "unit": "K"
+        },
+        "capacity": {
+          "value": 0,
+          "unit": "J/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000042",
+        "kind": "conductor",
+        "from_node_id": "00000000-0000-4000-8000-000000000040",
+        "to_node_id": "00000000-0000-4000-8000-000000000041",
+        "conductance": {
+          "value": 1e+100,
+          "unit": "W/K"
+        }
+      },
+      {
+        "id": "00000000-0000-4000-8000-000000000043",
+        "kind": "load",
+        "node_id": "00000000-0000-4000-8000-000000000040",
+        "power": {
+          "value": 3e+100,
+          "unit": "W"
+        }
+      }
+    ],
+    "source_maps": [],
+    "assumptions": [],
+    "limitations": [],
+    "mappings": [],
+    "attachments": []
+  },
+  "material_laws": [],
+  "node_storage": []
+}

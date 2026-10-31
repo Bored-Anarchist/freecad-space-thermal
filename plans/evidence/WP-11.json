@@ -1,0 +1,405 @@
+{
+  "work_package": "WP-11",
+  "status": "complete",
+  "scope": "WP-11.1 through WP-11.10 owned engine implementation and user-approved independent numerical qualification, including Pycanha trials and exact output-boundary regression.",
+  "contract": "docs/thermal-engine.md",
+  "qualification_register": "ci/thermal-qualification-v1.json",
+  "qualification_detail": "plans/WP-11-qualification.md",
+  "native_qualification": {
+    "schema_version": 1,
+    "execution_mode": "fcst_native",
+    "requirements": [
+      {
+        "requirement_id": "ARC-009",
+        "native_status": "passed",
+        "required_cases": [
+          "native-preparation",
+          "steady-cli-linear",
+          "transient-cli-analytic",
+          "build-identity"
+        ],
+        "remaining_q1_gates": []
+      },
+      {
+        "requirement_id": "ARC-015",
+        "native_status": "passed",
+        "required_cases": [
+          "transient-network-profile",
+          "transient-cli-capabilities",
+          "source-sinda-network",
+          "source-esatan-network",
+          "transient-network-localized"
+        ],
+        "remaining_q1_gates": [
+          "WP-13 host parity",
+          "WP-14 MCP parity"
+        ]
+      },
+      {
+        "requirement_id": "PHY-001",
+        "native_status": "passed",
+        "required_cases": [
+          "steady-nonlinear",
+          "transient-independent-reference",
+          "transient-initialization",
+          "source-sinda-network",
+          "source-esatan-network",
+          "steady-lu-subnormal-tail"
+        ],
+        "remaining_q1_gates": [
+          "GAP-LICENSES",
+          "GAP-RESULTS"
+        ]
+      },
+      {
+        "requirement_id": "PHY-005",
+        "native_status": "passed",
+        "required_cases": [
+          "transient-event-refinement",
+          "transient-schedule",
+          "transient-simultaneous",
+          "transient-checkpoint",
+          "transient-chattering"
+        ],
+        "remaining_q1_gates": []
+      },
+      {
+        "requirement_id": "PHY-006",
+        "native_status": "passed",
+        "required_cases": [
+          "steady-singular",
+          "steady-limits",
+          "transient-rejection",
+          "transient-failures",
+          "transient-cli-failures"
+        ],
+        "remaining_q1_gates": []
+      },
+      {
+        "requirement_id": "PHY-007",
+        "native_status": "passed",
+        "required_cases": [
+          "assembly-balance",
+          "steady-energy",
+          "transient-energy",
+          "transient-two-node"
+        ],
+        "remaining_q1_gates": [
+          "WP-12 radiation coupling",
+          "WP-17 environments"
+        ]
+      },
+      {
+        "requirement_id": "TST-004",
+        "native_status": "passed",
+        "required_cases": [
+          "assembly-callback-contracts",
+          "assembly-physics-coverage",
+          "source-oracle-rejections",
+          "transient-cli-failures",
+          "captured-reference-contract"
+        ],
+        "remaining_q1_gates": [
+          "WP-12 radiation suite",
+          "WP-17 environment suite"
+        ]
+      }
+    ],
+    "native_status": "passed",
+    "licensed_paired_status": "blocked",
+    "licensed_paired_reason": "approved_reference_pair_unavailable",
+    "q1_qualified": false
+  },
+  "remaining_native_qualification": [],
+  "acceptance_register": "ci/thermal-acceptance.json",
+  "implemented_substeps": [
+    "WP-11.1",
+    "WP-11.2",
+    "WP-11.3",
+    "WP-11.4",
+    "WP-11.5",
+    "WP-11.6",
+    "WP-11.7",
+    "WP-11.8",
+    "WP-11.9",
+    "WP-11.10"
+  ],
+  "remaining_substeps": [],
+  "qualification": "All native engine cases and the independent IDA/Radau/Pycanha numerical profile pass in Windows Debug and Release. WP-11 engine implementation and numerical sign-off are complete. Vendor compatibility and project-wide Q1 remain separately unqualified.",
+  "tested_candidate": "5082c20926896b1e2a768c5fa491b7a454d78978",
+  "checks": [
+    {
+      "id": "windows-debug",
+      "status": "passed",
+      "candidate": "5082c20926896b1e2a768c5fa491b7a454d78978",
+      "command": "python tools/verify.py --preset windows-debug",
+      "cases": 344,
+      "native_ctest_cases": 58,
+      "thermal_acceptance_cases": 80,
+      "reference_runs": 46,
+      "reference_comparisons": 63,
+      "report_sha256": "e48b63d943d356ad6a796cc4906bcc461026bcf15b3f0952045d1976124b392f",
+      "thermal_report_sha256": "d31670bc4dd7965efe9b04ea1264b80906247ff15b8b088e1ec4ae3ae8453d73",
+      "reference_report_sha256": "d62698062ea3a2b2d3d68896f98925143e162119327e41ffd46653234d3cd101",
+      "backend_capabilities": {
+        "checkpoint": true,
+        "compiler": "MSVC",
+        "compiler_version": "19.31.31107.0",
+        "durable_job_solver": false,
+        "enthalpy": true,
+        "events": true,
+        "execution_mode": "fcst_native",
+        "external_reference": false,
+        "index_one_dae": true,
+        "linear": "fcst_sparse_lu",
+        "nonlinear": "fcst_damped_newton",
+        "source_revision": "5082c20926896b1e2a768c5fa491b7a454d78978",
+        "stiff": true,
+        "transient": "fcst_enthalpy_backward_euler_step_doubling"
+      },
+      "reference_provenance": {
+        "native_subject_sha256": "2826680946fc0085da1484c6813a0690a78c7d8ef108c8916f011acaf5cb565a",
+        "ida_source": {
+          "archive_sha256": "a1aa9261c4034da363db379ffe2db0a3b77980f526ee0471f5f56dc53a9c2ed2",
+          "revision": "cb681a4e3a46bcad903fb966284d6f53e85bdb94",
+          "license_sha256": "5fa5c15f6262163679bf1fe70db6cbf5bc49e60726b39560330d402fd1dc79f8",
+          "runtime_sha256": {
+            "fcst-ida-reference.exe": "f7b244c8d8041b4dbeac7edba96405f402a80c2ea1763bb0c2ee7a44df9085b7",
+            "sundials_core.dll": "cda8b1bfdac36e0223286f528de688b4f6739368791c4c7b1b60acd8e2d42258",
+            "sundials_ida.dll": "99c0a11eb9cd7b33af4e2272da9515140f995afec9eeb08cd8b481bf6d9d9685",
+            "sundials_nvecserial.dll": "312e7e68097358e3c26d1f34b8bad72df5421aed2de1d7cf0c80b47977639706",
+            "sundials_sunlinsoldense.dll": "6781c2ed056749b326ab6a626acb50b80a188d664f94955717559feeeb7c19a9",
+            "sundials_sunmatrixdense.dll": "76fb844c1c7c789c1f62c1a14af2d7b3aa5826b447be39f8d37daffc89aae4e8"
+          }
+        },
+        "scipy_runtime_sha256": "9f3d4e2cded34af8e5ce1d1ba23b4e887c3d2631fa0336116f1f590c3cb83712",
+        "pycanha_runtime_sha256": "8ed9f38a0419d3a140d7829d59dad4343a275241d471e8481a344f24cdcb7764"
+      }
+    },
+    {
+      "id": "windows-release",
+      "status": "passed",
+      "candidate": "5082c20926896b1e2a768c5fa491b7a454d78978",
+      "command": "python tools/verify.py --preset windows-release",
+      "cases": 344,
+      "native_ctest_cases": 58,
+      "thermal_acceptance_cases": 80,
+      "reference_runs": 46,
+      "reference_comparisons": 63,
+      "report_sha256": "7b26651e68015105c485174133f14b3286a2f0b2337102d412be3939a5b34f9c",
+      "thermal_report_sha256": "273ba40f0a9169f25043d9c93a92ba2266f484704fcfae35e6cf62064cc38ca4",
+      "reference_report_sha256": "5becd3ce789b410267cb41d53b656f941201fee806ee0d97bdcfa6ef0a2ae0c7",
+      "backend_capabilities": {
+        "checkpoint": true,
+        "compiler": "MSVC",
+        "compiler_version": "19.31.31107.0",
+        "durable_job_solver": false,
+        "enthalpy": true,
+        "events": true,
+        "execution_mode": "fcst_native",
+        "external_reference": false,
+        "index_one_dae": true,
+        "linear": "fcst_sparse_lu",
+        "nonlinear": "fcst_damped_newton",
+        "source_revision": "5082c20926896b1e2a768c5fa491b7a454d78978",
+        "stiff": true,
+        "transient": "fcst_enthalpy_backward_euler_step_doubling"
+      },
+      "reference_provenance": {
+        "native_subject_sha256": "2ae3abfe00c61605d8f7dbae63d5e208740d408dc5ad650c80aabe19ad8527b9",
+        "ida_source": {
+          "archive_sha256": "a1aa9261c4034da363db379ffe2db0a3b77980f526ee0471f5f56dc53a9c2ed2",
+          "revision": "cb681a4e3a46bcad903fb966284d6f53e85bdb94",
+          "license_sha256": "5fa5c15f6262163679bf1fe70db6cbf5bc49e60726b39560330d402fd1dc79f8",
+          "runtime_sha256": {
+            "fcst-ida-reference.exe": "00645190bee5ac055586a51ec90479a594a8a0979c855636538e3f270b85c6e7",
+            "sundials_core.dll": "c2ea1a2604b00353b9aaf705fde64cc44e64656d788641430ddf08501dca735c",
+            "sundials_ida.dll": "37d1c3994764cd8dbc6853c602d25acb0e2642b7689da3ad5fc726f2ff725627",
+            "sundials_nvecserial.dll": "d48a0731c290eaa6fae06a7be237aea1ce8e752064d395b92f02c1cca812b0b0",
+            "sundials_sunlinsoldense.dll": "fde9d699938a30de33da8ee5d2a364b830fbb02c531806ff76bcb4fda6296e86",
+            "sundials_sunmatrixdense.dll": "bcdbcf68095e710255d8df17a5581afb8d4f00ccae9e40aeb401d3b0afdbd970"
+          }
+        },
+        "scipy_runtime_sha256": "9f3d4e2cded34af8e5ce1d1ba23b4e887c3d2631fa0336116f1f590c3cb83712",
+        "pycanha_runtime_sha256": "8ed9f38a0419d3a140d7829d59dad4343a275241d471e8481a344f24cdcb7764"
+      }
+    },
+    {
+      "id": "isolated-security",
+      "status": "passed",
+      "command": "python -S tools/check_security.py",
+      "cases": 322,
+      "report_sha256": "77e8f35a95ac75b41b62968759a737cb9d3f5e8a137fd296fcda43085589e8db"
+    }
+  ],
+  "input_sha256": {
+    "CMakeLists.txt": "23117511d2975d08e8fbc0fcd6b4cb763102ef4d45af29d5b8b069867ff62c7b",
+    "CMakePresets.json": "68a5d94ecb715b8ed4ca4157fef64fd10c8f9b645f343184390faf3cd4649dbf",
+    "ci/thermal-acceptance.json": "babf409d88583155ec5a0c9a5320923dd89c2ebbec0d8e2b5665ca468ebce985",
+    "ci/thermal-qualification-v1.json": "69404ddfaf64bef21888a2469f0a8f183b919cb89bf0b7becd24ac9407077731",
+    "engine/include/fcst/build_info.hpp.in": "a39b9c567abd186e960a5a4110df72507b40b0dbe6f1eb800cdfb9d076cc28cf",
+    "engine/include/fcst/contract_bundle.hpp": "cc2e286bbe453ebdaf20ed21d34b724a58d9089090818fcbc378704ddacc6730",
+    "engine/include/fcst/contract_types.hpp": "7c7af3a36204f732c3fc5fc610d12639e1c51240de2cdd4be7e7a099f55ea4f5",
+    "engine/include/fcst/contracts.hpp": "6a712aa169bc237a0420ba2fa098b3101ac925c86f3b258b4d7007064e7fa116",
+    "engine/include/fcst/diagnostic.hpp": "2196622a956afcf89d59bac4bcf1c7787717e646948a1f8383960e2960b2c6b2",
+    "engine/include/fcst/thermal.hpp": "733597ae4969e5b4c377b23a8cbaf97da2bd0c29b8689c9554d9bd3811095544",
+    "engine/include/fcst/thermal_assembly.hpp": "36f18c02c90daaf1987e8c7f76dfe8c7ceaec0561e7499ffe98a9c6662acda9e",
+    "engine/include/fcst/thermal_schema.hpp": "50b574eceea4a5aaf5186985df69b92208cfe8155547d9b65b8178705b6fbe7c",
+    "engine/include/fcst/thermal_steady.hpp": "317ff807eb9aa526803643a5b049a8a725815dff323841e853f08e09548d40f6",
+    "engine/include/fcst/thermal_transient.hpp": "8599367f586108053d7f6e505a7842e79cd5aeaacd2cec44219735afeacf9a0e",
+    "engine/src/contracts.cpp": "49e2ba22025372287c4982cc3588b8899af22c49cb7775ae1bd7af787fc82744",
+    "engine/src/diagnostic.cpp": "549e09fd222cc75c9d662fe115f90602a527c3a0ff3447b35c83210bb2ec997f",
+    "engine/src/spatial.inc": "102745857cdc2a4c9e43752ac84c8059e1824974cc77f4ce16b69cee875ba9c6",
+    "engine/src/thermal.cpp": "06293286afab72f1dbe6693b9f11a5a5db7edc412026f424ffe4e1a428a2ede9",
+    "engine/src/thermal_assembly.cpp": "3fa195ede5e801899f5e0b1364e3691514219d744a3362640af1b09bd5d6dfba",
+    "engine/src/thermal_execution.inc": "40bb7834c79a5a3245e3fe2489a8c7112ca0ce8ffba541a1e39e30b5fde94306",
+    "engine/src/thermal_loading.inc": "80298aa384abe1b277cabf0dc8ec19179cc1e0212f71daff8c59cb393da42e6a",
+    "engine/src/thermal_steady.cpp": "306b91f5e03de6875f2e422859a75f319fe89b5aa60fab68cb9da77735bc2d1e",
+    "engine/src/thermal_transient.cpp": "c0c558bb9df6e70b461f1fac3d2b102df22bd34fb8f433d86187039bd6d0e596",
+    "engine/tests/thermal_assembly_tests.cpp": "8671ba427a1916df8cdd3cee02e29cf4a5e48ff69cb5c9c14194ecc914123ae5",
+    "engine/tests/thermal_reference_subject.cpp": "f082ae1d2905b75a94903b1e14d82f3a14182d6acb520a3b9642186a4d7d2947",
+    "engine/tests/thermal_steady_tests.cpp": "bdc69380ef3ed06ebe10867406419256f294f0a99c505d85577c967080b441fd",
+    "engine/tests/thermal_tests.cpp": "e4261787958fb17cd1e0daf8ea4b0fecb20def4328dc9e9affeda436e59ec9bf",
+    "engine/tests/thermal_transient_tests.cpp": "fa31af8f64bb9c76f59050276c844b06f1077bc61f8f76eb37d3934fa1c4cafe",
+    "engine/worker/main.cpp": "4d22157a1fbde69f9d7fcafd0cabace725e47d82e36a3a04cce7205853c5bdc6",
+    "python/fcst_tools/thermal.py": "8827d98b787193de8b4a2d1c6ea2cfa008f2428c20c2e5869ab9ecae8f7abbf2",
+    "python/fcst_tools/thermal_qualification.py": "812af7125e81fd6dc7b9cdc9cda75ec6a9729fff996aa6b4ba7514c8a381163e",
+    "spec/schemas/thermal-input-v1.schema.json": "3f31dbd12e15adef26ba4eaa3363bed003ad55f47bfe718191213aca31d63975",
+    "tests/fixtures/thermal/algebraic-network.json": "af8f3c145913ca47e198eb4b0e2f9ed0728fcbe10cb43dbcfa83debc900d3e95",
+    "tests/fixtures/thermal/case-network.json": "48a0b92e45849c149fefc914dd3015eea7d9e118d35415d17658313486db45d8",
+    "tests/fixtures/thermal/control-network.json": "6c97ec7c9943ba478acea82af060adfb2d852f9e0fd918ca16f4cf32d766844b",
+    "tests/fixtures/thermal/element-network.json": "a2782091476aebb637c2f82d0e12f6373daed7135b9b042293f7b97b447f546f",
+    "tests/fixtures/thermal/expression-network.json": "3f2b5671bc3ec01ef8090b2b872b8e8dca509e43a8037ee52299ee2edb468966",
+    "tests/fixtures/thermal/isolated-network.json": "9293e2f485cf2721d61d1b69bbe5b22dc22cf2adf0c7dcd51c0f1e3bed212606",
+    "tests/fixtures/thermal/material-network.json": "7087b931019c251e6ad1ca5ecc1eae348b22e4b6d105658d36487f3e631f9f4e",
+    "tests/fixtures/thermal/power-network.json": "4bf3c2a32ae93f550ba8fd007a3e5576b11ecdf24ccfcba6f5a5f327098ba833",
+    "tests/fixtures/thermal/prescribed-network.json": "3530dfe2a78819c9e01e06e48d75e07489df1927fa67bbeb91b19cec44809107",
+    "tests/fixtures/thermal/source-esatan-network.json": "3660207cc150157c34d5546317d02d5a34effc0426a2d264fc68212d419013b5",
+    "tests/fixtures/thermal/source-sinda-network.json": "1a029e19a99730946403684c07cf80fcab18d803db957ce243d3cbbf38f307b9",
+    "tests/fixtures/thermal/steady-environment-anchor.json": "6c5ce55b809ebc7a780687e9c704ba1537e265ac090eddf56dc7c23a5448f018",
+    "tests/fixtures/thermal/steady-opposite-defects.json": "57d9a53f2761133b475fbc5330fc67fed9421a71e408afa71260a95533ae2440",
+    "tests/fixtures/thermal/steady-outside-domain.json": "ff003e37a911650e657a7f340453727e487d4ff3b584bb1fae55b5ef58809f76",
+    "tests/fixtures/thermal/steady-scaled-components.json": "81b7dbad0635f5646ab171a4c5cdd527f5e8b5bc0a85ebd399c96ec528f9af4c",
+    "tests/fixtures/thermal/steady-singular-zero.json": "19ae4b6fa37109c0acab5721da305beaba2e703001390069ec7563e60e33fc15",
+    "tests/fixtures/thermal/steady-temperature-resolution.json": "3cbfb79e47a9c328ca2c48875ff63e7d943b2320fb887584d01f516a534f9505",
+    "tests/fixtures/thermal/step-network.json": "992ee0ad642cc0c554a9f4acb42f7cbc5716482943525f6e0317066aed869b3a",
+    "tests/fixtures/thermal/transient-chattering.json": "fb12d16f59c54d6f83625d2544bb7b56944b0bb21792f834b9caf6c781d01485",
+    "tests/fixtures/thermal/transient-dae.json": "a19db7834ca9bc5dfad792ae0c21cf8d2c55366827d0f86fdfb1fb798d264925",
+    "tests/fixtures/thermal/transient-enthalpy.json": "5d89097d82b4d33e10dec1711717b53dfcf5f824a49f3809c9754cf0a02e2a57",
+    "tests/fixtures/thermal/transient-heater.json": "6abd864ab82e0813220cb95a44eba6295037350eabfcf78a70b30d8888b0003a",
+    "tests/fixtures/thermal/transient-parallel.json": "2fd98865ab3f3acf0236cfe5ed44c6b5aaf47d2821fe27d4e58978fc72c7ca69",
+    "tests/fixtures/thermal/transient-schedule-sensor.json": "78bc47664820d9708a75fadf4f12977f57c8dfceb5792a5b77c927baa0823b89",
+    "tests/fixtures/thermal/transient-simultaneous.json": "a556c2357b768023e3cc48dcdf569c7518db213ff3f0612cd602cade91513c41",
+    "tests/fixtures/thermal/transient-single.json": "d9c06984f500af056330b85b39fdc2fe858afd0f63f510cd1511ad773c22a82b",
+    "tests/fixtures/thermal/transient-stiff.json": "8a478bdbd81e6e5326f2f8c024f1869f7034eabd1e67146c470c2de9892b7ad0",
+    "tests/fixtures/thermal/transient-two.json": "77c2f93ab11ed4c8d635f46e37239f3ebe1d613985c29da9084aec80d7063324",
+    "tools/check_thermal.py": "603baf9f369e4040d3092108273621ced258d40696f028590db77f1fe66fcc5a",
+    "tools/compare_thermal_reference.py": "11cd061e4c7b23d4cbc0cc025d66a5f95a85bd2d6c720c2288d0c501f3b8cd12",
+    "tools/generate_contracts.py": "eb9a07618d3e200c751d04a5a579240d0ec439b856fd8088cc1cd9fefd1577e7",
+    "tools/thermal_schema.py": "ba97f2ce6afb23b0a05e7002cf9920fef5da055cf31b11f13c6bc0615bfbaa96"
+  },
+  "native_steady_available": true,
+  "native_transient_available": true,
+  "durable_job_solver_available": false,
+  "previous_evidence": {
+    "candidate": "8f62d24a8e75ea760e3a2091cd721f53a9a17062",
+    "tested_candidate": "acf91db0943e3d6ad4a4ee58d8f1dadc61904f5c",
+    "path": "plans/evidence/WP-11.json",
+    "scope": "Native qualification evidence retained in Git history"
+  },
+  "publication_privacy": "TST-021 requires exact staged/outgoing-history and approved identity scans plus final generated summary and PR-text clearance before upload. Only owned synthetic fixtures and bounded hash/count/timing/verdict evidence are public; raw inputs, trajectories, checkpoints, executables, debug files and compiler/backend logs remain local. Independent reference programs, native adapter, source/runtime/wheel pins, criteria, exact thermal-references.json summaries and final PR prose receive the same prepublication clearance; raw reference outputs and dependency/runtime artifacts remain local.",
+  "independent_qualification": {
+    "status": "passed",
+    "profile": "WP-11-independent-numerical-v1",
+    "policy": "ci/thermal-reference-v1.json",
+    "policy_sha256": "5b7a1cdec8c3c72c7032fa383ea975a581b5a8671d49647c75922ca00001d96e",
+    "required_backends": {
+      "sundials_ida": "7.3.0",
+      "scipy_radau": "1.15.2"
+    },
+    "additional_backend": {
+      "pycanha_core": "0.23.0"
+    },
+    "runs_per_configuration": 46,
+    "comparisons_per_configuration": 63,
+    "input_sha256": {
+      "CMakeLists.txt": "23117511d2975d08e8fbc0fcd6b4cb763102ef4d45af29d5b8b069867ff62c7b",
+      "CMakePresets.json": "68a5d94ecb715b8ed4ca4157fef64fd10c8f9b645f343184390faf3cd4649dbf",
+      "ci/probe-sources.json": "2568fd7323403752cb345c72b4baace4090251fe8240e1c2bd28c191a197f6be",
+      "ci/pycanha-reference-runtime.json": "e252f7ff7932c99df79126a36b260fa2efe670a7af9c03db5ab292bedbd60ef0",
+      "ci/pycanha-reference.lock": "76b3c5408a7345eb7c3ff98e30d48a105fc83fcd5180e8dc2a81cbf53f4d5c07",
+      "ci/requirements.lock": "a31eddfbb45adbab4c040beff0f70c130d3519657e9b90535c7394feb54366be",
+      "ci/thermal-reference-v1.json": "5b7a1cdec8c3c72c7032fa383ea975a581b5a8671d49647c75922ca00001d96e",
+      "engine/include/fcst/build_info.hpp.in": "a39b9c567abd186e960a5a4110df72507b40b0dbe6f1eb800cdfb9d076cc28cf",
+      "engine/include/fcst/contract_bundle.hpp": "cc2e286bbe453ebdaf20ed21d34b724a58d9089090818fcbc378704ddacc6730",
+      "engine/include/fcst/contract_types.hpp": "7c7af3a36204f732c3fc5fc610d12639e1c51240de2cdd4be7e7a099f55ea4f5",
+      "engine/include/fcst/contracts.hpp": "6a712aa169bc237a0420ba2fa098b3101ac925c86f3b258b4d7007064e7fa116",
+      "engine/include/fcst/diagnostic.hpp": "2196622a956afcf89d59bac4bcf1c7787717e646948a1f8383960e2960b2c6b2",
+      "engine/include/fcst/thermal.hpp": "733597ae4969e5b4c377b23a8cbaf97da2bd0c29b8689c9554d9bd3811095544",
+      "engine/include/fcst/thermal_assembly.hpp": "36f18c02c90daaf1987e8c7f76dfe8c7ceaec0561e7499ffe98a9c6662acda9e",
+      "engine/include/fcst/thermal_schema.hpp": "50b574eceea4a5aaf5186985df69b92208cfe8155547d9b65b8178705b6fbe7c",
+      "engine/include/fcst/thermal_steady.hpp": "317ff807eb9aa526803643a5b049a8a725815dff323841e853f08e09548d40f6",
+      "engine/include/fcst/thermal_transient.hpp": "8599367f586108053d7f6e505a7842e79cd5aeaacd2cec44219735afeacf9a0e",
+      "engine/src/contracts.cpp": "49e2ba22025372287c4982cc3588b8899af22c49cb7775ae1bd7af787fc82744",
+      "engine/src/diagnostic.cpp": "549e09fd222cc75c9d662fe115f90602a527c3a0ff3447b35c83210bb2ec997f",
+      "engine/src/thermal.cpp": "06293286afab72f1dbe6693b9f11a5a5db7edc412026f424ffe4e1a428a2ede9",
+      "engine/src/thermal_assembly.cpp": "3fa195ede5e801899f5e0b1364e3691514219d744a3362640af1b09bd5d6dfba",
+      "engine/src/thermal_steady.cpp": "306b91f5e03de6875f2e422859a75f319fe89b5aa60fab68cb9da77735bc2d1e",
+      "engine/src/thermal_transient.cpp": "c0c558bb9df6e70b461f1fac3d2b102df22bd34fb8f433d86187039bd6d0e596",
+      "engine/tests/thermal_assembly_tests.cpp": "8671ba427a1916df8cdd3cee02e29cf4a5e48ff69cb5c9c14194ecc914123ae5",
+      "engine/tests/thermal_reference_subject.cpp": "f082ae1d2905b75a94903b1e14d82f3a14182d6acb520a3b9642186a4d7d2947",
+      "engine/tests/thermal_steady_tests.cpp": "bdc69380ef3ed06ebe10867406419256f294f0a99c505d85577c967080b441fd",
+      "engine/tests/thermal_tests.cpp": "e4261787958fb17cd1e0daf8ea4b0fecb20def4328dc9e9affeda436e59ec9bf",
+      "engine/tests/thermal_transient_tests.cpp": "fa31af8f64bb9c76f59050276c844b06f1077bc61f8f76eb37d3934fa1c4cafe",
+      "python/fcst_tools/thermal_references.py": "6d94e4aa6f2bb401487a1b92421d1f4b75a5e1f9b82d5d55b082d539585f47a7",
+      "references/thermal/CMakeLists.txt": "939a6c4ae1be12b55e397afb993da8932c934d2f51b1affc97722100a85ff1a6",
+      "references/thermal/ida_reference.cpp": "3ebc3b9de59da684e831dfa56384ec16a64eef4be0842d85fa7eb35555004556",
+      "references/thermal/pycanha_reference.py": "7e65075b66ec78b7577ca95c67822c756ad0cd331f4a29e9436c3720479b05a0",
+      "references/thermal/radau_reference.py": "6d68861a38f0ab2e53116631d68d458ee574814808e78fbaeb5ff24307961484",
+      "tests/fixtures/thermal/algebraic-network.json": "af8f3c145913ca47e198eb4b0e2f9ed0728fcbe10cb43dbcfa83debc900d3e95",
+      "tests/fixtures/thermal/case-network.json": "48a0b92e45849c149fefc914dd3015eea7d9e118d35415d17658313486db45d8",
+      "tests/fixtures/thermal/control-network.json": "6c97ec7c9943ba478acea82af060adfb2d852f9e0fd918ca16f4cf32d766844b",
+      "tests/fixtures/thermal/element-network.json": "a2782091476aebb637c2f82d0e12f6373daed7135b9b042293f7b97b447f546f",
+      "tests/fixtures/thermal/expression-network.json": "3f2b5671bc3ec01ef8090b2b872b8e8dca509e43a8037ee52299ee2edb468966",
+      "tests/fixtures/thermal/isolated-network.json": "9293e2f485cf2721d61d1b69bbe5b22dc22cf2adf0c7dcd51c0f1e3bed212606",
+      "tests/fixtures/thermal/material-network.json": "7087b931019c251e6ad1ca5ecc1eae348b22e4b6d105658d36487f3e631f9f4e",
+      "tests/fixtures/thermal/power-network.json": "4bf3c2a32ae93f550ba8fd007a3e5576b11ecdf24ccfcba6f5a5f327098ba833",
+      "tests/fixtures/thermal/prescribed-network.json": "3530dfe2a78819c9e01e06e48d75e07489df1927fa67bbeb91b19cec44809107",
+      "tests/fixtures/thermal/source-esatan-network.json": "3660207cc150157c34d5546317d02d5a34effc0426a2d264fc68212d419013b5",
+      "tests/fixtures/thermal/source-sinda-network.json": "1a029e19a99730946403684c07cf80fcab18d803db957ce243d3cbbf38f307b9",
+      "tests/fixtures/thermal/steady-environment-anchor.json": "6c5ce55b809ebc7a780687e9c704ba1537e265ac090eddf56dc7c23a5448f018",
+      "tests/fixtures/thermal/steady-opposite-defects.json": "57d9a53f2761133b475fbc5330fc67fed9421a71e408afa71260a95533ae2440",
+      "tests/fixtures/thermal/steady-outside-domain.json": "ff003e37a911650e657a7f340453727e487d4ff3b584bb1fae55b5ef58809f76",
+      "tests/fixtures/thermal/steady-scaled-components.json": "81b7dbad0635f5646ab171a4c5cdd527f5e8b5bc0a85ebd399c96ec528f9af4c",
+      "tests/fixtures/thermal/steady-singular-zero.json": "19ae4b6fa37109c0acab5721da305beaba2e703001390069ec7563e60e33fc15",
+      "tests/fixtures/thermal/steady-temperature-resolution.json": "3cbfb79e47a9c328ca2c48875ff63e7d943b2320fb887584d01f516a534f9505",
+      "tests/fixtures/thermal/step-network.json": "992ee0ad642cc0c554a9f4acb42f7cbc5716482943525f6e0317066aed869b3a",
+      "tests/fixtures/thermal/transient-chattering.json": "fb12d16f59c54d6f83625d2544bb7b56944b0bb21792f834b9caf6c781d01485",
+      "tests/fixtures/thermal/transient-dae.json": "a19db7834ca9bc5dfad792ae0c21cf8d2c55366827d0f86fdfb1fb798d264925",
+      "tests/fixtures/thermal/transient-enthalpy.json": "5d89097d82b4d33e10dec1711717b53dfcf5f824a49f3809c9754cf0a02e2a57",
+      "tests/fixtures/thermal/transient-heater.json": "6abd864ab82e0813220cb95a44eba6295037350eabfcf78a70b30d8888b0003a",
+      "tests/fixtures/thermal/transient-parallel.json": "2fd98865ab3f3acf0236cfe5ed44c6b5aaf47d2821fe27d4e58978fc72c7ca69",
+      "tests/fixtures/thermal/transient-schedule-sensor.json": "78bc47664820d9708a75fadf4f12977f57c8dfceb5792a5b77c927baa0823b89",
+      "tests/fixtures/thermal/transient-simultaneous.json": "a556c2357b768023e3cc48dcdf569c7518db213ff3f0612cd602cade91513c41",
+      "tests/fixtures/thermal/transient-single.json": "d9c06984f500af056330b85b39fdc2fe858afd0f63f510cd1511ad773c22a82b",
+      "tests/fixtures/thermal/transient-stiff.json": "8a478bdbd81e6e5326f2f8c024f1869f7034eabd1e67146c470c2de9892b7ad0",
+      "tests/fixtures/thermal/transient-two.json": "77c2f93ab11ed4c8d635f46e37239f3ebe1d613985c29da9084aec80d7063324",
+      "tools/build_dependencies.py": "ce420e024eb6be52a640f2958ded2a90473d58b7d4cbfa95e20f7ac86a9701be",
+      "tools/check_thermal_references.py": "f8bb95609bdb05f074633ad8e90552e239550d536ef5363835a320cc74a001ee",
+      "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec",
+      "tools/provision_thermal_references.py": "7dc746e229d10307cda3d1662f550824adc63cbdc94747f29103a232a54075d1",
+      "tools/thermal_reference_build.py": "0cc664dcb0847f9963dd0fa252070e586bd20705ae7a3e443e75d10464e82a88"
+    },
+    "vendor_compatibility_qualified": false,
+    "q1_qualified": false
+  },
+  "blockers": [],
+  "remaining_engine_work": [],
+  "external_obligations": [
+    "WP-08/WP-09 TD/SINDA and ESATAN source-profile compatibility; GAP-LICENSES/GAP-RESULTS remain vendor-specific holds",
+    "WP-12/WP-17 coupled radiation/environment implementations and qualification",
+    "WP-13/WP-14 host/MCP parity and integration",
+    "WP-06/WP-13/WP-15 durable-job/HDF5/result integration",
+    "WP-19 release, hardware/performance profile and full project Q1 qualification"
+  ]
+}

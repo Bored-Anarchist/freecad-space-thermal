@@ -1,0 +1,73 @@
+# SPDX-License-Identifier: MIT OR Apache-2.0
+"""Owned thermal preparation acceptance identity, separate from solver qualification."""
+from hashlib import sha256
+import math
+import json
+from pathlib import Path
+from .gate import evaluate
+from .thermal_qualification import qualification,metrics_check,require
+
+IMPLEMENTED_SUBSTEPS = [f'WP-11.{n}' for n in range(1,11)]
+
+
+def input_hashes(root):
+    names = ['CMakeLists.txt', 'CMakePresets.json', 'engine/src/contracts.cpp',
+             'engine/worker/main.cpp', 'engine/include/fcst/contract_bundle.hpp',
+             'tools/generate_contracts.py', 'tools/thermal_schema.py', 'tools/check_thermal.py',
+             'python/fcst_tools/thermal.py', 'ci/thermal-acceptance.json',
+             'python/fcst_tools/thermal_qualification.py','tools/compare_thermal_reference.py','ci/thermal-qualification-v1.json',
+             'spec/schemas/thermal-input-v1.schema.json']
+    for folder in ('engine/include/fcst', 'engine/src', 'engine/tests', 'tests/fixtures/thermal'):
+        names += [p.relative_to(root).as_posix() for p in (root/folder).glob('*')
+                  if p.is_file() and p.suffix in {'.cpp','.hpp','.inc','.in','.json'}]
+    return {name: sha256((root/name).read_bytes()).hexdigest() for name in sorted(set(names))}
+
+
+def assess(report, policy, hashes, candidate):
+    binaries = report.get('binary_sha256', {})
+    build = report.get('worker_build', {})
+    capabilities=report.get('backend_capabilities', {})
+    profile=report.get('native_profile', {})
+    counters=('residual_evaluations','jacobian_evaluations','linear_solves','newton_iterations')
+    times=('assembly_seconds','linear_seconds','total_seconds')
+    if (report.get('schema_version') != 5 or report.get('candidate') != candidate
+            or report.get('input_sha256') != hashes or report.get('solver_available') is not False
+            or report.get('steady_available') is not True
+            or report.get('transient_available') is not True
+            or report.get('work_packages') != IMPLEMENTED_SUBSTEPS or policy.get('work_packages') != IMPLEMENTED_SUBSTEPS
+            or set(binaries) != {'worker','preparation_acceptance','assembly_acceptance','steady_acceptance','transient_acceptance'}
+            or any(not isinstance(v,str) or len(v)!=64 or set(v)-set('0123456789abcdef') for v in binaries.values())
+            or build.get('engine') != 'fcst_native' or build.get('solver_available') is not False
+            or build.get('steady_available') is not True
+            or build.get('transient_available') is not True
+            or build.get('source_revision') != candidate
+            or capabilities.get('execution_mode') != 'fcst_native' or capabilities.get('external_reference') is not False
+            or capabilities.get('durable_job_solver') is not False or capabilities.get('source_revision') != candidate
+            or capabilities.get('linear') != 'fcst_sparse_lu' or capabilities.get('nonlinear') != 'fcst_damped_newton'
+            or capabilities.get('transient') != 'fcst_enthalpy_backward_euler_step_doubling'
+            or any(capabilities.get(k) is not True for k in ('stiff','index_one_dae','enthalpy','events','checkpoint'))
+            or any(type(profile.get(k)) is not int or profile[k]<=0 for k in counters)
+            or any(type(profile.get(k)) not in (int,float) or not math.isfinite(profile[k]) or profile[k]<0 for k in times)
+            or report.get('gate', {}).get('status') != 'passed'
+            or evaluate(policy['required_cases'], report.get('cases', []))['status'] != 'passed'):
+        raise ValueError('thermal_engine_evidence_invalid')
+    try:
+        register=json.loads((Path(__file__).resolve().parents[2]/'ci/thermal-qualification-v1.json').read_bytes())
+        metrics_check(register,report['qualification_metrics'])
+        require(report['native_qualification']==qualification(register,report['cases'])
+                and report['native_qualification']['native_status']=='passed')
+        comparisons=report['source_comparisons'];require(set(comparisons)=={'sinda','esatan'})
+        for ecosystem,value in comparisons.items():
+            require(set(value)=={'fixture_sha256','source_sha256','model_hash','maximum_temperature_error_K',
+                                'maximum_boundary_power_error_W','maximum_storage_error_J','node_classes','execution_mode','vendor_qualified'})
+            for key in ('fixture_sha256','source_sha256','model_hash'):
+                require(isinstance(value[key],str) and len(value[key])==64 and not set(value[key])-set('0123456789abcdef'))
+            name=f'tests/fixtures/thermal/source-{ecosystem}-network.json'
+            fixture=json.loads((Path(__file__).resolve().parents[2]/name).read_bytes())
+            require(value['fixture_sha256']==hashes[name] and value['source_sha256']==sha256(fixture['source_ascii'].encode('ascii')).hexdigest())
+            for key,limit in [('maximum_temperature_error_K','temperature_tolerance_K'),('maximum_boundary_power_error_W','power_tolerance_W'),('maximum_storage_error_J','storage_tolerance_J')]:
+                require(type(value[key]) in (int,float) and math.isfinite(value[key]) and 0<=value[key]<register['source_oracle'][limit])
+            require(value['node_classes']==3 and value['execution_mode']=='fcst_native' and value['vendor_qualified'] is False)
+    except (KeyError,TypeError,ValueError) as error:
+        raise ValueError('thermal_qualification_evidence_invalid') from error
+    return True
