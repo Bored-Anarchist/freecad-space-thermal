@@ -1,5 +1,11 @@
 # WP-11 qualification and remaining gates
 
+WP-11 engine implementation and independent numerical sign-off are complete.
+Windows Debug and Release each passed 344 checks on the implementation candidate
+recorded in [the evidence](evidence/WP-11.json), including all 80 native cases and
+63 reference comparisons from 46 runs. Project-wide Q1 and vendor-specific
+compatibility remain separate and unqualified.
+
 All ten numbered native implementation substeps are present. Native
 qualification acceptance includes fixed-step event/duty refinement,
 representative manufactured/localized compiled-network profiling, subnormal-tail
