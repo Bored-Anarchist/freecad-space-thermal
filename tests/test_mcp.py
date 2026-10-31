@@ -194,7 +194,7 @@ class MCPTests(unittest.TestCase):
     def test_candidate_bound_gate_rejects_missing_substituted_or_changed_evidence(self):
         import sys
         sys.path.insert(0,str(ROOT/'tools'))
-        from check_mcp import assess,input_hashes
+        from fcst_tools.mcp import assess,input_hashes
         policy=json.loads((ROOT/'ci/mcp-acceptance.json').read_bytes())
         report=dict(candidate='a'*40,input_sha256=input_hashes(),native_worker_sha256='b'*64,
             gate=dict(status='passed'),protocols=policy['protocols'],sdk=policy['sdk'],

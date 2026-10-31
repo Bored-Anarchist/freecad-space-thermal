@@ -32,7 +32,7 @@ def check(directory):
         numerical=load(path.parent/"numerical.json");persistence=load(path.parent/"persistence.json")
         jobs=load(path.parent/"jobs.json")
         if jobs["gate"]["status"]!="passed": raise ValueError("job_lifecycle_regression")
-        from check_mcp import assess as assess_mcp
+        from fcst_tools.mcp import assess as assess_mcp
         mcp=load(path.parent/'mcp.json')
         assess_mcp(mcp,candidate,jobs['native_build_sha256'])
         exchange=load(path.parent/"exchange.json")
