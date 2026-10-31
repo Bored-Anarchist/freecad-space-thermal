@@ -258,6 +258,8 @@ class ReviewPanel(QtWidgets.QDockWidget):
         for title,key in [('Temperature contour','temperature'),('Heat flux vectors','heat_flux'),('Surface normals','normals'),('Material axes','material_axes')]:self.overlay_mode.addItem(title,key)
         self.overlay_mode.currentIndexChanged.connect(self.render_spatial)
         layout.addWidget(self.overlay_mode)
+        self.field_vertex=QtWidgets.QComboBox();self.field_vertex.setObjectName('FCSTFieldVertex')
+        self.field_vertex.currentIndexChanged.connect(self.render_spatial);layout.addWidget(self.field_vertex)
         self.cases=QtWidgets.QComboBox(); self.cases.setObjectName('FCSTCase'); self.cases.currentIndexChanged.connect(self.case_changed)
         layout.addWidget(self.cases)
         row=QtWidgets.QHBoxLayout()
@@ -305,12 +307,20 @@ class ReviewPanel(QtWidgets.QDockWidget):
         index=self.cases.findData(self.session.case_id); self.cases.setCurrentIndex(max(0,index))
         self.tree.expandAll(); self.tree.resizeColumnToContents(0)
         self.tree.blockSignals(False); self.cases.blockSignals(False)
-        if self.session.result is None:
+        spatial=self.session.spatial_view
+        self.field_vertex.setVisible(spatial is not None)
+        if spatial is not None:
+            self.field_vertex.blockSignals(True)
+            previous=self.field_vertex.currentText();self.field_vertex.clear();self.field_vertex.addItems(spatial.value['vertex_ids'])
+            index=self.field_vertex.findText(previous);self.field_vertex.setCurrentIndex(max(0,index));self.field_vertex.blockSignals(False)
+        if self.session.result is None and spatial is None:
             self.status.setText('Model edited / host dirty • result unavailable or stale')
             self.history.points=[]; self.history.update(); self.budget.clear()
             self.legend.setText('Temperature / no current data'); self.time.setEnabled(False)
-        else:
+        elif self.session.result is not None:
             self.time.setEnabled(True); self.time.setMaximum(len(self.session.result['samples'])-1); self.render()
+        else:
+            self.time.setEnabled(True);self.time.setMaximum(len(spatial.value['times'])-1);self.render_spatial()
 
     def case_changed(self, index):
         self.session.case_id=self.cases.itemData(index)
@@ -387,6 +397,23 @@ class ReviewPanel(QtWidgets.QDockWidget):
     def render_spatial(self,*_):
         if self.session.spatial_view is None:return
         try:
-            value=self.session.spatial_view.show(self.overlay_mode.currentData(),min(self.time.value(),len(self.session.spatial_view.value['times'])-1))
+            from fcst_contracts.spatial import field_global
+            import math
+            view=self.session.spatial_view;descriptor=view.value
+            quantity=self.overlay_mode.currentData();sample=min(self.time.value(),len(descriptor['times'])-1)
+            value=view.show(quantity,sample)
+            self.status.setText('CURRENT • spatial field • t = '+format(value['time_s'],'.6g')+' s')
+            if quantity in ('temperature','heat_flux'):
+                rows=[field_global(descriptor,quantity,i) for i in range(len(descriptor['times']))]
+                scalars=[[v[0] if len(v)==1 else math.sqrt(sum(c*c for c in v)) for v in row] for row in rows]
+                offset=273.15 if quantity=='temperature' and self.unit.currentText()=='degC' else 0
+                unit=self.unit.currentText() if quantity=='temperature' else 'W/m2'
+                all_values=[v-offset for row in scalars for v in row]
+                vertex=max(0,self.field_vertex.currentIndex())
+                self.legend.setText(f'{min(all_values):.4g} — {max(all_values):.4g} {unit} / fixed scale')
+                self.history.points=[(t,row[vertex]-offset) for t,row in zip(descriptor['times'],scalars)]
+                self.history.unit=unit;self.history.update()
             self.budget.setPlainText(json.dumps(value,indent=2))
-        except ValueError as e:self.status.setText(diagnostic(e))
+        except ValueError as e:
+            self.status.setText(diagnostic(e));self.history.points=[];self.history.update()
+            self.legend.setText('Spatial field unavailable or stale');self.time.setEnabled(False)

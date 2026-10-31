@@ -203,7 +203,11 @@ def main():
     rejects(lambda:fem_adapter.query(doc.FCSTResult,value,'0'*64),'stale_result')
     App.closeDocument(doc.Name)
     field_session=Session.create(folder/'field-session',model)
-    field_view=SpatialView(field_session,value)
+    field_view=field_session.import_field(value)
+    field_panel=workbench.show(field_session);field_panel.unit.setCurrentText('degC')
+    field_panel.time.setValue(1);field_panel.field_vertex.setCurrentIndex(2)
+    assert field_panel.history.points==[(0,302-273.15),(1,302-273.15)]
+    assert 'CURRENT' in field_panel.status.text() and 'degC' in field_panel.legend.text()
     field_view.show('temperature',1);assert field_view.displayed_scalars==[300,301,302,303]
     actual_colours=[list(c) for c in field_view.mesh.ViewObject.NodeColorArray]
     assert len(actual_colours)==4
@@ -220,7 +224,11 @@ def main():
             if c.blue()>c.red()*1.2 and c.blue()>70:blue+=1
             if c.green()>c.red()*1.2 and c.green()>70:teal+=1
     assert blue>100 and teal>100,'native_contour_not_coloured'
+    field_session.save(folder/'spatial.FCStd',folder/'spatial.fcst')
     field_view.remove_overlay();field_session.close();App.closeDocument(field_session.doc.Name)
+    spatial_reopened=Session.open(folder/'spatial.fcst',folder/'spatial-reopened')
+    assert spatial_reopened.spatial_view is not None and spatial_reopened.spatial_view.value==value
+    spatial_reopened.close();App.closeDocument(spatial_reopened.doc.Name)
     passed('FEM-REUSE-005')
     session.close();App.closeDocument(session.doc.Name)
     session=Session.open(folder/'solved.fcst',folder/'render-reopened')

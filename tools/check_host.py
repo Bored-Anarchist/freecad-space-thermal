@@ -18,6 +18,7 @@ from fcst_tools.gate import evaluate
 def input_hashes():
     paths=[p for folder in ('python/fcst_host','python/fcst_app','python/fcst_contracts','freecad/FCST') for p in (ROOT/folder).rglob('*') if p.suffix in ('.py','.json')]
     paths += [ROOT/p for p in ('tools/check_host.py','tools/host_acceptance_payload.py','tools/install_workbench.py','tools/profile_support.py','tools/host_smoke.py','tools/host_smoke_payload.py','ci/host-acceptance.json','ci/host-reuse.json','ci/fem-reuse.json','ci/host-profile.json','tests/test_host.py','engine/src/contracts.cpp','tests/fixtures/contracts/network.json','tests/fixtures/spatial/solid-surface-rotated.json')]
+    paths += [ROOT/'LICENSE',*(ROOT/'LICENSES').glob('*.txt')]
     return {p.relative_to(ROOT).as_posix():sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
 
 
