@@ -24,7 +24,20 @@ class Selection:
         import FreeCAD as App
         session = current()
         if session and session.panel:
+            if session.panel.selecting:return
             obj=App.getDocument(document).getObject(obj_name)
+            if sub and hasattr(obj,'FCSTKind') and obj.FCSTKind in ('geometry','face'):
+                nodes=[]
+                for key,item in session.objects.items():
+                    if item.FCSTKind=='node' and item.FCSTAttachment:
+                        target,names=item.FCSTAttachment
+                        if target==obj and sub in names:nodes.append(key)
+                if len(nodes)>1:
+                    session.panel.status.setText('Ambiguous review mapping • select an entity explicitly');return
+                if len(nodes)==1:
+                    session.panel.select_entity(nodes[0]);return
+                selected=session.objects.get(session.panel.selected)
+                if selected and selected.FCSTKind=='node':return
             if hasattr(obj,'FCSTEntityId') and session.panel.selected != obj.FCSTEntityId:
                 session.panel.select_entity(obj.FCSTEntityId)
 

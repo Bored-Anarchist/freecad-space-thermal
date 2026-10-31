@@ -100,7 +100,7 @@ class Session:
         self.workspace.mkdir(parents=True, exist_ok=True)
         self.projecting, self.closed, self.on_change = False, False, None
         self.diverged = False
-        self.spatial_view = None
+        self.spatial_view, self.spatial_id = None, None
         self.result_id, self.result, self.panel, self.job = None, None, None, None
         self.options = deepcopy(review.DEFAULT_SETTINGS)
         self.case_id = None
@@ -121,16 +121,29 @@ class Session:
         import FreeCAD as App
         workspace = Path(workspace); workspace.mkdir(parents=True, exist_ok=True)
         store = ProjectStore.create(workspace/'project.db', package=Package.open(package_path))
-        session = cls(App.newDocument('FCST'), store, workspace)
+        doc=App.newDocument('FCST')
+        session=None
+        try:
+            session=cls(doc,store,workspace)
+            return session.restore()
+        except BaseException:
+            if session is not None:session.close()
+            else:store.close()
+            App.closeDocument(doc.Name)
+            raise
+
+    def restore(self):
+        session,store=self,self.store
         configurations=[]
         for artifact in store._artifacts():
             if artifact[2].startswith('review-settings/'):
                 from fcst_contracts import loads
-                configurations.append(loads(artifact[3]))
+                configurations.append(review.configuration(loads(artifact[3]),store.snapshot()))
         if configurations:
             configuration=max(configurations,key=lambda c:c['sequence'])
             session.options=review.settings(configuration['options'])
             session.case_id=configuration['case_id']
+            session.spatial_id=configuration.get('spatial_id')
             for binding in configuration.get('bindings',[]):
                 target=session.objects.get(binding['target_id'])
                 if target is None or shape_signature(target.Shape)!=binding['source_revision']:
@@ -138,12 +151,15 @@ class Session:
                 session.bind(binding['entity_id'],target,binding['subelement'])
         for artifact in store._artifacts():
             if artifact[2].startswith('review-fields/'):
+                if session.spatial_id is not None and artifact[0]!=session.spatial_id:continue
                 from fcst_contracts import loads
                 value=loads(artifact[3])
                 if value.get('model_hash')==semantic_hash(store.snapshot()):
                     from .spatial import SpatialView
                     session.spatial_view=SpatialView(session,value)
+                    session.spatial_id=artifact[0]
                     break
+        if session.spatial_id is not None and session.spatial_view is None:reject('review_configuration')
         # Portable projection is rebuilt. No package-supplied Python or host path runs.
         candidates = [d for d in store.state()['derived'] if d['kind'] == 'solve' and not d['stale']]
         for item in reversed(candidates):
@@ -201,7 +217,7 @@ class Session:
                         ViewProvider(obj.ViewObject)
                 obj.Label = entity.get('label') or entity['kind'].title()+' '+entity['id'][-8:]
                 obj.FCSTEntityId, obj.FCSTKind, obj.FCSTData = entity['id'], entity['kind'], encode(entity).decode()
-                obj.FCSTAttachmentState = ('assigned' if obj.FCSTAttachment else 'unassigned') if entity['kind'] in ('face','facet','element') else 'network' if entity['kind']=='node' else 'contact link' if entity['kind']=='conductor' else 'definition'
+                obj.FCSTAttachmentState = 'assigned' if obj.FCSTAttachment else 'unassigned' if entity['kind'] in ('face','facet','element') else 'network' if entity['kind']=='node' else 'contact link' if entity['kind']=='conductor' else 'definition'
                 for prop in ('FCSTEntityId', 'FCSTKind', 'FCSTData'):
                     obj.setEditorMode(prop, 1)
                 self.objects[entity['id']] = obj
@@ -212,22 +228,33 @@ class Session:
                         'Density':str(material['density']['value'])+' kg/m^3',
                         'SpecificHeat':str(material['specific_heat']['value'])+' J/kg/K',
                         'ThermalConductivity':str(material['conductivity']['value'])+' W/m/K'}
+            from fcst_contracts import normalize
+            frames={e['id']:normalize(e) for e in model['entities'] if e['kind']=='frame'}
+            local_shapes={}
             for entity in sorted(model['entities'],key=lambda e: 0 if e['kind']=='geometry' else 1):
                 obj = self.objects[entity['id']]
                 if entity['kind'] == 'geometry':
                     ref = entity['artifact']
                     raw = next(a[3] for a in self.store._artifacts() if a[2] == ref['path'])
                     shape = Part.Shape(); shape.importBrepFromString(raw.decode('utf-8'))
+                    local_shapes[entity['id']]=shape.copy()
+                    frame=frames[entity['frame_id']];matrix=App.Matrix()
+                    for i in range(3):
+                        for j in range(3):setattr(matrix,'A'+str(i+1)+str(j+1),frame['rotation'][i][j])
+                        setattr(matrix,'A'+str(i+1)+'4',frame['origin'][i]['value']*1000)
+                    shape.Placement=App.Placement(matrix).multiply(shape.Placement)
                     obj.Shape = shape
                 elif entity['kind'] == 'face':
                     geometry = self.objects[entity['geometry_id']]
                     try:
-                        face = geometry.Shape.getElement(entity['persistent_ref'])
-                        if shape_signature(face) != entity['signature']:
+                        local_face=local_shapes[entity['geometry_id']].getElement(entity['persistent_ref'])
+                        if shape_signature(local_face) != entity['signature']:
                             raise ValueError('face_signature')
+                        face=geometry.Shape.getElement(entity['persistent_ref'])
                         obj.Shape = face
+                        obj.ViewObject.Visibility=False
                         obj.FCSTAttachment = (geometry,[entity['persistent_ref']])
-                        obj.FCSTAttachmentSignature = entity['signature']
+                        obj.FCSTAttachmentSignature = shape_signature(face)
                         obj.FCSTSourceRevision = shape_signature(geometry.Shape)
                         obj.FCSTAttachmentState = 'assigned'
                     except (ValueError,RuntimeError):
@@ -246,6 +273,30 @@ class Session:
                         obj.ViewObject.LineColor = (.38,.48,.55)
                         obj.ViewObject.LineWidth = 3
             self.doc.recompute()
+        self.check_bindings()
+        self.draw_bindings()
+
+    def draw_bindings(self):
+        import Part
+        with self.projection():
+            active=set()
+            for key,obj in self.objects.items():
+                if obj.FCSTKind!='node' or not obj.FCSTAttachment:continue
+                target,names=obj.FCSTAttachment
+                try:
+                    a,b=obj.Shape.BoundBox.Center,target.Shape.getElement(names[0]).CenterOfMass
+                    if (a-b).Length==0:continue
+                    name='FCSTMapping_'+key.replace('-','');active.add(name)
+                    line=self.doc.getObject(name)
+                    if line is None:
+                        line=self.doc.addObject('PartDesign::Feature',name)
+                        line.addProperty('App::PropertyString','FCSTReviewOverlay','FCST');line.FCSTReviewOverlay='mapping'
+                        self.root.addObject(line)
+                    line.Shape=Part.makeLine(a,b);line.Label='Review mapping '+key[-8:]
+                    line.ViewObject.LineWidth=2;line.ViewObject.LineColor=(.2,.7,.65) if obj.FCSTAttachmentState=='assigned' else (.9,.2,.1)
+                except (RuntimeError,ReferenceError,AttributeError,IndexError):continue
+            for obj in list(self.doc.Objects):
+                if hasattr(obj,'FCSTReviewOverlay') and obj.Name not in active:self.doc.removeObject(obj.Name)
 
     def edit(self, entity, *, expected_revision=None):
         assert_thread()
@@ -302,7 +353,7 @@ class Session:
                         bindings.append(dict(entity_id=key,target_id=target.FCSTEntityId,
                             subelement=names[0],source_revision=obj.FCSTSourceRevision))
             self.store.add_artifact(artifact_id,'evidence','review-settings/'+artifact_id+'.json',
-                encode(dict(sequence=sequence,options=self.options,case_id=self.case_id,bindings=bindings)),
+                encode(dict(sequence=sequence,options=self.options,case_id=self.case_id,bindings=bindings,spatial_id=self.spatial_id)),
                 expected_revision=self.store.snapshot()['revision'])
             staging = self.workspace/('save-'+uuid.uuid4().hex+'.FCStd')
             self.doc.recompute()
@@ -313,6 +364,8 @@ class Session:
     def bind(self, entity_id, host_object, subelement):
         assert_thread()
         if entity_id not in self.objects or host_object.Document != self.doc or not subelement.startswith('Face'):
+            reject('attachment_reassignment_required')
+        if hasattr(host_object,'FCSTKind') and host_object.FCSTKind not in ('geometry','face'):
             reject('attachment_reassignment_required')
         if not hasattr(host_object,'FCSTEntityId'):
             face_id=self.capture_surface(host_object,subelement)
@@ -328,6 +381,7 @@ class Session:
             obj.FCSTSourceRevision = shape_signature(host_object.Shape)
             obj.FCSTAttachmentState = 'assigned'
         self.clear_display()
+        self.draw_bindings()
 
     def capture_surface(self, host_object, subelement):
         """Freeze owned CAD bytes, then create the geometry and signed face atomically."""
@@ -348,6 +402,7 @@ class Session:
                          dict(upsert=[frame,geometry,face_value],delete=[]))
         self.store.mark_host_dirty(); self.clear_display(); self.project()
         self.diverged = False
+        with self.projection():host_object.ViewObject.Visibility=False
         return face_id
 
     def check_bindings(self):
@@ -377,9 +432,12 @@ class Session:
         if self.spatial_view is not None:
             self.spatial_view.hide()
         if hasattr(self, 'objects'):
-            for obj in self.objects.values():
+            for key in self.objects:
+                obj=self.doc.getObject('FCST_'+key.replace('-',''))
+                if obj is None:continue
                 if obj.FCSTKind == 'node':
                     obj.ViewObject.ShapeColor = (.48,.48,.48)
+                elif obj.FCSTKind=='geometry':obj.ViewObject.DiffuseColor=[(.65,.65,.65)]*len(obj.Shape.Faces)
 
     def import_field(self,value):
         from fcst_contracts import read
@@ -390,6 +448,7 @@ class Session:
         self.store.add_artifact(artifact_id,'evidence','review-fields/'+artifact_id+'.json',encode(value),
                                 expected_revision=self.store.snapshot()['revision'])
         self.spatial_view=view
+        self.spatial_id=artifact_id
         return view
 
     def load_result(self, result_id):
@@ -416,6 +475,13 @@ class Session:
         with self.projection():
             for key, rgb in zip(result['node_ids'], value['colours']):
                 self.objects[key].ViewObject.ShapeColor = rgb
+                obj=self.objects[key]
+                if obj.FCSTAttachment:
+                    target,names=obj.FCSTAttachment
+                    colours=list(target.ViewObject.DiffuseColor)
+                    if len(colours)!=len(target.Shape.Faces):colours=[target.ViewObject.ShapeColor]*len(target.Shape.Faces)
+                    colours[int(names[0][4:])-1]=rgb
+                    target.ViewObject.DiffuseColor=colours
         return value
 
     def close(self):

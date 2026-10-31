@@ -99,6 +99,7 @@
     "test_host.HostTests.test_host_import_is_independent_of_freecad_and_qt",
     "test_host.HostTests.test_input_artifacts_are_immutable_validated_and_revision_bound",
     "test_host.HostTests.test_partial_non_native_wrong_identity_and_invalid_results_reject",
+    "test_host.HostTests.test_reopen_configuration_is_closed_typed_and_cannot_rebind_unknown_entities",
     "test_host.HostTests.test_request_freezes_independent_model_and_sampling",
     "test_host.HostTests.test_result_publication_save_reopen_staleness_and_historical_queries",
     "test_host.HostTests.test_solver_settings_reject_fractional_nonfinite_and_unbounded_samples",

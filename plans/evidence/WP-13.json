@@ -5,24 +5,87 @@
   "tested_worktree_base": "67acf5ada6a269abf0283d1045aafbb6dc860cd7",
   "checks": [
     {
-      "id": "portable_host_contracts",
+      "id": "full_windows_debug_baseline",
       "status": "passed",
-      "command": "python -m unittest discover -s tests -p test_host.py"
+      "candidate": "d8c6da7",
+      "required_checks": 362,
+      "native_ctest_cases": 68,
+      "report_sha256": "d8cbffa9601ef225de24e8420082542038a3ce118d2d93bae1f7e4fbe529bc1c"
     },
     {
-      "id": "installed_workbench",
+      "id": "full_windows_release_baseline",
       "status": "passed",
-      "command": "python tools/check_host.py --worker PATH_TO_TESTED_WORKER"
+      "candidate": "d8c6da7",
+      "required_checks": 362,
+      "native_ctest_cases": 68,
+      "report_sha256": "c4f5e88bbbad5b20b2de160bf8612a979a81a88c50eac7fb946ef9739a9e5ebd"
+    },
+    {
+      "id": "final_standard_library_regressions",
+      "status": "passed",
+      "required_cases": 339,
+      "report_sha256": "f48b5514cde2de270f3b59a26d197c09d3b8cf72bfd091ad7cc0af0d4cbe5fac"
+    },
+    {
+      "id": "final_installed_workbench",
+      "status": "passed",
+      "required_cases": 17,
+      "report_sha256": "da1d9c008f11655146dada8bc3f35be0102ea0ed02b1a0138704e690e7449d1a"
     }
   ],
-  "blockers": [
-    "Final candidate Debug and Release verification and CI publication remain pending"
-  ],
+  "blockers": [],
   "remaining_qualification": [
     "WP-16 production spatial physics and FEM-REUSE-003/006",
     "WP-14/15 MCP and integrated P0 parity",
     "WP-17/18 production environments and campaigns",
     "TD/ESATAN paired and complete Q1 release qualification"
   ],
-  "publication": "Owned synthetic fixtures source-only adapters and bounded host.json summaries; raw documents screenshots arrays logs binaries preferences and engineering originals stay local"
+  "publication": "Owned synthetic fixtures source-only adapters and bounded host.json summaries; raw documents screenshots arrays logs binaries preferences and engineering originals stay local",
+  "implementation_delivery": "implemented",
+  "acceptance_status": "passed_on_declared_host_subset",
+  "review_status": "Implementation branch prepared for pull-request review; main-branch merge remains pending",
+  "input_sha256": {
+    "ci/fem-reuse.json": "affa8267243714bc05708cc7bff80fdf5f112d7bbd0572c000df8730b3bee6f5",
+    "ci/host-acceptance.json": "d7a51f8c4a52595772f8c6e7ae18deda25d7520f526565ebedc79e80dd54c665",
+    "ci/host-profile.json": "5662cd6012f669ab610f6c90d11f7dabd0d516bf7dda369ea9ec49630b90b3f0",
+    "ci/host-reuse.json": "3cd5ef9a019a9e41c8b5ab4001b736c2c937cfeac48e1aae640e357c25ffdd94",
+    "engine/src/contracts.cpp": "f1ca69f6508b6333b43587465728d99f1449af7740a0f70c641f7d60afb0c44b",
+    "freecad/FCST/Init.py": "8186b055c3ede8302b2df17f226a1d0e5f7b97f46189240b7460299b5e8fb02e",
+    "freecad/FCST/InitGui.py": "ec6af225f2faa5b1a62bc503544e762c2b2b1a37247de973a61f3d6001af468e",
+    "LICENSE": "11958a8dd20d4b21e3f37f81e3c920db7a0ee58efa2ae01c1c0f800ddb35078f",
+    "LICENSES/Apache-2.0.txt": "074e6e32c86a4c0ef8b3ed25b721ca23aca83df277cd88106ef7177c354615ff",
+    "LICENSES/CC-BY-4.0.txt": "d557539df68e771cc1eedcc91d13f70fca930e508d11eedcafa4b15db49e3744",
+    "LICENSES/LGPL-2.1-or-later.txt": "5749785c8bdefafcb5d798270ed0a967036fe2ca63dcedade1627565dfef81d2",
+    "LICENSES/MIT.txt": "b85dcd3e453d05982552c52b5fc9e0bdd6d23c6f8e844b984a88af32570b0cc0",
+    "python/fcst_app/__init__.py": "d5fb80b0622163ad4bf6b9ad0e3a10147a13f6017315a49d4e946d6f1822579e",
+    "python/fcst_app/arrays.py": "1bbb1a369796ff4da422ed63edd898a5479aec4db782c20bb4b2a016556f14ab",
+    "python/fcst_app/fem_adapter.py": "f79add478cda57ce558b3cfec025e8e7d15d24bd57fb89e76f8d0947a0f717bb",
+    "python/fcst_app/jobs.py": "e261b47ff350eec2cad4dc7d7eded8db571f228c565b25f65661f269c8b8776c",
+    "python/fcst_app/persistence.py": "ceca343f03e5f2b42c108475955c833f618c4f7c0cb0eb71c41f586b3dd57778",
+    "python/fcst_app/process_limits.py": "fbae3c77add596d49b2cd7e9c3fd0dab54012cd97bd42f293cacb07462e975f4",
+    "python/fcst_app/spatial_arrays.py": "ec1793b9aee9d0c7b16fa415a6921469a941300dd1e985254057bb8aef2cb1f7",
+    "python/fcst_app/store.py": "7232b254199c11b07f82ad859ebf5c288578a3820ca136caaa6d814224d9be59",
+    "python/fcst_contracts/__init__.py": "7ce10d4ade7d2f111eca73a4ab136ab1d184e6368b16c2d91bbaf4ecf1ed48c5",
+    "python/fcst_contracts/bundle.json": "785584588917e6d882f80247f25632cf1bd84c5ed9cb2c4116a96bc10365b932",
+    "python/fcst_contracts/spatial.py": "5019c4dce9233055e91b4cd63ba713324c252a12900de2d6bdde703238fb5e4a",
+    "python/fcst_contracts/types.py": "d399ea1521fbbb899bfa2a9194532ef1e7892e6719a6b3e9c54ca14cd43e9824",
+    "python/fcst_contracts/worker.py": "a8da22e6d4c3534ce73494312fd0641ed10bfb2866ab34ef87a196a9827fbadf",
+    "python/fcst_host/__init__.py": "281bedd49c2fd49f96ca0e4176708f5a38edac66beee1f6c0bbdadf0d86b5f1f",
+    "python/fcst_host/controller.py": "29646a314b48f4d7cace870bbb48d0bca0b69baf98bca26b2b95c5eb35b0d567",
+    "python/fcst_host/review.py": "e3d51dae76ba1ecde816b5db7082a43e57bcd8d08ecac64434b3542b5b6df2de",
+    "python/fcst_host/spatial.py": "20313acae5207b657d76245a98e0aecc7aeb758e179fbb60e4d00b518866f80f",
+    "python/fcst_host/templates.json": "b7ba367105b4e0eeea7855003fcb402cf6621fd432f6e1dcb6e21657729342eb",
+    "python/fcst_host/widgets.py": "74803afa23df32295fb5b98ae0c35794b2d3a059b97bb32d4928a36d394cdb9d",
+    "python/fcst_host/workbench.py": "93b9aaabec5c8a72273a3a53cab3bdec9d326cebccf9cb8b9039414d05dfd5d3",
+    "tests/fixtures/contracts/network.json": "856953a18cc4f3e633c99d24be86201bb2f08776b3b8968f660eff656292c806",
+    "tests/fixtures/spatial/solid-surface-rotated.json": "49c3eba18add86b72acc6f750d249c68397baf60315a82b3dc95d0a6f256c301",
+    "tests/test_host.py": "a6e58bb0372727173a20db5f85302be47b6dedbb8eacc534b1bd5a96d28a3b2d",
+    "tools/check_host.py": "95d2d6621d22778c43c8e3c06235c3bf2031b8c6a85ec2898649f8ba64f6959d",
+    "tools/host_acceptance_payload.py": "f5d03562e8bdb578fafd040290bfaef027dec1dec2334495a245f9bdc87b7807",
+    "tools/host_smoke.py": "c015342ca66773663af8469df9c3343e7756e0298b60f190b41b70dc93311b81",
+    "tools/host_smoke_payload.py": "aa87726597dc97b6d8ef79e5e78dee6602f347f38961584e9ce963f81c4f48c4",
+    "tools/install_workbench.py": "ef023c447c385e13a723305ebbc4914971abe8fef4b22278b80a74c01d749fd2",
+    "tools/profile_support.py": "df59eefbb79046ad59452be25b8500f2bc4a7dd07389679e48cc92ebb54bdcec"
+  },
+  "validation_policy": "Full Debug/Release baselines precede the final host-only frame mapping metadata and recovery changes. The final host source tree and 339-case standard-library suite pass separately. GitHub Actions reruns all 363 checks and the 17-case installed-host gate on the published candidate; merge requires its aggregate checks. No engine source changed after the full baselines."
 }

@@ -18,6 +18,8 @@ class SpatialView:
             self.mesh,self.result=fem_adapter.create(session.doc,self.value)
             self.mesh.ViewObject.Visibility=False
         self.overlay=None
+        import FreeCADGui as Gui
+        self.scene=Gui.getDocument(session.doc.Name).activeView().getSceneGraph()
         self.sample=0
         self.displayed_scalars=[]
 
@@ -42,7 +44,6 @@ class SpatialView:
             self.mesh.ViewObject.DisplayMode='Faces'
             self.mesh.ViewObject.Visibility=True
             self.session.doc.recompute()
-            Gui.updateGui()
             if quantity in ('temperature','heat_flux'):
                 vectors=field_global(value,quantity,sample)
                 scalars=[v[0] if len(v)==1 else math.sqrt(sum(x*x for x in v)) for v in vectors]
@@ -72,16 +73,17 @@ class SpatialView:
                     line([0,0,0],[frame[k][i]*200 for k in range(3)],rgb)
             else: reject('result_selection')
         self.remove_overlay()
-        Gui.activeDocument().activeView().getSceneGraph().addChild(root); self.overlay=root
+        self.scene.addChild(root); self.overlay=root
         return dict(unit='K' if quantity=='temperature' else 'W/m2' if quantity=='heat_flux' else '1',
             time_s=value['times'][sample],vertex_ids=value['vertex_ids'],
             integrated_flux_W={c['id']:integrated_boundary_power(value,c['id'],sample) for c in value['cells'] if c['topology']=='tri3'} if any(f['quantity']=='heat_flux' for f in value['fields']) else {})
 
     def remove_overlay(self):
-        import FreeCADGui as Gui
         if self.overlay is not None:
-            Gui.activeDocument().activeView().getSceneGraph().removeChild(self.overlay); self.overlay=None
+            if self.scene.findChild(self.overlay)>=0:self.scene.removeChild(self.overlay)
+            self.overlay=None
 
     def hide(self):
         self.remove_overlay()
-        self.mesh.ViewObject.Visibility=False
+        try:self.mesh.ViewObject.Visibility=False
+        except (ReferenceError,RuntimeError):pass

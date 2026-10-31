@@ -55,6 +55,17 @@ class HostTests(unittest.TestCase):
         flag,value=review.request(review.example_model(),{**review.DEFAULT_SETTINGS,'mode':'steady'})
         self.assertEqual(flag,'--thermal-steady');self.assertEqual(value['model'],review.example_model())
 
+    def test_reopen_configuration_is_closed_typed_and_cannot_rebind_unknown_entities(self):
+        model=review.example_model()
+        value=dict(sequence=0,options=review.DEFAULT_SETTINGS,case_id=None,bindings=[],spatial_id=None)
+        self.assertEqual(review.configuration(value,model),value)
+        for key,invalid in (('sequence','invalid'),('sequence',-1),('sequence',True),('sequence',float('inf')),
+                            ('case_id',[]),('case_id',review.uid(4)),('bindings','inert'),('spatial_id','not-a-uuid')):
+            with self.assertRaises(PersistenceError):review.configuration({**value,key:invalid},model)
+        with self.assertRaises(PersistenceError):review.configuration({**value,'unknown':1},model)
+        with self.assertRaises(PersistenceError):review.configuration({**value,'bindings':[dict(entity_id=review.uid(4),
+            target_id=review.uid(5),subelement='Face1',source_revision='0'*64)]},model)
+
     def test_creation_templates_bind_existing_types_and_keep_distinct_conductor_ends(self):
         from fcst_host.workbench import template
         with tempfile.TemporaryDirectory() as folder, ProjectStore.create(Path(folder)/'state.db',review.new_model()) as store:

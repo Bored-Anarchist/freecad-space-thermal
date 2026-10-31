@@ -32,9 +32,13 @@ frame, geometry and signed surface through a shared transaction. The BREP retain
 FreeCAD's native millimetres; canonical area is square metres. Imported canonical
 spatial descriptors explicitly use metres and convert by 1000 at the host edge.
 The frozen geometry copy is independent of later edits to the original CAD body.
+The original body is hidden after capture. Canonical frame rotations and
+metre-valued origins are applied when rebuilding the displayed placement.
 Use **Link selected entity to CAD face** for a review attachment. Persistent
 subelement references, geometric signatures and source-geometry revision hashes
 are retained together. Review links do not invent a production FE assignment.
+Mapping lines connect abstract nodes to their CAD faces; selecting a mapped face
+selects its thermal node, and current node results color that face.
 
 The assignment table exposes missing and invalid attachments and selects their
 canonical entities. CAD, conduction elements, radiation facets and thermal nodes

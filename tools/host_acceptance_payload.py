@@ -179,13 +179,42 @@ def main():
     Gui.runCommand('FCST_Surface')
     faces=[e for e in built.store.snapshot()['entities'] if e['kind']=='face'];assert len(faces)==1,built.panel.status.text()
     assert built.objects[faces[0]['id']].FCSTAttachmentState=='assigned'
+    geometry=next(e for e in built.store.snapshot()['entities'] if e['id']==faces[0]['geometry_id'])
+    frame=next(e for e in built.store.snapshot()['entities'] if e['id']==geometry['frame_id'])
+    frame_editor=EntityEditor(built,frame,built.panel)
+    frame_editor.fields['origin'][1].setPlainText(json.dumps([dict(value=2,unit='m'),dict(value=0,unit='mm'),dict(value=0,unit='m')]))
+    frame_editor.fields['rotation'][1].setPlainText(json.dumps([[0,-1,0],[1,0,0],[0,0,1]]))
+    frame_editor.commit();assert frame_editor.result()==QtWidgets.QDialog.Accepted
+    body=built.objects[geometry['id']]
+    assert abs(body.Shape.BoundBox.XMin-1000)<1e-7
+    assert abs(built.objects[faces[0]['id']].Shape.CenterOfMass.x-1500)<1e-7
+    built.bind(free_id,body,'Face1');built.panel.refresh()
+    Gui.Selection.clearSelection();Gui.Selection.addSelection(body,'Face1')
+    assert built.panel.selected==free_id
+    assert built.doc.getObject('FCSTMapping_'+free_id.replace('-','')).Shape.Length>1000
+    QtTest.QTest.mouseClick(built.panel.run,QtCore.Qt.LeftButton)
+    wait(lambda:built.job.state not in ('queued','running'))
+    assert built.job.state=='succeeded'
+    assert 'energy defect W' in built.panel.budget.toPlainText()
+    colors=review.display(built.result,0)['colours'];expected=colors[built.result['node_ids'].index(free_id)]
+    assert max(abs(a-b) for a,b in zip(body.ViewObject.DiffuseColor[0],expected))<1e-6
+    passed('HOST-FRAME')
     built.save(folder/'built.FCStd',folder/'built.fcst')
     copied=Session.open(folder/'built.fcst',folder/'built-reopened')
     assert copied.options['mode']=='steady' and copied.store.snapshot()==built.store.snapshot()
     assert copied.objects[faces[0]['id']].FCSTAttachmentState=='assigned'
+    assert abs(copied.objects[geometry['id']].Shape.BoundBox.XMin-1000)<1e-7
     copied.close();App.closeDocument(copied.doc.Name)
     built.close();App.closeDocument(built.doc.Name);App.setActiveDocument(session.doc.Name)
     passed('HOST-CREATE')
+    with ProjectStore.create(folder/'invalid-review.db',review.example_model()) as broken:
+        broken.add_artifact(review.uid(100),'evidence','review-settings/invalid.json',
+            b'{"sequence":"invalid","options":{},"case_id":null,"bindings":[]}',expected_revision=0)
+        broken.save(folder/'invalid-review.fcst')
+    before_documents=set(App.listDocuments())
+    rejects(lambda:Session.open(folder/'invalid-review.fcst',folder/'invalid-reopen'),'review_configuration')
+    assert set(App.listDocuments())==before_documents
+    passed('HOST-PACKAGE-RECOVERY')
     # Pinned FEM field path verifies raw vector values and actual contour scalars.
     model=loads((Path(os.environ['FCST_HOST_ROOT'])/'tests/fixtures/contracts/network.json').read_bytes())
     value=loads((Path(os.environ['FCST_HOST_ROOT'])/'tests/fixtures/spatial/solid-surface-rotated.json').read_bytes())
@@ -225,7 +254,14 @@ def main():
             if c.green()>c.red()*1.2 and c.green()>70:teal+=1
     assert blue>100 and teal>100,'native_contour_not_coloured'
     field_session.save(folder/'spatial.FCStd',folder/'spatial.fcst')
-    field_view.remove_overlay();field_session.close();App.closeDocument(field_session.doc.Name)
+    other=App.newDocument('OtherReviewDocument');marker=other.addObject('PartDesign::Feature','UnrelatedMarker');marker.Shape=Part.makeBox(1,2,3)
+    other_scene=Gui.getDocument(other.Name).activeView().getSceneGraph()
+    field_view.show('normals')
+    assert other_scene.findChild(field_view.overlay)==-1 and field_view.scene.findChild(field_view.overlay)>=0
+    owner_name=field_session.doc.Name;App.closeDocument(owner_name)
+    assert field_session.closed and abs(marker.Shape.Volume-6)<1e-12
+    App.closeDocument(other.Name)
+    passed('HOST-MULTI-DOCUMENT')
     spatial_reopened=Session.open(folder/'spatial.fcst',folder/'spatial-reopened')
     assert spatial_reopened.spatial_view is not None and spatial_reopened.spatial_view.value==value
     spatial_reopened.close();App.closeDocument(spatial_reopened.doc.Name)

@@ -213,6 +213,7 @@ class NativeJob(QtCore.QObject):
         if code != 0 or self.error_bytes or status != QtCore.QProcess.NormalExit:
             self.update('failed'); return
         try:
+            if sha256(self.worker.read_bytes()).hexdigest()!=self.worker_hash:reject('worker_changed')
             value = loads(bytes(self.output))
             result_id = review.attach_result(self.session.store,value,self.model,self.input,self.worker_hash)
             self.session.load_result(result_id)
@@ -235,7 +236,7 @@ class ReviewPanel(QtWidgets.QDockWidget):
     def __init__(self, session, parent=None):
         super().__init__('FCST • Thermal Review',parent)
         self.setObjectName('FCSTReviewDock'); self.session=session; self.selected=None
-        self.setMinimumWidth(390)
+        self.setMinimumWidth(390);self.selecting=False
         body=QtWidgets.QWidget(); self.setWidget(body); layout=QtWidgets.QVBoxLayout(body)
         heading=QtWidgets.QLabel('FCST  /  THERMAL REVIEW'); heading.setStyleSheet('font-size:17px;font-weight:600;color:#46b9aa;padding:8px')
         layout.addWidget(heading)
@@ -329,9 +330,16 @@ class ReviewPanel(QtWidgets.QDockWidget):
         import FreeCADGui as Gui
         items=self.tree.selectedItems()
         self.selected=items[0].data(0,QtCore.Qt.UserRole) if items else None
-        Gui.Selection.clearSelection()
-        if self.selected:
-            Gui.Selection.addSelection(self.session.objects[self.selected])
+        self.selecting=True
+        try:
+            Gui.Selection.clearSelection()
+            if self.selected:
+                obj=self.session.objects[self.selected]
+                Gui.Selection.addSelection(obj)
+                if obj.FCSTAttachment:
+                    target,names=obj.FCSTAttachment
+                    Gui.Selection.addSelection(target,names[0])
+        finally:self.selecting=False
         self.render()
 
     def select_entity(self, entity_id):

@@ -34,6 +34,7 @@ def assess(report, candidate, inputs, policy):
 def check(worker, report):
     report.unlink(missing_ok=True)
     frozen_inputs=input_hashes()
+    candidate=revision()
     import host_smoke
     host_smoke.main()
     policy=json.loads((ROOT/'ci/host-acceptance.json').read_bytes())
@@ -52,8 +53,9 @@ def check(worker, report):
             if sha256(raw).hexdigest()!=entry['sha256'] or sha256(b''.join(raw.splitlines(keepends=True)[:30])).hexdigest()!=entry['notice_sha256']:
                 raise ValueError('host_source_license_mismatch')
     worker=Path(worker).resolve()
+    worker_hash=sha256(worker.read_bytes()).hexdigest()
     identity=subprocess.run([str(worker),'--build-info'],capture_output=True,timeout=30)
-    if identity.returncode or json.loads(identity.stdout)['source_revision']!=revision():
+    if identity.returncode or json.loads(identity.stdout)['source_revision']!=candidate:
         raise ValueError('host_worker_candidate_mismatch')
     macro=folder/'acceptance.FCMacro'
     macro.write_text('import os\nfrom pathlib import Path\nexec(compile(Path(os.environ["FCST_HOST_PAYLOAD"]).read_text(encoding="utf-8"), "host_acceptance_payload.py", "exec"))\n')
@@ -65,9 +67,10 @@ def check(worker, report):
     run([str(host),str(macro),'--user-cfg',str(folder/'user.cfg'),'--system-cfg',str(folder/'system.cfg')],
         folder,folder/'host.log',env=env,timeout=240)
     data=json.loads((folder/'host.json').read_bytes())
-    if input_hashes()!=frozen_inputs:raise ValueError('host_sources_changed_during_acceptance')
-    data.update(candidate=revision(),input_sha256=frozen_inputs,
-        asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=sha256(worker.read_bytes()).hexdigest())
+    if input_hashes()!=frozen_inputs or revision()!=candidate or sha256(worker.read_bytes()).hexdigest()!=worker_hash:
+        raise ValueError('host_sources_changed_during_acceptance')
+    data.update(candidate=candidate,input_sha256=frozen_inputs,
+        asset_sha256=profile['platforms']['Windows']['sha256'],worker_sha256=worker_hash)
     data['gate']=evaluate(policy['required_cases'],data['cases'])
     assess(data,revision(),input_hashes(),policy)
     report.parent.mkdir(parents=True,exist_ok=True)

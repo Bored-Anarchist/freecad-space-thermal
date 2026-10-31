@@ -2,6 +2,7 @@
 """Value-only review operations shared by the workbench and unattended clients."""
 from copy import deepcopy
 import math
+import re
 import uuid
 
 from fcst_contracts import loads, normalize, read
@@ -58,6 +59,37 @@ DEFAULT_SETTINGS = dict(mode='transient',start=0, end=2, samples=21, absolute_te
                         relative_temperature_tolerance=1e-6)
 
 
+def configuration(value, model):
+    """Closed, inert view metadata; malformed packages never leave a half-open host."""
+    required={'sequence','options','case_id','bindings'}
+    if not isinstance(value,dict) or not required<=value.keys() or set(value)-required-{'spatial_id'}:
+        reject('review_configuration')
+    sequence=value['sequence']
+    if type(sequence) not in (int,float) or not math.isfinite(sequence) or sequence<0 or sequence!=int(sequence):
+        reject('review_configuration')
+    settings(value['options'])
+    entities={e['id']:e for e in read('model',model)['entities']}
+    if value['case_id'] is not None and (not isinstance(value['case_id'],str)
+            or entities.get(value['case_id'],{}).get('kind')!='case'):
+        reject('review_configuration')
+    bindings=value['bindings']
+    if not isinstance(bindings,list) or len(bindings)>len(entities):reject('review_configuration')
+    seen=set()
+    for binding in bindings:
+        if not isinstance(binding,dict) or set(binding)!={'entity_id','target_id','subelement','source_revision'}:
+            reject('review_configuration')
+        if (not all(isinstance(v,str) for v in binding.values()) or binding['entity_id'] not in entities
+                or binding['entity_id'] in seen or entities.get(binding['target_id'],{}).get('kind') not in ('geometry','face')
+                or not re.fullmatch(r'Face[1-9][0-9]{0,6}',binding['subelement'])
+                or not re.fullmatch(r'[a-f0-9]{64}',binding['source_revision'])):
+            reject('review_configuration')
+        seen.add(binding['entity_id'])
+    if value.get('spatial_id') is not None:
+        try:uuid.UUID(value['spatial_id'])
+        except (ValueError,TypeError,AttributeError):reject('review_configuration')
+    return deepcopy(value)
+
+
 def request(model, options, case_id=None):
     model = read('model', model)
     options = settings(options)
@@ -100,6 +132,9 @@ def validate_result(value, model):
         samples = [dict(time_s=0, temperature_K=[n['temperature_K'] for n in nodes],
                         boundary_power_W=[n['boundary_power_W'] for n in nodes],
                         valid=True, duty_cycles={}, run_energy={})]
+        balance={name:value.get(name) for name in ('energy_defect_W','internal_exchange_defect_W')}
+        if any(type(v) not in (int,float) for v in balance.values()):reject('result_samples')
+        samples[0]['steady_balance_W']=balance
     else:
         if value.get('valid') is not True:
             reject('invalid_result')
@@ -194,10 +229,12 @@ def display(result, sample_index, selected=None, unit='K'):
     lo, hi = min(all_values), max(all_values)
     sample = samples[sample_index]
     offset = 273.15 if unit == 'degC' else 0
+    powers={k: sample[k] for k in ('conductor_power_W', 'boundary_power_W', 'conductive_in_W',
+        'radiation_in_W', 'load_in_W', 'environment_in_W', 'storage_power_W', 'residual_W') if k in sample}
+    powers.update({k:[v] for k,v in sample.get('steady_balance_W',{}).items()})
     return dict(time_s=sample['time_s'], unit=unit, lower=lo-offset, upper=hi-offset,
         temperatures=[v-offset for v in sample['temperature_K']],
         colours=[colour(v, lo, hi) for v in sample['temperature_K']],
         history=[(s['time_s'], s['temperature_K'][index]-offset) for s in samples],
-        powers={k: sample[k] for k in ('conductor_power_W', 'boundary_power_W', 'conductive_in_W',
-            'radiation_in_W', 'load_in_W', 'environment_in_W', 'storage_power_W', 'residual_W') if k in sample},
+        powers=powers,
         energy=sample.get('run_energy', {}), duty=sample.get('duty_cycles', {}))
