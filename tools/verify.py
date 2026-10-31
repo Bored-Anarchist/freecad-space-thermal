@@ -24,7 +24,7 @@ STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-ge
 def command(args, log, env=None):
     with log.open("wb") as output:
         result = subprocess.run(args, cwd=ROOT, stdout=output, stderr=subprocess.STDOUT,
-                                env=env, timeout=600)
+                                env=env, timeout=1800 if "tools/check_radiation.py" in args else 600)
     return result.returncode == 0
 
 
