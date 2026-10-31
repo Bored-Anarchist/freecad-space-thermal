@@ -201,7 +201,7 @@ class MCPAcceptance(MCPTests):
 
     def test_native_steady_case_uses_explicit_environment_and_publishes_results(self):
         node=deepcopy(next(e for e in fixture()['entities'] if e['id']==review.uid(5)))
-        node['classification']='prescribed';node.pop('capacity')
+        node['classification']='prescribed';node['capacity']['value']=0
         case=deepcopy(next(e for e in fixture()['entities'] if e['kind']=='case'));case['mode']='steady'
         self.store.apply('trusted',{'changes.apply'},self.policy.project_id,0,'steady',dict(upsert=[node,case],delete=[]))
         client=Client(self.config())
