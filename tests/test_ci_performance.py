@@ -244,7 +244,10 @@ class CiPerformanceTests(unittest.TestCase):
             original = path.read_text()
             for replacement in (original.replace("path: .local/public-download-cache", "path: .local"),
                                 original.replace("cache_downloads.py seal", "cache_downloads.py prepare"),
-                                original.replace("steps.cache-clear.outcome == 'success'", "true")):
+                                original.replace("steps.cache-clear.outcome == 'success'", "true"),
+                                original.replace("acceptance_jobs: 3", "acceptance_jobs: 9"),
+                                original.replace("compiler_jobs: 4", "compiler_jobs: 16"),
+                                original.replace("--compiler-jobs ${{ matrix.compiler_jobs }}", "")):
                 path.write_text(replacement, encoding="utf-8")
                 with patch.object(check_workflows, "ROOT", root), self.assertRaises(AssertionError):
                     check_workflows.validate()

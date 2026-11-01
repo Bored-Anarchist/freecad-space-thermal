@@ -84,11 +84,14 @@ struct Engine {
     auto evaluate=[&,initial](std::span<const double> x,bool jacobian) {
       auto start=Clock::now(); ++profile.residual_evaluations; if(jacobian) ++profile.jacobian_evaluations;
       try {
-        auto v=jacobian?(initialize?a.steady_linearize(t,x):a.step_linearize(t,x,initial,h)):
-          Linearization{initialize?a.steady_residual(t,x):a.step_residual(t,x,initial,h),SparseMatrix(a.sparsity()),SparseMatrix(a.sparsity())};
+        NonlinearEvaluation v;
+        if (jacobian) {
+          auto assembled=initialize?a.steady_linearize(t,x):a.step_linearize(t,x,initial,h);
+          v={std::move(assembled.balance.residual),std::move(assembled.d_temperature)};
+        } else v={initialize?a.steady_residual(t,x).residual:a.step_residual(t,x,initial,h).residual,{}};
         // Fixed differential initial conditions replace their rows, never their capacities.
         if (initialize) for (const auto& node:a.model().data().nodes) if (node.differential_index) {
-          auto row=*node.equation; v.balance.residual[row]=x[row]-initial[row];
+          auto row=*node.equation; v.residual[row]=x[row]-initial[row];
         }
         profile.assembly_seconds+=seconds(start);
         return v;
@@ -103,19 +106,20 @@ struct Engine {
     for (std::size_t i=0;i<n;++i) {
       if(fixed.contains(i)) { limits[i]=1e-10; continue; }
       for (std::size_t k=p.offsets()[i];k<p.offsets()[i+1];++k)
-        limits[i]=std::max(limits[i],finite(std::abs(seed.d_temperature.values()[k])*std::max(1.0,std::abs(initial[p.columns()[k]]))*1e-12));
+        limits[i]=std::max(limits[i],finite(std::abs(seed.jacobian->values()[k])*std::max(1.0,std::abs(initial[p.columns()[k]]))*1e-12));
     }
     NonlinearProblem problem{a.sparsity(),[&](std::span<const double> x,bool jacobian) {
-      auto v=evaluate(x,jacobian); SparseMatrix j(a.sparsity());
+      auto v=evaluate(x,jacobian); std::optional<SparseMatrix> j;
+      if(jacobian)j.emplace(a.sparsity());
       for (std::size_t i=0;i<n;++i) {
-        v.balance.residual[i]=finite(v.balance.residual[i]/limits[i]);
+        v.residual[i]=finite(v.residual[i]/limits[i]);
         if (jacobian) for (std::size_t k=p.offsets()[i];k<p.offsets()[i+1];++k) {
           const auto column=p.columns()[k];
-          double entry=fixed.contains(i)?(column==i?1.:0.):v.d_temperature.values()[k];
-          j.add({i,column},finite(entry/limits[i]));
+          double entry=fixed.contains(i)?(column==i?1.:0.):v.jacobian->values()[k];
+          j->add({i,column},finite(entry/limits[i]));
         }
       }
-      return NonlinearEvaluation{std::move(v.balance.residual),jacobian?std::optional<SparseMatrix>(std::move(j)):std::nullopt};
+      return NonlinearEvaluation{std::move(v.residual),std::move(j)};
     }};
     auto result=solve_nonlinear(DampedNewtonBackend(settings,linear),problem,initial,{1,0,o.maximum_newton_iterations});
     profile.newton_iterations+=result.iterations;

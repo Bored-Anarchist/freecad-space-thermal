@@ -29,8 +29,9 @@ The acceptance scripts execute these cases and retain their existing metrics and
 binary/source bindings. CTest itself executes the two remaining native smoke
 cases. No prior pass verdict is cached.
 
-MSVC package probes retain two compiler processes per project and two MSBuild
-projects. The measured Ninja experiment did not establish a gain and was not
+MSVC package probes retain two MSBuild projects. A separate resumed experiment
+uses four compiler processes per Embree project, with two for other packages.
+The compiler budget is explicit and recorded with each report. The measured Ninja experiment did not establish a gain and was not
 adopted; the original package configuration, full build, install and fresh
 installed-consumer checks remain. Numerical prototype build directories are stable per checkout and
 configuration, while each attempt keeps its own installed runtime and evidence.
@@ -72,7 +73,7 @@ permission to bypass these checks.
 
 `verification.json` records wall time, worker count, relative stage starts,
 local-versus-receipt unit execution and cold/warm/unknown download-cache state.
-Package reports include generator, worker count and configure/build/install/consumer
+Package reports include generator, project/compiler worker counts and configure/build/install/consumer
 timings. Thermal acceptance records per-case durations so the next solver-test
 bottleneck can be identified without rerunning it merely to add instrumentation.
 Raw compiler output and environment values remain local.
@@ -152,10 +153,29 @@ The versioned baseline now deliberately references that passing run with unchang
 workload and case retention. The original cold run remains recorded above.
 
 The first resumed experiment sets Debug to three acceptance workers and leaves
-Release at two. This is a hypothesis under evaluation, not yet a measured gain.
+Release at two. Debug passed in 407.015s versus 578.078s (29.6% shorter), retaining
+all 391 records; the complete aggregate is still awaiting the independent package
+probe. Stage durations stayed comparable while long stages overlapped.
 The full qualification tier remains serial. Before retaining it, compare complete
 warm hosted runs, correctness, contention and runner cost against the identified
 two-worker reference.
+
+The next experiment removes unused derivative-matrix allocations from thermal
+residual probes and transient line-search callbacks. A local sequential Debug
+pair passed the same two-node, heater and checkpoint tests in 12.64/27.28/53.71s
+versus 14.59/31.50/64.10s before (13-16% shorter). Exact residual/linearization
+balance parity is checked for all three storage modes. Integration tolerances,
+step/event algorithms, callback invocation order, energy checks and Debug runtime
+checking remain unchanged. A separate complete heater-output pair matched every sample, event, all 26,688
+step records, energy budgets and checkpoint bytes exactly, with identical solver
+evaluation counters. Hosted acceptance is still required.
+
+Embree's warm build phase alone took 579.797s in the reference. Its largest
+MSBuild project is capped at two compiler processes. Test a four-compiler budget
+for Embree with the same full source/options/generator and installed consumer;
+leave other packages at two. This avoids repeating the neutral Ninja migration.
+Retain the change only after reviewing full hosted timing, memory/failure behavior
+and total runner cost. Never infer a gain from an incremental local rebuild.
 
 1. **Test three Debug workers on the same hosted runner.** Use the passing warm
    run above as the reference and compare against two workers with equivalent
@@ -174,6 +194,10 @@ two-worker reference.
    phase timings and the recorded neutral Ninja result. Do not repeat a generator
    migration without a specific hypothesis, weaken package coverage, or upload
    generated binaries/build trees under the current download-cache policy.
+
+Radiation reports now retain native-case and ensemble build/trace scalar timings
+to locate the next dominant cost without repeating the fixed campaign just to
+add instrumentation. Required seeds, repetitions and assertions remain intact.
 
 Raw diagnostics and usage-account metadata remain local. Only existing sanitized
 scalar reports and reviewed source/documentation are published under TST-021.

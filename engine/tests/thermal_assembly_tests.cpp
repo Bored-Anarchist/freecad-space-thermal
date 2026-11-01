@@ -124,6 +124,24 @@ int main(int argc,char** argv) {
     } else if (name == "jacobian-differences") {
       Assembly network(fixture(folder,"power-network.json"),powers());
       State state{1.25,{320,310},{.7}};
+      // Residual-only probes and derivative probes must expose identical physics,
+      // including reservoirs and energy diagnostics, in every storage mode.
+      auto identical_balance=[](const Balance& a,const Balance& b) {
+        require(a.temperature==b.temperature && a.residual==b.residual &&
+          a.conductive_in==b.conductive_in && a.load_in==b.load_in &&
+          a.radiation_in==b.radiation_in && a.environment_in==b.environment_in &&
+          a.storage_power==b.storage_power && a.boundary_power==b.boundary_power &&
+          a.conductor_power==b.conductor_power && a.energy_defect==b.energy_defect &&
+          a.internal_exchange_defect==b.internal_exchange_defect && a.internal_terms.size()==b.internal_terms.size());
+        for(std::size_t i=0;i<a.internal_terms.size();++i) {
+          const auto& x=a.internal_terms[i]; const auto& y=b.internal_terms[i];
+          require(x.entity_id==y.entity_id && x.net_power==y.net_power && x.absolute_power==y.absolute_power);
+        }
+      };
+      identical_balance(network.residual(state),network.linearize(state).balance);
+      identical_balance(network.steady_residual(state.time,state.temperature),network.steady_linearize(state.time,state.temperature).balance);
+      identical_balance(network.step_residual(state.time,state.temperature,std::vector<double>{300,300},2),
+                        network.step_linearize(state.time,state.temperature,std::vector<double>{300,300},2).balance);
       const double h = 1e-3, alpha = .4;
       auto jac = network.linearize(state); auto combined = jac.combined(alpha);
       conservation(jac.balance);

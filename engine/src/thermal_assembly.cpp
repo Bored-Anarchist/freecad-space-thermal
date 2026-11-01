@@ -237,9 +237,10 @@ std::vector<double> Assembly::initial_temperature() const {
 bool Assembly::has_temperature_dependent_power() const {
   return std::any_of(impl_->powers.begin(),impl_->powers.end(),[](const auto& p) { return !p.dependencies.empty(); });
 }
-Linearization Assembly::evaluate(Storage mode, double time, std::span<const double> x,
-                                  std::span<const double> rate, std::span<const double> previous,
-                                  double seconds, bool jacobian) const {
+Balance Assembly::evaluate(Storage mode, double time, std::span<const double> x,
+                           std::span<const double> rate, std::span<const double> previous,
+                           double seconds, Linearization* derivatives) const {
+  const bool jacobian = derivatives != nullptr;
   (void)checked(time);
   const auto& d = model().data();
   vector_check(x,sparsity()->dimension(),true);
@@ -248,8 +249,8 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
     vector_check(previous,x.size(),true);
     if (!std::isfinite(seconds) || seconds <= 0) throw Error("range");
   }
-  Linearization out{{},SparseMatrix(sparsity()),SparseMatrix(sparsity())};
-  auto& b = out.balance;
+  // Residual and energy probes do not need zero-filled derivative matrices.
+  Balance b;
   b.temperature.resize(d.nodes.size()); b.residual.resize(x.size());
   for (auto* values : {&b.conductive_in,&b.load_in,&b.radiation_in,&b.environment_in,&b.storage_power,&b.boundary_power})
     values->assign(d.nodes.size(),0);
@@ -275,7 +276,7 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
       if (jacobian && c.conductance > 0) {
         for (auto i : {c.from,c.to}) for (auto j : {c.from,c.to})
           if (d.nodes[i].equation && d.nodes[j].equation)
-            out.d_temperature.add({*d.nodes[i].equation,*d.nodes[j].equation},i == j ? c.conductance : -c.conductance);
+            derivatives->d_temperature.add({*d.nodes[i].equation,*d.nodes[j].equation},i == j ? c.conductance : -c.conductance);
       }
     } catch (const Error& error) { impl_->context(error,c.id); }
   }
@@ -305,7 +306,7 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
       if (jacobian) for (std::size_t k = 0; k < p.dependencies.size(); ++k) {
         const auto& e = p.dependencies[k];
         if (d.nodes[e.row].equation && d.nodes[e.column].equation)
-          out.d_temperature.add({*d.nodes[e.row].equation,*d.nodes[e.column].equation},-value.d_temperature[k]);
+          derivatives->d_temperature.add({*d.nodes[e.row].equation,*d.nodes[e.column].equation},-value.d_temperature[k]);
       }
     } catch (const Error& error) { impl_->context(error,p.entity_id); }
   }
@@ -325,12 +326,12 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
           double r = rate[*node.differential_index];
           b.storage_power[i] = checked(capacity.value*r);
           if (jacobian) {
-            out.d_temperature.add({*node.equation,*node.equation},checked(capacity.derivative*r));
-            out.d_rate.add({*node.equation,*node.equation},capacity.value);
+            derivatives->d_temperature.add({*node.equation,*node.equation},checked(capacity.derivative*r));
+            derivatives->d_rate.add({*node.equation,*node.equation},capacity.value);
           }
         } else if (mode == Storage::enthalpy) {
           b.storage_power[i] = checked(model().storage_change(i,previous[*node.equation],b.temperature[i])/seconds);
-          if (jacobian) out.d_temperature.add({*node.equation,*node.equation},checked(capacity.value/seconds));
+          if (jacobian) derivatives->d_temperature.add({*node.equation,*node.equation},checked(capacity.value/seconds));
         }
       }
       const double external = narrow(static_cast<long double>(b.load_in[i])+b.radiation_in[i]+b.environment_in[i]);
@@ -344,17 +345,24 @@ Linearization Assembly::evaluate(Storage mode, double time, std::span<const doub
   }
   b.energy_defect = narrow(storage_total-external_total);
   b.internal_exchange_defect = narrow(internal_total);
-  return out;
+  return b;
 }
-Balance Assembly::residual(const State& s) const { return evaluate(Storage::rate,s.time,s.temperature,s.rate,{},0,false).balance; }
-Linearization Assembly::linearize(const State& s) const { return evaluate(Storage::rate,s.time,s.temperature,s.rate,{},0,true); }
-Balance Assembly::steady_residual(double t, std::span<const double> x) const { return evaluate(Storage::none,t,x,{},{},0,false).balance; }
-Linearization Assembly::steady_linearize(double t, std::span<const double> x) const { return evaluate(Storage::none,t,x,{},{},0,true); }
+Balance Assembly::residual(const State& s) const { return evaluate(Storage::rate,s.time,s.temperature,s.rate,{},0); }
+Linearization Assembly::linearize(const State& s) const {
+  Linearization out{{},SparseMatrix(sparsity()),SparseMatrix(sparsity())};
+  out.balance = evaluate(Storage::rate,s.time,s.temperature,s.rate,{},0,&out); return out;
+}
+Balance Assembly::steady_residual(double t, std::span<const double> x) const { return evaluate(Storage::none,t,x,{},{},0); }
+Linearization Assembly::steady_linearize(double t, std::span<const double> x) const {
+  Linearization out{{},SparseMatrix(sparsity()),SparseMatrix(sparsity())};
+  out.balance = evaluate(Storage::none,t,x,{},{},0,&out); return out;
+}
 Balance Assembly::step_residual(double t, std::span<const double> x, std::span<const double> previous, double seconds) const {
-  return evaluate(Storage::enthalpy,t,x,{},previous,seconds,false).balance;
+  return evaluate(Storage::enthalpy,t,x,{},previous,seconds);
 }
 Linearization Assembly::step_linearize(double t, std::span<const double> x, std::span<const double> previous, double seconds) const {
-  return evaluate(Storage::enthalpy,t,x,{},previous,seconds,true);
+  Linearization out{{},SparseMatrix(sparsity()),SparseMatrix(sparsity())};
+  out.balance = evaluate(Storage::enthalpy,t,x,{},previous,seconds,&out); return out;
 }
 NonlinearProblem Assembly::steady_problem(double time) const {
   (void)checked(time);

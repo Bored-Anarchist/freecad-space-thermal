@@ -78,7 +78,11 @@ def validate():
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]
     assert packages["os"] == ["windows-2022"], "Windows-only package matrix required"
     assert set(packages["candidate"]) == {"sundials", "hdf5", "embree", "occt"}, "Incorrect active Windows package candidates"
+    assert packages.get("include") == [
+        {"candidate": "sundials", "compiler_jobs": "2"}, {"candidate": "hdf5", "compiler_jobs": "2"},
+        {"candidate": "embree", "compiler_jobs": "4"}, {"candidate": "occt", "compiler_jobs": "2"}], "Reviewed compiler worker budgets required"
     assert any('--jobs 2' in step.get('run','') for step in workflow['jobs']['dependencies']['steps']), "Bounded dependency compilation absent"
+    assert any('--compiler-jobs ${{ matrix.compiler_jobs }}' in step.get('run','') for step in workflow['jobs']['dependencies']['steps']), "Bounded compiler budget absent"
     gate_steps = workflow['jobs']['gate']['steps']
     assert any('summarize_ci_performance.py' in step.get('run','') for step in gate_steps), "Continuous CI timing comparison absent"
     assert any('publication_preflight.py' in step.get('run','') and '--file .local/ci-performance.json' in step['run'] for step in gate_steps), "CI performance summary lacks publication clearance"

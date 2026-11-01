@@ -104,7 +104,7 @@ def source_tree(item, work):
     return source
 
 
-def cmake_probe(item, source, work, cmake, ctest, jobs, *, timings=None):
+def cmake_probe(item, source, work, cmake, ctest, jobs, *, compiler_jobs=2, timings=None):
     name = item["id"]
     build, install = work / "build", work / "install"
     def measured(command, directory, log, env=None):
@@ -116,7 +116,7 @@ def cmake_probe(item, source, work, cmake, ctest, jobs, *, timings=None):
     common = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX=" + str(install),
               "-DCMAKE_C_FLAGS=-ffp-contract=off", "-DCMAKE_CXX_FLAGS=-ffp-contract=off"] if os.name != "nt" else [
               "-DCMAKE_INSTALL_PREFIX=" + str(install),
-              "-DCMAKE_C_FLAGS=/MP2", "-DCMAKE_CXX_FLAGS=/MP2"]
+              f"-DCMAKE_C_FLAGS=/MP{compiler_jobs}", f"-DCMAKE_CXX_FLAGS=/MP{compiler_jobs}"]
     measured([cmake, "-S", str(source), "-B", str(build), *generator, *common,
          *["-D" + option for option in OPTIONS[name]]], ROOT, work / "configure.log")
     measured([cmake, "--build", str(build), "--config", "Release", "--parallel", str(jobs)], ROOT, work / "build.log")
@@ -190,12 +190,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", choices=list(OPTIONS) + ["petsc"])
     parser.add_argument("--jobs", type=int, default=2)
+    parser.add_argument("--compiler-jobs", type=int, default=2,
+                        help="Maximum MSVC compiler processes per MSBuild project")
     parser.add_argument("--prepare-system", action="store_true", help="Install signed Linux BLAS/LAPACK probe prerequisites using sudo apt-get")
     args = parser.parse_args()
     if platform.system() != "Windows":
         parser.error("macOS and Linux package probes are uncommitted stretch goals outside the work packages")
     if not 1 <= args.jobs <= 16:
         parser.error("jobs must be between 1 and 16")
+    if not 1 <= args.compiler_jobs <= 4:
+        parser.error("compiler-jobs must be between 1 and 4")
     lock = ROOT / "ci/probe-sources.json"
     items = json.loads(lock.read_text(encoding="utf-8"))["sources"]
     cmake, ctest = cmake_tools()
@@ -209,7 +213,8 @@ def main():
         work.mkdir(exist_ok=True)
         record = {"id": item["id"], "version": item["version"], "source_sha256": item["sha256"],
                   "license_sha256": item["license_sha256"], "adopted": False,
-                  "generator": "visual-studio-2022", "build_jobs": args.jobs, "stage_seconds": {}}
+                  "generator": "visual-studio-2022", "build_jobs": args.jobs,
+                  "compiler_jobs": args.compiler_jobs, "stage_seconds": {}}
         start = time.monotonic()
         if item["id"] == "petsc" and os.name == "nt":
             record.update(status="unsupported", reason_code="petsc_native_msvc_unsupported",
@@ -219,7 +224,7 @@ def main():
                 if item["id"] == "petsc" and args.prepare_system:
                     prepare_blas(work)
                 source = source_tree(item, work)
-                install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs, timings=record["stage_seconds"])
+                install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs, compiler_jobs=args.compiler_jobs, timings=record["stage_seconds"])
                 record.update(status="passed", stages=["source_hash", "license_hash", "configure", "build", "install", "installed_consumer"],
                               installed_bytes=sum(p.stat().st_size for p in install.rglob("*") if p.is_file()),
                               toolchain=toolchain(work), build_options=OPTIONS.get(item["id"], ["serial", "shared", "system_blas_lapack"]))

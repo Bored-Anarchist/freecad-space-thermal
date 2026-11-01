@@ -189,6 +189,15 @@ jobs:
       matrix:
         os: [windows-2022]
         candidate: [sundials, hdf5, embree, occt]
+        include:
+          - candidate: sundials
+            compiler_jobs: 2
+          - candidate: hdf5
+            compiler_jobs: 2
+          - candidate: embree
+            compiler_jobs: 4
+          - candidate: occt
+            compiler_jobs: 2
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -209,7 +218,7 @@ jobs:
         run: >-
           python -m pip install --no-index --find-links .local/public-download-cache/wheels --require-hashes --only-binary=:all: -r ci/requirements.lock
       - name: Build install and run installed consumer
-        run: python tools/build_dependencies.py --candidate ${{ matrix.candidate }} --jobs 2 --prepare-system
+        run: python tools/build_dependencies.py --candidate ${{ matrix.candidate }} --jobs 2 --compiler-jobs ${{ matrix.compiler_jobs }} --prepare-system
       - name: Clear exact package report
         id: clear
         if: always()

@@ -164,10 +164,16 @@ Optimization has resumed from the passing warm documentation checkpoint
 baseline is deliberately refreshed to that compatible passing warm run; retain
 the original cold evidence in the ledger/history. Evaluate three Debug workers
 against this reference, leaving Release at two and full qualification serial.
-Then profile checkpoint/heater costs and address dependency compilation when it
-limits the critical path. Follow the acceptance, privacy and keep/revert rules in
+Local matched Debug tests support removing unused derivative allocations
+(two-node/heater/checkpoint 13-16% shorter with unchanged acceptance). Verify exact
+balance parity and complete hosted acceptance before retaining it. Separately
+measure four MSVC compiler processes for Embree's largest project, leaving other
+package budgets and all source/features/installed consumers unchanged. Record
+both outcomes and runner cost before deciding what to retain. Follow the acceptance, privacy and keep/revert rules in
 [the ongoing experiment record](../docs/ci-performance.md#resumed-experiments-and-next-work).
-Runtime and account diagnostics remain local; TST-021 continues to clear exact
+Radiation native-case and ensemble build/trace scalar timings extend the existing
+public evidence for future diagnosis; raw outputs and account diagnostics remain
+local. TST-021 continues to clear exact
 sanitized sources, scalar evidence and outgoing history before publication.
 
 The planned GitHub workflow deliverables are:
