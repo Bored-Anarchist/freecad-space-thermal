@@ -21,6 +21,7 @@ import cache_downloads
 import check_workflows
 import summarize_ci_performance
 from profile_support import run
+from fcst_tools.profiles import RESOURCE_PROFILE
 
 SCRATCH = ROOT / ".local/test-scratch"
 SCRATCH.mkdir(parents=True, exist_ok=True)
@@ -31,11 +32,17 @@ class CiPerformanceTests(unittest.TestCase):
         with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
             resources = {"stale": "must be removed"}
             child = "memory=bytearray(50_000_000);sum(range(1_000_000))"
-            parent = ("import subprocess,sys;sys.path.insert(0," + repr(str(ROOT / "python")) + ");"
+            parent = ("import subprocess,sys,os;sys.path.insert(0," + repr(str(ROOT / "python")) + ");"
+                      "assert os.environ['MSBUILDDISABLENODEREUSE']=='1';"
                       "from fcst_app.process_limits import WorkerLimits;"
                       "p=subprocess.Popen([sys.executable,'-c'," + repr(child) + "],creationflags=4);"
                       "limits=WorkerLimits(p,128);code=p.wait();limits.close();sys.exit(code)")
-            run([sys.executable, "-c", parent], ROOT, Path(directory) / "raw.log", timeout=15, resources=resources)
+            run([sys.executable, "-c", parent], ROOT, Path(directory) / "raw.log", timeout=15, resources=resources,
+                env=dict(os.environ, MSBUILDDISABLENODEREUSE="0"))
+            with patch.dict(os.environ, {"MSBUILDDISABLENODEREUSE": "0"}):
+                run([sys.executable, "-c", "import os;print(os.environ['MSBUILDDISABLENODEREUSE'])"], ROOT,
+                    Path(directory) / "second.log", timeout=15, resources={})
+            self.assertEqual((Path(directory) / "second.log").read_text().strip(), "1")
             self.assertEqual(set(resources), {"cpu_seconds", "peak_process_commit_bytes", "peak_job_commit_bytes", "total_processes"})
             self.assertGreater(resources["cpu_seconds"], 0)
             self.assertGreaterEqual(resources["peak_process_commit_bytes"], 50_000_000)
@@ -47,6 +54,10 @@ class CiPerformanceTests(unittest.TestCase):
             self.assertTrue(valid_resources(stages))
             stages["build"]["process_id"] = 1
             self.assertFalse(valid_resources(stages))
+            for key in resources:
+                stages = {stage: dict(resources) for stage in RESOURCE_STAGES}
+                stages["build"][key] = 10**400
+                self.assertFalse(valid_resources(stages))
 
     def test_build_accounting_timeout_terminates_owned_descendants(self):
         import ctypes
@@ -90,7 +101,7 @@ class CiPerformanceTests(unittest.TestCase):
                 for record in records:
                     if record["id"] not in ("synthetic.unit", "engine-only"):
                         record["resources"] = dict(cpu_seconds=1, peak_process_commit_bytes=1000, peak_job_commit_bytes=2000, total_processes=2)
-                report = dict(candidate="a"*40, preset=preset, cases=records, gate=evaluate(expected, records), execution=dict(jobs=2, seconds=50, logical_cpus=4, resource_profile="windows-job-v1"))
+                report = dict(candidate="a"*40, preset=preset, cases=records, gate=evaluate(expected, records), execution=dict(jobs=2, seconds=50, logical_cpus=4, resource_profile=RESOURCE_PROFILE))
                 path = reports / preset / "verification.json"; path.parent.mkdir(); path.write_text(json.dumps(report), encoding="utf-8")
             sources = json.loads((root / names[2]).read_bytes())["sources"]
             for source in sources:
@@ -99,6 +110,7 @@ class CiPerformanceTests(unittest.TestCase):
                 record = dict(id=name, version=source["version"], source_sha256=source["sha256"], license_sha256=source["license_sha256"],
                               adopted=False, status="passed", stages=sorted(BUILD_STAGES), installed_bytes=100, seconds=50,
                               generator="visual-studio-2022", build_jobs=2, compiler_jobs=2,
+                              resource_profile=RESOURCE_PROFILE,
                               stage_seconds={stage: 5 for stage in RESOURCE_STAGES}, stage_resources={stage:
                               dict(cpu_seconds=2, peak_process_commit_bytes=1000, peak_job_commit_bytes=2000, total_processes=2)
                               for stage in RESOURCE_STAGES})
@@ -164,7 +176,7 @@ class CiPerformanceTests(unittest.TestCase):
         with self.assertRaises(ValueError): check(with_resources)
         with_resources = deepcopy(report); with_resources["execution"]["logical_cpus"] = "not-a-scalar-count"
         with self.assertRaises(ValueError): check(with_resources)
-        for change in ("candidate", "preset", "missing", "duplicate", "failed", "timing", "duration", "jobs"):
+        for change in ("candidate", "preset", "missing", "duplicate", "failed", "timing", "duration", "jobs", "overflow"):
             r = deepcopy(report)
             if change == "candidate": r["candidate"] = "b"*40
             if change == "preset": r["preset"] = "unregistered"
@@ -174,6 +186,7 @@ class CiPerformanceTests(unittest.TestCase):
             if change == "timing": r["cases"][-1]["seconds"] = float("nan")
             if change == "duration": r["execution"]["seconds"] = -1
             if change == "jobs": r["execution"]["jobs"] = 0
+            if change == "overflow": r["execution"]["seconds"] = 10**400
             with self.subTest(change=change), self.assertRaises(ValueError): check(r)
         baseline["required_case_ids"].append("lost-original-test")
         with self.assertRaises(ValueError): check(report)

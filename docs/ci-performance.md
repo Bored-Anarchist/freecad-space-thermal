@@ -136,6 +136,7 @@ are recorded so a cold/warm comparison cannot silently become a causal claim.
 | Three Debug acceptance workers | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41355909563), commit `35cdeb5` | Full CI 11m 02s; Debug driver 407.015s versus the warm reference's 578.078s (29.6% shorter). Embree became the critical path. Aggregate job duration 2,690s. |
 | Thermal residual allocation removal and four-compiler Embree | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41356914583), commit `f44ab6b` | Full CI 8m 58s; Debug driver 351.812s; Release 254.500s. Embree build 321.860s versus 573.719s in the prior run; all package consumers passed. Aggregate job duration 2,331s, 13.3% less than the prior run. OCCT and the Debug tail now dominate. |
 | Invariant ray cache, final checkpoint hashing and native compiler parallelism | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41357834232), commit `7072a4d` | Full CI 11m 03s; Debug 413.781s; Release 203.625s; all 391 records per configuration passed. Embree's unchanged four-compiler build took 566.484s, while OCCT's unchanged two-compiler build took 228.062s. Aggregate job duration 2,420s. Retain this slower sample; resource telemetry and repetitions are needed before causal hosted-time claims. |
+| Aggregate process-tree resource evidence | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41359314196), commit `d94fd6f` | Full CI 10m 13s; Debug 373.407s; Release 163.484s; all 393 records per configuration passed. Embree build 503.953s / 1,974.453 CPU seconds / 2.207 GB peak job commit; OCCT build 317.015s / 728.422 CPU seconds / 1.516 GB peak job commit. All measured runners reported four logical CPUs. Aggregate job duration 2,390s. Initial accounting profile `windows-job-v1`; later comparisons isolate reusable MSBuild workers explicitly. |
 
 The BVH change sorts indices rather than large optical facet records, detects
 duplicate IDs in canonical order, and computes bounds/centroids once per facet.
@@ -204,6 +205,23 @@ the slower aggregate sample is retained rather than discarded:
   15.15s to 9.10s. Strict floating point, assertions and Debug runtime checks remain.
   Judge the full clean hosted build, rather than incremental build time.
 
+The next candidate replaces the eager per-facet ray cache with bounded per-row
+scratch. A row preloads geometry when the mesh fits its 512 slots; larger meshes
+cache only visited facets and evict by slot. Rows own their scratch, so concurrent
+rows never mutate the mesh. Native cached/uncached comparisons force eviction and
+retain every integer result. At one million facets the new cache replaces
+56,000,032 extra retained bytes with 32,768 bytes of fixed scratch, which remains
+included in `storage_bytes`. Both-order diagnostic pairs retained exact raw rows;
+construction stayed about 28-30s and peak working set fell by about 56 MB. Dense
+trace timings remain close to the eager cache. Judge final timings after hosted
+confirmation; do not claim the small construction differences as a controlled win.
+
+The first local OCCT budget pair passed both full builds/consumers but is
+**inconclusive**: CPU/process totals differed unexpectedly and another local build
+overlapped part of the experiment. Do not use that pair to justify a gain. Repeat
+fresh builds with four-CPU affinity and an isolated MSBuild worker pool, in reversed
+order, with no concurrent local compiler work.
+
 1. **Measure the next worker budget against the current three-worker result.**
    Keep Release at two and full qualification serial. Compare four versus three
    Debug workers only with equivalent warm workloads and toolchains. Preserve all
@@ -235,7 +253,15 @@ present either as reference-hardware qualification or conflate them. CPU seconds
 divided by phase wall time indicates average CPU parallelism, not elapsed time.
 
 Each phase runs in a fresh Windows job, assigned before resuming the tool so its
-children cannot escape accounting. No CPU/memory/process-count limit is added.
+children cannot escape accounting. Profile `windows-job-v2` also forces
+`MSBUILDDISABLENODEREUSE=1`: an existing MSBuild worker can otherwise execute work
+outside the new process tree or retain another stage's temporary directory.
+See the [MSBuild guidance](https://github.com/dotnet/msbuild/blob/main/documentation/wiki/MSBuild-Tips-%26-Tricks.md)
+and [upstream reuse issue](https://github.com/dotnet/msbuild/issues/13594).
+The setting applies to explicit and inherited environments and is tested
+unattended. Extra process startup is included in the measured wall time. V1 and V2
+resource profiles remain distinct; do not mix their CPU totals as a causal pair.
+External pre-existing system services are outside owned-tree accounting. No CPU/memory/process-count limit is added.
 Closing the job terminates its remaining descendants, including timeout cleanup;
 command outcomes and every installed consumer still determine acceptance.
 Regression tests prove exited-child accounting, nested worker containment, owned-tree timeout cleanup, and

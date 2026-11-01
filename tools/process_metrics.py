@@ -59,8 +59,12 @@ def run_tracked(command, directory, output, env, timeout, resources):
         limits.basic.flags = 0x2000  # JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE only.
         if not api.SetInformationJobObject(job, 9, ctypes.byref(limits), ctypes.sizeof(limits)):
             raise OSError("build_accounting_unavailable")
+        # Reusable MSBuild nodes can predate this job and share another stage's
+        # temporary directory. Keep this command's workers inside its own tree.
+        stage_env = dict(os.environ if env is None else env)
+        stage_env["MSBUILDDISABLENODEREUSE"] = "1"
         process = subprocess.Popen(command, cwd=directory, stdout=output, stderr=subprocess.STDOUT,
-                                   stdin=subprocess.DEVNULL, env=env, creationflags=0x4 | 0x08000000)
+                                   stdin=subprocess.DEVNULL, env=stage_env, creationflags=0x4 | 0x08000000)
         handle = wintypes.HANDLE(int(process._handle))
         if not api.AssignProcessToJobObject(job, handle) or native.NtResumeProcess(handle) < 0:
             raise OSError("build_accounting_unavailable")

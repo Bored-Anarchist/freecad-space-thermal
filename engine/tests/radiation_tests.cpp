@@ -60,6 +60,17 @@ int main(int argc,char** argv) {
       rejects([&]{mesh.intersect({{0,0,0},{0,0,0}});});rejects([&]{mesh.intersect({{0,0,0},{0,0,2}});});
       Mesh dense(plates(20));for(int i=1;i<20;++i) { auto hit=dense.intersect({{static_cast<double>(i)/20+.001,.373,-1},{0,0,1}});require(hit.has_value());near(hit->distance,1); }
     } else if(name=="bvh-equivalence") {
+      // Exceed the bounded row cache and compare every integer result against
+      // the public uncached backend, including re-entry after cache eviction.
+      Mesh many(plates(30));
+      for(auto seed:{1701ULL,2903ULL})for(std::size_t source=0;source<many.patches().size();++source) {
+        auto cached=trace_row(many,source,{seed,4096,1000});
+        auto direct=trace_row(many,source,{seed,4096,1000},&many);
+        require(cached.source==direct.source && cached.samples==direct.samples && cached.escaped==direct.escaped &&
+          cached.blocked==direct.blocked && cached.counts.size()==direct.counts.size());
+        for(std::size_t i=0;i<cached.counts.size();++i)
+          require(cached.counts[i].target==direct.counts[i].target && cached.counts[i].hits==direct.counts[i].hits);
+      }
       for(int axis=0;axis<3;++axis) {
         auto fs=plates(9);auto overlap=fs.front();overlap.id="tie-first";fs.push_back(overlap);
         for(auto& f:fs)for(auto& v:f.vertices)std::rotate(v.begin(),v.begin()+axis,v.end());

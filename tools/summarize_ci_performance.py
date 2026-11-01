@@ -8,7 +8,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.ci_performance import compare, change, seconds, workload_hash
-from fcst_tools.profiles import assess_dependencies, RESOURCE_STAGES, valid_resources
+from fcst_tools.profiles import assess_dependencies, RESOURCE_STAGES, RESOURCE_PROFILE, valid_resources
 from profile_support import revision
 from verify import STEPS
 
@@ -27,7 +27,7 @@ def summarize(directory, baseline, candidate):
     presets = {}
     for path in reports:
         report = json.loads(path.read_bytes())
-        if report.get("execution", {}).get("resource_profile") != "windows-job-v1":
+        if report.get("execution", {}).get("resource_profile") != RESOURCE_PROFILE:
             raise ValueError("ci_performance_resource_profile")
         if report["preset"] in presets:
             raise ValueError("ci_performance_duplicate_configuration")
@@ -46,6 +46,7 @@ def summarize(directory, baseline, candidate):
                 or not assess_dependencies(report, sources, "Windows", name)):
             raise ValueError("ci_performance_package_coverage")
         if (record.get("generator") != "visual-studio-2022"
+                or record.get("resource_profile") != RESOURCE_PROFILE
                 or type(record.get("build_jobs")) is not int or not 1 <= record["build_jobs"] <= 16
                 or type(record.get("compiler_jobs")) is not int or not 1 <= record["compiler_jobs"] <= 4
                 or not valid_resources(record.get("stage_resources"))
@@ -61,7 +62,7 @@ def summarize(directory, baseline, candidate):
                               stage_resources=record["stage_resources"])
     if set(packages) != set(baseline["packages"]):
         raise ValueError("ci_performance_missing_package")
-    return dict(schema_version=1, candidate=candidate, baseline_candidate=baseline["candidate"],
+    return dict(schema_version=1, candidate=candidate, resource_profile=RESOURCE_PROFILE, baseline_candidate=baseline["candidate"],
                 baseline_run_id=baseline["run_id"], workload_sha256=baseline["workload_sha256"],
                 presets=presets, packages=packages,
                 timing_policy="Investigate increases over 20 percent and at least 60 seconds; timing alone is not a correctness failure")

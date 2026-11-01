@@ -8,14 +8,17 @@ import re
 HOST_CASES = {"create_geometry", "save_reopen", "edit_undo", "application_imports"}
 BUILD_STAGES = {"source_hash", "license_hash", "configure", "build", "install", "installed_consumer"}
 RESOURCE_STAGES = {"configure", "build", "install", "consumer-configure", "consumer-build", "consumer-run"}
+RESOURCE_PROFILE = "windows-job-v2"
 
 
 def valid_resource_usage(usage):
     fields = {"cpu_seconds", "peak_process_commit_bytes", "peak_job_commit_bytes", "total_processes"}
     return not (not isinstance(usage, dict) or set(usage) != fields
                 or type(usage["cpu_seconds"]) not in (int, float)
+                or not 0 <= usage["cpu_seconds"] <= (2**64-1)/10_000_000
                 or not math.isfinite(usage["cpu_seconds"]) or usage["cpu_seconds"] < 0
-                or any(type(usage[key]) is not int or usage[key] <= 0 for key in fields - {"cpu_seconds"})
+                or any(type(usage[key]) is not int or not 0 < usage[key] <= 2**64-1 for key in fields - {"cpu_seconds"})
+                or usage["total_processes"] > 2**32-1
                 or usage["peak_job_commit_bytes"] < usage["peak_process_commit_bytes"])
 
 

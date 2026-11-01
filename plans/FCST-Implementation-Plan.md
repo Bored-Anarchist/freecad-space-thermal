@@ -213,6 +213,13 @@ of the owned process tree, nested worker containment, and rejection of identity
 fields, missing phases,
 nonfinite values and inconsistent peaks. Execute the complete unit suite, pinned
 package build/install/consumer probes and exact-source/report/history preflights.
+Profile `windows-job-v2` disables external MSBuild worker reuse in explicit and
+inherited environments so accounting and per-stage temp isolation do not depend
+on a pre-existing process pool. Keep V1/V2 measurements distinct. A first local
+OCCT pair with inconsistent CPU/process totals remains inconclusive and must be
+repeated under isolated conditions. The bounded row-cache candidate preserves
+exact ray results while replacing per-facet retained storage with accounted fixed
+scratch; require full hosted confirmation and every existing scaling repetition.
 This extends TST-021 without uploading process identities, paths, environment or
 raw logs and without relaxing build, numerical or memory acceptance. Collect a
 passing two-compiler OCCT resource baseline before increasing its budget.

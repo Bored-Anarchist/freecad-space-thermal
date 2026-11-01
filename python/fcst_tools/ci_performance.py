@@ -4,7 +4,7 @@ import hashlib
 import json
 import math
 from .gate import evaluate
-from .profiles import valid_resource_usage
+from .profiles import valid_resource_usage, RESOURCE_PROFILE
 
 
 def workload_hash(root):
@@ -18,7 +18,8 @@ def workload_hash(root):
 
 
 def seconds(value):
-    if isinstance(value, bool) or not isinstance(value, (int, float)) or not math.isfinite(value) or value < 0:
+    if (isinstance(value, bool) or not isinstance(value, (int, float))
+            or not 0 <= value <= 2**63-1 or not math.isfinite(value)):
         raise ValueError("invalid_ci_timing")
     return value
 
@@ -51,7 +52,7 @@ def compare(report, baseline, candidate, expected, stages):
     if any(not valid_resource_usage(usage) for usage in resources.values()):
         raise ValueError("ci_performance_stage_resources")
     resource_profile = report["execution"].get("resource_profile")
-    if resource_profile is not None and (resource_profile != "windows-job-v1" or set(resources) != set(stages) - {"engine-only"}):
+    if resource_profile is not None and (resource_profile != RESOURCE_PROFILE or set(resources) != set(stages) - {"engine-only"}):
         raise ValueError("ci_performance_resource_coverage")
     logical_cpus = report["execution"].get("logical_cpus")
     if logical_cpus is not None and (type(logical_cpus) is not int or not 1 <= logical_cpus <= 1024):

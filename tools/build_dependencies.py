@@ -17,7 +17,7 @@ from pathlib import Path
 from profile_support import ROOT, cmake_tools, run, verified_download, revision, ProbeFailure
 import sys
 sys.path.insert(0, str(ROOT / "python"))
-from fcst_tools.profiles import assess_dependencies
+from fcst_tools.profiles import assess_dependencies, RESOURCE_PROFILE
 
 OPTIONS = {
     "sundials": ["BUILD_ARKODE=OFF", "BUILD_CVODES=OFF", "BUILD_IDAS=OFF", "BUILD_IDA=OFF",
@@ -219,7 +219,8 @@ def main():
         record = {"id": item["id"], "version": item["version"], "source_sha256": item["sha256"],
                   "license_sha256": item["license_sha256"], "adopted": False,
                   "generator": "visual-studio-2022", "build_jobs": args.jobs,
-                  "compiler_jobs": args.compiler_jobs, "stage_seconds": {}, "stage_resources": {}}
+                  "compiler_jobs": args.compiler_jobs, "resource_profile": RESOURCE_PROFILE,
+                  "stage_seconds": {}, "stage_resources": {}}
         start = time.monotonic()
         if item["id"] == "petsc" and os.name == "nt":
             record.update(status="unsupported", reason_code="petsc_native_msvc_unsupported",
