@@ -5,7 +5,8 @@ sample counts, scaling sizes and numerical tolerances. This change does not crea
 a smaller qualification tier or move required acceptance to a scheduled workflow.
 
 `tools/verify.py --preset windows-release --jobs 2` runs compilation and installation
-before scheduling at most two independent acceptance processes. Historical stage
+before scheduling a bounded number of independent acceptance processes.
+The current hosted experiment uses three workers for Debug and two for Release. Historical stage
 costs prioritize long work so expensive application tests do not form a late tail;
 estimates only change order and never remove new or existing work. Each stage receives
 its own temporary directory. The SUNDIALS numerical checkpoint and IDA reference
@@ -126,7 +127,7 @@ are recorded so a cold/warm comparison cannot silently become a causal claim.
 | Experiment | Evidence | Outcome |
 |---|---|---|
 | Original sequential workflow | [Main run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41252470867) | Full CI 19m 44s; Debug driver 18m 17s; Release driver 8m 04s. |
-| Shared units, native deduplication, bounded acceptance | [PR baseline](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41343113138) | Cold full CI 15m 58s; Debug driver 12m 47s; Release driver 4m 19s; all checks passed. This is the versioned baseline, not a controlled hardware comparison. |
+| Shared units, native deduplication, bounded acceptance | [PR baseline](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41343113138) | Cold full CI 15m 58s; Debug driver 12m 47s; Release driver 4m 19s; all checks passed. The original cold baseline remains in this ledger and Git history. This is not a controlled hardware comparison. |
 | Canonical index sorting and construction-only BVH geometry | Local synthetic one-million-facet diagnostic pair | Debug construction 112.1s to 30.4s; all non-timing rows and storage accounting matched. All three independent CI scaling builds remain required. Hosted confirmation accompanies the PR. |
 | Allocation-free BVH traversal stack | Local three-refinement diagnostic pairs | Trace time 1.83s to 1.13s at 99,856 facets and 1.97s to 1.35s at one million facets; all non-timing results matched. |
 | Four-worker Ninja package build | Complete local pinned Embree build/install/consumer | Passed in 600s; no established gain over the hosted baseline. Incremental migration also exposed compiler-cache handling costs. Reverted the migration and retained package-phase timing instrumentation for future diagnosis. |
@@ -142,12 +143,19 @@ the median tree and two-million-facet limit keep depth below 20, with a defensiv
 capacity check. Never report these synthetic diagnostic timings as frozen-hardware
 product performance qualification.
 
-## Next work, deliberately not started
+## Resumed experiments and next work
 
-The user ended this optimization session after the passing `ac3003d` run. Both
-hosted configurations retain **two acceptance workers**; full qualification stays
-serial. A proposed three-worker Debug experiment and a warm-baseline refresh were
-reverted before commit or execution. Do not treat them as tested improvements.
+Optimization resumed after the passing documentation checkpoint `1156dff` in
+[run 41352210980](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41352210980):
+full CI 12m 13s, Debug 578.078s and Release 206.406s, both warm with two workers.
+The versioned baseline now deliberately references that passing run with unchanged
+workload and case retention. The original cold run remains recorded above.
+
+The first resumed experiment sets Debug to three acceptance workers and leaves
+Release at two. This is a hypothesis under evaluation, not yet a measured gain.
+The full qualification tier remains serial. Before retaining it, compare complete
+warm hosted runs, correctness, contention and runner cost against the identified
+two-worker reference.
 
 1. **Test three Debug workers on the same hosted runner.** Use the passing warm
    run above as the reference and compare against two workers with equivalent
@@ -167,7 +175,5 @@ reverted before commit or execution. Do not treat them as tested improvements.
    migration without a specific hypothesis, weaken package coverage, or upload
    generated binaries/build trees under the current download-cache policy.
 
-The versioned baseline still references the earlier passing cold run. A future
-experiment should deliberately record a matching warm baseline from the identified
-passing run, retain the previous evidence, and explain the refresh. This session
-leaves no new worker-budget experiment active.
+Raw diagnostics and usage-account metadata remain local. Only existing sanitized
+scalar reports and reviewed source/documentation are published under TST-021.

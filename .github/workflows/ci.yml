@@ -59,8 +59,10 @@ jobs:
         include:
           - os: windows-2022
             preset: windows-debug
+            acceptance_jobs: 3
           - os: windows-2022
             preset: windows-release
+            acceptance_jobs: 2
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -87,7 +89,7 @@ jobs:
       - name: Execute identical local driver
         env:
           FCST_DOWNLOAD_CACHE_STATE: ${{ steps.downloads.outputs.cache-hit == 'true' && 'warm' || 'cold' }}
-        run: python tools/verify.py --preset ${{ matrix.preset }} --jobs 2 --unit-report .local/unit-owner/unit-tests.json
+        run: python tools/verify.py --preset ${{ matrix.preset }} --jobs ${{ matrix.acceptance_jobs }} --unit-report .local/unit-owner/unit-tests.json
       - name: Clear exact public reports
         id: clear
         if: always()

@@ -40,6 +40,8 @@ def validate():
                 assert step.get("with", {}).get("ref") == "${{ github.event.pull_request.head.sha || github.sha }}", "Every handoff job must test the same published candidate"
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
+    budgets = {row["preset"]: row.get("acceptance_jobs") for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]}
+    assert budgets == {"windows-debug": "3", "windows-release": "2"}, "Reviewed acceptance worker budgets required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
     assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies", "dwg"}, "Profile jobs absent from required gate"
     native=workflow['jobs']['dwg']['steps']
@@ -51,7 +53,7 @@ def validate():
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
     build_steps = workflow["jobs"]["build"]["steps"]
     assert workflow["jobs"]["build"]["needs"] == "unit", "Unit receipt lacks a current-run owner"
-    assert any('--unit-report .local/unit-owner/unit-tests.json' in step.get('run','') and '--jobs 2' in step['run'] for step in build_steps), "Bounded current-run verification absent"
+    assert any('--unit-report .local/unit-owner/unit-tests.json' in step.get('run','') and '--jobs ${{ matrix.acceptance_jobs }}' in step['run'] for step in build_steps), "Bounded current-run verification absent"
     units = workflow["jobs"]["unit"]["steps"]
     assert any('check_security.py --report .local/unit/unit-tests.json' in step.get('run','') for step in units), "Complete unit owner absent"
     assert any('publication_preflight.py --file .local/unit/unit-tests.json' in step.get('run','') for step in units), "Unit receipt lacks clearance"

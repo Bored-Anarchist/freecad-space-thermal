@@ -158,13 +158,17 @@ Inside FreeCAD, application dispatch runs on the host's owning thread for docume
 required check in [the recorded warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41350452498):
 full CI 12m 45s, Debug verification 9m 53s and Release verification 4m 14s, with
 391 required records per configuration. Preserve this tested implementation.
-At the user's request, further optimization stops here. The proposed three-worker
-Debug experiment and warm-baseline refresh were not run and are not implemented;
-both hosted configurations still use two acceptance workers and full qualification
-is serial. Future work is to compare three versus two Debug workers under matched
-warm conditions, profile checkpoint/heater test costs, then address dependency
-compilation if it becomes the critical path. Follow the acceptance, privacy and
-keep/revert rules in [the future-work record](../docs/ci-performance.md#next-work-deliberately-not-started).
+Optimization has resumed from the passing warm documentation checkpoint
+`1156dff` ([run 41352210980](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41352210980)):
+12m 13s overall, Debug 578.078s and Release 206.406s with two workers. The timing
+baseline is deliberately refreshed to that compatible passing warm run; retain
+the original cold evidence in the ledger/history. Evaluate three Debug workers
+against this reference, leaving Release at two and full qualification serial.
+Then profile checkpoint/heater costs and address dependency compilation when it
+limits the critical path. Follow the acceptance, privacy and keep/revert rules in
+[the ongoing experiment record](../docs/ci-performance.md#resumed-experiments-and-next-work).
+Runtime and account diagnostics remain local; TST-021 continues to clear exact
+sanitized sources, scalar evidence and outgoing history before publication.
 
 The planned GitHub workflow deliverables are:
 

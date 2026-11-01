@@ -153,6 +153,13 @@ class CiPerformanceTests(unittest.TestCase):
         self.assertEqual(results["radiation-acceptance"]["status"], "failed")
         self.assertEqual(max(map(len, observed)), 2)
         self.assertFalse(any({"thermal-reference-comparison", "numerical-checkpoint"} <= s for s in observed))
+        barrier = threading.Barrier(3, timeout=10)
+        active.clear(); observed.clear()
+        stages = ["thermal-reference-comparison", "numerical-checkpoint", "radiation-acceptance", "thermal-preparation"]
+        results = dict(schedule(stages, execute, 3))
+        self.assertEqual(set(results), set(stages))
+        self.assertEqual(max(map(len, observed)), 3)
+        self.assertFalse(any({"thermal-reference-comparison", "numerical-checkpoint"} <= s for s in observed))
         for stages, jobs in ((["duplicate", "duplicate"], 2), (["one"], 0), (["one"], 5)):
             with self.assertRaises(ValueError): list(schedule(stages, execute, jobs))
 
