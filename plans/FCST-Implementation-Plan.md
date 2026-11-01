@@ -154,6 +154,18 @@ Inside FreeCAD, application dispatch runs on the host's owning thread for docume
 8. **Verify repository settings automatically.** Add a settings checker for remote identity, required branch checks, workflow permissions, supported protection settings, runner restrictions and release-to-commit evidence links. Unavailable permissions, protection features or licensed runners are reported as setup blockers, not silently relaxed. Review of repository access or a release decision does not make the user responsible for executing tests.
 9. **Continuously reduce feedback time (TST-017).** Treat CI runtime as an ongoing engineering constraint for every feature and verification change. Inspect the passing aggregate's `ci-performance.json` and GitHub critical path; target the largest measured cost, state an experiment, and verify the result unattended. Preserve all coverage, statistical/scaling workloads, numerical criteria, assertions and both Windows configurations. Compare equivalent cold/warm states and toolchains, account for setup/queue time and runner minutes, and repeat noisy comparisons when needed. Investigate increases over 20% and at least 60 seconds and record their disposition. Keep a source/run-bound baseline and sanitized experiment ledger in [the CI performance guide](../docs/ci-performance.md); refresh baselines deliberately after passing evidence, never to hide regressions. The working target is full warm Foundation feedback within ten minutes, without claiming reference-hardware product qualification.
 
+**CI improvement checkpoint, 1 November 2026.** Commit `ac3003d` passed every
+required check in [the recorded warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41350452498):
+full CI 12m 45s, Debug verification 9m 53s and Release verification 4m 14s, with
+391 required records per configuration. Preserve this tested implementation.
+At the user's request, further optimization stops here. The proposed three-worker
+Debug experiment and warm-baseline refresh were not run and are not implemented;
+both hosted configurations still use two acceptance workers and full qualification
+is serial. Future work is to compare three versus two Debug workers under matched
+warm conditions, profile checkpoint/heater test costs, then address dependency
+compilation if it becomes the critical path. Follow the acceptance, privacy and
+keep/revert rules in [the future-work record](../docs/ci-performance.md#next-work-deliberately-not-started).
+
 The planned GitHub workflow deliverables are:
 
 | Workflow | Scope and trigger | Runner/evidence |
