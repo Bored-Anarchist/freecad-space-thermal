@@ -17,7 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
-from fcst_tools.verification import check_unit_report, check_native_inventory, schedule, unit_inputs
+from fcst_tools.verification import check_unit_report, check_native_inventory, schedule, unit_inputs, prioritize
 
 STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "thermal-preparation", "thermal-reference-comparison", "radiation-acceptance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange", "esatan-exchange", "host-acceptance", "mcp-acceptance"]
 
@@ -159,9 +159,11 @@ def main():
                 (output / "build-info.json").write_text(json.dumps(data, indent=2) + "\n")
             else:
                 okay = command(actions[case_id], output / (case_id + ".log"), env=stage_env)
-            return dict(status="passed" if okay else "failed", seconds=round(time.monotonic() - start, 3))
+            return dict(status="passed" if okay else "failed", seconds=round(time.monotonic() - start, 3),
+                        started_seconds=round(start-started, 3))
         except (OSError, ValueError, subprocess.SubprocessError, KeyError, TypeError):
-            return dict(status="failed", reason="execution_unavailable", seconds=round(time.monotonic() - start, 3))
+            return dict(status="failed", reason="execution_unavailable", seconds=round(time.monotonic() - start, 3),
+                        started_seconds=round(start-started, 3))
     # All build prerequisites finish before concurrent processes read installed bytes.
     preparation = STEPS[:STEPS.index("contract-conformance")]
     prerequisites_okay = True
@@ -171,6 +173,9 @@ def main():
         prerequisites_okay = prerequisites_okay and result["status"] == "passed"
     acceptance = ["radiation-acceptance", "thermal-preparation", "thermal-reference-comparison"]
     acceptance += [s for s in STEPS if s not in preparation and s not in acceptance]
+    if args.tier != "full":
+        baseline = json.loads((ROOT / "ci/ci-performance-baseline.json").read_bytes())
+        acceptance = prioritize(acceptance, baseline["presets"][args.preset]["stage_seconds"])
     jobs = 1 if args.tier == "full" else args.jobs
     if prerequisites_okay:
         for case_id, result in schedule(acceptance, execute, jobs):
@@ -203,7 +208,9 @@ def main():
               "candidate": revision, "preset": args.preset, "tier": args.tier,
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
               "execution": {"jobs": jobs, "seconds": round(time.monotonic() - started, 3),
-                            "unit_seconds": unit_seconds, "unit_source": "current-run-receipt" if args.unit_report else "local"},
+                            "unit_seconds": unit_seconds, "unit_source": "current-run-receipt" if args.unit_report else "local",
+                            "cache_state": os.environ.get("FCST_DOWNLOAD_CACHE_STATE", "unknown")
+                                if os.environ.get("FCST_DOWNLOAD_CACHE_STATE", "unknown") in ("cold", "warm", "unknown") else "unknown"},
               "coverage_manifest_sha256": hashlib.sha256((ROOT / "ci/coverage.json").read_bytes()).hexdigest(),
               "gate": verdict, "cases": records}
     (output / "verification.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

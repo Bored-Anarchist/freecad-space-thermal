@@ -76,6 +76,10 @@ def validate():
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]
     assert packages["os"] == ["windows-2022"], "Windows-only package matrix required"
     assert set(packages["candidate"]) == {"sundials", "hdf5", "embree", "occt"}, "Incorrect active Windows package candidates"
+    assert any('--jobs 2' in step.get('run','') for step in workflow['jobs']['dependencies']['steps']), "Bounded dependency compilation absent"
+    gate_steps = workflow['jobs']['gate']['steps']
+    assert any('summarize_ci_performance.py' in step.get('run','') for step in gate_steps), "Continuous CI timing comparison absent"
+    assert any('publication_preflight.py' in step.get('run','') and '--file .local/ci-performance.json' in step['run'] for step in gate_steps), "CI performance summary lacks publication clearance"
     for path in sorted((ROOT / ".github/workflows").glob("*.yml")):
         document = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
         for job in document["jobs"].values():

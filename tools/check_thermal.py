@@ -9,6 +9,7 @@ from pathlib import Path
 import subprocess
 import sys
 import tempfile
+import time
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT/'python'))
@@ -329,6 +330,7 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
            'safe-failures': safe_failures}
     records = []
     for case in policy['required_cases']:
+        started = time.monotonic()
         try:
             if case.startswith('transient-') and not case.startswith('transient-cli-'):
                 result = subprocess.run([str(transient_tests),case.removeprefix('transient-'),str(fixture.parent)],
@@ -355,7 +357,7 @@ def check(worker, native_tests, assembly_tests, steady_tests, transient_tests):
             status = 'passed'
         except (AssertionError, KeyError, ValueError, OSError, subprocess.SubprocessError):
             status = 'failed'
-        records.append({'id': case, 'status': status})
+        records.append({'id': case, 'status': status, 'seconds': round(time.monotonic()-started, 6)})
     return records, build_info, backend_capabilities, native_profile, qualification_metrics, source_comparisons, qualification(qualification_policy,records)
 
 

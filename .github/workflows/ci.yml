@@ -85,6 +85,8 @@ jobs:
           name: foundation-units
           path: .local/unit-owner
       - name: Execute identical local driver
+        env:
+          FCST_DOWNLOAD_CACHE_STATE: ${{ steps.downloads.outputs.cache-hit == 'true' && 'warm' || 'cold' }}
         run: python tools/verify.py --preset ${{ matrix.preset }} --jobs 2 --unit-report .local/unit-owner/unit-tests.json
       - name: Clear exact public reports
         id: clear
@@ -298,14 +300,22 @@ jobs:
         with:
           name: host-windows-2022
           path: .local/handoff-reports/host
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: package-*
+          path: .local/handoff-reports/packages
       - name: Candidate-bound TST-022 handoff
         run: python tools/check_foundation_handoff.py --reports .local/handoff-reports --report .local/handoff.json
+      - name: Compare verified CI timings with recorded baseline
+        run: python tools/summarize_ci_performance.py --reports .local/handoff-reports --report .local/ci-performance.json
       - name: Clear final handoff report
-        run: python tools/publication_preflight.py --file .local/handoff.json
+        run: python tools/publication_preflight.py --file .local/handoff.json --file .local/ci-performance.json
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: foundation-handoff
-          path: .local/handoff.json
+          path: |
+            .local/handoff.json
+            .local/ci-performance.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30

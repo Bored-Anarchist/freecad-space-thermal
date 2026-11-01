@@ -362,7 +362,11 @@
     "test_ci_performance.CiPerformanceTests.test_native_deduplication_rejects_new_cases_and_changed_commands",
     "test_ci_performance.CiPerformanceTests.test_scheduler_bounds_concurrency_and_serializes_reference_builds",
     "test_ci_performance.CiPerformanceTests.test_unit_receipts_reject_stale_inputs_candidates_and_incomplete_results",
-    "test_ci_performance.CiPerformanceTests.test_workflow_cache_uploads_require_exact_path_and_immediate_clearance"
+    "test_ci_performance.CiPerformanceTests.test_workflow_cache_uploads_require_exact_path_and_immediate_clearance",
+    "test_ci_performance.CiPerformanceTests.test_cost_estimates_only_reorder_and_never_remove_new_work",
+    "test_ci_performance.CiPerformanceTests.test_timing_comparison_rejects_coverage_loss_failed_candidates_and_bad_metrics",
+    "test_ci_performance.CiPerformanceTests.test_workload_digest_binds_seeds_sizes_and_fixtures_but_allows_more_native_regressions",
+    "test_ci_performance.CiPerformanceTests.test_summary_requires_both_configurations_and_each_current_package"
   ],
   "full_prerequisites": [
     "freecad-exact-build-smoke",

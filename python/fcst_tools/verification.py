@@ -47,6 +47,15 @@ def schedule(stages, execute, jobs=2):
                 yield stage, future.result()
 
 
+def prioritize(stages, estimates):
+    """Historical costs change order only; new stages still execute exactly once."""
+    import math
+    if any(not isinstance(v, (int, float)) or isinstance(v, bool) or not math.isfinite(v) or v < 0
+           for v in estimates.values()):
+        raise ValueError("verification_estimates")
+    return sorted(stages, key=lambda stage: -estimates.get(stage, 0))
+
+
 def check_native_inventory(inventory, thermal, radiation, build, root):
     """Every omitted CTest invocation must have the identical acceptance owner."""
     config = Path(build)

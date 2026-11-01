@@ -14,15 +14,107 @@ from unittest.mock import patch
 ROOT = Path(__file__).resolve().parents[1]
 sys.path[:0] = [str(ROOT / "python"), str(ROOT / "tools")]
 from fcst_tools.gate import evaluate
-from fcst_tools.verification import check_unit_report, check_native_inventory, schedule
+from fcst_tools.verification import check_unit_report, check_native_inventory, schedule, prioritize
+from fcst_tools.ci_performance import compare, workload_hash
 import cache_downloads
 import check_workflows
+import summarize_ci_performance
 
 SCRATCH = ROOT / ".local/test-scratch"
 SCRATCH.mkdir(parents=True, exist_ok=True)
 
 
 class CiPerformanceTests(unittest.TestCase):
+    def test_summary_requires_both_configurations_and_each_current_package(self):
+        from fcst_tools.profiles import BUILD_STAGES
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
+            root = Path(directory); reports = root / "reports"; reports.mkdir()
+            names = ("ci/radiation-acceptance-v1.json", "ci/numerical-criteria-v1.json", "ci/probe-sources.json",
+                     "engine/tests/radiation_fixtures.hpp", "tests/fixtures/radiation/plates.json", "tests/fixtures/radiation/steady.json")
+            for name in names:
+                path = root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes((ROOT / name).read_bytes())
+            (root / "ci/coverage.json").write_text(json.dumps(dict(unit_cases=["synthetic.unit"])), encoding="utf-8")
+            expected = ["synthetic.unit"] + summarize_ci_performance.STEPS
+            baseline = dict(candidate="b"*40, run_id=1, required_case_ids=expected, workload_sha256=workload_hash(root),
+                            presets={}, packages={})
+            for preset in ("windows-debug", "windows-release"):
+                baseline["presets"][preset] = dict(driver_seconds=100, stage_seconds={s: 5 for s in summarize_ci_performance.STEPS})
+                records = [dict(id=name, status="passed", **({"seconds": 1} if name != "synthetic.unit" else {})) for name in expected]
+                report = dict(candidate="a"*40, preset=preset, cases=records, gate=evaluate(expected, records), execution=dict(jobs=2, seconds=50))
+                path = reports / preset / "verification.json"; path.parent.mkdir(); path.write_text(json.dumps(report), encoding="utf-8")
+            sources = json.loads((root / names[2]).read_bytes())["sources"]
+            for source in sources:
+                if source["id"] == "petsc": continue
+                name = source["id"]; baseline["packages"][name] = dict(seconds=100, source_sha256=source["sha256"])
+                record = dict(id=name, version=source["version"], source_sha256=source["sha256"], license_sha256=source["license_sha256"],
+                              adopted=False, status="passed", stages=sorted(BUILD_STAGES), installed_bytes=100, seconds=50)
+                (reports / ("dependency-builds-"+name+".json")).write_text(json.dumps(dict(platform="Windows", candidate="a"*40, candidates=[record])), encoding="utf-8")
+            with patch.object(summarize_ci_performance, "ROOT", root):
+                result = summarize_ci_performance.summarize(reports, baseline, "a"*40)
+                self.assertEqual(set(result["packages"]), {"sundials", "embree", "hdf5", "occt"})
+                native = root / "ci/radiation-acceptance-v1.json"; original_policy = native.read_bytes()
+                policy = json.loads(original_policy)
+                baseline["acceptance_case_ids"] = {"ci/radiation-acceptance-v1.json": dict(field="native_cases", cases=list(policy["native_cases"]))}
+                policy["native_cases"].pop(); native.write_text(json.dumps(policy), encoding="utf-8")
+                with self.assertRaises(ValueError): summarize_ci_performance.summarize(reports, baseline, "a"*40)
+                native.write_bytes(original_policy)
+                for path in (reports / "windows-debug/verification.json", reports / "dependency-builds-embree.json"):
+                    original = path.read_bytes(); path.unlink()
+                    with self.assertRaises(ValueError): summarize_ci_performance.summarize(reports, baseline, "a"*40)
+                    path.write_bytes(original)
+
+    def test_cost_estimates_only_reorder_and_never_remove_new_work(self):
+        stages = ["new-stage", "short", "long", "unknown"]
+        result = prioritize(stages, {"short": 2, "long": 100, "obsolete": 1000})
+        self.assertEqual(result, ["long", "short", "new-stage", "unknown"])
+        self.assertCountEqual(result, stages)
+        for value in (float("nan"), float("inf"), -1, True, "100"):
+            with self.assertRaises(ValueError): prioritize(stages, {"long": value})
+
+    def test_timing_comparison_rejects_coverage_loss_failed_candidates_and_bad_metrics(self):
+        expected = ["unit", "build", "radiation"]
+        records = [dict(id="unit", status="passed"), dict(id="build", status="passed", seconds=10),
+                   dict(id="radiation", status="passed", seconds=20)]
+        baseline = dict(required_case_ids=expected, presets={"windows-debug": dict(driver_seconds=60,
+            stage_seconds=dict(build=15, radiation=40))})
+        report = dict(candidate="a"*40, preset="windows-debug", cases=records, gate=evaluate(expected, records),
+                      execution=dict(seconds=30, jobs=2))
+        def check(value): return compare(value, baseline, "a"*40, expected, ["build", "radiation"])
+        self.assertEqual(check(report)["driver"]["ratio"], .5)
+        for change in ("candidate", "preset", "missing", "duplicate", "failed", "timing", "duration", "jobs"):
+            r = deepcopy(report)
+            if change == "candidate": r["candidate"] = "b"*40
+            if change == "preset": r["preset"] = "unregistered"
+            if change == "missing": r["cases"].pop(0)
+            if change == "duplicate": r["cases"].append(deepcopy(r["cases"][0]))
+            if change == "failed": r["cases"][0]["status"] = "failed"
+            if change == "timing": r["cases"][-1]["seconds"] = float("nan")
+            if change == "duration": r["execution"]["seconds"] = -1
+            if change == "jobs": r["execution"]["jobs"] = 0
+            with self.subTest(change=change), self.assertRaises(ValueError): check(r)
+        baseline["required_case_ids"].append("lost-original-test")
+        with self.assertRaises(ValueError): check(report)
+
+    def test_workload_digest_binds_seeds_sizes_and_fixtures_but_allows_more_native_regressions(self):
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
+            root = Path(directory)
+            names = ("ci/radiation-acceptance-v1.json", "ci/numerical-criteria-v1.json",
+                     "engine/tests/radiation_fixtures.hpp", "tests/fixtures/radiation/plates.json", "tests/fixtures/radiation/steady.json")
+            for name in names:
+                path = root / name; path.parent.mkdir(parents=True, exist_ok=True); path.write_bytes((ROOT / name).read_bytes())
+            original = workload_hash(root)
+            path = root / names[0]; policy = json.loads(path.read_bytes())
+            policy["native_cases"].append("new-regression"); path.write_text(json.dumps(policy), encoding="utf-8")
+            self.assertEqual(workload_hash(root), original)
+            policy["scaling_subdivisions"].pop(); path.write_text(json.dumps(policy), encoding="utf-8")
+            self.assertNotEqual(workload_hash(root), original)
+            path.write_bytes((ROOT / names[0]).read_bytes())
+            criteria = root / names[1]; value = json.loads(criteria.read_bytes()); value["statistical_policy"]["seeds"].pop()
+            criteria.write_text(json.dumps(value), encoding="utf-8"); self.assertNotEqual(workload_hash(root), original)
+            criteria.write_bytes((ROOT / names[1]).read_bytes())
+            (root / names[2]).write_bytes(b"changed fixture generator")
+            self.assertNotEqual(workload_hash(root), original)
+
     def test_unit_receipts_reject_stale_inputs_candidates_and_incomplete_results(self):
         expected = ["synthetic.one", "synthetic.two"]
         records = [dict(id=case, status="passed") for case in expected]
