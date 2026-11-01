@@ -6,7 +6,8 @@ a smaller qualification tier or move required acceptance to a scheduled workflow
 
 `tools/verify.py --preset windows-release --jobs 2` runs compilation and installation
 before scheduling a bounded number of independent acceptance processes.
-The current hosted experiment uses three workers for Debug and two for Release. Historical stage
+The next hosted experiment uses four workers for Debug and two for Release;
+the passing three-worker reference remains recorded below. Historical stage
 costs prioritize long work so expensive application tests do not form a late tail;
 estimates only change order and never remove new or existing work. Each stage receives
 its own temporary directory. The SUNDIALS numerical checkpoint and IDA reference
@@ -30,7 +31,8 @@ binary/source bindings. CTest itself executes the two remaining native smoke
 cases. No prior pass verdict is cached.
 
 MSVC package probes retain two MSBuild projects. A separate resumed experiment
-uses four compiler processes per Embree project, with two for other packages.
+uses four compiler processes per Embree and OCCT project, with two for the other
+packages. OCCT remains under the explicitly recorded budget trial.
 The compiler budget is explicit and recorded with each report. The measured Ninja experiment did not establish a gain and was not
 adopted; the original package configuration, full build, install and fresh
 installed-consumer checks remain. Numerical prototype build directories are stable per checkout and
@@ -137,6 +139,7 @@ are recorded so a cold/warm comparison cannot silently become a causal claim.
 | Thermal residual allocation removal and four-compiler Embree | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41356914583), commit `f44ab6b` | Full CI 8m 58s; Debug driver 351.812s; Release 254.500s. Embree build 321.860s versus 573.719s in the prior run; all package consumers passed. Aggregate job duration 2,331s, 13.3% less than the prior run. OCCT and the Debug tail now dominate. |
 | Invariant ray cache, final checkpoint hashing and native compiler parallelism | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41357834232), commit `7072a4d` | Full CI 11m 03s; Debug 413.781s; Release 203.625s; all 391 records per configuration passed. Embree's unchanged four-compiler build took 566.484s, while OCCT's unchanged two-compiler build took 228.062s. Aggregate job duration 2,420s. Retain this slower sample; resource telemetry and repetitions are needed before causal hosted-time claims. |
 | Aggregate process-tree resource evidence | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41359314196), commit `d94fd6f` | Full CI 10m 13s; Debug 373.407s; Release 163.484s; all 393 records per configuration passed. Embree build 503.953s / 1,974.453 CPU seconds / 2.207 GB peak job commit; OCCT build 317.015s / 728.422 CPU seconds / 1.516 GB peak job commit. All measured runners reported four logical CPUs. Aggregate job duration 2,390s. Initial accounting profile `windows-job-v1`; later comparisons isolate reusable MSBuild workers explicitly. |
+| Bounded row cache and isolated accounting V2 | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41362070826), commit `8ad7ee1` | Full CI 7m 51s; Debug 252.032s with three workers; Release 231.578s with two; all 393 records per configuration passed. Embree build 379.657s / 1,495.125 CPU seconds; OCCT build 308.016s / 731.828 CPU seconds / 1.515 GB peak job commit. Aggregate job duration 2,194s. Shared-runner variation remains substantial; this is the V2 reference for the next budget trial. |
 
 The BVH change sorts indices rather than large optical facet records, detects
 duplicate IDs in canonical order, and computes bounds/centroids once per facet.
@@ -221,6 +224,16 @@ The first local OCCT budget pair passed both full builds/consumers but is
 overlapped part of the experiment. Do not use that pair to justify a gain. Repeat
 fresh builds with four-CPU affinity and an isolated MSBuild worker pool, in reversed
 order, with no concurrent local compiler work.
+
+The next hosted trial changes Debug from three to four acceptance workers and
+OCCT from two to four compiler workers per project. Release stays at two;
+Embree stays at four; full qualification stays serial. The V2 reference above
+shows OCCT averaging about 2.38 CPUs during compilation, while Embree averages
+about 3.94. More OCCT workers may fill unused CPU capacity. Debug's extra worker
+may reduce the acceptance tail; the full workflow remains limited by dependency
+compilation until that cost falls. Keep/revert decisions require complete passing
+runs and review of wall time, runner duration and committed memory, not just a
+single fast stage. The isolated local OCCT comparison is still running.
 
 1. **Measure the next worker budget against the current three-worker result.**
    Keep Release at two and full qualification serial. Compare four versus three

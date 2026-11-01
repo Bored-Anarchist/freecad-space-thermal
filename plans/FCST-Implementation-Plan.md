@@ -189,6 +189,14 @@ the identified three-worker runs. Keep the measured allocation/compiler changes;
 next validate the geometry-cache, final checkpoint hashing and native compilation
 candidates, then remeasure the moving OCCT/Debug critical path.
 
+**V2 reference and next budget trial.** [Run 41362070826](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41362070826),
+commit `8ad7ee1`, passed all required checks in 7m 51s (warm), with 393 records per
+configuration. Debug took 252.032s at three workers; Release 231.578s at two.
+Embree/OCCT builds took 379.657/308.016s; OCCT averaged about 2.38 CPUs on a
+four-CPU runner. Evaluate four Debug workers and four OCCT compiler workers
+against this reference with all coverage and criteria intact. The isolated local
+OCCT pair remains pending; do not treat earlier inconclusive timings as a win.
+
 The planned GitHub workflow deliverables are:
 
 | Workflow | Scope and trigger | Runner/evidence |

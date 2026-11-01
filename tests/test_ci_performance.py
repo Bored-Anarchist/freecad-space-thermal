@@ -256,6 +256,13 @@ class CiPerformanceTests(unittest.TestCase):
         self.assertEqual(set(results), set(stages))
         self.assertEqual(max(map(len, observed)), 3)
         self.assertFalse(any({"thermal-reference-comparison", "numerical-checkpoint"} <= s for s in observed))
+        barrier = threading.Barrier(4, timeout=10)
+        active.clear(); observed.clear()
+        stages.append("mcp-acceptance")
+        results = dict(schedule(stages, execute, 4))
+        self.assertEqual(set(results), set(stages))
+        self.assertEqual(max(map(len, observed)), 4)
+        self.assertFalse(any({"thermal-reference-comparison", "numerical-checkpoint"} <= s for s in observed))
         for stages, jobs in ((["duplicate", "duplicate"], 2), (["one"], 0), (["one"], 5)):
             with self.assertRaises(ValueError): list(schedule(stages, execute, jobs))
 
@@ -341,7 +348,7 @@ class CiPerformanceTests(unittest.TestCase):
             for replacement in (original.replace("path: .local/public-download-cache", "path: .local"),
                                 original.replace("cache_downloads.py seal", "cache_downloads.py prepare"),
                                 original.replace("steps.cache-clear.outcome == 'success'", "true"),
-                                original.replace("acceptance_jobs: 3", "acceptance_jobs: 9"),
+                                original.replace("acceptance_jobs: 4", "acceptance_jobs: 9"),
                                 original.replace("compiler_jobs: 4", "compiler_jobs: 16"),
                                 original.replace("--compiler-jobs ${{ matrix.compiler_jobs }}", "")):
                 path.write_text(replacement, encoding="utf-8")

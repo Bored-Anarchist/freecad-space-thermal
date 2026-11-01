@@ -41,7 +41,7 @@ def validate():
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
     budgets = {row["preset"]: row.get("acceptance_jobs") for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]}
-    assert budgets == {"windows-debug": "3", "windows-release": "2"}, "Reviewed acceptance worker budgets required"
+    assert budgets == {"windows-debug": "4", "windows-release": "2"}, "Reviewed acceptance worker budgets required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
     assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies", "dwg"}, "Profile jobs absent from required gate"
     native=workflow['jobs']['dwg']['steps']
@@ -80,7 +80,7 @@ def validate():
     assert set(packages["candidate"]) == {"sundials", "hdf5", "embree", "occt"}, "Incorrect active Windows package candidates"
     assert packages.get("include") == [
         {"candidate": "sundials", "compiler_jobs": "2"}, {"candidate": "hdf5", "compiler_jobs": "2"},
-        {"candidate": "embree", "compiler_jobs": "4"}, {"candidate": "occt", "compiler_jobs": "2"}], "Reviewed compiler worker budgets required"
+        {"candidate": "embree", "compiler_jobs": "4"}, {"candidate": "occt", "compiler_jobs": "4"}], "Reviewed compiler worker budgets required"
     assert any('--jobs 2' in step.get('run','') for step in workflow['jobs']['dependencies']['steps']), "Bounded dependency compilation absent"
     assert any('--compiler-jobs ${{ matrix.compiler_jobs }}' in step.get('run','') for step in workflow['jobs']['dependencies']['steps']), "Bounded compiler budget absent"
     gate_steps = workflow['jobs']['gate']['steps']

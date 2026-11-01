@@ -59,7 +59,7 @@ jobs:
         include:
           - os: windows-2022
             preset: windows-debug
-            acceptance_jobs: 3
+            acceptance_jobs: 4
           - os: windows-2022
             preset: windows-release
             acceptance_jobs: 2
@@ -197,7 +197,7 @@ jobs:
           - candidate: embree
             compiler_jobs: 4
           - candidate: occt
-            compiler_jobs: 2
+            compiler_jobs: 4
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
