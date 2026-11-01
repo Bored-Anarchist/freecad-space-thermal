@@ -110,7 +110,8 @@ def cmake_probe(item, source, work, cmake, ctest, jobs):
     generator = ["-G", "Visual Studio 17 2022", "-A", "x64"] if os.name == "nt" else ["-G", "Ninja"]
     common = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX=" + str(install),
               "-DCMAKE_C_FLAGS=-ffp-contract=off", "-DCMAKE_CXX_FLAGS=-ffp-contract=off"] if os.name != "nt" else [
-              "-DCMAKE_INSTALL_PREFIX=" + str(install)]
+              "-DCMAKE_INSTALL_PREFIX=" + str(install),
+              "-DCMAKE_C_FLAGS=/MP2", "-DCMAKE_CXX_FLAGS=/MP2"]
     run([cmake, "-S", str(source), "-B", str(build), *generator, *common,
          *["-D" + option for option in OPTIONS[name]]], ROOT, work / "configure.log")
     run([cmake, "--build", str(build), "--config", "Release", "--parallel", str(jobs)], ROOT, work / "build.log")

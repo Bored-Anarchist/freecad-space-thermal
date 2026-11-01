@@ -17,6 +17,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
+from fcst_tools.verification import check_unit_report, check_native_inventory, schedule, unit_inputs
 
 STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "thermal-preparation", "thermal-reference-comparison", "radiation-acceptance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange", "esatan-exchange", "host-acceptance", "mcp-acceptance"]
 
@@ -29,15 +30,19 @@ def command(args, log, env=None):
 
 
 def main():
+    started = time.monotonic()
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--tier", choices=["fast", "full"], default="fast")
     parser.add_argument("--preset", choices=["windows-debug", "windows-release"], default="windows-debug")
+    parser.add_argument("--jobs", type=int, choices=range(1, 5), default=2)
+    parser.add_argument("--unit-report", type=Path, help="Exact unit receipt downloaded from this CI run")
     args = parser.parse_args()
     if platform.system() != "Windows":
         parser.error("macOS and Linux verification is an uncommitted stretch goal outside the work packages")
     manifest = json.loads((ROOT / "ci/coverage.json").read_text())
     output = ROOT / ".local" / args.preset
     output.mkdir(parents=True, exist_ok=True)
+    (output / "verification.json").unlink(missing_ok=True)
     temporary = output / "tmp"
     temporary.mkdir(exist_ok=True)
     os.environ.update(TEMP=str(temporary), TMP=str(temporary), TMPDIR=str(temporary))
@@ -47,25 +52,37 @@ def main():
     def record(case_id, status, **extra):
         records.append({"id": case_id, "status": status, **extra})
         print(case_id + ": " + status, flush=True)
-    suite = unittest.defaultTestLoader.discover(str(ROOT / "tests"))
-    def flatten(tests):
-        for test in tests:
-            if isinstance(test, unittest.TestSuite):
-                yield from flatten(test)
-            else:
-                yield test
-    tests = list(flatten(suite))
-    for test in tests:
-        stream = io.StringIO()
-        result = unittest.TextTestRunner(stream=stream).run(unittest.TestSuite([test]))
-        (output / (test.id() + ".log")).write_text(stream.getvalue(), encoding="utf-8")
-        record(test.id(), "passed" if result.wasSuccessful() and not result.skipped else "failed")
     try:
         revision = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
     except OSError:
         revision = ""
     if not revision or any(char not in "0123456789abcdef" for char in revision):
         revision = "uncommitted"
+    unit_started = time.monotonic()
+    if args.unit_report:
+        try:
+            receipt = json.loads(args.unit_report.read_bytes())
+            unit_cases = check_unit_report(receipt, revision, unit_inputs(ROOT),
+                hashlib.sha256((ROOT / "ci/coverage.json").read_bytes()).hexdigest(), manifest["unit_cases"])
+        except (OSError, ValueError, KeyError, TypeError):
+            print("Unit receipt: failed; stale or incomplete evidence", flush=True)
+            return 1
+        for case in unit_cases:
+            record(case["id"], case["status"])
+    else:
+        suite = unittest.defaultTestLoader.discover(str(ROOT / "tests"))
+        def flatten(tests):
+            for test in tests:
+                if isinstance(test, unittest.TestSuite):
+                    yield from flatten(test)
+                else:
+                    yield test
+        for test in flatten(suite):
+            stream = io.StringIO()
+            result = unittest.TextTestRunner(stream=stream).run(unittest.TestSuite([test]))
+            (output / (test.id() + ".log")).write_text(stream.getvalue(), encoding="utf-8")
+            record(test.id(), "passed" if result.wasSuccessful() and not result.skipped else "failed")
+    unit_seconds = round(time.monotonic() - unit_started, 3)
     try:
         import cmake as cmake_package
         cmake_bin = Path(cmake_package.CMAKE_BIN_DIR)
@@ -87,7 +104,7 @@ def main():
         "python-imports": [sys.executable, "-I", "-c", "import fcst_app,fcst_cli,fcst_mcp; assert not fcst_app.capabilities()['solver_available']"],
         "configure": [cmake, "--preset", args.preset, "-DFCST_SOURCE_REVISION=" + revision],
         "build": [cmake, "--build", "--preset", args.preset, "--parallel", "2"],
-        "ctest": [ctest, "--preset", args.preset],
+        "ctest": [ctest, "--preset", args.preset, "--parallel", str(args.jobs), "-R", "^native-"],
         "install": [cmake, "--install", str(ROOT / "out" / args.preset), "--config", config, "--prefix", str(install)],
         "contract-conformance": [sys.executable, "tools/check_contracts.py", "--worker", str(install / "bin/fcst-worker.exe"),
                                  "--report", str(output / "contracts.json")],
@@ -115,12 +132,22 @@ def main():
         "host-acceptance": [sys.executable,"tools/check_host.py","--worker",str(install / "bin/fcst-worker.exe"),"--report",str(output / "host.json")],
         "mcp-acceptance": [sys.executable,"tools/check_mcp.py","--worker",str(install / "bin/fcst-worker.exe"),"--report",str(output / "mcp.json")],
     }
-    for case_id in STEPS:
+    def execute(case_id):
         start = time.monotonic()
         try:
+            stage_temp = temporary / case_id
+            stage_temp.mkdir(exist_ok=True)
+            stage_env = dict(os.environ, TEMP=str(stage_temp), TMP=str(stage_temp), TMPDIR=str(stage_temp))
+            if case_id == "ctest":
+                inventory = subprocess.run([ctest, "--preset", args.preset, "--show-only=json-v1"],
+                    cwd=ROOT, capture_output=True, timeout=30, check=True)
+                check_native_inventory(json.loads(inventory.stdout),
+                    json.loads((ROOT / "ci/thermal-acceptance.json").read_bytes()),
+                    json.loads((ROOT / "ci/radiation-acceptance-v1.json").read_bytes()),
+                    ROOT / "out" / args.preset / config, ROOT)
             if case_id == "engine-only":
                 worker = install / "bin" / ("fcst-worker.exe" if os.name == "nt" else "fcst-worker")
-                env = dict(os.environ, PATH=str(worker.parent))
+                env = dict(stage_env, PATH=str(worker.parent))
                 env.pop("PYTHONPATH", None)
                 env.pop("PYTHONHOME", None)
                 info = subprocess.run([str(worker), "--build-info"], capture_output=True, text=True, env=env, timeout=30)
@@ -131,10 +158,26 @@ def main():
                         and rejected.returncode == 2 and json.loads(rejected.stderr)["code"] == "not_implemented")
                 (output / "build-info.json").write_text(json.dumps(data, indent=2) + "\n")
             else:
-                okay = command(actions[case_id], output / (case_id + ".log"))
-            record(case_id, "passed" if okay else "failed", seconds=round(time.monotonic() - start, 3))
-        except (OSError, ValueError, subprocess.SubprocessError, KeyError):
-            record(case_id, "failed", reason="execution_unavailable")
+                okay = command(actions[case_id], output / (case_id + ".log"), env=stage_env)
+            return dict(status="passed" if okay else "failed", seconds=round(time.monotonic() - start, 3))
+        except (OSError, ValueError, subprocess.SubprocessError, KeyError, TypeError):
+            return dict(status="failed", reason="execution_unavailable", seconds=round(time.monotonic() - start, 3))
+    # All build prerequisites finish before concurrent processes read installed bytes.
+    preparation = STEPS[:STEPS.index("contract-conformance")]
+    prerequisites_okay = True
+    for case_id in preparation:
+        result = execute(case_id)
+        record(case_id, **result)
+        prerequisites_okay = prerequisites_okay and result["status"] == "passed"
+    acceptance = ["radiation-acceptance", "thermal-preparation", "thermal-reference-comparison"]
+    acceptance += [s for s in STEPS if s not in preparation and s not in acceptance]
+    jobs = 1 if args.tier == "full" else args.jobs
+    if prerequisites_okay:
+        for case_id, result in schedule(acceptance, execute, jobs):
+            record(case_id, **result)
+    else:
+        for case_id in acceptance:
+            record(case_id, "failed", reason="prerequisite_failed")
     expected = manifest["unit_cases"] + STEPS
     if args.tier == "full":
         for case_id in manifest["full_prerequisites"]:
@@ -159,6 +202,8 @@ def main():
     report = {"schema_version": 1, "scope": "Foundation, contracts, numerical prototype, persistence, spatial foundation, jobs, shared exchange, TD/SINDA and bounded ESATAN implementation; no production solver or vendor qualification",
               "candidate": revision, "preset": args.preset, "tier": args.tier,
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
+              "execution": {"jobs": jobs, "seconds": round(time.monotonic() - started, 3),
+                            "unit_seconds": unit_seconds, "unit_source": "current-run-receipt" if args.unit_report else "local"},
               "coverage_manifest_sha256": hashlib.sha256((ROOT / "ci/coverage.json").read_bytes()).hexdigest(),
               "gate": verdict, "cases": records}
     (output / "verification.json").write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")

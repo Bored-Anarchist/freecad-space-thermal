@@ -169,6 +169,21 @@ The foundation, planning, publication, exact host smoke and candidate packaging 
 
 ### 2.2 Privacy and sanitization before publication
 
+CI acceleration preserves both Windows configurations and every existing native,
+reference, radiation ensemble/scaling, host and MCP case. TST-021 now also covers
+the [public download cache](../docs/ci-performance.md): cache-specific clearance
+admits only byte-identical distributions from reviewed public SHA-256 locks,
+with pin/name/size/path/link checks before reuse and immediately before upload.
+Generated binaries/debug paths, build trees, raw logs, model inputs and pass
+verdicts remain excluded. General scanner patterns and binary rejection remain
+unchanged. Execute `tests/test_ci_performance.py`, the complete unit owner and
+Publication security scope; reject corrupt/unlisted cache files, stale or
+incomplete candidate/source-bound unit receipts, native inventory substitution,
+unsafe cache paths and upload without clearance. Two bounded acceptance workers
+use isolated temporary directories and serialize mutable reference preparation;
+full qualification remains serial. Scan exact changed sources, workflow/policy,
+unit receipts, plan/register/prose and outgoing history before publication.
+
 WP-12 extends TST-021 to exact native BVH/sampling/radiosity/coupling sources,
 optical declarations, synthetic plate/steady fixtures, frozen ensemble quantities,
 statistical driver, bounded `radiation.json`, scaling curves and final GitHub

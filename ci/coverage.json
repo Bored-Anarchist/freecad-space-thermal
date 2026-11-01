@@ -356,7 +356,13 @@
     "test_thermal_references.ThermalReferenceTests.test_independent_analytic_oracles_cover_conservation_enthalpy_and_fast_mode",
     "test_thermal_references.ThermalReferenceTests.test_raw_runs_require_exact_grids_modes_dimensions_versions_and_finite_values",
     "test_validation_boundary.ValidationBoundaryTests.test_closed_boundary_and_privileged_trigger_rejection",
-    "test_validation_boundary.ValidationBoundaryTests.test_guard_bypass_policy_activation_and_write_permissions_rejected"
+    "test_validation_boundary.ValidationBoundaryTests.test_guard_bypass_policy_activation_and_write_permissions_rejected",
+    "test_ci_performance.CiPerformanceTests.test_cache_rejects_tampered_wheels_unlisted_files_and_objects",
+    "test_ci_performance.CiPerformanceTests.test_cache_seals_only_exact_upstream_bytes_and_restores_them",
+    "test_ci_performance.CiPerformanceTests.test_native_deduplication_rejects_new_cases_and_changed_commands",
+    "test_ci_performance.CiPerformanceTests.test_scheduler_bounds_concurrency_and_serializes_reference_builds",
+    "test_ci_performance.CiPerformanceTests.test_unit_receipts_reject_stale_inputs_candidates_and_incomplete_results",
+    "test_ci_performance.CiPerformanceTests.test_workflow_cache_uploads_require_exact_path_and_immediate_clearance"
   ],
   "full_prerequisites": [
     "freecad-exact-build-smoke",

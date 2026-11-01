@@ -11,6 +11,10 @@ def validate():
     for path in sorted((ROOT / ".github/workflows").glob("*.yml")):
         document = yaml.load(path.read_text(), Loader=yaml.BaseLoader)
         assert document.get("permissions") == {"contents": "read"}, "Non-minimal default permissions"
+        assert document["concurrency"] == {
+            "group": "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}",
+            "cancel-in-progress": "${{ github.event_name == 'pull_request' }}"}, "Obsolete PR runs not cancelled safely"
+        assert document["on"]["push"]["branches"] == ["main", "release/**"], "Duplicate branch/PR workflows"
         assert set(document["on"]) <= {"push", "pull_request", "workflow_dispatch"}, "Unexpected privileged trigger"
         assert document.get("jobs"), "No workflow jobs"
         for job in document["jobs"].values():
@@ -19,7 +23,16 @@ def validate():
                 if "run" in step:
                     assert isinstance(step["run"], str), "Run must be a scalar string"
                 if "uses" in step:
-                    assert re.fullmatch(r"actions/[a-z-]+@[a-f0-9]{40}", step["uses"]), "Unpinned workflow dependency"
+                    assert re.fullmatch(r"actions/[a-z-]+(?:/(?:restore|save))?@[a-f0-9]{40}", step["uses"]), "Unpinned workflow dependency"
+            steps = job.get("steps", [])
+            for index, step in enumerate(steps):
+                if step.get("uses", "").startswith("actions/cache/"):
+                    assert step["with"]["path"] == ".local/public-download-cache", "Unsafe online cache path"
+                    assert "restore-keys" not in step["with"], "Unbounded cache fallback"
+                    assert "hashFiles(" in step["with"]["key"] and "ci/publication-policy.json" in step["with"]["key"], "Cache lock/policy identity absent"
+                    if step["uses"].startswith("actions/cache/save@"):
+                        assert "success()" in step.get("if", "") and "steps.cache-clear.outcome == 'success'" in step["if"], "Cache save lacks exact-byte clearance"
+                        assert index > 0 and steps[index-1].get("id") == "cache-clear" and "cache_downloads.py seal" in steps[index-1].get("run", ""), "Cache clearance must immediately precede upload"
     workflow = yaml.load((ROOT / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader)
     for job in workflow["jobs"].values():
         for step in job.get("steps", []):
@@ -37,6 +50,11 @@ def validate():
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
     build_steps = workflow["jobs"]["build"]["steps"]
+    assert workflow["jobs"]["build"]["needs"] == "unit", "Unit receipt lacks a current-run owner"
+    assert any('--unit-report .local/unit-owner/unit-tests.json' in step.get('run','') and '--jobs 2' in step['run'] for step in build_steps), "Bounded current-run verification absent"
+    units = workflow["jobs"]["unit"]["steps"]
+    assert any('check_security.py --report .local/unit/unit-tests.json' in step.get('run','') for step in units), "Complete unit owner absent"
+    assert any('publication_preflight.py --file .local/unit/unit-tests.json' in step.get('run','') for step in units), "Unit receipt lacks clearance"
     assert any('mcp-requirements.lock' in step.get('run','') for step in build_steps), 'MCP SDK lock absent'
     assert any('publication_preflight.py' in step.get('run','') and 'mcp.json' in step['run'] for step in build_steps), 'MCP report lacks clearance'
     assert any('mcp.json' in step.get('with',{}).get('path','') for step in build_steps if step.get('uses','').startswith('actions/upload-artifact@')), 'MCP report absent'

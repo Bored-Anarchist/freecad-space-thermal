@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "approved_identities": [
     {
       "name": "Bored-Anarchist",
@@ -59,5 +59,5 @@
   "max_archive_depth": 3,
   "max_items": 10000,
   "exceptions": [],
-  "policy": "Fail closed on uninspected binaries/media, symlinks, archive traversal, encrypted or oversized archives. Publish only separately sanitized text copies; preserve authorized originals locally. Exact identity approval required before publication."
+  "policy": "Fail closed on uninspected binaries/media, symlinks, archive traversal, encrypted or oversized archives. Publish separately sanitized text copies; preserve authorized originals locally. Exact identity approval required before publication. The dedicated public-download cache admits only byte-identical reviewed upstream distributions under tools/cache_downloads.py pin/hash/size/path/link validation before reuse and immediately before save; generated binaries, build trees, logs, model inputs and pass verdicts remain excluded. General scanner binary rejection and inspection limits are unchanged."
 }
