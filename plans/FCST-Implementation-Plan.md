@@ -169,12 +169,25 @@ Local matched Debug tests support removing unused derivative allocations
 balance parity and complete hosted acceptance before retaining it. Separately
 measure four MSVC compiler processes for Embree's largest project, leaving other
 package budgets and all source/features/installed consumers unchanged. Record
-both outcomes and runner cost before deciding what to retain. Follow the acceptance, privacy and keep/revert rules in
+both outcomes and runner cost before deciding what to retain. Additional local
+candidates cache invariant triangle-intersection geometry with explicit memory
+accounting, defer checkpoint hashing until synchronous return of the retained
+committed snapshot, and enable two-compiler native builds. Require exact hit/output
+comparisons, near-parallel and partial-failure restart/tamper regressions, unchanged
+memory/physics criteria and full hosted acceptance before retaining these changes. Follow the acceptance, privacy and keep/revert rules in
 [the ongoing experiment record](../docs/ci-performance.md#resumed-experiments-and-next-work).
 Radiation native-case and ensemble build/trace scalar timings extend the existing
 public evidence for future diagnosis; raw outputs and account diagnostics remain
 local. TST-021 continues to clear exact
 sanitized sources, scalar evidence and outgoing history before publication.
+
+**Resumed passing checkpoint.** [Run 41356914583](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41356914583),
+commit `f44ab6b`, passed every required check in 8m 58s (warm); Debug 351.812s,
+Release 254.500s. Embree's build shortened from 573.719s to 321.860s with four
+compiler processes. Aggregate job duration dropped from 2,690s to 2,331s between
+the identified three-worker runs. Keep the measured allocation/compiler changes;
+next validate the geometry-cache, final checkpoint hashing and native compilation
+candidates, then remeasure the moving OCCT/Debug critical path.
 
 The planned GitHub workflow deliverables are:
 

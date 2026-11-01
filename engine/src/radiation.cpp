@@ -53,6 +53,7 @@ double emission(double t) {
 struct Mesh::Impl {
   struct Box { Vec3 lo,hi; };
   struct BuildFacet { Box bounds; Vec3 centroid; };
+  struct TraceFacet { Vec3 edge1,edge2; double determinant_limit; };
   struct Tree { Box box; std::size_t begin,end,left=0,right=0; };
   std::vector<Facet> facets;
   std::vector<Patch> patches;
@@ -60,6 +61,7 @@ struct Mesh::Impl {
   std::vector<std::vector<std::pair<std::size_t,double>>> members;
   std::vector<std::size_t> order;
   std::vector<Tree> tree;
+  std::vector<TraceFacet> tracing;
   static Box box(const Facet& f) {
     Box b{f.vertices[0],f.vertices[0]};
     for (const auto& v:f.vertices) for (int k=0;k<3;++k) { b.lo[k]=std::min(b.lo[k],v[k]); b.hi[k]=std::max(b.hi[k],v[k]); }
@@ -139,9 +141,12 @@ Mesh::Mesh(std::vector<Facet> facets,std::vector<std::string> excluded) {
   // Bounds and centroid arithmetic are invariant across every partition level.
   // This scratch data is released after construction, not retained in mesh storage.
   std::vector<Impl::BuildFacet> geometry; geometry.reserve(p->facets.size());
+  p->tracing.reserve(p->facets.size());
   for (const auto& f:p->facets) {
     Vec3 centroid{}; for (int k=0;k<3;++k) centroid[k]=(f.vertices[0][k]+f.vertices[1][k]+f.vertices[2][k])/3;
     geometry.push_back({Impl::box(f),centroid});
+    auto edge1=sub(f.vertices[1],f.vertices[0]),edge2=sub(f.vertices[2],f.vertices[0]);
+    p->tracing.push_back({edge1,edge2,1e-14*norm(edge1)*norm(edge2)});
   }
   p->tree.reserve(p->facets.size()/2+1); p->build(0,p->facets.size(),geometry); impl_=p;
 }
@@ -153,7 +158,8 @@ std::optional<std::size_t> Mesh::patch(std::size_t i,bool back) const {
 }
 std::size_t Mesh::storage_bytes() const {
   std::size_t size=sizeof(Impl)+impl_->facets.capacity()*sizeof(Facet)+impl_->tree.capacity()*sizeof(Impl::Tree)+
-    impl_->order.capacity()*sizeof(std::size_t)+impl_->mapping.capacity()*sizeof(impl_->mapping[0]);
+    impl_->order.capacity()*sizeof(std::size_t)+impl_->mapping.capacity()*sizeof(impl_->mapping[0])+
+    impl_->tracing.capacity()*sizeof(Impl::TraceFacet);
   auto metadata_bytes=[](const Optics& o) { const auto& d=o.dataset;return d.solar_band.capacity()+d.infrared_band.capacity()+d.condition.capacity()+d.provenance.capacity(); };
   for (const auto& f:impl_->facets) size+=f.id.capacity()+f.surface_id.capacity()+f.group.capacity()+metadata_bytes(f.front)+metadata_bytes(f.back);
   size+=impl_->patches.capacity()*sizeof(Patch)+impl_->members.capacity()*sizeof(impl_->members[0]);
@@ -177,9 +183,10 @@ std::optional<Hit> Mesh::intersect(const Ray& r,std::optional<std::size_t> ignor
     }
     for (auto j=tree.begin;j<tree.end;++j) {
       auto i=impl_->order[j]; if (ignore && i==*ignore) continue;
-      const auto& f=facets()[i]; auto e1=sub(f.vertices[1],f.vertices[0]),e2=sub(f.vertices[2],f.vertices[0]);
+      const auto& f=facets()[i]; const auto& geometry=impl_->tracing[i];
+      const auto& e1=geometry.edge1; const auto& e2=geometry.edge2;
       auto h=cross(r.direction,e2); double det=dot(e1,h);
-      if (std::abs(det)<=1e-14*norm(e1)*norm(e2)) continue;
+      if (std::abs(det)<=geometry.determinant_limit) continue;
       auto s=sub(r.origin,f.vertices[0]); double u=dot(s,h)/det;
       auto q=cross(s,e1); double v=dot(r.direction,q)/det;
       if (u<0 || v<0 || u+v>1) continue;

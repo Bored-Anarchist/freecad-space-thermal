@@ -35,7 +35,7 @@ if(BUILD_TESTING)
 endif()
 foreach(target ${FCST_TARGETS})
   if(MSVC)
-    target_compile_options(${target} PRIVATE /W4 /WX /permissive- /fp:strict /experimental:deterministic
+    target_compile_options(${target} PRIVATE /MP2 /W4 /WX /permissive- /fp:strict /experimental:deterministic
       "/pathmap:${CMAKE_SOURCE_DIR}=src" "/pathmap:${CMAKE_BINARY_DIR}=build")
   else()
     target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror

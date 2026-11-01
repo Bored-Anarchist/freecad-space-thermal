@@ -219,6 +219,21 @@ int main(int argc,char** argv) {
     require(p.assembly_seconds>0 && p.linear_seconds>0 && p.total_seconds>=p.linear_seconds+p.assembly_seconds);
     const auto& c=r.backend;require(c.execution_mode=="fcst_native" && !c.external_reference && !c.durable_job_solver && c.index_one_dae && c.stiff && c.checkpoint && !c.compiler.empty());
   } else if(name=="limits") {
+    // Numerical/resource failures must still expose the last committed, sealed
+    // checkpoint, and it must resume to the same final checkpoint as a full run.
+    auto short_o=options(.01);short_o.initial_step=.001;short_o.maximum_step=.001;short_o.absolute_temperature_tolerance=.001;
+    auto short_a=assembly(root,"single");auto complete=solve_transient(short_a,short_o);success(complete);
+    for(bool result_limit:{false,true}) {
+      auto limited=short_o;
+      if(result_limit)limited.maximum_result_values=100;else limited.maximum_attempts=2;
+      auto partial=solve_transient(short_a,limited);
+      require(!partial.valid && partial.reason==(result_limit?"result_limit":"attempt_limit") && partial.checkpoint);
+      require(partial.checkpoint->accepted_steps>0 && partial.checkpoint->time>0 && partial.checkpoint->time<short_o.end);
+      auto resumed=solve_transient(short_a,short_o,partial.checkpoint);success(resumed);
+      require(resumed.checkpoint->checksum==complete.checkpoint->checksum);
+      auto changed=*partial.checkpoint;changed.temperature[0]+=.001;
+      rejects([&]{solve_transient(short_a,short_o,changed);},"checkpoint");
+    }
     auto a=assembly(root,"single");auto o=options();o.maximum_attempts=1;auto r=solve_transient(a,o);require(!r.valid && r.reason=="attempt_limit" && r.checkpoint);
     o=options();o.minimum_step=.1;r=solve_transient(a,o);require(!r.valid && r.reason=="step_underflow");
     o=options();o.maximum_result_values=1;r=solve_transient(a,o);require(!r.valid && r.reason=="result_limit");

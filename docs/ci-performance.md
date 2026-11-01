@@ -133,6 +133,8 @@ are recorded so a cold/warm comparison cannot silently become a causal claim.
 | Allocation-free BVH traversal stack | Local three-refinement diagnostic pairs | Trace time 1.83s to 1.13s at 99,856 facets and 1.97s to 1.35s at one million facets; all non-timing results matched. |
 | Four-worker Ninja package build | Complete local pinned Embree build/install/consumer | Passed in 600s; no established gain over the hosted baseline. Incremental migration also exposed compiler-cache handling costs. Reverted the migration and retained package-phase timing instrumentation for future diagnosis. |
 | Optimized BVH, timing-prioritized scheduling and continuous comparisons | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41350452498), commit `ac3003d` | Full CI 12m 45s; Debug driver 9m 53s; Release driver 4m 14s; Debug radiation 5m 13s. All required checks passed, with 391 records per configuration. The prior run was cold, so total runtime differences include cache effects. |
+| Three Debug acceptance workers | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41355909563), commit `35cdeb5` | Full CI 11m 02s; Debug driver 407.015s versus the warm reference's 578.078s (29.6% shorter). Embree became the critical path. Aggregate job duration 2,690s. |
+| Thermal residual allocation removal and four-compiler Embree | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41356914583), commit `f44ab6b` | Full CI 8m 58s; Debug driver 351.812s; Release 254.500s. Embree build 321.860s versus 573.719s in the prior run; all package consumers passed. Aggregate job duration 2,331s, 13.3% less than the prior run. OCCT and the Debug tail now dominate. |
 
 The BVH change sorts indices rather than large optical facet records, detects
 duplicate IDs in canonical order, and computes bounds/centroids once per facet.
@@ -154,8 +156,9 @@ workload and case retention. The original cold run remains recorded above.
 
 The first resumed experiment sets Debug to three acceptance workers and leaves
 Release at two. Debug passed in 407.015s versus 578.078s (29.6% shorter), retaining
-all 391 records; the complete aggregate is still awaiting the independent package
-probe. Stage durations stayed comparable while long stages overlapped.
+all 391 records. [The complete run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41355909563)
+passed in 11m 02s, with Embree now limiting the critical path. Stage durations
+stayed comparable while long stages overlapped.
 The full qualification tier remains serial. Before retaining it, compare complete
 warm hosted runs, correctness, contention and runner cost against the identified
 two-worker reference.
@@ -168,14 +171,35 @@ balance parity is checked for all three storage modes. Integration tolerances,
 step/event algorithms, callback invocation order, energy checks and Debug runtime
 checking remain unchanged. A separate complete heater-output pair matched every sample, event, all 26,688
 step records, energy budgets and checkpoint bytes exactly, with identical solver
-evaluation counters. Hosted acceptance is still required.
+evaluation counters. The complete hosted run passed as recorded in the ledger.
 
 Embree's warm build phase alone took 579.797s in the reference. Its largest
 MSBuild project is capped at two compiler processes. Test a four-compiler budget
 for Embree with the same full source/options/generator and installed consumer;
 leave other packages at two. This avoids repeating the neutral Ninja migration.
-Retain the change only after reviewing full hosted timing, memory/failure behavior
-and total runner cost. Never infer a gain from an incremental local rebuild.
+The full hosted run passed and its substantial build-time/runner-time reduction
+supports retaining four Embree compiler workers. Package peak-memory telemetry is
+not yet collected; record it before increasing budgets further. Never infer a gain
+from an incremental local rebuild.
+
+Further measured local candidates are ready for complete hosted verification:
+
+- Cache invariant triangle edge vectors and the exact scale-relative determinant
+  cutoff used by intersection. Paired Debug traces at 65,536 samples shortened
+  from 0.462/3.248/2.883s to 0.379/2.313/1.895s for plates/cube/spheres, with all
+  non-timing hit rows identical. The cache adds 56 bytes per facet plus fixed
+  container overhead, explicitly included in `storage_bytes`; the unchanged
+  2,048-byte-per-facet limit and peak-working-set evidence still apply. Preserve
+  near-parallel rejection and nearest/ignore/tie behavior.
+- Keep each last-committed checkpoint snapshot but serialize/hash it once before
+  synchronous return. Both successful and partial-failure results retain sealed,
+  resumable checkpoints. The heater acceptance shortened from 27.31s to 23.58s
+  after the allocation change. Resource-failure restart/tamper regressions cover
+  checkpoints returned after accepted steps; existing energy/event failures remain.
+- Compile native MSVC targets with two compiler processes per project alongside
+  the existing two-project limit. A matched clean Debug core build shortened from
+  15.15s to 9.10s. Strict floating point, assertions and Debug runtime checks remain.
+  Judge the full clean hosted build, rather than incremental build time.
 
 1. **Test three Debug workers on the same hosted runner.** Use the passing warm
    run above as the reference and compare against two workers with equivalent

@@ -54,6 +54,9 @@ int main(int argc,char** argv) {
       h=mesh.intersect({{.25,.4,.5},{0,0,-1}});require(h && !h->back);near(h->distance,.5);
       require(!mesh.intersect({{2,.5,.5},{0,0,1}}));require(!mesh.intersect({{.5,.5,-1},{1,0,0}}));
       auto edge=mesh.intersect({{.5,.5,-1},{0,0,1}});require(edge.has_value());near(edge->distance,1);
+      // Preserve the scale-relative near-parallel cutoff as cached geometry is used.
+      require(!mesh.intersect({{.25,.4,-1e-16},{1,0,1e-15}}));
+      auto grazing=mesh.intersect({{.25,.4,-1e-15},{1,0,1e-13}});require(grazing.has_value());near(grazing->distance,.01);
       rejects([&]{mesh.intersect({{0,0,0},{0,0,0}});});rejects([&]{mesh.intersect({{0,0,0},{0,0,2}});});
       Mesh dense(plates(20));for(int i=1;i<20;++i) { auto hit=dense.intersect({{static_cast<double>(i)/20+.001,.373,-1},{0,0,1}});require(hit.has_value());near(hit->distance,1); }
     } else if(name=="bvh-equivalence") {
