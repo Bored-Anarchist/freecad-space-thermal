@@ -2,10 +2,25 @@
 """Reject missing, substituted or stale foundation profile evidence."""
 import hashlib
 import json
+import math
 import re
 
 HOST_CASES = {"create_geometry", "save_reopen", "edit_undo", "application_imports"}
 BUILD_STAGES = {"source_hash", "license_hash", "configure", "build", "install", "installed_consumer"}
+RESOURCE_STAGES = {"configure", "build", "install", "consumer-configure", "consumer-build", "consumer-run"}
+
+
+def valid_resource_usage(usage):
+    fields = {"cpu_seconds", "peak_process_commit_bytes", "peak_job_commit_bytes", "total_processes"}
+    return not (not isinstance(usage, dict) or set(usage) != fields
+                or type(usage["cpu_seconds"]) not in (int, float)
+                or not math.isfinite(usage["cpu_seconds"]) or usage["cpu_seconds"] < 0
+                or any(type(usage[key]) is not int or usage[key] <= 0 for key in fields - {"cpu_seconds"})
+                or usage["peak_job_commit_bytes"] < usage["peak_process_commit_bytes"])
+
+
+def valid_resources(stages):
+    return isinstance(stages, dict) and set(stages) == RESOURCE_STAGES and all(valid_resource_usage(usage) for usage in stages.values())
 
 
 def file_hash(path):
@@ -41,6 +56,8 @@ def assess_dependencies(report, sources, system, selected=None):
                 return False
         elif (row.get("status") != "passed" or set(row.get("stages", [])) != BUILD_STAGES
               or len(row.get("stages", [])) != len(BUILD_STAGES) or row.get("installed_bytes", 0) <= 0):
+            return False
+        elif "stage_resources" in row and not valid_resources(row["stage_resources"]):
             return False
     return True
 

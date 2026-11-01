@@ -7,8 +7,8 @@ import sys
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
-from fcst_tools.ci_performance import compare, change, workload_hash
-from fcst_tools.profiles import assess_dependencies
+from fcst_tools.ci_performance import compare, change, seconds, workload_hash
+from fcst_tools.profiles import assess_dependencies, RESOURCE_STAGES, valid_resources
 from profile_support import revision
 from verify import STEPS
 
@@ -27,6 +27,8 @@ def summarize(directory, baseline, candidate):
     presets = {}
     for path in reports:
         report = json.loads(path.read_bytes())
+        if report.get("execution", {}).get("resource_profile") != "windows-job-v1":
+            raise ValueError("ci_performance_resource_profile")
         if report["preset"] in presets:
             raise ValueError("ci_performance_duplicate_configuration")
         presets[report["preset"]] = compare(report, baseline, candidate, expected, STEPS)
@@ -43,7 +45,20 @@ def summarize(directory, baseline, candidate):
                 or record["source_sha256"] != baseline["packages"][name]["source_sha256"]
                 or not assess_dependencies(report, sources, "Windows", name)):
             raise ValueError("ci_performance_package_coverage")
-        packages[name] = change(baseline["packages"][name]["seconds"], record["seconds"])
+        if (record.get("generator") != "visual-studio-2022"
+                or type(record.get("build_jobs")) is not int or not 1 <= record["build_jobs"] <= 16
+                or type(record.get("compiler_jobs")) is not int or not 1 <= record["compiler_jobs"] <= 4
+                or not valid_resources(record.get("stage_resources"))
+                or not isinstance(record.get("stage_seconds"), dict) or set(record["stage_seconds"]) != RESOURCE_STAGES):
+            raise ValueError("ci_performance_package_execution")
+        logical_cpus = record.get("toolchain", {}).get("logical_cpus")
+        if logical_cpus is not None and (type(logical_cpus) is not int or not 1 <= logical_cpus <= 1024):
+            raise ValueError("ci_performance_package_cpus")
+        packages[name] = dict(change(baseline["packages"][name]["seconds"], record["seconds"]),
+                              logical_cpus=logical_cpus,
+                              generator=record["generator"], build_jobs=record["build_jobs"], compiler_jobs=record["compiler_jobs"],
+                              stage_seconds={stage: seconds(record["stage_seconds"][stage]) for stage in sorted(RESOURCE_STAGES)},
+                              stage_resources=record["stage_resources"])
     if set(packages) != set(baseline["packages"]):
         raise ValueError("ci_performance_missing_package")
     return dict(schema_version=1, candidate=candidate, baseline_candidate=baseline["candidate"],

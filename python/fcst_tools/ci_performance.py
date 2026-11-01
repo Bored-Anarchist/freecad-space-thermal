@@ -4,6 +4,7 @@ import hashlib
 import json
 import math
 from .gate import evaluate
+from .profiles import valid_resource_usage
 
 
 def workload_hash(root):
@@ -46,8 +47,18 @@ def compare(report, baseline, candidate, expected, stages):
     cache_state = report["execution"].get("cache_state", "unknown")
     if cache_state not in ("cold", "warm", "unknown"):
         raise ValueError("ci_performance_cache_state")
+    resources = {c["id"]: c["resources"] for c in report["cases"] if c["id"] in stages and "resources" in c}
+    if any(not valid_resource_usage(usage) for usage in resources.values()):
+        raise ValueError("ci_performance_stage_resources")
+    resource_profile = report["execution"].get("resource_profile")
+    if resource_profile is not None and (resource_profile != "windows-job-v1" or set(resources) != set(stages) - {"engine-only"}):
+        raise ValueError("ci_performance_resource_coverage")
+    logical_cpus = report["execution"].get("logical_cpus")
+    if logical_cpus is not None and (type(logical_cpus) is not int or not 1 <= logical_cpus <= 1024):
+        raise ValueError("ci_performance_logical_cpus")
     return dict(driver=change(old["driver_seconds"], elapsed),
                 stages={name: change(old["stage_seconds"].get(name, 0), timing[name]) for name in stages},
                 required_cases=len(expected), jobs=report["execution"]["jobs"],
+                logical_cpus=logical_cpus, stage_resources=resources,
                 cache_state=cache_state, baseline_cache_state=baseline.get("cache_state", "unknown"),
                 longest_stage=max(stages, key=timing.get))

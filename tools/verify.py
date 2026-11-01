@@ -18,14 +18,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "python"))
 from fcst_tools.gate import evaluate
 from fcst_tools.verification import check_unit_report, check_native_inventory, schedule, unit_inputs, prioritize
+from process_metrics import run_tracked
 
 STEPS = ["planning", "specification", "inventory", "workflow-lint", "contract-generation", "python-package", "python-imports", "configure", "build", "ctest", "install", "engine-only", "contract-conformance", "thermal-preparation", "thermal-reference-comparison", "radiation-acceptance", "numerical-checkpoint", "persistence-conformance", "spatial-foundation", "job-lifecycle", "exchange-conformance", "td-exchange", "esatan-exchange", "host-acceptance", "mcp-acceptance"]
 
 
-def command(args, log, env=None):
+def command(args, log, env=None, resources=None):
     with log.open("wb") as output:
-        result = subprocess.run(args, cwd=ROOT, stdout=output, stderr=subprocess.STDOUT,
-                                env=env, timeout=1800 if "tools/check_radiation.py" in args else 1200 if "tools/check_mcp.py" in args else 600)
+        timeout = 1800 if "tools/check_radiation.py" in args else 1200 if "tools/check_mcp.py" in args else 600
+        result = run_tracked(args, ROOT, output, env, timeout, resources if resources is not None else {})
     return result.returncode == 0
 
 
@@ -134,6 +135,7 @@ def main():
     }
     def execute(case_id):
         start = time.monotonic()
+        resources = {}
         try:
             stage_temp = temporary / case_id
             stage_temp.mkdir(exist_ok=True)
@@ -158,9 +160,9 @@ def main():
                         and rejected.returncode == 2 and json.loads(rejected.stderr)["code"] == "not_implemented")
                 (output / "build-info.json").write_text(json.dumps(data, indent=2) + "\n")
             else:
-                okay = command(actions[case_id], output / (case_id + ".log"), env=stage_env)
+                okay = command(actions[case_id], output / (case_id + ".log"), env=stage_env, resources=resources)
             return dict(status="passed" if okay else "failed", seconds=round(time.monotonic() - start, 3),
-                        started_seconds=round(start-started, 3))
+                        started_seconds=round(start-started, 3), **({"resources": resources} if resources else {}))
         except (OSError, ValueError, subprocess.SubprocessError, KeyError, TypeError):
             return dict(status="failed", reason="execution_unavailable", seconds=round(time.monotonic() - start, 3),
                         started_seconds=round(start-started, 3))
@@ -208,6 +210,8 @@ def main():
               "candidate": revision, "preset": args.preset, "tier": args.tier,
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
               "execution": {"jobs": jobs, "seconds": round(time.monotonic() - started, 3),
+                            "resource_profile": "windows-job-v1",
+                            "logical_cpus": os.cpu_count(),
                             "unit_seconds": unit_seconds, "unit_source": "current-run-receipt" if args.unit_report else "local",
                             "cache_state": os.environ.get("FCST_DOWNLOAD_CACHE_STATE", "unknown")
                                 if os.environ.get("FCST_DOWNLOAD_CACHE_STATE", "unknown") in ("cold", "warm", "unknown") else "unknown"},

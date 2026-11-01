@@ -104,14 +104,17 @@ def source_tree(item, work):
     return source
 
 
-def cmake_probe(item, source, work, cmake, ctest, jobs, *, compiler_jobs=2, timings=None):
+def cmake_probe(item, source, work, cmake, ctest, jobs, *, compiler_jobs=2, timings=None, resources=None):
     name = item["id"]
     build, install = work / "build", work / "install"
     def measured(command, directory, log, env=None):
         start = time.monotonic()
-        run(command, directory, log, env=env)
+        usage = {} if resources is not None else None
+        run(command, directory, log, env=env, resources=usage)
         if timings is not None:
             timings[Path(log).stem] = round(time.monotonic()-start, 3)
+        if resources is not None:
+            resources[Path(log).stem] = usage
     generator = ["-G", "Visual Studio 17 2022", "-A", "x64"] if os.name == "nt" else ["-G", "Ninja"]
     common = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX=" + str(install),
               "-DCMAKE_C_FLAGS=-ffp-contract=off", "-DCMAKE_CXX_FLAGS=-ffp-contract=off"] if os.name != "nt" else [
@@ -166,6 +169,8 @@ def prepare_blas(work):
 
 def toolchain(work):
     values = {"system": platform.system(), "architecture": platform.machine(), "threads": 1}
+    if os.cpu_count() is not None:
+        values["logical_cpus"] = os.cpu_count()
     for name in ("ImageOS", "ImageVersion"):
         value = os.environ.get(name, "")
         if value and re.fullmatch(r"[A-Za-z0-9_.-]{1,80}", value):
@@ -214,7 +219,7 @@ def main():
         record = {"id": item["id"], "version": item["version"], "source_sha256": item["sha256"],
                   "license_sha256": item["license_sha256"], "adopted": False,
                   "generator": "visual-studio-2022", "build_jobs": args.jobs,
-                  "compiler_jobs": args.compiler_jobs, "stage_seconds": {}}
+                  "compiler_jobs": args.compiler_jobs, "stage_seconds": {}, "stage_resources": {}}
         start = time.monotonic()
         if item["id"] == "petsc" and os.name == "nt":
             record.update(status="unsupported", reason_code="petsc_native_msvc_unsupported",
@@ -224,7 +229,7 @@ def main():
                 if item["id"] == "petsc" and args.prepare_system:
                     prepare_blas(work)
                 source = source_tree(item, work)
-                install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs, compiler_jobs=args.compiler_jobs, timings=record["stage_seconds"])
+                install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs, compiler_jobs=args.compiler_jobs, timings=record["stage_seconds"], resources=record["stage_resources"])
                 record.update(status="passed", stages=["source_hash", "license_hash", "configure", "build", "install", "installed_consumer"],
                               installed_bytes=sum(p.stat().st_size for p in install.rglob("*") if p.is_file()),
                               toolchain=toolchain(work), build_options=OPTIONS.get(item["id"], ["serial", "shared", "system_blas_lapack"]))

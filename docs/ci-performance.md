@@ -135,6 +135,7 @@ are recorded so a cold/warm comparison cannot silently become a causal claim.
 | Optimized BVH, timing-prioritized scheduling and continuous comparisons | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41350452498), commit `ac3003d` | Full CI 12m 45s; Debug driver 9m 53s; Release driver 4m 14s; Debug radiation 5m 13s. All required checks passed, with 391 records per configuration. The prior run was cold, so total runtime differences include cache effects. |
 | Three Debug acceptance workers | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41355909563), commit `35cdeb5` | Full CI 11m 02s; Debug driver 407.015s versus the warm reference's 578.078s (29.6% shorter). Embree became the critical path. Aggregate job duration 2,690s. |
 | Thermal residual allocation removal and four-compiler Embree | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41356914583), commit `f44ab6b` | Full CI 8m 58s; Debug driver 351.812s; Release 254.500s. Embree build 321.860s versus 573.719s in the prior run; all package consumers passed. Aggregate job duration 2,331s, 13.3% less than the prior run. OCCT and the Debug tail now dominate. |
+| Invariant ray cache, final checkpoint hashing and native compiler parallelism | [Passing warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41357834232), commit `7072a4d` | Full CI 11m 03s; Debug 413.781s; Release 203.625s; all 391 records per configuration passed. Embree's unchanged four-compiler build took 566.484s, while OCCT's unchanged two-compiler build took 228.062s. Aggregate job duration 2,420s. Retain this slower sample; resource telemetry and repetitions are needed before causal hosted-time claims. |
 
 The BVH change sorts indices rather than large optical facet records, detects
 duplicate IDs in canonical order, and computes bounds/centroids once per facet.
@@ -182,7 +183,9 @@ supports retaining four Embree compiler workers. Package peak-memory telemetry i
 not yet collected; record it before increasing budgets further. Never infer a gain
 from an incremental local rebuild.
 
-Further measured local candidates are ready for complete hosted verification:
+The geometry/checkpoint/native-build candidates passed complete hosted verification
+as recorded above. Local controlled pairs support their execution-time changes;
+the slower aggregate sample is retained rather than discarded:
 
 - Cache invariant triangle edge vectors and the exact scale-relative determinant
   cutoff used by intersection. Paired Debug traces at 65,536 samples shortened
@@ -201,23 +204,49 @@ Further measured local candidates are ready for complete hosted verification:
   15.15s to 9.10s. Strict floating point, assertions and Debug runtime checks remain.
   Judge the full clean hosted build, rather than incremental build time.
 
-1. **Test three Debug workers on the same hosted runner.** Use the passing warm
-   run above as the reference and compare against two workers with equivalent
-   cache, workload and toolchain conditions. Preserve all required cases and
-   frozen samples/scaling repetitions. Check memory, CPU contention, deadlines,
-   runner minutes and the end-to-end critical path, not just one stage. Retain
-   three workers only if the complete unattended run shows a material gain
-   without instability; otherwise retain two. Release remains at two and frozen
-   qualification remains serial during the experiment.
-2. **Profile the remaining Debug thermal cost.** Use per-case durations in
-   `thermal.json`, especially checkpoint and heater acceptance, to locate actual
-   solver/serialization overhead. Optimize implementation work while retaining
-   the same integration, restart, energy and event acceptance criteria.
-3. **Investigate dependency compilation once it limits the critical path.**
-   Embree still took about nine minutes in the passing run. Use the new package
-   phase timings and the recorded neutral Ninja result. Do not repeat a generator
-   migration without a specific hypothesis, weaken package coverage, or upload
-   generated binaries/build trees under the current download-cache policy.
+1. **Measure the next worker budget against the current three-worker result.**
+   Keep Release at two and full qualification serial. Compare four versus three
+   Debug workers only with equivalent warm workloads and toolchains. Preserve all
+   cases, samples, scaling repetitions and deadlines. Retain four only after a
+   complete unattended run reduces the critical path without instability or a
+   material compute/memory penalty; otherwise retain three.
+2. **Measure OCCT compilation using resource evidence.** Its pinned package took
+   426.203s in the latest passing run. Collect the two-compiler baseline's CPU and
+   peak committed memory before testing four per project. Keep the same full
+   source/features, two MSBuild projects, install and independent consumer. Check
+   the aggregate critical path and runner cost; do not retain a neutral change.
+3. **Profile the new Debug thermal/radiation balance.** Inspect per-case and
+   ensemble timings after the geometry/checkpoint changes. Prefer removing
+   repeated invariant work before adding complexity. Keep exact-output tests,
+   energy/event/restart criteria, memory limits and strict Debug behavior.
+4. **Refresh the warm baseline deliberately after the final passing run.** Retain
+   prior cold/warm evidence and identify the run/candidate/workload and worker
+   budgets. Repeat borderline measurements; never choose the fastest seed or
+   automatically raise a baseline to conceal a regression.
+
+Verification command stages, package phases and the aggregate `ci-performance.json`
+now add CPU seconds, peak per-process and aggregate job
+committed-memory bytes, and total process count. These are kernel-maintained job
+counters, including already exited descendants; they are not sampled process
+lists. See Microsoft's [job accounting](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-jobobject_basic_accounting_information)
+and [memory counters](https://learn.microsoft.com/en-us/windows/win32/api/winnt/ns-winnt-jobobject_extended_limit_information).
+Committed memory differs from the radiation subject's peak working set; do not
+present either as reference-hardware qualification or conflate them. CPU seconds
+divided by phase wall time indicates average CPU parallelism, not elapsed time.
+
+Each phase runs in a fresh Windows job, assigned before resuming the tool so its
+children cannot escape accounting. No CPU/memory/process-count limit is added.
+Closing the job terminates its remaining descendants, including timeout cleanup;
+command outcomes and every installed consumer still determine acceptance.
+Regression tests prove exited-child accounting, nested worker containment, owned-tree timeout cleanup, and
+numeric-only allowlists. The aggregate requires all six valid phase records,
+reviewed generator and bounded project/compiler counts. Missing metadata, private
+identity fields, nonfinite or impossible values fail the summary. Earlier baseline
+scalar totals remain compatible.
+Only fixed stage/phase names, numeric totals and logical CPU counts enter these
+new public fields. The small direct engine-identity probe keeps its existing
+bounded evidence. Process
+identities, executable/command paths, environment and raw logs remain local.
 
 Radiation reports now retain native-case and ensemble build/trace scalar timings
 to locate the next dominant cost without repeating the fixed campaign just to

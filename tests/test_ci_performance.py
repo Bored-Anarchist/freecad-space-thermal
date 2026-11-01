@@ -8,6 +8,7 @@ from pathlib import Path
 import sys
 import tempfile
 import threading
+import subprocess
 import unittest
 from unittest.mock import patch
 
@@ -19,14 +20,60 @@ from fcst_tools.ci_performance import compare, workload_hash
 import cache_downloads
 import check_workflows
 import summarize_ci_performance
+from profile_support import run
 
 SCRATCH = ROOT / ".local/test-scratch"
 SCRATCH.mkdir(parents=True, exist_ok=True)
 
 
 class CiPerformanceTests(unittest.TestCase):
+    def test_build_accounting_includes_exited_descendants_and_only_scalar_metrics(self):
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
+            resources = {"stale": "must be removed"}
+            child = "memory=bytearray(50_000_000);sum(range(1_000_000))"
+            parent = ("import subprocess,sys;sys.path.insert(0," + repr(str(ROOT / "python")) + ");"
+                      "from fcst_app.process_limits import WorkerLimits;"
+                      "p=subprocess.Popen([sys.executable,'-c'," + repr(child) + "],creationflags=4);"
+                      "limits=WorkerLimits(p,128);code=p.wait();limits.close();sys.exit(code)")
+            run([sys.executable, "-c", parent], ROOT, Path(directory) / "raw.log", timeout=15, resources=resources)
+            self.assertEqual(set(resources), {"cpu_seconds", "peak_process_commit_bytes", "peak_job_commit_bytes", "total_processes"})
+            self.assertGreater(resources["cpu_seconds"], 0)
+            self.assertGreaterEqual(resources["peak_process_commit_bytes"], 50_000_000)
+            self.assertGreaterEqual(resources["peak_job_commit_bytes"], resources["peak_process_commit_bytes"])
+            self.assertGreaterEqual(resources["total_processes"], 2)
+            self.assertTrue(all(type(value) in (int, float) for value in resources.values()))
+            from fcst_tools.profiles import RESOURCE_STAGES, valid_resources
+            stages = {stage: dict(resources) for stage in RESOURCE_STAGES}
+            self.assertTrue(valid_resources(stages))
+            stages["build"]["process_id"] = 1
+            self.assertFalse(valid_resources(stages))
+
+    def test_build_accounting_timeout_terminates_owned_descendants(self):
+        import ctypes
+        from ctypes import wintypes
+        with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
+            pid_file = Path(directory) / "owned-child.txt"
+            child = "import os,time;from pathlib import Path;Path(" + repr(str(pid_file)) + ").write_text(str(os.getpid()));time.sleep(60)"
+            parent = "import subprocess,sys,time;subprocess.Popen([sys.executable,'-c'," + repr(child) + "]);time.sleep(60)"
+            resources = {"stale": 1}
+            with self.assertRaises(subprocess.TimeoutExpired):
+                run([sys.executable, "-c", parent], ROOT, Path(directory) / "raw.log", timeout=2, resources=resources)
+            self.assertEqual(resources, {})
+            self.assertTrue(pid_file.is_file())
+            api = ctypes.WinDLL("kernel32", use_last_error=True)
+            api.OpenProcess.argtypes = [wintypes.DWORD, wintypes.BOOL, wintypes.DWORD]
+            api.OpenProcess.restype = wintypes.HANDLE
+            api.WaitForSingleObject.argtypes = [wintypes.HANDLE, wintypes.DWORD]
+            api.CloseHandle.argtypes = [wintypes.HANDLE]
+            handle = api.OpenProcess(0x100000, False, int(pid_file.read_text()))
+            if handle:
+                try:
+                    self.assertEqual(api.WaitForSingleObject(handle, 1000), 0)
+                finally:
+                    api.CloseHandle(handle)
+
     def test_summary_requires_both_configurations_and_each_current_package(self):
-        from fcst_tools.profiles import BUILD_STAGES
+        from fcst_tools.profiles import BUILD_STAGES, RESOURCE_STAGES
         with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
             root = Path(directory); reports = root / "reports"; reports.mkdir()
             names = ("ci/radiation-acceptance-v1.json", "ci/numerical-criteria-v1.json", "ci/probe-sources.json",
@@ -40,18 +87,47 @@ class CiPerformanceTests(unittest.TestCase):
             for preset in ("windows-debug", "windows-release"):
                 baseline["presets"][preset] = dict(driver_seconds=100, stage_seconds={s: 5 for s in summarize_ci_performance.STEPS})
                 records = [dict(id=name, status="passed", **({"seconds": 1} if name != "synthetic.unit" else {})) for name in expected]
-                report = dict(candidate="a"*40, preset=preset, cases=records, gate=evaluate(expected, records), execution=dict(jobs=2, seconds=50))
+                for record in records:
+                    if record["id"] not in ("synthetic.unit", "engine-only"):
+                        record["resources"] = dict(cpu_seconds=1, peak_process_commit_bytes=1000, peak_job_commit_bytes=2000, total_processes=2)
+                report = dict(candidate="a"*40, preset=preset, cases=records, gate=evaluate(expected, records), execution=dict(jobs=2, seconds=50, logical_cpus=4, resource_profile="windows-job-v1"))
                 path = reports / preset / "verification.json"; path.parent.mkdir(); path.write_text(json.dumps(report), encoding="utf-8")
             sources = json.loads((root / names[2]).read_bytes())["sources"]
             for source in sources:
                 if source["id"] == "petsc": continue
                 name = source["id"]; baseline["packages"][name] = dict(seconds=100, source_sha256=source["sha256"])
                 record = dict(id=name, version=source["version"], source_sha256=source["sha256"], license_sha256=source["license_sha256"],
-                              adopted=False, status="passed", stages=sorted(BUILD_STAGES), installed_bytes=100, seconds=50)
+                              adopted=False, status="passed", stages=sorted(BUILD_STAGES), installed_bytes=100, seconds=50,
+                              generator="visual-studio-2022", build_jobs=2, compiler_jobs=2,
+                              stage_seconds={stage: 5 for stage in RESOURCE_STAGES}, stage_resources={stage:
+                              dict(cpu_seconds=2, peak_process_commit_bytes=1000, peak_job_commit_bytes=2000, total_processes=2)
+                              for stage in RESOURCE_STAGES})
                 (reports / ("dependency-builds-"+name+".json")).write_text(json.dumps(dict(platform="Windows", candidate="a"*40, candidates=[record])), encoding="utf-8")
             with patch.object(summarize_ci_performance, "ROOT", root):
                 result = summarize_ci_performance.summarize(reports, baseline, "a"*40)
                 self.assertEqual(set(result["packages"]), {"sundials", "embree", "hdf5", "occt"})
+                self.assertEqual(result["packages"]["embree"]["stage_resources"]["build"]["cpu_seconds"], 2)
+                verification = reports / "windows-debug/verification.json"; original_verification = verification.read_bytes()
+                for change in ("missing-profile", "missing-stage", "identity"):
+                    damaged = json.loads(original_verification)
+                    if change == "missing-profile": damaged["execution"].pop("resource_profile")
+                    if change == "missing-stage": damaged["cases"][-1].pop("resources")
+                    if change == "identity": damaged["cases"][-1]["resources"]["process_id"] = 1
+                    verification.write_text(json.dumps(damaged), encoding="utf-8")
+                    with self.assertRaises(ValueError): summarize_ci_performance.summarize(reports, baseline, "a"*40)
+                verification.write_bytes(original_verification)
+                package = reports / "dependency-builds-embree.json"; original_package = package.read_bytes()
+                for change in ("missing-resources", "identity", "nonfinite", "missing-phase", "jobs", "generator"):
+                    damaged = json.loads(original_package); row = damaged["candidates"][0]
+                    if change == "missing-resources": row.pop("stage_resources")
+                    if change == "identity": row["stage_resources"]["build"]["process_path"] = "not-a-public-metric"
+                    if change == "nonfinite": row["stage_seconds"]["build"] = float("inf")
+                    if change == "missing-phase": row["stage_seconds"].pop("build")
+                    if change == "jobs": row["compiler_jobs"] = True
+                    if change == "generator": row["generator"] = "unreviewed"
+                    package.write_text(json.dumps(damaged), encoding="utf-8")
+                    with self.assertRaises(ValueError): summarize_ci_performance.summarize(reports, baseline, "a"*40)
+                package.write_bytes(original_package)
                 native = root / "ci/radiation-acceptance-v1.json"; original_policy = native.read_bytes()
                 policy = json.loads(original_policy)
                 baseline["acceptance_case_ids"] = {"ci/radiation-acceptance-v1.json": dict(field="native_cases", cases=list(policy["native_cases"]))}
@@ -81,6 +157,13 @@ class CiPerformanceTests(unittest.TestCase):
                       execution=dict(seconds=30, jobs=2))
         def check(value): return compare(value, baseline, "a"*40, expected, ["build", "radiation"])
         self.assertEqual(check(report)["driver"]["ratio"], .5)
+        with_resources = deepcopy(report)
+        with_resources["cases"][-1]["resources"] = dict(cpu_seconds=1, peak_process_commit_bytes=1000, peak_job_commit_bytes=2000, total_processes=2)
+        self.assertEqual(check(with_resources)["stage_resources"]["radiation"]["cpu_seconds"], 1)
+        with_resources["cases"][-1]["resources"]["process_id"] = 1
+        with self.assertRaises(ValueError): check(with_resources)
+        with_resources = deepcopy(report); with_resources["execution"]["logical_cpus"] = "not-a-scalar-count"
+        with self.assertRaises(ValueError): check(with_resources)
         for change in ("candidate", "preset", "missing", "duplicate", "failed", "timing", "duration", "jobs"):
             r = deepcopy(report)
             if change == "candidate": r["candidate"] = "b"*40

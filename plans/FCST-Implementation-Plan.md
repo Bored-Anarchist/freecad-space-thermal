@@ -205,6 +205,18 @@ The foundation, planning, publication, exact host smoke and candidate packaging 
 
 ### 2.2 Privacy and sanitization before publication
 
+Build/verification resource evidence adds only allowlisted numeric CPU seconds,
+peak process/job committed bytes, total process count and logical CPU count for
+fixed command stages and the six package phases.
+Unattended regressions verify inclusion of terminated descendants, timeout cleanup
+of the owned process tree, nested worker containment, and rejection of identity
+fields, missing phases,
+nonfinite values and inconsistent peaks. Execute the complete unit suite, pinned
+package build/install/consumer probes and exact-source/report/history preflights.
+This extends TST-021 without uploading process identities, paths, environment or
+raw logs and without relaxing build, numerical or memory acceptance. Collect a
+passing two-compiler OCCT resource baseline before increasing its budget.
+
 Continued CI improvement adds a source/run-bound timing baseline, frozen
 fixture/statistical workload digest, relative stage starts and dependency
 generator/phase timings. TST-021 clears the exact scalar `ci-performance.json`
