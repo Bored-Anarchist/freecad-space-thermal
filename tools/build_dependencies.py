@@ -17,7 +17,7 @@ from pathlib import Path
 from profile_support import ROOT, cmake_tools, run, verified_download, revision, ProbeFailure
 import sys
 sys.path.insert(0, str(ROOT / "python"))
-from fcst_tools.profiles import assess_dependencies
+from fcst_tools.profiles import assess_dependencies, RESOURCE_PROFILE
 
 OPTIONS = {
     "sundials": ["BUILD_ARKODE=OFF", "BUILD_CVODES=OFF", "BUILD_IDAS=OFF", "BUILD_IDA=OFF",
@@ -104,17 +104,26 @@ def source_tree(item, work):
     return source
 
 
-def cmake_probe(item, source, work, cmake, ctest, jobs):
+def cmake_probe(item, source, work, cmake, ctest, jobs, *, compiler_jobs=2, timings=None, resources=None):
     name = item["id"]
     build, install = work / "build", work / "install"
+    def measured(command, directory, log, env=None):
+        start = time.monotonic()
+        usage = {} if resources is not None else None
+        run(command, directory, log, env=env, resources=usage)
+        if timings is not None:
+            timings[Path(log).stem] = round(time.monotonic()-start, 3)
+        if resources is not None:
+            resources[Path(log).stem] = usage
     generator = ["-G", "Visual Studio 17 2022", "-A", "x64"] if os.name == "nt" else ["-G", "Ninja"]
     common = ["-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_INSTALL_PREFIX=" + str(install),
               "-DCMAKE_C_FLAGS=-ffp-contract=off", "-DCMAKE_CXX_FLAGS=-ffp-contract=off"] if os.name != "nt" else [
-              "-DCMAKE_INSTALL_PREFIX=" + str(install)]
-    run([cmake, "-S", str(source), "-B", str(build), *generator, *common,
+              "-DCMAKE_INSTALL_PREFIX=" + str(install),
+              f"-DCMAKE_C_FLAGS=/MP{compiler_jobs}", f"-DCMAKE_CXX_FLAGS=/MP{compiler_jobs}"]
+    measured([cmake, "-S", str(source), "-B", str(build), *generator, *common,
          *["-D" + option for option in OPTIONS[name]]], ROOT, work / "configure.log")
-    run([cmake, "--build", str(build), "--config", "Release", "--parallel", str(jobs)], ROOT, work / "build.log")
-    run([cmake, "--install", str(build), "--config", "Release"], ROOT, work / "install.log")
+    measured([cmake, "--build", str(build), "--config", "Release", "--parallel", str(jobs)], ROOT, work / "build.log")
+    measured([cmake, "--install", str(build), "--config", "Release"], ROOT, work / "install.log")
     client = work / "consumer"
     client.mkdir(exist_ok=True)
     find, libraries, code = CLIENTS[name]
@@ -123,16 +132,16 @@ def cmake_probe(item, source, work, cmake, ctest, jobs):
         "cmake_minimum_required(VERSION 3.22)\nproject(InstalledProbe LANGUAGES C CXX)\n" + find +
         "\nadd_executable(probe main.cpp)\ntarget_link_libraries(probe PRIVATE " + libraries +
         ")\nenable_testing()\nadd_test(NAME installed_consumer COMMAND probe)\n", encoding="utf-8")
-    run([cmake, "-S", str(client), "-B", str(client / "build"), *generator,
+    measured([cmake, "-S", str(client), "-B", str(client / "build"), *generator,
          "-DCMAKE_BUILD_TYPE=Release", "-DCMAKE_PREFIX_PATH=" + str(install)], ROOT, work / "consumer-configure.log")
-    run([cmake, "--build", str(client / "build"), "--config", "Release"], ROOT, work / "consumer-build.log")
+    measured([cmake, "--build", str(client / "build"), "--config", "Release"], ROOT, work / "consumer-build.log")
     env = dict(os.environ, OMP_NUM_THREADS="1")
     if os.name == "nt":
         dll_dirs = sorted({str(p.parent) for p in install.rglob("*.dll")})
         env["PATH"] = os.pathsep.join(dll_dirs) + os.pathsep + env.get("PATH", "")
     else:
         env["LD_LIBRARY_PATH"] = os.pathsep.join(sorted({str(p.parent) for p in install.rglob("*.so*")}))
-    run([ctest, "--test-dir", str(client / "build"), "-C", "Release", "--output-on-failure",
+    measured([ctest, "--test-dir", str(client / "build"), "-C", "Release", "--output-on-failure",
          "--no-tests=error"], ROOT, work / "consumer-run.log", env=env)
     return install
 
@@ -160,6 +169,8 @@ def prepare_blas(work):
 
 def toolchain(work):
     values = {"system": platform.system(), "architecture": platform.machine(), "threads": 1}
+    if os.cpu_count() is not None:
+        values["logical_cpus"] = os.cpu_count()
     for name in ("ImageOS", "ImageVersion"):
         value = os.environ.get(name, "")
         if value and re.fullmatch(r"[A-Za-z0-9_.-]{1,80}", value):
@@ -184,12 +195,16 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--candidate", choices=list(OPTIONS) + ["petsc"])
     parser.add_argument("--jobs", type=int, default=2)
+    parser.add_argument("--compiler-jobs", type=int, default=2,
+                        help="Maximum MSVC compiler processes per MSBuild project")
     parser.add_argument("--prepare-system", action="store_true", help="Install signed Linux BLAS/LAPACK probe prerequisites using sudo apt-get")
     args = parser.parse_args()
     if platform.system() != "Windows":
         parser.error("macOS and Linux package probes are uncommitted stretch goals outside the work packages")
     if not 1 <= args.jobs <= 16:
         parser.error("jobs must be between 1 and 16")
+    if not 1 <= args.compiler_jobs <= 4:
+        parser.error("compiler-jobs must be between 1 and 4")
     lock = ROOT / "ci/probe-sources.json"
     items = json.loads(lock.read_text(encoding="utf-8"))["sources"]
     cmake, ctest = cmake_tools()
@@ -202,7 +217,10 @@ def main():
         work = output / item["id"]
         work.mkdir(exist_ok=True)
         record = {"id": item["id"], "version": item["version"], "source_sha256": item["sha256"],
-                  "license_sha256": item["license_sha256"], "adopted": False}
+                  "license_sha256": item["license_sha256"], "adopted": False,
+                  "generator": "visual-studio-2022", "build_jobs": args.jobs,
+                  "compiler_jobs": args.compiler_jobs, "resource_profile": RESOURCE_PROFILE,
+                  "stage_seconds": {}, "stage_resources": {}}
         start = time.monotonic()
         if item["id"] == "petsc" and os.name == "nt":
             record.update(status="unsupported", reason_code="petsc_native_msvc_unsupported",
@@ -212,7 +230,7 @@ def main():
                 if item["id"] == "petsc" and args.prepare_system:
                     prepare_blas(work)
                 source = source_tree(item, work)
-                install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs)
+                install = petsc_probe(source, work, args.jobs) if item["id"] == "petsc" else cmake_probe(item, source, work, cmake, ctest, args.jobs, compiler_jobs=args.compiler_jobs, timings=record["stage_seconds"], resources=record["stage_resources"])
                 record.update(status="passed", stages=["source_hash", "license_hash", "configure", "build", "install", "installed_consumer"],
                               installed_bytes=sum(p.stat().st_size for p in install.rglob("*") if p.is_file()),
                               toolchain=toolchain(work), build_options=OPTIONS.get(item["id"], ["serial", "shared", "system_blas_lapack"]))

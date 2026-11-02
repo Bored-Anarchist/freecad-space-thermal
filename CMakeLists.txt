@@ -35,7 +35,7 @@ if(BUILD_TESTING)
 endif()
 foreach(target ${FCST_TARGETS})
   if(MSVC)
-    target_compile_options(${target} PRIVATE /W4 /WX /permissive- /fp:strict /experimental:deterministic
+    target_compile_options(${target} PRIVATE /MP2 /W4 /WX /permissive- /fp:strict /experimental:deterministic
       "/pathmap:${CMAKE_SOURCE_DIR}=src" "/pathmap:${CMAKE_BINARY_DIR}=build")
   else()
     target_compile_options(${target} PRIVATE -Wall -Wextra -Wpedantic -Werror
@@ -50,7 +50,7 @@ endforeach()
 install(TARGETS fcst-worker RUNTIME DESTINATION bin)
 install(FILES ci/dependencies.json DESTINATION share/fcst)
 if(BUILD_TESTING)
-  foreach(case intersections geometry-mapping seed-streams occlusion-groups exchange-correction black-gray-sphere jacobian thermal-coupling limits-failures sparse-storage)
+  foreach(case intersections bvh-equivalence geometry-mapping seed-streams occlusion-groups exchange-correction black-gray-sphere jacobian thermal-coupling limits-failures sparse-storage)
     add_test(NAME radiation-${case} COMMAND fcst-radiation-tests ${case} "${CMAKE_SOURCE_DIR}/tests/fixtures/thermal")
   endforeach()
   add_test(NAME native-build-info COMMAND fcst-worker --build-info)

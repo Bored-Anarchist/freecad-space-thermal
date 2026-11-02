@@ -11,6 +11,10 @@ def validate():
     for path in sorted((ROOT / ".github/workflows").glob("*.yml")):
         document = yaml.load(path.read_text(), Loader=yaml.BaseLoader)
         assert document.get("permissions") == {"contents": "read"}, "Non-minimal default permissions"
+        assert document["concurrency"] == {
+            "group": "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}",
+            "cancel-in-progress": "${{ github.event_name == 'pull_request' }}"}, "Obsolete PR runs not cancelled safely"
+        assert document["on"]["push"]["branches"] == ["main", "release/**"], "Duplicate branch/PR workflows"
         assert set(document["on"]) <= {"push", "pull_request", "workflow_dispatch"}, "Unexpected privileged trigger"
         assert document.get("jobs"), "No workflow jobs"
         for job in document["jobs"].values():
@@ -19,7 +23,16 @@ def validate():
                 if "run" in step:
                     assert isinstance(step["run"], str), "Run must be a scalar string"
                 if "uses" in step:
-                    assert re.fullmatch(r"actions/[a-z-]+@[a-f0-9]{40}", step["uses"]), "Unpinned workflow dependency"
+                    assert re.fullmatch(r"actions/[a-z-]+(?:/(?:restore|save))?@[a-f0-9]{40}", step["uses"]), "Unpinned workflow dependency"
+            steps = job.get("steps", [])
+            for index, step in enumerate(steps):
+                if step.get("uses", "").startswith("actions/cache/"):
+                    assert step["with"]["path"] == ".local/public-download-cache", "Unsafe online cache path"
+                    assert "restore-keys" not in step["with"], "Unbounded cache fallback"
+                    assert "hashFiles(" in step["with"]["key"] and "ci/publication-policy.json" in step["with"]["key"], "Cache lock/policy identity absent"
+                    if step["uses"].startswith("actions/cache/save@"):
+                        assert "success()" in step.get("if", "") and "steps.cache-clear.outcome == 'success'" in step["if"], "Cache save lacks exact-byte clearance"
+                        assert index > 0 and steps[index-1].get("id") == "cache-clear" and "cache_downloads.py seal" in steps[index-1].get("run", ""), "Cache clearance must immediately precede upload"
     workflow = yaml.load((ROOT / ".github/workflows/ci.yml").read_text(), Loader=yaml.BaseLoader)
     for job in workflow["jobs"].values():
         for step in job.get("steps", []):
@@ -27,6 +40,8 @@ def validate():
                 assert step.get("with", {}).get("ref") == "${{ github.event.pull_request.head.sha || github.sha }}", "Every handoff job must test the same published candidate"
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
+    budgets = {row["preset"]: row.get("acceptance_jobs") for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]}
+    assert budgets == {"windows-debug": "3", "windows-release": "2"}, "Reviewed acceptance worker budgets required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
     assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies", "dwg"}, "Profile jobs absent from required gate"
     native=workflow['jobs']['dwg']['steps']
@@ -37,6 +52,25 @@ def validate():
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
     build_steps = workflow["jobs"]["build"]["steps"]
+    assert workflow["jobs"]["build"]["timeout-minutes"] == "60", "Worker benchmark lacks a bounded job deadline"
+    inputs = workflow["on"]["workflow_dispatch"]["inputs"]
+    assert set(inputs) == {"benchmark_workers"} and inputs["benchmark_workers"]["type"] == "boolean" and inputs["benchmark_workers"]["default"] == "false", "Benchmark must be opt-in"
+    guard = "github.event_name == 'workflow_dispatch' && inputs.benchmark_workers && matrix.preset == 'windows-debug'"
+    assert any(guard + " && '--paired-workers' || ''" in step.get("run", "") for step in build_steps), "Paired driver dispatch guard absent"
+    evidence = ".local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/*.json"
+    exact_files = [evidence.replace("*.json", f"attempt-{i}.json") for i in range(5)] + [evidence.replace("*.json", "summary.json")]
+    uploads = [(index, step) for index, step in enumerate(build_steps) if step.get("with", {}).get("name") == "worker-benchmark"]
+    assert len(uploads) == 1, "Paired evidence upload missing or duplicated"
+    index, upload = uploads[0]
+    clearance = build_steps[index-1]
+    assert (upload["with"]["path"].splitlines() == exact_files and upload["if"] == "success() && " + guard + " && steps.benchmark-clear.outcome == 'success'"
+            and clearance.get("id") == "benchmark-clear" and clearance.get("if") == guard
+            and clearance.get("run") == "python tools/publication_preflight.py" + "".join(" --file " + path for path in exact_files)), "Paired evidence lacks exact clearance"
+    assert workflow["jobs"]["build"]["needs"] == "unit", "Unit receipt lacks a current-run owner"
+    assert any('--unit-report .local/unit-owner/unit-tests.json' in step.get('run','') and '--jobs ${{ matrix.acceptance_jobs }}' in step['run'] for step in build_steps), "Bounded current-run verification absent"
+    units = workflow["jobs"]["unit"]["steps"]
+    assert any('check_security.py --report .local/unit/unit-tests.json' in step.get('run','') for step in units), "Complete unit owner absent"
+    assert any('publication_preflight.py --file .local/unit/unit-tests.json' in step.get('run','') for step in units), "Unit receipt lacks clearance"
     assert any('mcp-requirements.lock' in step.get('run','') for step in build_steps), 'MCP SDK lock absent'
     assert any('publication_preflight.py' in step.get('run','') and 'mcp.json' in step['run'] for step in build_steps), 'MCP report lacks clearance'
     assert any('mcp.json' in step.get('with',{}).get('path','') for step in build_steps if step.get('uses','').startswith('actions/upload-artifact@')), 'MCP report absent'
@@ -58,6 +92,14 @@ def validate():
     packages = workflow["jobs"]["dependencies"]["strategy"]["matrix"]
     assert packages["os"] == ["windows-2022"], "Windows-only package matrix required"
     assert set(packages["candidate"]) == {"sundials", "hdf5", "embree", "occt"}, "Incorrect active Windows package candidates"
+    assert packages.get("include") == [
+        {"candidate": "sundials", "compiler_jobs": "2"}, {"candidate": "hdf5", "compiler_jobs": "2"},
+        {"candidate": "embree", "compiler_jobs": "4"}, {"candidate": "occt", "compiler_jobs": "4"}], "Reviewed compiler worker budgets required"
+    assert any('--jobs 2' in step.get('run','') for step in workflow['jobs']['dependencies']['steps']), "Bounded dependency compilation absent"
+    assert any('--compiler-jobs ${{ matrix.compiler_jobs }}' in step.get('run','') for step in workflow['jobs']['dependencies']['steps']), "Bounded compiler budget absent"
+    gate_steps = workflow['jobs']['gate']['steps']
+    assert any('summarize_ci_performance.py' in step.get('run','') for step in gate_steps), "Continuous CI timing comparison absent"
+    assert any('publication_preflight.py' in step.get('run','') and '--file .local/ci-performance.json' in step['run'] for step in gate_steps), "CI performance summary lacks publication clearance"
     for path in sorted((ROOT / ".github/workflows").glob("*.yml")):
         document = yaml.load(path.read_text(encoding="utf-8"), Loader=yaml.BaseLoader)
         for job in document["jobs"].values():

@@ -73,7 +73,8 @@ def build(configuration, work):
          *["-D"+v for v in OPTIONS["sundials"]]], ROOT, work / "dependency-configure.log")
     run([cmake, "--build", str(dep / "build"), "--config", "Release", "--parallel", "2"], ROOT, work / "dependency-build.log")
     run([cmake, "--install", str(dep / "build"), "--config", "Release"], ROOT, work / "dependency-install.log")
-    prototype_build = dep / "attempts" / work.name
+    # Build inputs are incremental; installed copies and evidence remain per attempt.
+    prototype_build = dep / "prototype" / configuration
     run([cmake, "-S", str(ROOT / "prototypes/numerical"), "-B", str(prototype_build), *generator,
          "-DCMAKE_PREFIX_PATH=" + str(install)], ROOT, work / "configure.log")
     run([cmake, "--build", str(prototype_build), "--config", configuration, "--parallel", "2"], ROOT, work / "build.log")

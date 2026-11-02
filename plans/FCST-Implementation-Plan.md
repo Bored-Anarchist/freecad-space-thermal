@@ -152,6 +152,44 @@ Inside FreeCAD, application dispatch runs on the host's owning thread for docume
 6. **Version and scope workflow dependencies.** Pin external actions to reviewed full commit SHAs, lock build/test dependencies and grant the minimum job permissions. PR test jobs need read access; release publication receives write permissions only in its release job. Do not execute candidate code through privileged `pull_request_target` workflows. Record workflow revisions, Actions run/attempt/job IDs, commit SHA and runner image with evidence. [GitHub Actions secure-use reference](https://docs.github.com/en/actions/reference/security/secure-use)
 7. **Publish qualified releases.** Run the gate evaluator for the exact candidate, then produce GitHub Releases tied to that tested commit/tag with binaries, source/build/dependency/license manifests, checksums, profile matrix and approved qualification summaries. Preserve immutable evidence in durable, access-appropriate storage; expiring workflow artifacts alone cannot satisfy the retention contract. Restricted model contents and license material stay in controlled storage with hash references in public summaries.
 8. **Verify repository settings automatically.** Add a settings checker for remote identity, required branch checks, workflow permissions, supported protection settings, runner restrictions and release-to-commit evidence links. Unavailable permissions, protection features or licensed runners are reported as setup blockers, not silently relaxed. Review of repository access or a release decision does not make the user responsible for executing tests.
+9. **Continuously reduce feedback time (TST-017).** Treat CI runtime as an ongoing engineering constraint for every feature and verification change. Inspect the passing aggregate's `ci-performance.json` and GitHub critical path; target the largest measured cost, state an experiment, and verify the result unattended. Preserve all coverage, statistical/scaling workloads, numerical criteria, assertions and both Windows configurations. Compare equivalent cold/warm states and toolchains, account for setup/queue time and runner minutes, and repeat noisy comparisons when needed. Investigate increases over 20% and at least 60 seconds and record their disposition. Keep a source/run-bound baseline and sanitized experiment ledger in [the CI performance guide](../docs/ci-performance.md); refresh baselines deliberately after passing evidence, never to hide regressions. The working target is full warm Foundation feedback within ten minutes, without claiming reference-hardware product qualification.
+
+**CI improvement checkpoint, 1 November 2026.** The implementation preserves all
+required numerical/statistical/scaling, host, package and both Windows checks.
+The original full CI took 19m 44s; passing warm optimized runs range from 7m 51s
+to 11m 03s, with substantial shared-runner variation. The latest four-worker trial,
+[run 41363285933](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41363285933)
+(`25c406c`), passed all 393 records per configuration in 10m 28s. Retained changes
+remove repeated unit/native execution, derivative allocations, checkpoint hashing,
+BVH construction work and per-ray allocations. Bounded row scratch replaces the
+intermediate per-facet cache, saving about 56 MB at one million facets with exact
+ray outputs. Package/native compilation uses explicit bounded MSVC budgets.
+
+An isolated local OCCT four-versus-two compiler pair passed fresh full builds,
+installs and consumers: 274.361s versus 339.676s (19.2% shorter), with higher CPU
+and peak committed memory. Retain four with that tradeoff recorded; exclude the
+earlier overlapped local pair. The opt-in single-runner calibration/ABBA workflow settled Debug's budget:
+[run 41367494887](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41367494887)
+passed five complete attempts; four-worker median acceptance was 347.820s versus
+321.125s with three, consuming about 15.9% more CPU. Return Debug to three;
+Release remains two and full qualification serial. Repeat only with a new
+measurement hypothesis, following
+[the ongoing experiment record](../docs/ci-performance.md#paired-debug-worker-measurement).
+It repeats every case five times, preserves candidate/source/unit-receipt checks,
+uses bounded deadlines and publishes only individually cleared JSON. The expanded
+inventory has 394 records per configuration. Benchmark summaries are explicitly
+ineligible for ordinary timing baseline refreshes. After the budget decision,
+refresh the baseline deliberately from a complete passing ordinary warm run.
+Continue measuring the largest cost, recording keep/revert decisions and failed
+or neutral experiments; the corrected local PCH prototype passed but was slower with higher memory and
+is not adopted.
+
+**Final ordinary checkpoint.** Warm [run 41370540527](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41370540527),
+`e52197d`, passed all 394 records per configuration in 9m 34s, with three Debug
+workers and two Release workers. Debug/Release drivers took 414.500/251.766s;
+aggregate job duration was 2,322s. Deliberately refresh the versioned baseline to
+this complete ordinary run, preserving all prior evidence and frozen workloads.
+The measurement loop remains required for future changes under TST-017/TST-021.
 
 The planned GitHub workflow deliverables are:
 
@@ -168,6 +206,55 @@ The planned GitHub workflow deliverables are:
 The foundation, planning, publication, exact host smoke and candidate packaging workflows are implemented under WP-02; run links and deployment evidence are tracked in the [WP-02 evidence record](evidence/WP-02.json) and [durable profile summaries](evidence/foundation-profiles.json). Product integration, GUI, licensed vendor, numerical performance and release workflows remain future outputs until their runnable profiles exist. Workflow schedules are GitHub Actions configuration, not app automations.
 
 ### 2.2 Privacy and sanitization before publication
+
+Build/verification resource evidence adds only allowlisted numeric CPU seconds,
+peak process/job committed bytes, total process count and logical CPU count for
+fixed command stages and the six package phases.
+Unattended regressions verify inclusion of terminated descendants, timeout cleanup
+of the owned process tree, nested worker containment, and rejection of identity
+fields, missing phases,
+nonfinite values and inconsistent peaks. Execute the complete unit suite, pinned
+package build/install/consumer probes and exact-source/report/history preflights.
+Profile `windows-job-v2` disables external MSBuild worker reuse in explicit and
+inherited environments so accounting and per-stage temp isolation do not depend
+on a pre-existing process pool. Keep V1/V2 measurements distinct. The first overlapped local OCCT pair remains inconclusive; the later isolated
+pair and its CPU/memory tradeoffs are recorded in the performance guide. The bounded row-cache candidate preserves
+exact ray results while replacing per-facet retained storage with accounted fixed
+scratch; retain its passing hosted confirmation and every existing scaling repetition.
+This extends TST-021 without uploading process identities, paths, environment or
+raw logs and without relaxing build, numerical or memory acceptance. Keep the paired OCCT resource baseline when reviewing its four-compiler budget.
+The cache validator rejects dangling links/reparse points using metadata even
+when the destination target is missing. Paired-worker artifacts clear the five
+exact verification JSON files and summary immediately before upload; raw logs
+remain local. Missing clearance or unsafe resource metadata fails unattended.
+
+Continued CI improvement adds a source/run-bound timing baseline, frozen
+fixture/statistical workload digest, relative stage starts and dependency
+generator/phase timings. TST-021 clears the exact scalar `ci-performance.json`
+alongside the final handoff before upload. Its generator rejects stale candidates,
+lost/missing/failed/duplicate cases, changed frozen workloads, substituted package
+sources and invalid timings. Cost estimates affect scheduling order only. Execute
+the expanded `tests/test_ci_performance.py`, native flat-scan BVH regression and
+both complete acceptance configurations. Preserve original fixed ensembles,
+independent scaling construction repetitions and strict Debug/Release checks.
+Raw profiles, environment values, build trees and binaries remain local; this
+adds no cache or general-scanner exception. Record positive and neutral
+experiments in sanitized PR evidence and the ongoing performance guide.
+
+CI acceleration preserves both Windows configurations and every existing native,
+reference, radiation ensemble/scaling, host and MCP case. TST-021 now also covers
+the [public download cache](../docs/ci-performance.md): cache-specific clearance
+admits only byte-identical distributions from reviewed public SHA-256 locks,
+with pin/name/size/path/link checks before reuse and immediately before upload.
+Generated binaries/debug paths, build trees, raw logs, model inputs and pass
+verdicts remain excluded. General scanner patterns and binary rejection remain
+unchanged. Execute `tests/test_ci_performance.py`, the complete unit owner and
+Publication security scope; reject corrupt/unlisted cache files, stale or
+incomplete candidate/source-bound unit receipts, native inventory substitution,
+unsafe cache paths and upload without clearance. Bounded acceptance workers
+use isolated temporary directories and serialize mutable reference preparation;
+full qualification remains serial. Scan exact changed sources, workflow/policy,
+unit receipts, plan/register/prose and outgoing history before publication.
 
 WP-12 extends TST-021 to exact native BVH/sampling/radiosity/coupling sources,
 optical declarations, synthetic plate/steady fixtures, frozen ensemble quantities,

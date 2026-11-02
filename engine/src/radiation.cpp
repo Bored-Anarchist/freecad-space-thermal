@@ -52,6 +52,12 @@ double emission(double t) {
 }
 struct Mesh::Impl {
   struct Box { Vec3 lo,hi; };
+  struct BuildFacet { Box bounds; Vec3 centroid; };
+  struct TraceFacet { Vec3 edge1,edge2; double determinant_limit; };
+  struct TraceCache {
+    std::array<std::size_t,512> keys;
+    std::array<TraceFacet,512> geometry;
+  };
   struct Tree { Box box; std::size_t begin,end,left=0,right=0; };
   std::vector<Facet> facets;
   std::vector<Patch> patches;
@@ -59,24 +65,28 @@ struct Mesh::Impl {
   std::vector<std::vector<std::pair<std::size_t,double>>> members;
   std::vector<std::size_t> order;
   std::vector<Tree> tree;
+  std::optional<Hit> intersect(const Ray&,std::optional<std::size_t>,TraceCache*) const;
+  static TraceFacet trace_geometry(const Facet& f) {
+    auto edge1=sub(f.vertices[1],f.vertices[0]),edge2=sub(f.vertices[2],f.vertices[0]);
+    return {edge1,edge2,1e-14*norm(edge1)*norm(edge2)};
+  }
   static Box box(const Facet& f) {
     Box b{f.vertices[0],f.vertices[0]};
     for (const auto& v:f.vertices) for (int k=0;k<3;++k) { b.lo[k]=std::min(b.lo[k],v[k]); b.hi[k]=std::max(b.hi[k],v[k]); }
     return b;
   }
-  std::size_t build(std::size_t begin,std::size_t end) {
-    Box b=box(facets[order[begin]]);
-    for (auto i=begin+1;i<end;++i) { auto a=box(facets[order[i]]); for (int k=0;k<3;++k) { b.lo[k]=std::min(b.lo[k],a.lo[k]); b.hi[k]=std::max(b.hi[k],a.hi[k]); } }
+  std::size_t build(std::size_t begin,std::size_t end,const std::vector<BuildFacet>& geometry) {
+    Box b=geometry[order[begin]].bounds;
+    for (auto i=begin+1;i<end;++i) { const auto& a=geometry[order[i]].bounds; for (int k=0;k<3;++k) { b.lo[k]=std::min(b.lo[k],a.lo[k]); b.hi[k]=std::max(b.hi[k],a.hi[k]); } }
     auto index=tree.size(); tree.push_back({b,begin,end});
     if (end-begin>8) {
       int axis=0; for (int k=1;k<3;++k) if (b.hi[k]-b.lo[k]>b.hi[axis]-b.lo[axis]) axis=k;
       auto middle=begin+(end-begin)/2;
       std::nth_element(order.begin()+static_cast<std::ptrdiff_t>(begin),order.begin()+static_cast<std::ptrdiff_t>(middle),order.begin()+static_cast<std::ptrdiff_t>(end),[&](auto i,auto j) {
-        const auto& a=facets[i].vertices; const auto& c=facets[j].vertices;
-        double x=(a[0][axis]+a[1][axis]+a[2][axis])/3,y=(c[0][axis]+c[1][axis]+c[2][axis])/3;
+        double x=geometry[i].centroid[axis],y=geometry[j].centroid[axis];
         return x==y ? i<j : x<y;
       });
-      auto left=build(begin,middle),right=build(middle,end); tree[index].left=left; tree[index].right=right;
+      auto left=build(begin,middle,geometry),right=build(middle,end,geometry); tree[index].left=left; tree[index].right=right;
     }
     return index;
   }
@@ -96,20 +106,26 @@ struct Mesh::Impl {
 Mesh::Mesh(std::vector<Facet> facets,std::vector<std::string> excluded) {
   if (facets.empty() || facets.size()>2000000) throw Error("radiation_limit");
   auto p=std::make_shared<Impl>();
-  std::sort(facets.begin(),facets.end(),[](const auto& a,const auto& b) { return a.id<b.id; });
-  std::set<std::string> ids,exclusions(excluded.begin(),excluded.end());
+  // Sort small indices rather than repeatedly moving facets and their optical metadata.
+  std::vector<std::size_t> sorted(facets.size()); std::iota(sorted.begin(),sorted.end(),0);
+  std::sort(sorted.begin(),sorted.end(),[&](auto a,auto b) { return facets[a].id<facets[b].id; });
+  std::set<std::string> exclusions(excluded.begin(),excluded.end());
   if (exclusions.size()!=excluded.size()) throw Error("duplicate_id");
   // Validate even excluded geometry. Exclusions remove it from tracing explicitly.
-  for (const auto& f:facets) {
-    if (f.id.empty() || f.surface_id.empty() || !ids.insert(f.id).second) throw Error("radiation_mapping");
+  for (std::size_t position=0;position<sorted.size();++position) {
+    const auto& f=facets[sorted[position]];
+    if (f.id.empty() || f.surface_id.empty() || (position && f.id==facets[sorted[position-1]].id)) throw Error("radiation_mapping");
     for (auto v:f.vertices) for (double x:v) if (!std::isfinite(x) || std::abs(x)>1e12) throw Error("radiation_geometry");
     double area=norm(cross(sub(f.vertices[1],f.vertices[0]),sub(f.vertices[2],f.vertices[0])))/2;
     if (area<=1e-24) throw Error("radiation_geometry");
     optics(f.front); optics(f.back);
   }
-  for (const auto& id:exclusions) if (!ids.contains(id)) throw Error("reference");
+  for (const auto& id:exclusions) {
+    auto found=std::lower_bound(sorted.begin(),sorted.end(),id,[&](auto i,const auto& value) { return facets[i].id<value; });
+    if (found==sorted.end() || facets[*found].id!=id) throw Error("reference");
+  }
   p->facets.reserve(facets.size()-exclusions.size());
-  for (auto& f:facets) if (!exclusions.contains(f.id)) p->facets.push_back(std::move(f));
+  for (auto i:sorted) if (!exclusions.contains(facets[i].id)) p->facets.push_back(std::move(facets[i]));
   if (p->facets.empty()) throw Error("radiation_mapping");
   std::map<std::string,std::size_t> by_id;
   p->mapping.resize(p->facets.size());
@@ -128,8 +144,16 @@ Mesh::Mesh(std::vector<Facet> facets,std::vector<std::string> excluded) {
     }
   }
   if (p->patches.empty()) throw Error("radiation_mapping");
+  if (exclusions.empty()) p->order=std::move(sorted);
   p->order.resize(p->facets.size()); std::iota(p->order.begin(),p->order.end(),0);
-  p->tree.reserve(p->facets.size()/2+1); p->build(0,p->facets.size()); impl_=p;
+  // Bounds and centroid arithmetic are invariant across every partition level.
+  // This scratch data is released after construction, not retained in mesh storage.
+  std::vector<Impl::BuildFacet> geometry; geometry.reserve(p->facets.size());
+  for (const auto& f:p->facets) {
+    Vec3 centroid{}; for (int k=0;k<3;++k) centroid[k]=(f.vertices[0][k]+f.vertices[1][k]+f.vertices[2][k])/3;
+    geometry.push_back({Impl::box(f),centroid});
+  }
+  p->tree.reserve(p->facets.size()/2+1); p->build(0,p->facets.size(),geometry); impl_=p;
 }
 const std::vector<Facet>& Mesh::facets() const { return impl_->facets; }
 const std::vector<Patch>& Mesh::patches() const { return impl_->patches; }
@@ -139,7 +163,8 @@ std::optional<std::size_t> Mesh::patch(std::size_t i,bool back) const {
 }
 std::size_t Mesh::storage_bytes() const {
   std::size_t size=sizeof(Impl)+impl_->facets.capacity()*sizeof(Facet)+impl_->tree.capacity()*sizeof(Impl::Tree)+
-    impl_->order.capacity()*sizeof(std::size_t)+impl_->mapping.capacity()*sizeof(impl_->mapping[0]);
+    impl_->order.capacity()*sizeof(std::size_t)+impl_->mapping.capacity()*sizeof(impl_->mapping[0])+
+    sizeof(Impl::TraceCache);
   auto metadata_bytes=[](const Optics& o) { const auto& d=o.dataset;return d.solar_band.capacity()+d.infrared_band.capacity()+d.condition.capacity()+d.provenance.capacity(); };
   for (const auto& f:impl_->facets) size+=f.id.capacity()+f.surface_id.capacity()+f.group.capacity()+metadata_bytes(f.front)+metadata_bytes(f.back);
   size+=impl_->patches.capacity()*sizeof(Patch)+impl_->members.capacity()*sizeof(impl_->members[0]);
@@ -148,19 +173,35 @@ std::size_t Mesh::storage_bytes() const {
   return size;
 }
 std::optional<Hit> Mesh::intersect(const Ray& r,std::optional<std::size_t> ignore) const {
+  return impl_->intersect(r,ignore,nullptr);
+}
+std::optional<Hit> Mesh::Impl::intersect(const Ray& r,std::optional<std::size_t> ignore,TraceCache* cache) const {
   for (int k=0;k<3;++k) if (!std::isfinite(r.origin[k]) || !std::isfinite(r.direction[k])) throw Error("radiation_ray");
-  if (std::abs(norm(r.direction)-1)>1e-12 || (ignore && *ignore>=facets().size())) throw Error("radiation_ray");
+  if (std::abs(norm(r.direction)-1)>1e-12 || (ignore && *ignore>=facets.size())) throw Error("radiation_ray");
   std::optional<Hit> best;
-  std::vector<std::size_t> stack{0};
-  while (!stack.empty()) {
-    auto index=stack.back(); stack.pop_back(); const auto& tree=impl_->tree[index];
-    if (!Impl::intersects(tree.box,r,best?best->distance:std::numeric_limits<double>::infinity())) continue;
-    if (tree.left) { stack.push_back(tree.right); stack.push_back(tree.left); continue; }
-    for (auto j=tree.begin;j<tree.end;++j) {
-      auto i=impl_->order[j]; if (ignore && i==*ignore) continue;
-      const auto& f=facets()[i]; auto e1=sub(f.vertices[1],f.vertices[0]),e2=sub(f.vertices[2],f.vertices[0]);
+  const bool complete_cache=cache && facets.size()<=cache->geometry.size();
+  // Median splits and the two-million-facet limit bound depth below 20.
+  // Avoid a heap allocation on every sampled ray; preserve traversal/tie order.
+  std::array<std::size_t,64> stack; stack[0]=0; std::size_t pending=1;
+  while (pending) {
+    auto index=stack[--pending]; const auto& branch=tree[index];
+    if (!intersects(branch.box,r,best?best->distance:std::numeric_limits<double>::infinity())) continue;
+    if (branch.left) {
+      if (pending+2>stack.size()) throw Error("radiation_limit");
+      stack[pending++]=branch.right; stack[pending++]=branch.left; continue;
+    }
+    for (auto j=branch.begin;j<branch.end;++j) {
+      auto i=order[j]; if (ignore && i==*ignore) continue;
+      const auto& f=facets[i]; TraceFacet uncached; const TraceFacet* geometry;
+      if(complete_cache) geometry=&cache->geometry[i];
+      else if(cache) {
+        auto slot=i%cache->geometry.size();
+        if(cache->keys[slot]!=i) {cache->geometry[slot]=trace_geometry(f);cache->keys[slot]=i;}
+        geometry=&cache->geometry[slot];
+      } else {uncached=trace_geometry(f);geometry=&uncached;}
+      const auto& e1=geometry->edge1; const auto& e2=geometry->edge2;
       auto h=cross(r.direction,e2); double det=dot(e1,h);
-      if (std::abs(det)<=1e-14*norm(e1)*norm(e2)) continue;
+      if (std::abs(det)<=geometry->determinant_limit) continue;
       auto s=sub(r.origin,f.vertices[0]); double u=dot(s,h)/det;
       auto q=cross(s,e1); double v=dot(r.direction,q)/det;
       if (u<0 || v<0 || u+v>1) continue;
@@ -176,6 +217,12 @@ struct Sampler {
     const auto& patch=mesh.patches()[source]; Random random{mix(settings.seed)^identity(patch.id)};
     const auto& members=mesh.impl_->members[source]; std::map<std::size_t,std::uint64_t> counts;
     Row row{source,settings.samples,0,0,{}};
+    // A row owns its bounded cache, so meshes stay immutable and concurrent rows
+    // need no shared mutation. Large meshes compute only geometry actually hit.
+    Mesh::Impl::TraceCache cache;
+    if(mesh.facets().size()<=cache.geometry.size()) {
+      for(std::size_t i=0;i<mesh.facets().size();++i)cache.geometry[i]=Mesh::Impl::trace_geometry(mesh.facets()[i]);
+    } else cache.keys.fill(std::numeric_limits<std::size_t>::max());
     for (std::uint64_t n=0;n<settings.samples;++n) {
       double selection=random.next()*patch.area;
       auto member=std::upper_bound(members.begin(),members.end(),selection,[](double v,const auto& entry) { return v<entry.second; });
@@ -190,7 +237,7 @@ struct Sampler {
       auto direction=add(mul(normal_,std::sqrt(1-radial*radial)),add(mul(tangent,radial*std::cos(angle)),mul(bitangent,radial*std::sin(angle))));
       // Offset by representable coordinates toward the emitting hemisphere.
       for (int k=0;k<3;++k) if (normal_[k]!=0) origin[k]=std::nextafter(origin[k],normal_[k]>0?std::numeric_limits<double>::infinity():-std::numeric_limits<double>::infinity());
-      auto hit=(backend?*backend:static_cast<const IntersectionBackend&>(mesh)).intersect({origin,direction},i);
+      auto hit=backend?backend->intersect({origin,direction},i):mesh.impl_->intersect({origin,direction},i,&cache);
       if (!hit) { ++row.escaped; continue; }
       auto target=mesh.patch(hit->facet,hit->back);
       if (!target || mesh.patches()[*target].group!=patch.group) { ++row.blocked; continue; }

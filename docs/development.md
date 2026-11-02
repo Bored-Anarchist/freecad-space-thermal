@@ -26,7 +26,16 @@ Use `windows-release` for the release configuration. Active development and qual
 
 If an older pip cannot use the operating system certificate store, `python tools/fetch_tooling.py` downloads wheels using verified TLS and verifies every wheel against the lock; install with `--no-index --find-links .local/wheelhouse` and the same `--require-hashes` options. No TLS-verification bypass is needed.
 
-The fast driver compares collected case IDs with `ci/coverage.json`. Missing, duplicated, skipped, cancelled, blocked or failed required cases fail the gate. Tests prove those rejection paths. Local raw logs remain under `.local/`; CI publishes only the privacy-cleared verification/build-info JSON files. Debug symbols, source maps, raw compiler output and native binaries are not uploaded by these foundation workflows.
+The fast driver compares collected case IDs with `ci/coverage.json`. Missing, duplicated, skipped, cancelled, blocked or failed required cases fail the gate. Tests prove those rejection paths. Local raw logs remain under `.local/`; CI publishes only privacy-cleared JSON evidence and byte-identical public distributions admitted by the download-cache validator. Debug symbols, source maps, raw compiler output and generated native binaries are not uploaded by these foundation workflows.
+
+Verification uses two concurrent acceptance processes by default (`--jobs 1` restores
+serial execution). Both configurations retain the complete thermal/reference,
+radiation/statistical/scaling, host and MCP campaigns. The full qualification tier
+serializes acceptance to protect reference measurements. CI executes the Python
+unit suite once and both build jobs validate its current-run, candidate/source-bound
+receipt. CTest inventories are checked against exact acceptance commands before
+overlapping native cases are executed once by their acceptance owner. See
+[CI execution and download-cache policy](ci-performance.md).
 
 WP-01 adds the offline inventory checker and synthetic regression cases to that same fast driver. See [the corpus inventory](../inventory/README.md) for reproducible acquisition, local original-byte checks and the separate blocked compatibility-prerequisite command (not WP-01 completion). CI validates provenance/coverage metadata without downloading third-party models or executing imported logic. An acquired file, syntax-only corpus or retained upstream result cannot satisfy native physics or vendor qualification.
 

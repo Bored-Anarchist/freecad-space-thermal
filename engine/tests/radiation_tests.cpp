@@ -20,6 +20,30 @@ thermal::Model model(const std::filesystem::path& root) {
   std::ifstream f(root/"power-network.json"); return thermal::load(std::string(std::istreambuf_iterator<char>(f),{}));
 }
 double sum(const std::vector<double>& v) { return std::accumulate(v.begin(),v.end(),0.0); }
+// Flat scan checks BVH partition/bounds decisions independently of its traversal.
+std::optional<Hit> flat_hit(const std::vector<Facet>& facets,const Ray& ray,std::optional<std::size_t> ignore={}) {
+  auto subtract=[](Vec3 a,Vec3 b) { for(int k=0;k<3;++k)a[k]-=b[k];return a; };
+  auto product=[](Vec3 a,Vec3 b) { return Vec3{a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]}; };
+  auto scalar=[](Vec3 a,Vec3 b) { return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]; };
+  std::optional<Hit> best;
+  for(std::size_t i=0;i<facets.size();++i) {
+    if(ignore && i==*ignore)continue;
+    const auto& f=facets[i];auto a=subtract(f.vertices[1],f.vertices[0]),b=subtract(f.vertices[2],f.vertices[0]);
+    auto n=product(a,b);double denominator=scalar(n,ray.direction);
+    if(denominator==0)continue;
+    double distance=scalar(n,subtract(f.vertices[0],ray.origin))/denominator;
+    if(distance<=0)continue;
+    Vec3 point=ray.origin;for(int k=0;k<3;++k)point[k]+=distance*ray.direction[k];
+    bool inside=true;
+    for(int k=0;k<3;++k) {
+      auto edge=subtract(f.vertices[(k+1)%3],f.vertices[k]);
+      if(scalar(product(edge,subtract(point,f.vertices[k])),n)<0)inside=false;
+    }
+    if(inside && (!best || distance<best->distance || (distance==best->distance && i<best->facet)))
+      best=Hit{i,denominator>0,distance};
+  }
+  return best;
+}
 }
 int main(int argc,char** argv) {
   try {
@@ -30,8 +54,42 @@ int main(int argc,char** argv) {
       h=mesh.intersect({{.25,.4,.5},{0,0,-1}});require(h && !h->back);near(h->distance,.5);
       require(!mesh.intersect({{2,.5,.5},{0,0,1}}));require(!mesh.intersect({{.5,.5,-1},{1,0,0}}));
       auto edge=mesh.intersect({{.5,.5,-1},{0,0,1}});require(edge.has_value());near(edge->distance,1);
+      // Preserve the scale-relative near-parallel cutoff as cached geometry is used.
+      require(!mesh.intersect({{.25,.4,-1e-16},{1,0,1e-15}}));
+      auto grazing=mesh.intersect({{.25,.4,-1e-15},{1,0,1e-13}});require(grazing.has_value());near(grazing->distance,.01);
       rejects([&]{mesh.intersect({{0,0,0},{0,0,0}});});rejects([&]{mesh.intersect({{0,0,0},{0,0,2}});});
       Mesh dense(plates(20));for(int i=1;i<20;++i) { auto hit=dense.intersect({{static_cast<double>(i)/20+.001,.373,-1},{0,0,1}});require(hit.has_value());near(hit->distance,1); }
+    } else if(name=="bvh-equivalence") {
+      // Exceed the bounded row cache and compare every integer result against
+      // the public uncached backend, including re-entry after cache eviction.
+      Mesh many(plates(30));
+      for(auto seed:{1701ULL,2903ULL})for(std::size_t source=0;source<many.patches().size();++source) {
+        auto cached=trace_row(many,source,{seed,4096,1000});
+        auto direct=trace_row(many,source,{seed,4096,1000},&many);
+        require(cached.source==direct.source && cached.samples==direct.samples && cached.escaped==direct.escaped &&
+          cached.blocked==direct.blocked && cached.counts.size()==direct.counts.size());
+        for(std::size_t i=0;i<cached.counts.size();++i)
+          require(cached.counts[i].target==direct.counts[i].target && cached.counts[i].hits==direct.counts[i].hits);
+      }
+      for(int axis=0;axis<3;++axis) {
+        auto fs=plates(9);auto overlap=fs.front();overlap.id="tie-first";fs.push_back(overlap);
+        for(auto& f:fs)for(auto& v:f.vertices)std::rotate(v.begin(),v.begin()+axis,v.end());
+        std::reverse(fs.begin(),fs.end());
+        std::vector<std::string> excluded{fs[7].id,fs[19].id};Mesh mesh(fs,excluded);
+        std::erase_if(fs,[&](const auto& f){return std::find(excluded.begin(),excluded.end(),f.id)!=excluded.end();});
+        std::sort(fs.begin(),fs.end(),[](const auto& a,const auto& b){return a.id<b.id;});
+        require(mesh.facets().size()==fs.size());
+        for(std::size_t i=0;i<fs.size();++i)require(mesh.facets()[i].id==fs[i].id);
+        for(int x=-1;x<=10;++x)for(int y=-1;y<=10;++y)for(int side=0;side<2;++side) {
+          Ray ray{{(static_cast<double>(x)+.25)/9,(static_cast<double>(y)+.625)/9,side?2.0:-1.0},{0,0,side?-1.0:1.0}};
+          std::rotate(ray.origin.begin(),ray.origin.begin()+axis,ray.origin.end());
+          std::rotate(ray.direction.begin(),ray.direction.begin()+axis,ray.direction.end());
+          auto expected=flat_hit(fs,ray),actual=mesh.intersect(ray);require(actual.has_value()==expected.has_value());
+          if(actual){require(actual->facet==expected->facet && actual->back==expected->back);near(actual->distance,expected->distance);
+            auto next=flat_hit(fs,ray,actual->facet),ignored=mesh.intersect(ray,actual->facet);require(next.has_value()==ignored.has_value());
+            if(next){require(next->facet==ignored->facet && next->back==ignored->back);near(next->distance,ignored->distance);}}
+        }
+      }
     } else if(name=="geometry-mapping") {
       auto fs=plates();auto invalid=fs;invalid[0].vertices[1]=invalid[0].vertices[0];rejects([&]{Mesh m(invalid);});
       invalid=fs;invalid[0].id=invalid[1].id;rejects([&]{Mesh m(invalid);});invalid=fs;invalid[0].node=2;rejects([&]{Mesh m(invalid);});

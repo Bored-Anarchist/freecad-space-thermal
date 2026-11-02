@@ -84,10 +84,14 @@ def revision():
     return value
 
 
-def run(command, directory, log, env=None, timeout=1800):
+def run(command, directory, log, env=None, timeout=1800, resources=None):
     with Path(log).open("wb") as output:
-        process = subprocess.run(command, cwd=directory, stdout=output, stderr=subprocess.STDOUT,
-                                 stdin=subprocess.DEVNULL, env=env, timeout=timeout)
+        if resources is not None:
+            from process_metrics import run_tracked
+            process = run_tracked(command, directory, output, env, timeout, resources)
+        else:
+            process = subprocess.run(command, cwd=directory, stdout=output, stderr=subprocess.STDOUT,
+                                     stdin=subprocess.DEVNULL, env=env, timeout=timeout)
     if process.returncode:
         text = Path(log).read_text(encoding="utf-8", errors="replace").lower()
         reason = "process_failure"

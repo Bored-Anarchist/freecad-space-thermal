@@ -115,9 +115,9 @@ class Assembly {
   struct Impl;
   std::shared_ptr<const Impl> impl_;
   enum class Storage { none, rate, enthalpy };
-  Linearization evaluate(Storage storage, double time, std::span<const double> temperature,
-                         std::span<const double> rate, std::span<const double> previous,
-                         double seconds, bool jacobian) const;
+  Balance evaluate(Storage storage, double time, std::span<const double> temperature,
+                   std::span<const double> rate, std::span<const double> previous,
+                   double seconds, Linearization* derivatives = nullptr) const;
 };
 
 enum class SolveStatus { converged, singular, nonconverged, unsupported };

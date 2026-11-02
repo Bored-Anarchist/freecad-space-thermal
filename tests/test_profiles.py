@@ -44,6 +44,21 @@ class ProfileTests(unittest.TestCase):
                     "stages": sorted(BUILD_STAGES), "installed_bytes": 100} for s in self.sources]
         report = {"platform": "Linux", "candidates": records}
         self.assertTrue(assess_dependencies(report, self.sources, "Linux"))
+        from fcst_tools.profiles import RESOURCE_STAGES
+        report["candidates"][0]["stage_resources"] = {
+            stage: dict(cpu_seconds=1.5, peak_process_commit_bytes=1000, peak_job_commit_bytes=2000, total_processes=2)
+            for stage in RESOURCE_STAGES}
+        self.assertTrue(assess_dependencies(report, self.sources, "Linux"))
+        for change in ("missing", "identity", "negative", "nonfinite", "boolean", "peak"):
+            damaged = copy.deepcopy(report)
+            stages = damaged["candidates"][0]["stage_resources"]
+            if change == "missing": stages.pop("build")
+            if change == "identity": stages["build"]["process_path"] = "not-a-public-metric"
+            if change == "negative": stages["build"]["cpu_seconds"] = -1
+            if change == "nonfinite": stages["build"]["cpu_seconds"] = float("nan")
+            if change == "boolean": stages["build"]["total_processes"] = True
+            if change == "peak": stages["build"]["peak_job_commit_bytes"] = 1
+            self.assertFalse(assess_dependencies(damaged, self.sources, "Linux"))
         for mutation in [lambda r: r["candidates"].pop(),
                          lambda r: r["candidates"][0].update(status="skipped"),
                          lambda r: r["candidates"][0].update(source_sha256="0" * 64),

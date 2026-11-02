@@ -11,7 +11,7 @@
   "interval_family": "All 12 quantities times all 16 seeds times all 3 sample counts; any miss fails and is retained for investigation",
   "practical_error": "Every quantity at the largest sample count must satisfy the frozen 0.01 absolute error bound",
   "convergence": "Aggregate RMS over all predeclared quantities and seeds must strictly decrease at each sample count",
-  "native_cases": ["intersections", "geometry-mapping", "seed-streams", "occlusion-groups", "exchange-correction", "black-gray-sphere", "jacobian", "thermal-coupling", "limits-failures", "sparse-storage"],
+  "native_cases": ["intersections", "bvh-equivalence", "geometry-mapping", "seed-streams", "occlusion-groups", "exchange-correction", "black-gray-sphere", "jacobian", "thermal-coupling", "limits-failures", "sparse-storage"],
   "scaling_subdivisions": [16, 50, 158, 500],
   "scaling_replicates": 3,
   "scaling_samples": [4096, 16384, 65536],

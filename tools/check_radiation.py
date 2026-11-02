@@ -53,8 +53,10 @@ def check(subject, native, worker, output):
     identity = execute(worker, ['--build-info'], 'worker-identity')
     require(identity.returncode == 0 and json.loads(identity.stdout)['source_revision'] == candidate)
     for case in policy['native_cases']:
+        started = time.monotonic()
         r = execute(native, [case, ROOT/'tests/fixtures/thermal'], 'native-'+case)
-        records.append(dict(id=case, status='passed' if r.returncode == 0 and r.stdout == b'passed\r\n' or r.returncode == 0 and r.stdout == b'passed\n' else 'failed'))
+        records.append(dict(id=case, status='passed' if r.returncode == 0 and r.stdout == b'passed\r\n' or r.returncode == 0 and r.stdout == b'passed\n' else 'failed',
+                            seconds=round(time.monotonic()-started, 3)))
     for geometry, size in policy['geometry_size'].items():
         for n in statistical['samples_per_replicate']:
             for seed in statistical['seeds']:
@@ -152,6 +154,7 @@ def check(subject, native, worker, output):
                   input_sha256=input_hashes(), native_sha256=digest(subject), worker_sha256=digest(worker),
                   status='passed' if all(c['status'] == 'passed' for c in records) else 'failed', cases=records,
                   ensemble=ensemble, runs=[dict(geometry=x['geometry'], seed=x['seed'], samples=x['samples'],
+                  build_seconds=x['build_seconds'], trace_seconds=x['trace_seconds'],
                   raw_sha256=digest(work/f"{x['geometry']}-{x['seed']}-{x['samples']}.json")) for x in runs],
                   independent_reference=dict(plate_quadrature=quadrature, quadrature_error_bound=error, maximum_radiosity_error=source_error, coupled_steady_temperature_error_K=steady_error), scaling=curves)
     report['independent_backends'] = reference_versions

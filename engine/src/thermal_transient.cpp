@@ -84,11 +84,14 @@ struct Engine {
     auto evaluate=[&,initial](std::span<const double> x,bool jacobian) {
       auto start=Clock::now(); ++profile.residual_evaluations; if(jacobian) ++profile.jacobian_evaluations;
       try {
-        auto v=jacobian?(initialize?a.steady_linearize(t,x):a.step_linearize(t,x,initial,h)):
-          Linearization{initialize?a.steady_residual(t,x):a.step_residual(t,x,initial,h),SparseMatrix(a.sparsity()),SparseMatrix(a.sparsity())};
+        NonlinearEvaluation v;
+        if (jacobian) {
+          auto assembled=initialize?a.steady_linearize(t,x):a.step_linearize(t,x,initial,h);
+          v={std::move(assembled.balance.residual),std::move(assembled.d_temperature)};
+        } else v={initialize?a.steady_residual(t,x).residual:a.step_residual(t,x,initial,h).residual,{}};
         // Fixed differential initial conditions replace their rows, never their capacities.
         if (initialize) for (const auto& node:a.model().data().nodes) if (node.differential_index) {
-          auto row=*node.equation; v.balance.residual[row]=x[row]-initial[row];
+          auto row=*node.equation; v.residual[row]=x[row]-initial[row];
         }
         profile.assembly_seconds+=seconds(start);
         return v;
@@ -103,19 +106,20 @@ struct Engine {
     for (std::size_t i=0;i<n;++i) {
       if(fixed.contains(i)) { limits[i]=1e-10; continue; }
       for (std::size_t k=p.offsets()[i];k<p.offsets()[i+1];++k)
-        limits[i]=std::max(limits[i],finite(std::abs(seed.d_temperature.values()[k])*std::max(1.0,std::abs(initial[p.columns()[k]]))*1e-12));
+        limits[i]=std::max(limits[i],finite(std::abs(seed.jacobian->values()[k])*std::max(1.0,std::abs(initial[p.columns()[k]]))*1e-12));
     }
     NonlinearProblem problem{a.sparsity(),[&](std::span<const double> x,bool jacobian) {
-      auto v=evaluate(x,jacobian); SparseMatrix j(a.sparsity());
+      auto v=evaluate(x,jacobian); std::optional<SparseMatrix> j;
+      if(jacobian)j.emplace(a.sparsity());
       for (std::size_t i=0;i<n;++i) {
-        v.balance.residual[i]=finite(v.balance.residual[i]/limits[i]);
+        v.residual[i]=finite(v.residual[i]/limits[i]);
         if (jacobian) for (std::size_t k=p.offsets()[i];k<p.offsets()[i+1];++k) {
           const auto column=p.columns()[k];
-          double entry=fixed.contains(i)?(column==i?1.:0.):v.d_temperature.values()[k];
-          j.add({i,column},finite(entry/limits[i]));
+          double entry=fixed.contains(i)?(column==i?1.:0.):v.jacobian->values()[k];
+          j->add({i,column},finite(entry/limits[i]));
         }
       }
-      return NonlinearEvaluation{std::move(v.balance.residual),jacobian?std::optional<SparseMatrix>(std::move(j)):std::nullopt};
+      return NonlinearEvaluation{std::move(v.residual),std::move(j)};
     }};
     auto result=solve_nonlinear(DampedNewtonBackend(settings,linear),problem,initial,{1,0,o.maximum_newton_iterations});
     profile.newton_iterations+=result.iterations;
@@ -234,7 +238,9 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
   c.temperature=a.initial_temperature(); c.initial_temperature=c.temperature; c.operating=a.operating_state();
   c.run_energy=empty_budget(a.model().data().nodes.size()); for(const auto& control:a.model().data().controls)c.on_seconds.emplace(control.id,0);
   if(restart)c=*restart;
-  auto seal=[&] { c.checksum=checksum(c); out.checkpoint=c; };
+  // Keep the last committed snapshot through every failure path. Its digest is
+  // observable only when this synchronous solve returns, so serialize it once.
+  auto snapshot=[&] { out.checkpoint=c; };
   auto record_event=[&](const std::string& id,const std::string& kind,double before,double after) {
     if(c.event_count>=o.maximum_events)throw Failure{"event_limit",id};
     reserve_values(4);
@@ -284,7 +290,7 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
       for(std::size_t i=0;i<c.temperature.size();++i)if(std::abs(c.temperature[i]-consistent[i])>1e-8)throw Error("checkpoint");
       for(const auto& control:a.model().data().controls)if(engine.triggered(a,control,c.time,c.temperature))throw Error("checkpoint");
     } else { c.temperature=std::move(consistent); update_events(true,{}); }
-    seal(); sample(); std::size_t attempts=0;
+    snapshot(); sample(); std::size_t attempts=0;
     while(c.time<o.end) {
       if(++attempts>o.maximum_attempts)throw Failure{"attempt_limit",{}};
       auto output=std::upper_bound(o.output_times.begin(),o.output_times.end(),c.time);
@@ -351,7 +357,7 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
       for(const auto& schedule:o.schedules)for(const auto& point:schedule.points)if(point.time==c.time)scheduled=true;
       try { if(scheduled || !located.empty())update_events(false,located); }
       catch(...) {c=committed;out.events.resize(events_before);throw;}
-      out.steps.push_back({old_time,c.time,trial.error,true,"accepted",trial.energy}); seal();
+      out.steps.push_back({old_time,c.time,trial.error,true,"accepted",trial.energy}); snapshot();
       if(std::binary_search(o.output_times.begin(),o.output_times.end(),c.time) || out.events.size()!=events_before)sample();
     }
     out.valid=true; out.reason="completed";
@@ -359,7 +365,8 @@ TransientResult solve_transient(const Assembly& base,const TransientOptions& o,s
     catch(const Error& e) {out.reason=e.code;out.entity_id=e.entity_id;out.source_map_id=e.source_map_id;}
   if(!out.entity_id.empty() && out.source_map_id.empty() && base.model().data().sources_by_entity.contains(out.entity_id))
     out.source_map_id=base.model().data().source_identities.at(base.model().data().sources_by_entity.at(out.entity_id).front()).source_map_id;
-  if(!out.checkpoint)out.events.clear();
+  if(out.checkpoint)out.checkpoint->checksum=checksum(*out.checkpoint);
+  else out.events.clear();
   out.profile.total_seconds=seconds(started); return out;
 }
 } // namespace fcst::thermal

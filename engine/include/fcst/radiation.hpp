@@ -47,6 +47,7 @@ class Mesh final : public IntersectionBackend {
   const std::vector<Facet>& facets() const;
   const std::vector<Patch>& patches() const;
   std::optional<std::size_t> patch(std::size_t facet, bool back) const;
+  // Retained mesh allocations plus fixed native intersection-cache scratch.
   std::size_t storage_bytes() const;
  private:
   struct Impl;
