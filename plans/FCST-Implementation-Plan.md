@@ -184,6 +184,13 @@ Continue measuring the largest cost, recording keep/revert decisions and failed
 or neutral experiments; the corrected local PCH prototype passed but was slower with higher memory and
 is not adopted.
 
+**Final ordinary checkpoint.** Warm [run 41370540527](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41370540527),
+`e52197d`, passed all 394 records per configuration in 9m 34s, with three Debug
+workers and two Release workers. Debug/Release drivers took 414.500/251.766s;
+aggregate job duration was 2,322s. Deliberately refresh the versioned baseline to
+this complete ordinary run, preserving all prior evidence and frozen workloads.
+The measurement loop remains required for future changes under TST-017/TST-021.
+
 The planned GitHub workflow deliverables are:
 
 | Workflow | Scope and trigger | Runner/evidence |

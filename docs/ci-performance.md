@@ -156,8 +156,8 @@ product performance qualification.
 Optimization resumed after the passing documentation checkpoint `1156dff` in
 [run 41352210980](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41352210980):
 full CI 12m 13s, Debug 578.078s and Release 206.406s, both warm with two workers.
-The versioned baseline now deliberately references that passing run with unchanged
-workload and case retention. The original cold run remains recorded above.
+That intermediate baseline referenced the passing run with unchanged workload
+and case retention; the final refreshed baseline is recorded below. The original cold run remains recorded above.
 
 The first resumed experiment sets Debug to three acceptance workers and leaves
 Release at two. Debug passed in 407.015s versus 578.078s (29.6% shorter), retaining
@@ -290,8 +290,9 @@ Next work, in order:
 1. Retain three Debug workers. Reopen this budget only after a workload/toolchain
    change or a new hypothesis; use the opt-in paired workflow rather than comparing
    unrelated fast/slow runners.
-2. Refresh the warm baseline deliberately from a complete passing ordinary run;
-   retain all prior cold/warm and neutral evidence, never the fastest selected seed.
+2. Use the final warm baseline below for ongoing comparisons. Refresh it only
+   deliberately after a passing ordinary run; retain prior cold/warm and neutral
+   evidence, never the fastest selected seed.
 3. Investigate Embree's remaining compilation cost before further concurrency.
    A local standard-header PCH prototype initially omitted upstream `platform.h`
    initialization and was stopped without a performance claim. The corrected
@@ -341,3 +342,15 @@ add instrumentation. Required seeds, repetitions and assertions remain intact.
 
 Raw diagnostics and usage-account metadata remain local. Only existing sanitized
 scalar reports and reviewed source/documentation are published under TST-021.
+
+## Final ordinary checkpoint
+
+[Run 41370540527](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41370540527),
+commit `e52197d`, passed every required check with warm caches and 394 records per
+configuration. Full workflow: 9m 34s; Debug: 414.500s with three workers; Release:
+251.766s with two; aggregate job duration: 2,322s. This ordinary run deliberately
+refreshes `ci/ci-performance-baseline.json`, retaining the frozen statistical
+workload and all historical cases. It is neither a benchmark-mode incremental
+sample nor the fastest selected hosted run. The original main run was 19m 44s;
+the observed full-workflow reduction is about 51.5%, with shared-runner variation
+and source/coverage differences documented throughout this ledger.
