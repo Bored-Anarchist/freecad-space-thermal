@@ -168,13 +168,17 @@ ray outputs. Package/native compilation uses explicit bounded MSVC budgets.
 An isolated local OCCT four-versus-two compiler pair passed fresh full builds,
 installs and consumers: 274.361s versus 339.676s (19.2% shorter), with higher CPU
 and peak committed memory. Retain four with that tradeoff recorded; exclude the
-earlier overlapped local pair. Debug's four-versus-three acceptance budget needs
-the opt-in single-runner calibration/ABBA workflow described in
+earlier overlapped local pair. The opt-in single-runner calibration/ABBA workflow settled Debug's budget:
+[run 41367494887](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41367494887)
+passed five complete attempts; four-worker median acceptance was 347.820s versus
+321.125s with three, consuming about 15.9% more CPU. Return Debug to three;
+Release remains two and full qualification serial. Repeat only with a new
+measurement hypothesis, following
 [the ongoing experiment record](../docs/ci-performance.md#paired-debug-worker-measurement).
 It repeats every case five times, preserves candidate/source/unit-receipt checks,
 uses bounded deadlines and publishes only individually cleared JSON. The expanded
 inventory has 394 records per configuration. Benchmark summaries are explicitly
-ineligible for ordinary timing baseline refreshes. After evaluating the pair,
+ineligible for ordinary timing baseline refreshes. After the budget decision,
 refresh the baseline deliberately from a complete passing ordinary warm run.
 Continue measuring the largest cost, recording keep/revert decisions and failed
 or neutral experiments; the corrected local PCH prototype passed but was slower with higher memory and

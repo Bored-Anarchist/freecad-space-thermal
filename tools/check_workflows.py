@@ -41,7 +41,7 @@ def validate():
     presets = [row["preset"] for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]]
     assert sorted(presets) == ["windows-debug", "windows-release"], "Windows-only build matrix required"
     budgets = {row["preset"]: row.get("acceptance_jobs") for row in workflow["jobs"]["build"]["strategy"]["matrix"]["include"]}
-    assert budgets == {"windows-debug": "4", "windows-release": "2"}, "Reviewed acceptance worker budgets required"
+    assert budgets == {"windows-debug": "3", "windows-release": "2"}, "Reviewed acceptance worker budgets required"
     assert workflow["jobs"]["gate"]["if"] == "always()", "Aggregate gate can be skipped"
     assert set(workflow["jobs"]["gate"]["needs"]) == {"build", "host", "dependencies", "dwg"}, "Profile jobs absent from required gate"
     native=workflow['jobs']['dwg']['steps']

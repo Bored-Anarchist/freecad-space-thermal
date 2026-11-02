@@ -6,8 +6,7 @@ a smaller qualification tier or move required acceptance to a scheduled workflow
 
 `tools/verify.py --preset windows-release --jobs 2` runs compilation and installation
 before scheduling a bounded number of independent acceptance processes.
-Debug currently uses four workers and Release two; the opt-in paired comparison
-below determines whether Debug should retain four or return to three. Historical stage
+Debug uses three workers and Release two, following the paired comparison below. Historical stage
 costs prioritize long work so expensive application tests do not form a late tail;
 estimates only change order and never remove new or existing work. Each stage receives
 its own temporary directory. The SUNDIALS numerical checkpoint and IDA reference
@@ -272,10 +271,25 @@ dangling symlinks and junctions before copying. The validator change deliberatel
 invalidates the previous cache identity: the first new run is cold; collect a
 subsequent ordinary warm run before refreshing the timing baseline.
 
+The [completed paired run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41367494887)
+passed all five attempts at `65b164a`, each with 394 records on four logical CPUs.
+The four-worker acceptance samples were 352.594/343.046s; the three-worker samples
+321.609/320.641s. Medians were 347.820s versus 321.125s: four was 8.3% slower.
+Mean acceptance CPU consumption was 1,147.930 versus 990.797 seconds, about 15.9%
+higher with four. Return Debug to three. Radiation remained the acceptance tail;
+this paired result supports the decision without treating separate runner timings
+as causal evidence. All seeds, samples and scaling repetitions remained intact.
+
+The ordinary first run after the cache fix also passed all 394 records per
+configuration: [cold run 41367427888](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41367427888),
+8m 16s overall, Debug 287.484s, Release 235.016s, aggregate job duration 2,278s.
+It used the previous four-worker Debug budget; retain that context.
+
 Next work, in order:
 
-1. Finish the paired hosted measurement and retain four Debug workers only if
-   same-runner medians support it without instability or excessive resource cost.
+1. Retain three Debug workers. Reopen this budget only after a workload/toolchain
+   change or a new hypothesis; use the opt-in paired workflow rather than comparing
+   unrelated fast/slow runners.
 2. Refresh the warm baseline deliberately from a complete passing ordinary run;
    retain all prior cold/warm and neutral evidence, never the fastest selected seed.
 3. Investigate Embree's remaining compilation cost before further concurrency.

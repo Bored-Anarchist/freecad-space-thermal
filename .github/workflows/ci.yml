@@ -65,7 +65,7 @@ jobs:
         include:
           - os: windows-2022
             preset: windows-debug
-            acceptance_jobs: 4
+            acceptance_jobs: 3
           - os: windows-2022
             preset: windows-release
             acceptance_jobs: 2

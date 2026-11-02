@@ -402,7 +402,7 @@ class CiPerformanceTests(unittest.TestCase):
             for replacement in (original.replace("path: .local/public-download-cache", "path: .local"),
                                 original.replace("cache_downloads.py seal", "cache_downloads.py prepare"),
                                 original.replace("steps.cache-clear.outcome == 'success'", "true"),
-                                original.replace("acceptance_jobs: 4", "acceptance_jobs: 9"),
+                                original.replace("acceptance_jobs: 3", "acceptance_jobs: 9"),
                                 original.replace("compiler_jobs: 4", "compiler_jobs: 16"),
                                 original.replace("--compiler-jobs ${{ matrix.compiler_jobs }}", ""),
                                 original.replace("steps.benchmark-clear.outcome == 'success'", "true"),
