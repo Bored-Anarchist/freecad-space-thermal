@@ -6,8 +6,8 @@ a smaller qualification tier or move required acceptance to a scheduled workflow
 
 `tools/verify.py --preset windows-release --jobs 2` runs compilation and installation
 before scheduling a bounded number of independent acceptance processes.
-The next hosted experiment uses four workers for Debug and two for Release;
-the passing three-worker reference remains recorded below. Historical stage
+Debug currently uses four workers and Release two; the opt-in paired comparison
+below determines whether Debug should retain four or return to three. Historical stage
 costs prioritize long work so expensive application tests do not form a late tail;
 estimates only change order and never remove new or existing work. Each stage receives
 its own temporary directory. The SUNDIALS numerical checkpoint and IDA reference
@@ -32,7 +32,8 @@ cases. No prior pass verdict is cached.
 
 MSVC package probes retain two MSBuild projects. A separate resumed experiment
 uses four compiler processes per Embree and OCCT project, with two for the other
-packages. OCCT remains under the explicitly recorded budget trial.
+packages. The isolated OCCT comparison below supports retaining four, with its higher
+CPU and committed-memory cost recorded.
 The compiler budget is explicit and recorded with each report. The measured Ninja experiment did not establish a gain and was not
 adopted; the original package configuration, full build, install and fresh
 installed-consumer checks remain. Numerical prototype build directories are stable per checkout and
@@ -183,8 +184,8 @@ MSBuild project is capped at two compiler processes. Test a four-compiler budget
 for Embree with the same full source/options/generator and installed consumer;
 leave other packages at two. This avoids repeating the neutral Ninja migration.
 The full hosted run passed and its substantial build-time/runner-time reduction
-supports retaining four Embree compiler workers. Package peak-memory telemetry is
-not yet collected; record it before increasing budgets further. Never infer a gain
+supports retaining four Embree compiler workers. Subsequent process-tree resource evidence records the CPU and committed-memory
+cost; review it before increasing budgets further. Never infer a gain
 from an incremental local rebuild.
 
 The geometry/checkpoint/native-build candidates passed complete hosted verification
@@ -208,7 +209,7 @@ the slower aggregate sample is retained rather than discarded:
   15.15s to 9.10s. Strict floating point, assertions and Debug runtime checks remain.
   Judge the full clean hosted build, rather than incremental build time.
 
-The next candidate replaces the eager per-facet ray cache with bounded per-row
+The retained implementation replaces the eager per-facet ray cache with bounded per-row
 scratch. A row preloads geometry when the mesh fits its 512 slots; larger meshes
 cache only visited facets and evict by slot. Rows own their scratch, so concurrent
 rows never mutate the mesh. Native cached/uncached comparisons force eviction and
@@ -216,8 +217,7 @@ retain every integer result. At one million facets the new cache replaces
 56,000,032 extra retained bytes with 32,768 bytes of fixed scratch, which remains
 included in `storage_bytes`. Both-order diagnostic pairs retained exact raw rows;
 construction stayed about 28-30s and peak working set fell by about 56 MB. Dense
-trace timings remain close to the eager cache. Judge final timings after hosted
-confirmation; do not claim the small construction differences as a controlled win.
+trace timings remain close to the eager cache. Complete hosted verification passed; do not claim the small construction differences as a controlled win.
 
 The first local OCCT budget pair passed both full builds/consumers but is
 **inconclusive**: CPU/process totals differed unexpectedly and another local build
@@ -225,35 +225,69 @@ overlapped part of the experiment. Do not use that pair to justify a gain. Repea
 fresh builds with four-CPU affinity and an isolated MSBuild worker pool, in reversed
 order, with no concurrent local compiler work.
 
-The next hosted trial changes Debug from three to four acceptance workers and
-OCCT from two to four compiler workers per project. Release stays at two;
-Embree stays at four; full qualification stays serial. The V2 reference above
-shows OCCT averaging about 2.38 CPUs during compilation, while Embree averages
-about 3.94. More OCCT workers may fill unused CPU capacity. Debug's extra worker
-may reduce the acceptance tail; the full workflow remains limited by dependency
-compilation until that cost falls. Keep/revert decisions require complete passing
-runs and review of wall time, runner duration and committed memory, not just a
-single fast stage. The isolated local OCCT comparison is still running.
+The four-worker Debug/OCCT trial passed all 393 records in
+[run 41363285933](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41363285933),
+commit `25c406c`: full CI 10m 28s, Debug 425.610s, Release 164.250s, aggregate
+job duration 2,499s. OCCT build took 292.047s / 1,129.703 CPU seconds / 1.730 GB
+peak job commit. The slower unchanged stages demonstrate runner variation;
+comparing this against the earlier 7m 51s run alone cannot settle Debug's budget.
 
-1. **Measure the next worker budget against the current three-worker result.**
-   Keep Release at two and full qualification serial. Compare four versus three
-   Debug workers only with equivalent warm workloads and toolchains. Preserve all
-   cases, samples, scaling repetitions and deadlines. Retain four only after a
-   complete unattended run reduces the critical path without instability or a
-   material compute/memory penalty; otherwise retain three.
-2. **Measure OCCT compilation using resource evidence.** Its pinned package took
-   426.203s in the latest passing run. Collect the two-compiler baseline's CPU and
-   peak committed memory before testing four per project. Keep the same full
-   source/features, two MSBuild projects, install and independent consumer. Check
-   the aggregate critical path and runner cost; do not retain a neutral change.
-3. **Profile the new Debug thermal/radiation balance.** Inspect per-case and
-   ensemble timings after the geometry/checkpoint changes. Prefer removing
-   repeated invariant work before adding complexity. Keep exact-output tests,
-   energy/event/restart criteria, memory limits and strict Debug behavior.
-4. **Refresh the warm baseline deliberately after the final passing run.** Retain
-   prior cold/warm evidence and identify the run/candidate/workload and worker
-   budgets. Repeat borderline measurements; never choose the fastest seed or
-   automatically raise a baseline to conceal a regression.
+An isolated local OCCT comparison, reversed to four then two compilers with four
+logical CPUs and V2 accounting, passed both fresh full builds/install/consumers.
+Total elapsed time was 274.361s versus 339.676s (19.2% shorter); CPU time was
+941.031s versus 702.953s and peak job commit 1.449 GB versus 0.901 GB. Retain four
+for its measured elapsed-time reduction, recording the higher resource cost.
+This does not establish the same percentage gain on shared hosted hardware.
+
+### Paired Debug worker measurement
+
+Dispatch the existing Foundation workflow with `benchmark_workers=true`; the
+input defaults to false, so ordinary PR checks still execute one full driver per
+configuration. For example:
+
+```text
+gh workflow run ci.yml --repo Bored-Anarchist/freecad-space-thermal --ref codex/accelerate-ci -f benchmark_workers=true
+```
+
+The Debug job performs one complete calibration, then an ABBA comparison of
+three/four workers on that same runner. All five attempts repeat every acceptance
+case, fixed seed, sample count and scaling repetition, and reuse only the approved
+current-run, source-bound unit receipt. The final attempt uses the configured
+budget. Candidate/source changes, missing cases, mixed CPU counts, invalid resource
+records or any failed attempt fail the benchmark. Each attempt has a 20-minute
+deadline and the whole job a 60-minute deadline. Raw subprocess output stays local.
+
+The `worker-benchmark` artifact contains five bounded verification JSON reports
+and `summary.json`, cleared individually immediately before upload. Summaries
+compare acceptance spans after calibration, retain both samples per budget and
+report medians, per-stage durations, CPU and peak committed memory. Preparation
+still runs on each attempt but is excluded from the acceptance comparison.
+Benchmark reports carry `run_mode=worker-benchmark`; the aggregate marks them
+`baseline_eligible=false`. Never refresh an ordinary clean-run baseline from
+these repeated incremental-build timings. The current inventory is 369 unit cases
+plus 25 driver records (394 per configuration).
+
+Cache link validation also checks `lstat` metadata for missing targets, rejecting
+dangling symlinks and junctions before copying. The validator change deliberately
+invalidates the previous cache identity: the first new run is cold; collect a
+subsequent ordinary warm run before refreshing the timing baseline.
+
+Next work, in order:
+
+1. Finish the paired hosted measurement and retain four Debug workers only if
+   same-runner medians support it without instability or excessive resource cost.
+2. Refresh the warm baseline deliberately from a complete passing ordinary run;
+   retain all prior cold/warm and neutral evidence, never the fastest selected seed.
+3. Investigate Embree's remaining compilation cost before further concurrency.
+   A local standard-header PCH prototype initially omitted upstream `platform.h`
+   initialization and was stopped without a performance claim. The corrected
+   header-first prototype passed its fresh full build/install/consumer, checked
+   invalid-PCH diagnostics and clean installed interfaces, but took 629.847s
+   versus 619.017s for the control with four-CPU affinity; build peak job commit
+   increased from 2.684 GB to 2.858 GB. Do not adopt this neutral/slower candidate.
+   Both local overlays and raw logs stay local; no PCH source changes are shipped.
+4. Profile per-case thermal/radiation costs as they move. Preserve exact results,
+   all energy/event/restart criteria, memory limits and strict Debug checks.
 
 Verification command stages, package phases and the aggregate `ci-performance.json`
 now add CPU seconds, peak per-process and aggregate job

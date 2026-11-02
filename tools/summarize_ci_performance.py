@@ -65,6 +65,7 @@ def summarize(directory, baseline, candidate):
     return dict(schema_version=1, candidate=candidate, resource_profile=RESOURCE_PROFILE, baseline_candidate=baseline["candidate"],
                 baseline_run_id=baseline["run_id"], workload_sha256=baseline["workload_sha256"],
                 presets=presets, packages=packages,
+                baseline_eligible=all(p["run_mode"] == "standard" for p in presets.values()),
                 timing_policy="Investigate increases over 20 percent and at least 60 seconds; timing alone is not a correctness failure")
 
 

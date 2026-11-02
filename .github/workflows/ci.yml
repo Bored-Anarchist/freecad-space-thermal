@@ -4,6 +4,11 @@ on:
     branches: [main, 'release/**']
   pull_request:
   workflow_dispatch:
+    inputs:
+      benchmark_workers:
+        description: Run a calibrated paired Debug worker comparison on one runner
+        type: boolean
+        default: false
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
@@ -52,6 +57,7 @@ jobs:
           key: public-downloads-v1-${{ runner.os }}-unit-${{ hashFiles('ci/*.lock', 'ci/probe-sources.json', 'ci/host-profile.json', 'ci/dwg-backend.json', 'ci/pycanha-reference-runtime.json', 'ci/publication-policy.json', 'tools/cache_downloads.py') }}
   build:
     needs: unit
+    timeout-minutes: 60
     name: ${{ matrix.preset }}
     strategy:
       fail-fast: false
@@ -89,7 +95,9 @@ jobs:
       - name: Execute identical local driver
         env:
           FCST_DOWNLOAD_CACHE_STATE: ${{ steps.downloads.outputs.cache-hit == 'true' && 'warm' || 'cold' }}
-        run: python tools/verify.py --preset ${{ matrix.preset }} --jobs ${{ matrix.acceptance_jobs }} --unit-report .local/unit-owner/unit-tests.json
+        run: >-
+          python tools/verify.py --preset ${{ matrix.preset }} --jobs ${{ matrix.acceptance_jobs }} --unit-report .local/unit-owner/unit-tests.json
+          ${{ github.event_name == 'workflow_dispatch' && inputs.benchmark_workers && matrix.preset == 'windows-debug' && '--paired-workers' || '' }}
       - name: Clear exact public reports
         id: clear
         if: always()
@@ -114,6 +122,24 @@ jobs:
             .local/${{ matrix.preset }}/radiation.json
             .local/${{ matrix.preset }}/host.json
             .local/${{ matrix.preset }}/mcp.json
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 30
+      - name: Clear paired worker evidence
+        id: benchmark-clear
+        if: github.event_name == 'workflow_dispatch' && inputs.benchmark_workers && matrix.preset == 'windows-debug'
+        run: python tools/publication_preflight.py --file .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-0.json --file .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-1.json --file .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-2.json --file .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-3.json --file .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-4.json --file .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/summary.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: success() && github.event_name == 'workflow_dispatch' && inputs.benchmark_workers && matrix.preset == 'windows-debug' && steps.benchmark-clear.outcome == 'success'
+        with:
+          name: worker-benchmark
+          path: |
+            .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-0.json
+            .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-1.json
+            .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-2.json
+            .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-3.json
+            .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/attempt-4.json
+            .local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/summary.json
           include-hidden-files: true
           if-no-files-found: error
           retention-days: 30

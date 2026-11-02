@@ -52,6 +52,20 @@ def validate():
     assert "spatial.json" in str(workflow["jobs"]["build"]), "Spatial reports absent"
     assert "jobs.json" in str(workflow["jobs"]["build"]), "WP-06 lifecycle reports absent"
     build_steps = workflow["jobs"]["build"]["steps"]
+    assert workflow["jobs"]["build"]["timeout-minutes"] == "60", "Worker benchmark lacks a bounded job deadline"
+    inputs = workflow["on"]["workflow_dispatch"]["inputs"]
+    assert set(inputs) == {"benchmark_workers"} and inputs["benchmark_workers"]["type"] == "boolean" and inputs["benchmark_workers"]["default"] == "false", "Benchmark must be opt-in"
+    guard = "github.event_name == 'workflow_dispatch' && inputs.benchmark_workers && matrix.preset == 'windows-debug'"
+    assert any(guard + " && '--paired-workers' || ''" in step.get("run", "") for step in build_steps), "Paired driver dispatch guard absent"
+    evidence = ".local/worker-benchmark/${{ github.run_id }}-${{ github.run_attempt }}/*.json"
+    exact_files = [evidence.replace("*.json", f"attempt-{i}.json") for i in range(5)] + [evidence.replace("*.json", "summary.json")]
+    uploads = [(index, step) for index, step in enumerate(build_steps) if step.get("with", {}).get("name") == "worker-benchmark"]
+    assert len(uploads) == 1, "Paired evidence upload missing or duplicated"
+    index, upload = uploads[0]
+    clearance = build_steps[index-1]
+    assert (upload["with"]["path"].splitlines() == exact_files and upload["if"] == "success() && " + guard + " && steps.benchmark-clear.outcome == 'success'"
+            and clearance.get("id") == "benchmark-clear" and clearance.get("if") == guard
+            and clearance.get("run") == "python tools/publication_preflight.py" + "".join(" --file " + path for path in exact_files)), "Paired evidence lacks exact clearance"
     assert workflow["jobs"]["build"]["needs"] == "unit", "Unit receipt lacks a current-run owner"
     assert any('--unit-report .local/unit-owner/unit-tests.json' in step.get('run','') and '--jobs ${{ matrix.acceptance_jobs }}' in step['run'] for step in build_steps), "Bounded current-run verification absent"
     units = workflow["jobs"]["unit"]["steps"]

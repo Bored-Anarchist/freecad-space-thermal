@@ -9,6 +9,8 @@ import sys
 import tempfile
 import threading
 import subprocess
+import stat
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
@@ -20,6 +22,7 @@ from fcst_tools.ci_performance import compare, workload_hash
 import cache_downloads
 import check_workflows
 import summarize_ci_performance
+import benchmark_ci_workers
 from profile_support import run
 from fcst_tools.profiles import RESOURCE_PROFILE
 
@@ -28,6 +31,38 @@ SCRATCH.mkdir(parents=True, exist_ok=True)
 
 
 class CiPerformanceTests(unittest.TestCase):
+    def test_worker_benchmark_rejects_incomplete_stale_or_mixed_runner_pairs(self):
+        stages = benchmark_ci_workers.STEPS
+        expected = ["synthetic.unit"] + stages
+        baseline = dict(required_case_ids=expected, presets={"windows-debug": dict(driver_seconds=100,
+                        stage_seconds={name: 1 for name in stages})})
+        reports = []
+        for jobs in [4, 4, 3, 3, 4]:
+            records = [dict(id="synthetic.unit", status="passed")]
+            for index, name in enumerate(stages):
+                acceptance = name in stages[stages.index("contract-conformance"):]
+                duration = (2 if jobs == 3 else 1) if acceptance else 1
+                start = 10+(index-stages.index("contract-conformance"))*duration if acceptance else 0
+                row = dict(id=name, status="passed", seconds=duration, started_seconds=start)
+                if name != "engine-only":
+                    row["resources"] = dict(cpu_seconds=.5, peak_process_commit_bytes=1000, peak_job_commit_bytes=2000, total_processes=2)
+                records.append(row)
+            reports.append(dict(candidate="a"*40, preset="windows-debug", cases=records, gate=evaluate(expected, records),
+                execution=dict(jobs=jobs, seconds=100, logical_cpus=4, resource_profile=RESOURCE_PROFILE, run_mode="worker-benchmark")))
+        def check(values): return benchmark_ci_workers.analyze(values, 4, baseline, "a"*40, expected)
+        self.assertEqual(check(reports)["four_vs_three_ratio"], .5)
+        for change in ("missing", "candidate", "coverage", "jobs", "cpu", "profile", "time", "identity"):
+            damaged = deepcopy(reports)
+            if change == "missing": damaged.pop()
+            if change == "candidate": damaged[2]["candidate"] = "b"*40
+            if change == "coverage": damaged[2]["cases"].pop()
+            if change == "jobs": damaged[2]["execution"]["jobs"] = 4
+            if change == "cpu": damaged[2]["execution"]["logical_cpus"] = 8
+            if change == "profile": damaged[2]["execution"].pop("resource_profile")
+            if change == "time": damaged[2]["cases"][-1]["started_seconds"] = float("nan")
+            if change == "identity": damaged[2]["cases"][-1]["resources"]["process_id"] = 1
+            with self.subTest(change=change), self.assertRaises(ValueError): check(damaged)
+
     def test_build_accounting_includes_exited_descendants_and_only_scalar_metrics(self):
         with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
             resources = {"stale": "must be removed"}
@@ -117,6 +152,12 @@ class CiPerformanceTests(unittest.TestCase):
                 (reports / ("dependency-builds-"+name+".json")).write_text(json.dumps(dict(platform="Windows", candidate="a"*40, candidates=[record])), encoding="utf-8")
             with patch.object(summarize_ci_performance, "ROOT", root):
                 result = summarize_ci_performance.summarize(reports, baseline, "a"*40)
+                self.assertTrue(result["baseline_eligible"])
+                debug_path = reports / "windows-debug/verification.json"; original_debug = debug_path.read_bytes()
+                benchmark_report = json.loads(original_debug); benchmark_report["execution"]["run_mode"] = "worker-benchmark"
+                debug_path.write_text(json.dumps(benchmark_report), encoding="utf-8")
+                self.assertFalse(summarize_ci_performance.summarize(reports, baseline, "a"*40)["baseline_eligible"])
+                debug_path.write_bytes(original_debug)
                 self.assertEqual(set(result["packages"]), {"sundials", "embree", "hdf5", "occt"})
                 self.assertEqual(result["packages"]["embree"]["stage_resources"]["build"]["cpu_seconds"], 2)
                 verification = reports / "windows-debug/verification.json"; original_verification = verification.read_bytes()
@@ -313,6 +354,19 @@ class CiPerformanceTests(unittest.TestCase):
             self.assertEqual(source.stat().st_size, size)
             source.write_bytes(b"locally modified")
             with self.assertRaises(ValueError): cache_downloads.seal(cache, locks, archives)
+        for mode, attributes in ((stat.S_IFLNK, 0), (stat.S_IFDIR, 0x400)):
+            with tempfile.TemporaryDirectory(dir=SCRATCH) as directory:
+                cache, locks, archives = self.cache_fixture(Path(directory))
+                cache_downloads.seal(cache, locks, archives)
+                destination = archives[0][0]; destination.unlink()
+                original_lstat = Path.lstat
+                def dangling_link(path, *args, **kwargs):
+                    if path == destination:
+                        return SimpleNamespace(st_mode=mode, st_file_attributes=attributes)
+                    return original_lstat(path, *args, **kwargs)
+                with patch.object(Path, "lstat", dangling_link), self.assertRaises(ValueError):
+                    cache_downloads.restore(cache, archives)
+                self.assertFalse(destination.exists())
 
     def test_cache_rejects_tampered_wheels_unlisted_files_and_objects(self):
         for change in ("wheel-bytes", "wheel-pin", "log", "nested", "object", "object-size", "hard-link"):
@@ -350,7 +404,9 @@ class CiPerformanceTests(unittest.TestCase):
                                 original.replace("steps.cache-clear.outcome == 'success'", "true"),
                                 original.replace("acceptance_jobs: 4", "acceptance_jobs: 9"),
                                 original.replace("compiler_jobs: 4", "compiler_jobs: 16"),
-                                original.replace("--compiler-jobs ${{ matrix.compiler_jobs }}", "")):
+                                original.replace("--compiler-jobs ${{ matrix.compiler_jobs }}", ""),
+                                original.replace("steps.benchmark-clear.outcome == 'success'", "true"),
+                                original.replace("inputs.benchmark_workers", "true")):
                 path.write_text(replacement, encoding="utf-8")
                 with patch.object(check_workflows, "ROOT", root), self.assertRaises(AssertionError):
                     check_workflows.validate()

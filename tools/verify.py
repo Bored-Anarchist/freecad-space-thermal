@@ -38,9 +38,15 @@ def main():
     parser.add_argument("--preset", choices=["windows-debug", "windows-release"], default="windows-debug")
     parser.add_argument("--jobs", type=int, choices=range(1, 5), default=2)
     parser.add_argument("--unit-report", type=Path, help="Exact unit receipt downloaded from this CI run")
+    parser.add_argument("--paired-workers", action="store_true", help="Calibrate then compare three/four Debug workers on this runner")
     args = parser.parse_args()
     if platform.system() != "Windows":
         parser.error("macOS and Linux verification is an uncommitted stretch goal outside the work packages")
+    if args.paired_workers:
+        if args.preset != "windows-debug" or args.tier != "fast" or args.jobs not in (3, 4) or args.unit_report is None:
+            parser.error("paired workers require Debug fast tier, three/four jobs and a current unit receipt")
+        from benchmark_ci_workers import run
+        return run(args.jobs, args.unit_report.resolve())
     manifest = json.loads((ROOT / "ci/coverage.json").read_text())
     output = ROOT / ".local" / args.preset
     output.mkdir(parents=True, exist_ok=True)
@@ -212,6 +218,7 @@ def main():
               "python": platform.python_version(), "os": platform.system(), "machine_arch": platform.machine(),
               "execution": {"jobs": jobs, "seconds": round(time.monotonic() - started, 3),
                             "resource_profile": RESOURCE_PROFILE,
+                            "run_mode": "worker-benchmark" if os.environ.get("FCST_VERIFICATION_MODE") == "worker-benchmark" else "standard",
                             "logical_cpus": os.cpu_count(),
                             "unit_seconds": unit_seconds, "unit_source": "current-run-receipt" if args.unit_report else "local",
                             "cache_state": os.environ.get("FCST_DOWNLOAD_CACHE_STATE", "unknown")

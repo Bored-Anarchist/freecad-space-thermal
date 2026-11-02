@@ -57,9 +57,12 @@ def compare(report, baseline, candidate, expected, stages):
     logical_cpus = report["execution"].get("logical_cpus")
     if logical_cpus is not None and (type(logical_cpus) is not int or not 1 <= logical_cpus <= 1024):
         raise ValueError("ci_performance_logical_cpus")
+    run_mode = report["execution"].get("run_mode", "standard")
+    if run_mode not in ("standard", "worker-benchmark"):
+        raise ValueError("ci_performance_run_mode")
     return dict(driver=change(old["driver_seconds"], elapsed),
                 stages={name: change(old["stage_seconds"].get(name, 0), timing[name]) for name in stages},
                 required_cases=len(expected), jobs=report["execution"]["jobs"],
-                logical_cpus=logical_cpus, stage_resources=resources,
+                logical_cpus=logical_cpus, stage_resources=resources, run_mode=run_mode,
                 cache_state=cache_state, baseline_cache_state=baseline.get("cache_state", "unknown"),
                 longest_stage=max(stages, key=timing.get))

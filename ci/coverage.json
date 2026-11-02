@@ -368,7 +368,8 @@
     "test_ci_performance.CiPerformanceTests.test_workload_digest_binds_seeds_sizes_and_fixtures_but_allows_more_native_regressions",
     "test_ci_performance.CiPerformanceTests.test_summary_requires_both_configurations_and_each_current_package",
     "test_ci_performance.CiPerformanceTests.test_build_accounting_includes_exited_descendants_and_only_scalar_metrics",
-    "test_ci_performance.CiPerformanceTests.test_build_accounting_timeout_terminates_owned_descendants"
+    "test_ci_performance.CiPerformanceTests.test_build_accounting_timeout_terminates_owned_descendants",
+    "test_ci_performance.CiPerformanceTests.test_worker_benchmark_rejects_incomplete_stale_or_mixed_runner_pairs"
   ],
   "full_prerequisites": [
     "freecad-exact-build-smoke",

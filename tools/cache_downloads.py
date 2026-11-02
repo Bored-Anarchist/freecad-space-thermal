@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import re
 import shutil
+import stat
 import subprocess
 import sys
 
@@ -27,8 +28,11 @@ def digest(path):
 
 def no_links(path):
     for parent in (path, *path.parents):
-        if parent.exists() and (parent.is_symlink() or
-                getattr(parent.stat(), "st_file_attributes", 0) & 0x400):
+        try:
+            info = parent.lstat()
+        except FileNotFoundError:
+            continue
+        if stat.S_ISLNK(info.st_mode) or getattr(info, "st_file_attributes", 0) & 0x400:
             raise ValueError("download_cache_link")
 
 

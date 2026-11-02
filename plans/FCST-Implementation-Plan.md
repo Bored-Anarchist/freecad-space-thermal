@@ -154,48 +154,31 @@ Inside FreeCAD, application dispatch runs on the host's owning thread for docume
 8. **Verify repository settings automatically.** Add a settings checker for remote identity, required branch checks, workflow permissions, supported protection settings, runner restrictions and release-to-commit evidence links. Unavailable permissions, protection features or licensed runners are reported as setup blockers, not silently relaxed. Review of repository access or a release decision does not make the user responsible for executing tests.
 9. **Continuously reduce feedback time (TST-017).** Treat CI runtime as an ongoing engineering constraint for every feature and verification change. Inspect the passing aggregate's `ci-performance.json` and GitHub critical path; target the largest measured cost, state an experiment, and verify the result unattended. Preserve all coverage, statistical/scaling workloads, numerical criteria, assertions and both Windows configurations. Compare equivalent cold/warm states and toolchains, account for setup/queue time and runner minutes, and repeat noisy comparisons when needed. Investigate increases over 20% and at least 60 seconds and record their disposition. Keep a source/run-bound baseline and sanitized experiment ledger in [the CI performance guide](../docs/ci-performance.md); refresh baselines deliberately after passing evidence, never to hide regressions. The working target is full warm Foundation feedback within ten minutes, without claiming reference-hardware product qualification.
 
-**CI improvement checkpoint, 1 November 2026.** Commit `ac3003d` passed every
-required check in [the recorded warm run](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41350452498):
-full CI 12m 45s, Debug verification 9m 53s and Release verification 4m 14s, with
-391 required records per configuration. Preserve this tested implementation.
-Optimization has resumed from the passing warm documentation checkpoint
-`1156dff` ([run 41352210980](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41352210980)):
-12m 13s overall, Debug 578.078s and Release 206.406s with two workers. The timing
-baseline is deliberately refreshed to that compatible passing warm run; retain
-the original cold evidence in the ledger/history. Evaluate three Debug workers
-against this reference, leaving Release at two and full qualification serial.
-Local matched Debug tests support removing unused derivative allocations
-(two-node/heater/checkpoint 13-16% shorter with unchanged acceptance). Verify exact
-balance parity and complete hosted acceptance before retaining it. Separately
-measure four MSVC compiler processes for Embree's largest project, leaving other
-package budgets and all source/features/installed consumers unchanged. Record
-both outcomes and runner cost before deciding what to retain. Additional local
-candidates cache invariant triangle-intersection geometry with explicit memory
-accounting, defer checkpoint hashing until synchronous return of the retained
-committed snapshot, and enable two-compiler native builds. Require exact hit/output
-comparisons, near-parallel and partial-failure restart/tamper regressions, unchanged
-memory/physics criteria and full hosted acceptance before retaining these changes. Follow the acceptance, privacy and keep/revert rules in
-[the ongoing experiment record](../docs/ci-performance.md#resumed-experiments-and-next-work).
-Radiation native-case and ensemble build/trace scalar timings extend the existing
-public evidence for future diagnosis; raw outputs and account diagnostics remain
-local. TST-021 continues to clear exact
-sanitized sources, scalar evidence and outgoing history before publication.
+**CI improvement checkpoint, 1 November 2026.** The implementation preserves all
+required numerical/statistical/scaling, host, package and both Windows checks.
+The original full CI took 19m 44s; passing warm optimized runs range from 7m 51s
+to 11m 03s, with substantial shared-runner variation. The latest four-worker trial,
+[run 41363285933](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41363285933)
+(`25c406c`), passed all 393 records per configuration in 10m 28s. Retained changes
+remove repeated unit/native execution, derivative allocations, checkpoint hashing,
+BVH construction work and per-ray allocations. Bounded row scratch replaces the
+intermediate per-facet cache, saving about 56 MB at one million facets with exact
+ray outputs. Package/native compilation uses explicit bounded MSVC budgets.
 
-**Resumed passing checkpoint.** [Run 41356914583](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41356914583),
-commit `f44ab6b`, passed every required check in 8m 58s (warm); Debug 351.812s,
-Release 254.500s. Embree's build shortened from 573.719s to 321.860s with four
-compiler processes. Aggregate job duration dropped from 2,690s to 2,331s between
-the identified three-worker runs. Keep the measured allocation/compiler changes;
-next validate the geometry-cache, final checkpoint hashing and native compilation
-candidates, then remeasure the moving OCCT/Debug critical path.
-
-**V2 reference and next budget trial.** [Run 41362070826](https://github.com/Bored-Anarchist/freecad-space-thermal/actions/runs/41362070826),
-commit `8ad7ee1`, passed all required checks in 7m 51s (warm), with 393 records per
-configuration. Debug took 252.032s at three workers; Release 231.578s at two.
-Embree/OCCT builds took 379.657/308.016s; OCCT averaged about 2.38 CPUs on a
-four-CPU runner. Evaluate four Debug workers and four OCCT compiler workers
-against this reference with all coverage and criteria intact. The isolated local
-OCCT pair remains pending; do not treat earlier inconclusive timings as a win.
+An isolated local OCCT four-versus-two compiler pair passed fresh full builds,
+installs and consumers: 274.361s versus 339.676s (19.2% shorter), with higher CPU
+and peak committed memory. Retain four with that tradeoff recorded; exclude the
+earlier overlapped local pair. Debug's four-versus-three acceptance budget needs
+the opt-in single-runner calibration/ABBA workflow described in
+[the ongoing experiment record](../docs/ci-performance.md#paired-debug-worker-measurement).
+It repeats every case five times, preserves candidate/source/unit-receipt checks,
+uses bounded deadlines and publishes only individually cleared JSON. The expanded
+inventory has 394 records per configuration. Benchmark summaries are explicitly
+ineligible for ordinary timing baseline refreshes. After evaluating the pair,
+refresh the baseline deliberately from a complete passing ordinary warm run.
+Continue measuring the largest cost, recording keep/revert decisions and failed
+or neutral experiments; the corrected local PCH prototype passed but was slower with higher memory and
+is not adopted.
 
 The planned GitHub workflow deliverables are:
 
@@ -223,14 +206,16 @@ nonfinite values and inconsistent peaks. Execute the complete unit suite, pinned
 package build/install/consumer probes and exact-source/report/history preflights.
 Profile `windows-job-v2` disables external MSBuild worker reuse in explicit and
 inherited environments so accounting and per-stage temp isolation do not depend
-on a pre-existing process pool. Keep V1/V2 measurements distinct. A first local
-OCCT pair with inconsistent CPU/process totals remains inconclusive and must be
-repeated under isolated conditions. The bounded row-cache candidate preserves
+on a pre-existing process pool. Keep V1/V2 measurements distinct. The first overlapped local OCCT pair remains inconclusive; the later isolated
+pair and its CPU/memory tradeoffs are recorded in the performance guide. The bounded row-cache candidate preserves
 exact ray results while replacing per-facet retained storage with accounted fixed
-scratch; require full hosted confirmation and every existing scaling repetition.
+scratch; retain its passing hosted confirmation and every existing scaling repetition.
 This extends TST-021 without uploading process identities, paths, environment or
-raw logs and without relaxing build, numerical or memory acceptance. Collect a
-passing two-compiler OCCT resource baseline before increasing its budget.
+raw logs and without relaxing build, numerical or memory acceptance. Keep the paired OCCT resource baseline when reviewing its four-compiler budget.
+The cache validator rejects dangling links/reparse points using metadata even
+when the destination target is missing. Paired-worker artifacts clear the five
+exact verification JSON files and summary immediately before upload; raw logs
+remain local. Missing clearance or unsafe resource metadata fails unattended.
 
 Continued CI improvement adds a source/run-bound timing baseline, frozen
 fixture/statistical workload digest, relative stage starts and dependency
@@ -255,7 +240,7 @@ verdicts remain excluded. General scanner patterns and binary rejection remain
 unchanged. Execute `tests/test_ci_performance.py`, the complete unit owner and
 Publication security scope; reject corrupt/unlisted cache files, stale or
 incomplete candidate/source-bound unit receipts, native inventory substitution,
-unsafe cache paths and upload without clearance. Two bounded acceptance workers
+unsafe cache paths and upload without clearance. Bounded acceptance workers
 use isolated temporary directories and serialize mutable reference preparation;
 full qualification remains serial. Scan exact changed sources, workflow/policy,
 unit receipts, plan/register/prose and outgoing history before publication.
